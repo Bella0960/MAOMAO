@@ -1,0 +1,493 @@
+:root {
+  --desktop-bg: #ffffff;
+  --ink: #222222;
+  --muted: #888888;
+  --screen: #ffffff;
+  --purple: #444444;
+  --cyan: #666666;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: #2C2C2E !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", 'PingFang SC', sans-serif;
+  background: #ffffff !important;
+}
+
+body::before, body::after {
+  display: none !important;
+}
+
+button { color: inherit; font: inherit; }
+
+.simulator-stage {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 36px 20px 30px;
+  background: #ffffff !important;
+}
+
+/* 一、 桌面背景与外框 */
+.phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 24px));
+  height: min(844px, calc(100vh - 96px));
+  border: 8px solid #ffffff !important;
+  border-radius: 45px !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+  overflow: hidden;
+}
+
+.phone::before, .phone::after {
+  display: none !important;
+}
+
+.phone-camera {
+  position: absolute;
+  z-index: 3;
+  top: 18px;
+  left: 50%;
+  width: 80px;
+  height: 22px;
+  border-radius: 12px;
+  background: #f0f0f0 !important;
+  border: 1px solid rgba(0,0,0,0.04) !important;
+  transform: translateX(-50%);
+}
+
+.phone-camera::after {
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d8d8d8 !important;
+  box-shadow: none !important;
+  content: '';
+}
+
+/* 屏幕背景层：纯白默认，使用 --desktop-bg 变量预留壁纸 */
+.phone-screen,
+.bg-layer,
+.app-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 37px !important;
+  border: none !important;
+  background-color: #ffffff !important;
+  background-image: var(--desktop-bg-img, none) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  color: #222222 !important;
+}
+
+.phone-screen {
+  flex: 1;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 27px 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  color: #333333 !important;
+}
+
+.status-icons { display: flex; align-items: center; gap: 10px; }
+.signal-icon { display: flex; align-items: end; gap: 2px; height: 12px; }
+.signal-icon i { display: block; width: 3px; border-radius: 2px; background: #333333 !important; }
+.signal-icon i:nth-child(1) { height: 4px; opacity: .4; }
+.signal-icon i:nth-child(2) { height: 6px; opacity: .6; }
+.signal-icon i:nth-child(3) { height: 9px; opacity: .8; }
+.signal-icon i:nth-child(4) { height: 12px; opacity: 1; }
+
+.wifi-icon {
+  width: 16px;
+  height: 11px;
+  border: 1.2px solid transparent !important;
+  border-top-color: #333333 !important;
+  border-radius: 50% 50% 0 0;
+  transform: translateY(3px);
+}
+.wifi-icon::after {
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin: 5px auto 0;
+  border-radius: 50%;
+  background: #333333 !important;
+  content: '';
+}
+
+.battery-icon {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 11px;
+  border: 1.2px solid #333333 !important;
+  border-radius: 3px;
+}
+.battery-icon::after {
+  position: absolute;
+  top: 3px;
+  right: -3px;
+  width: 2px;
+  height: 4px;
+  border-radius: 0 2px 2px 0;
+  background: #333333 !important;
+  content: '';
+}
+.battery-icon b {
+  display: block;
+  width: 15px;
+  height: 7px;
+  margin: 1px;
+  border-radius: 1px;
+  background: #333333 !important;
+}
+
+/* 主屏区域 */
+.home-screen {
+  flex: 1;
+  padding: 44px 16px 10px;
+  background: transparent !important;
+}
+
+/* 二、 透明时钟组件 */
+.clock-widget {
+  text-align: center;
+  margin-bottom: 22px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.clock-display {
+  font-size: 56px !important;
+  font-weight: 100 !important;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #2C2C2E !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+.clock-meta {
+  margin-top: 6px;
+  font-size: 12px !important;
+  font-weight: 300 !important;
+  color: #888888 !important;
+  letter-spacing: 0.02em;
+}
+
+/* 四、 桌面挂件区（韩系氛围磨砂玻璃卡片） */
+.korean-widgets {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.widget-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  border-radius: 12px !important;
+  background: var(--icon-bg, rgba(255, 255, 255, 0.6)) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .15s ease, background-color .2s ease;
+}
+.widget-card:hover {
+  transform: translateY(-1px);
+}
+.widget-card:active {
+  transform: scale(0.98);
+}
+
+.widget-kaomoji {
+  font-size: 13px;
+  font-weight: 300;
+  color: #555555;
+  letter-spacing: 0.04em;
+}
+
+.widget-motto {
+  font-size: 12px;
+  font-weight: 300;
+  color: #666666;
+  letter-spacing: 0.02em;
+}
+
+/* 三、 桌面图标 */
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px 10px;
+}
+
+.app-card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+.app-card:hover, .app-card:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* 图标容器：50px x 50px，圆角 14px，半透明磨砂玻璃 */
+.app-icon {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 14px !important;
+  background: var(--icon-bg, rgba(255, 255, 255, 0.6)) !important;
+  backdrop-filter: var(--icon-blur, blur(12px)) !important;
+  -webkit-backdrop-filter: var(--icon-blur, blur(12px)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+  overflow: hidden;
+  transition: background-color .2s ease;
+}
+
+/* 图标 SVG：尺寸 22px，颜色 #666，线条粗细 1.5 */
+.app-icon svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke: #666666 !important;
+  stroke-width: 1.5 !important;
+  color: #666666 !important;
+  fill: none !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 图标下方文字：10px，颜色 #666，字重 300 */
+.app-name {
+  color: #666666 !important;
+  font-size: 10px !important;
+  font-weight: 300 !important;
+  letter-spacing: 0.02em;
+}
+
+/* 五、 底部 Dock 栏（悬浮圆角长方形磨砂玻璃栏） */
+.dock-wrapper {
+  padding: 0 16px 8px;
+  background: transparent !important;
+}
+
+.dock-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 58px;
+  border-radius: 20px !important;
+  background: var(--icon-bg, rgba(255, 255, 255, 0.65)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 12px;
+  transition: background-color .2s ease;
+}
+
+.dock-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent !important;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform .2s ease;
+}
+.dock-item:hover, .dock-item:focus-visible {
+  transform: scale(1.08);
+  outline: none;
+}
+
+.dock-item svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke: #555555 !important;
+  stroke-width: 1.5 !important;
+  color: #555555 !important;
+  fill: none !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gesture-bar {
+  width: 90px;
+  height: 4px;
+  margin: 0 auto 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+
+.stage-caption {
+  margin: 18px 0 0;
+  color: #aaaaaa !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  letter-spacing: .25em;
+}
+.stage-caption span {
+  color: #666666 !important;
+}
+
+.toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-radius: 12px;
+  color: #2C2C2E !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity .25s, transform .25s;
+}
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* 弹窗通用样式 */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 290px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2C2C2E;
+  text-align: center;
+}
+
+.modal-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  background: #f7f7f7;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.modal-input:focus {
+  border-color: #999;
+  background: #fff;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.modal-btn:active {
+  opacity: 0.8;
+}
+
+.btn-cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.btn-confirm {
+  background: #222;
+  color: #fff;
+}
+
+@media (max-height: 800px) {
+  .home-screen { padding-top: 36px; }
+  .clock-widget { margin-bottom: 16px; }
+  .korean-widgets { margin-bottom: 18px; }
+  .app-grid { gap: 16px 10px; }
+}
+
+@media (max-width: 420px) {
+  .simulator-stage { padding: 12px 6px 16px; }
+}

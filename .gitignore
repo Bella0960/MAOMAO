@@ -1,0 +1,43 @@
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ===== 编辑器 / IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== 依赖与构建产物 =====
+node_modules/
+dist/
+build/
+.cache/
+
+# ===== 密钥 / 环境变量 / 隐私文件（重点防护，禁止上传） =====
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*secret*
+*credentials*
+*token*
+api_config*.json
+
+# ===== 日志与临时文件 =====
+*.log
+logs/
+*.tmp
+*.bak
+*.old
+
+# ===== 杂项 =====
+.zip
+.rar
+.7z

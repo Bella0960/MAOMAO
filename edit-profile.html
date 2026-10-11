@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑资料 · 小手机</title>
+    <style>
+        /* 全局重置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 手机外壳 */
+        .phone-mockup {
+            position: relative;
+            width: min(390px, calc(100vw - 24px));
+            height: min(844px, calc(100vh - 24px));
+            min-height: 0;
+            background-color: #F7F7F9;
+            border-radius: 45px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            border: 8px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            z-index: 50;
+        }
+
+        /* 顶部导航 */
+        .ep-header {
+            padding: 54px 16px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: #F7F7F9;
+        }
+        .ep-back {
+            position: absolute;
+            left: 16px;
+            top: 54px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #333333;
+            text-decoration: none;
+        }
+        .ep-back svg { width: 22px; height: 22px; }
+        .ep-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+        }
+
+        /* 滚动内容区 */
+        .ep-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px 16px;
+            scrollbar-width: none;
+        }
+        .ep-content::-webkit-scrollbar { display: none; }
+
+        /* 图片上传区 */
+        .ep-cover {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            background-color: #F2F2F7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            transition: background-color 0.2s ease;
+        }
+        .ep-cover:active { background-color: #E5E5EA; }
+        .ep-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ep-cover .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #8E8E93;
+            font-size: 11px;
+        }
+        .ep-cover .upload-hint svg { width: 20px; height: 20px; }
+
+        .ep-avatar-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .ep-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #F2F2F7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.15s ease;
+        }
+        .ep-avatar:active { transform: scale(0.96); }
+        .ep-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ep-avatar svg { width: 34px; height: 34px; }
+
+        /* 表单 */
+        .ep-field { margin-bottom: 14px; }
+        .ep-field label {
+            display: block;
+            font-size: 12px;
+            color: #8E8E93;
+            margin-bottom: 6px;
+        }
+        .ep-field input,
+        .ep-field textarea,
+        .ep-field select {
+            width: 100%;
+            background-color: #F2F2F7;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            height: 44px;
+            padding: 0 14px;
+            font-size: 14px;
+            color: #333333;
+            font-family: inherit;
+        }
+        .ep-field input::placeholder,
+        .ep-field textarea::placeholder { color: #B0B0B5; }
+        .ep-field textarea {
+            height: auto;
+            min-height: 100px;
+            padding: 12px 14px;
+            line-height: 1.6;
+            resize: none;
+        }
+        .ep-field input[type="date"] {
+            color: #333333;
+            -webkit-appearance: none;
+            appearance: none;
+            text-align: left;
+        }
+        .ep-field input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0.45;
+        }
+        .ep-field select {
+            width: 100%;
+            height: 44px;
+        }
+
+        /* select 自定义箭头 */
+        .select-wrap { position: relative; }
+        .select-wrap select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 38px;
+            cursor: pointer;
+        }
+        .select-wrap svg {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #8E8E93;
+            pointer-events: none;
+        }
+
+        /* 底部固定保存按钮（flex 底栏，与内容区左右对齐） */
+        .ep-footer {
+            flex-shrink: 0;
+            padding: 10px 16px 22px;
+            background: rgba(247, 247, 249, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .ep-save {
+            width: 100%;
+            height: 48px;
+            background-color: #1C1C1E;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .ep-save:hover { background-color: #2C2C2E; }
+        .ep-save:active { transform: scale(0.99); }
+        .ep-save:disabled {
+            background-color: #8E8E93;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-mockup">
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>4:41</span>
+        </div>
+
+        <!-- 顶部导航 -->
+        <header class="ep-header">
+            <a class="ep-back" href="profile.html" aria-label="返回">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </a>
+            <h1 class="ep-title">编辑资料</h1>
+        </header>
+
+        <!-- 表单内容 -->
+        <main class="ep-content">
+
+            <!-- 封面图 -->
+            <div class="ep-cover" id="coverBox" title="点击上传封面">
+                <div class="upload-hint" id="coverHint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <span>上传封面图</span>
+                </div>
+            </div>
+            <input type="file" id="coverInput" accept="image/*" style="display:none;">
+
+            <!-- 头像 -->
+            <div class="ep-avatar-row">
+                <div class="ep-avatar" id="avatarBox" title="点击上传头像">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+
+            <!-- 可扩展表单：新增字段只需在 form 内加带 name 的控件 -->
+            <form id="profileForm" onsubmit="return false;">
+                <div class="ep-field">
+                    <label for="f-nickname">昵称</label>
+                    <input type="text" id="f-nickname" name="nickname" maxlength="20" placeholder="输入昵称">
+                </div>
+                <div class="ep-field">
+                    <label for="f-sign">个性签名</label>
+                    <input type="text" id="f-sign" name="sign" maxlength="40" placeholder="一句话介绍自己">
+                </div>
+                <div class="ep-field">
+                    <label for="f-wechat">微信号 / ID</label>
+                    <input type="text" id="f-wechat" name="wechatId" maxlength="30" placeholder="设置微信号">
+                </div>
+                <div class="ep-field">
+                    <label for="f-about">关于我 / 用户人设</label>
+                    <textarea id="f-about" name="about" maxlength="500" placeholder="描述你的身份、性格、背景等（可用于 AI 提示词）"></textarea>
+                </div>
+                <div class="ep-field">
+                    <label for="f-gender">性别</label>
+                    <div class="select-wrap">
+                        <select id="f-gender" name="gender">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                            <option value="保密" selected>保密</option>
+                        </select>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                </div>
+                <div class="ep-field">
+                    <label for="f-birthday">生日</label>
+                    <input type="date" id="f-birthday" name="birthday">
+                </div>
+            </form>
+
+        </main>
+
+        <!-- 底部固定按钮 -->
+        <footer class="ep-footer">
+            <button class="ep-save" id="btnSave" type="button">保存修改</button>
+        </footer>
+
+    </div>
+
+    <script>
+        /* ================= 数据层 ================= */
+        var PROFILE_KEY = 'myProfile';
+        // 图片数据独立暂存（编辑中），保存时合并进 myProfile
+        var pendingAvatar = '';
+        var pendingCover = '';
+
+        function loadProfile() {
+            try {
+                var raw = localStorage.getItem(PROFILE_KEY);
+                if (raw) {
+                    var obj = JSON.parse(raw);
+                    if (obj && typeof obj === 'object') return obj;
+                }
+            } catch (e) {}
+            return {};
+        }
+
+        /* ================= 图片压缩（统一工具函数） ================= */
+        // mode: 'cover' 居中裁剪为目标正方形；'contain' 等比缩放到最大边界内
+        function compressImage(file, maxW, maxH, mode, cb) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                    try {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        var w = img.width, h = img.height;
+
+                        if (mode === 'cover') {
+                            var size = Math.min(w, h);
+                            canvas.width = maxW;
+                            canvas.height = maxH;
+                            var sx = (w - size) / 2;
+                            var sy = (h - size) / 2;
+                            ctx.drawImage(img, sx, sy, size, size, 0, 0, maxW, maxH);
+                        } else {
+                            var scale = Math.min(1, maxW / w, maxH / h);
+                            canvas.width = Math.round(w * scale);
+                            canvas.height = Math.round(h * scale);
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        }
+                        cb(canvas.toDataURL('image/jpeg', 0.7));
+                    } catch (err) {
+                        alert('图片处理失败，请更换图片重试');
+                        cb('');
+                    }
+                };
+                img.onerror = function () {
+                    alert('图片读取失败，请检查文件格式');
+                    cb('');
+                };
+                img.src = ev.target.result;
+            };
+            reader.onerror = function () { cb(''); };
+            reader.readAsDataURL(file);
+        }
+
+        /* ================= 预览渲染 ================= */
+        function renderAvatar(dataUrl) {
+            var box = document.getElementById('avatarBox');
+            if (dataUrl) {
+                box.innerHTML = '<img src="' + dataUrl + '" alt="头像">';
+            } else {
+                box.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+            }
+        }
+        function renderCover(dataUrl) {
+            var box = document.getElementById('coverBox');
+            if (dataUrl) {
+                box.innerHTML = '<img src="' + dataUrl + '" alt="封面">';
+            } else {
+                box.innerHTML = '<div class="upload-hint">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' +
+                    '<span>上传封面图</span></div>';
+            }
+        }
+
+        /* ================= 上传绑定 ================= */
+        document.getElementById('avatarBox').addEventListener('click', function () {
+            document.getElementById('avatarInput').click();
+        });
+        document.getElementById('coverBox').addEventListener('click', function () {
+            document.getElementById('coverInput').click();
+        });
+        document.getElementById('avatarInput').addEventListener('change', function (e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            compressImage(file, 200, 200, 'cover', function (dataUrl) {
+                if (dataUrl) {
+                    pendingAvatar = dataUrl;
+                    renderAvatar(dataUrl);
+                }
+            });
+            e.target.value = '';
+        });
+        document.getElementById('coverInput').addEventListener('change', function (e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            compressImage(file, 600, 400, 'contain', function (dataUrl) {
+                if (dataUrl) {
+                    pendingCover = dataUrl;
+                    renderCover(dataUrl);
+                }
+            });
+            e.target.value = '';
+        });
+
+        /* ================= 回填：载入 myProfile 自动填充所有控件 ================= */
+        (function fillForm() {
+            var profile = loadProfile();
+
+            // 动态遍历：所有带 name 的 input / textarea / select
+            var controls = document.querySelectorAll('#profileForm input[name], #profileForm textarea[name], #profileForm select[name]');
+            controls.forEach(function (el) {
+                var val = profile[el.name];
+                if (typeof val === 'string' && val.length) el.value = val;
+            });
+
+            // 图片
+            pendingAvatar = profile.avatar || '';
+            pendingCover = profile.cover || '';
+            renderAvatar(pendingAvatar);
+            renderCover(pendingCover);
+        })();
+
+        /* ================= 保存：动态组装对象 → localStorage ================= */
+        document.getElementById('btnSave').addEventListener('click', function () {
+            var btn = this;
+
+            // 1) 先取旧数据做底，避免图片等未更新字段丢失
+            var data = loadProfile();
+
+            // 2) 动态遍历所有表单控件（新增字段自动纳入，无需改保存逻辑）
+            var controls = document.querySelectorAll('#profileForm input[name], #profileForm textarea[name], #profileForm select[name]');
+            controls.forEach(function (el) {
+                if (el.type === 'file') return;
+                data[el.name] = el.value.trim();
+            });
+
+            // 3) 合并图片
+            if (pendingAvatar) data.avatar = pendingAvatar;
+            if (pendingCover) data.cover = pendingCover;
+            data.updatedAt = new Date().toISOString();
+
+            // 4) 写入（try-catch 捕获存储空间超限）
+            try {
+                localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+            } catch (err) {
+                alert('存储空间不足，请压缩图片');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '已保存';
+            setTimeout(function () {
+                window.history.back();
+            }, 350);
+        });
+    </script>
+</body>
+</html>
