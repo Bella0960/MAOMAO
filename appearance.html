@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Appearance · 外观</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<script src="statusbar-control.js"></script>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --card: #F8F8FA;
+    --card-2: #F4F4F6;
+    --ink: #111111;
+    --sub: #666666;
+    --aux: #999999;
+    --weak: #B0B0B5;
+    --line: #E5E5EA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #E9E9EB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+  }
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: var(--bg);
+    border-radius: 45px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 16px 26px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    z-index: 50;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+
+  /* 顶部 */
+  .header {
+    padding: 56px 22px 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 30px; height: 30px;
+    background: var(--card-2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    border: none; cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .icon-btn:active { transform: scale(0.97); background: var(--weak); }
+  .icon-btn svg { width: 14px; height: 14px; }
+  .header-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  /* 内容 */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 18px 24px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  .group-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--weak);
+    padding: 16px 6px 6px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 4px 16px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+  }
+
+  /* row */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 0.5px solid var(--line);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:active { transform: scale(0.98); }
+  .row-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--card-2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--ink);
+  }
+  .row-icon svg { width: 15px; height: 15px; }
+  .row-main { flex: 1; min-width: 0; }
+  .row-title { font-size: 14.5px; color: var(--ink); }
+  .row-sub { font-size: 11.5px; color: var(--aux); margin-top: 1px; }
+  .row-value { font-size: 13px; color: var(--aux); flex-shrink: 0; }
+  .row-check { width: 18px; height: 18px; flex-shrink: 0; color: var(--ink); opacity: 0; }
+  .row.selected .row-check { opacity: 1; }
+  .row-check svg { width: 18px; height: 18px; }
+
+  /* 色卡 */
+  .color-palette {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 14px 0;
+  }
+  .color-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: 16px;
+    border: 1.5px solid transparent;
+    background: var(--bg);
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease;
+  }
+  .color-chip:active { transform: scale(0.96); }
+  .color-chip.active { border-color: var(--ink); }
+  .color-circle { width: 28px; height: 28px; border-radius: 50%; }
+  .color-chip span { font-size: 11px; color: var(--sub); }
+
+  /* 壁纸 */
+  .wallpaper-preview {
+    width: 100%;
+    height: 140px;
+    border-radius: 16px;
+    border: 0.5px dashed var(--line);
+    background: var(--bg);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  .wallpaper-empty { font-size: 12px; color: var(--aux); }
+  .wallpaper-actions { display: flex; gap: 10px; margin-bottom: 14px; }
+  .btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .btn:active { transform: scale(0.98); opacity: 0.85; }
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-secondary { background: var(--card-2); color: var(--sub); }
+
+  /* toast */
+  .toast {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .footnote {
+    text-align: center;
+    font-size: 11px;
+    color: var(--weak);
+    padding: 18px 0 8px;
+  }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+<div class="phone-mockup">
+
+  <div class="status-bar">
+    <span class="status-time">09:41</span>
+    <div class="status-icons">
+      <svg width="15" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 8.5V3.5M5.5 9.5V2.5M10 10V1.5M14.5 8V4"/></svg>
+      <svg width="18" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="8" rx="2"/><path d="M16 5v2"/></svg>
+    </div>
+  </div>
+
+  <header class="header">
+    <button type="button" class="icon-btn" onclick="location.href='settings.html'" aria-label="返回">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h1 class="header-title">Appearance</h1>
+  </header>
+
+  <main class="content">
+
+    <!-- 图标样式 -->
+    <div class="group-title">ICON STYLE</div>
+    <section class="card">
+      <div class="row" id="rowGlass" data-style="glass">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2.5 4 6 6.5 6 9.5a6 6 0 0 1-12 0C6 9.5 9.5 7 12 3z"/></svg></div>
+        <div class="row-main">
+          <div class="row-title">毛玻璃</div>
+          <div class="row-sub">半透明模糊图标底</div>
+        </div>
+        <span class="row-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+      <div class="row" id="rowClean" data-style="clean">
+        <div class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></div>
+        <div class="row-main">
+          <div class="row-title">纯净</div>
+          <div class="row-sub">纯色无模糊图标底</div>
+        </div>
+        <span class="row-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+    </section>
+
+    <!-- 图标底色 -->
+    <div class="group-title">ICON COLOR</div>
+    <section class="card">
+      <div class="color-palette" id="colorPalette">
+        <div class="color-chip" data-color="rgba(255, 255, 255, 0.6)">
+          <div class="color-circle" style="background: #FFFFFF; border: 0.5px solid #E5E5EA;"></div>
+          <span>纯白</span>
+        </div>
+        <div class="color-chip" data-color="rgba(242, 242, 247, 0.65)">
+          <div class="color-circle" style="background: #F2F2F7;"></div>
+          <span>极浅灰</span>
+        </div>
+        <div class="color-chip" data-color="rgba(229, 229, 234, 0.65)">
+          <div class="color-circle" style="background: #E5E5EA;"></div>
+          <span>浅灰</span>
+        </div>
+        <div class="color-chip" data-color="rgba(199, 199, 204, 0.65)">
+          <div class="color-circle" style="background: #C7C7CC;"></div>
+          <span>中灰</span>
+        </div>
+        <div class="color-chip" data-color="rgba(142, 142, 147, 0.65)">
+          <div class="color-circle" style="background: #8E8E93;"></div>
+          <span>深灰</span>
+        </div>
+        <div class="color-chip" data-color="rgba(44, 44, 46, 0.65)">
+          <div class="color-circle" style="background: #2C2C2E;"></div>
+          <span>近黑</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 壁纸 -->
+    <div class="group-title">WALLPAPER</div>
+    <section class="card">
+      <div class="wallpaper-preview" id="wallpaperPreviewBox">
+        <div class="wallpaper-empty" id="wallpaperEmptyText">当前：纯白默认</div>
+      </div>
+      <div class="wallpaper-actions">
+        <label class="btn btn-primary" for="wallpaperInput">
+          <span>上传壁纸</span>
+          <input type="file" id="wallpaperInput" accept="image/*" style="display:none;">
+        </label>
+        <button type="button" class="btn btn-secondary" id="resetWallpaperBtn">恢复默认</button>
+      </div>
+    </section>
+
+    <div class="footnote">Appearance</div>
+  </main>
+
+  <div class="toast" id="toast">已更新</div>
+</div>
+
+<script>
+(function () {
+  var WALLPAPER_KEY = 'home_custom_wallpaper';
+  var ICON_BG_KEY = 'home_custom_icon_bg';
+  var ICON_STYLE_KEY = 'home_icon_style';
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+  }
+
+  /* ---- 图标样式：毛玻璃 / 纯净 ---- */
+  var rowGlass = document.getElementById('rowGlass');
+  var rowClean = document.getElementById('rowClean');
+
+  function applyStyle(style) {
+    var isGlass = style !== 'clean';
+    rowGlass.classList.toggle('selected', isGlass);
+    rowClean.classList.toggle('selected', !isGlass);
+    try { localStorage.setItem(ICON_STYLE_KEY, style); } catch (e) {}
+  }
+  rowGlass.addEventListener('click', function () {
+    applyStyle('glass');
+    try { localStorage.setItem(ICON_BG_KEY, 'rgba(255, 255, 255, 0.6)'); } catch (e) {}
+    showToast('已切换为毛玻璃');
+  });
+  rowClean.addEventListener('click', function () {
+    applyStyle('clean');
+    try { localStorage.setItem(ICON_BG_KEY, '#F2F2F7'); } catch (e) {}
+    showToast('已切换为纯净');
+  });
+  applyStyle(localStorage.getItem(ICON_STYLE_KEY) || 'glass');
+
+  /* ---- 图标底色色卡 ---- */
+  var chips = document.querySelectorAll('.color-chip');
+  var savedColor = localStorage.getItem(ICON_BG_KEY) || 'rgba(255, 255, 255, 0.6)';
+  chips.forEach(function (chip) {
+    if (chip.dataset.color === savedColor) chip.classList.add('active');
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      try { localStorage.setItem(ICON_BG_KEY, chip.dataset.color); } catch (e) {}
+      showToast('图标底色已更新');
+    });
+  });
+
+  /* ---- 壁纸 ---- */
+  var previewBox = document.getElementById('wallpaperPreviewBox');
+  var emptyText = document.getElementById('wallpaperEmptyText');
+  var wallpaperInput = document.getElementById('wallpaperInput');
+  var resetBtn = document.getElementById('resetWallpaperBtn');
+
+  function renderWallpaper() {
+    var saved = localStorage.getItem(WALLPAPER_KEY);
+    if (saved) {
+      previewBox.style.backgroundImage = 'url("' + saved + '")';
+      emptyText.style.display = 'none';
+    } else {
+      previewBox.style.backgroundImage = 'none';
+      emptyText.style.display = 'block';
+    }
+  }
+  renderWallpaper();
+
+  function compressImage(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        var MAX_W = 640, MAX_H = 1136;
+        var w = img.width, h = img.height;
+        if (w > h) {
+          if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+        } else {
+          if (h > MAX_H) { w = Math.round(w * MAX_H / h); h = MAX_H; }
+        }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  wallpaperInput.addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    compressImage(file, function (base64) {
+      try {
+        localStorage.setItem(WALLPAPER_KEY, base64);
+        renderWallpaper();
+        showToast('壁纸已更新');
+      } catch (err) {
+        showToast('壁纸保存失败，图片过大');
+      }
+    });
+    wallpaperInput.value = '';
+  });
+
+  resetBtn.addEventListener('click', function () {
+    try { localStorage.removeItem(WALLPAPER_KEY); } catch (e) {}
+    renderWallpaper();
+    showToast('已恢复默认');
+  });
+})();
+</script>
+</body>
+</html>

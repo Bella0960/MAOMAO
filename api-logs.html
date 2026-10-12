@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>API 调用记录 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: #F7F7F9;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+  /* 本页无底部悬浮导航，无需 nav.js；此规则仅作兜底 */
+  .floating-nav { display: none !important; }
+
+  /* 可滚动内容区 */
+  .al-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #F7F7F9;
+  }
+  .al-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：左返回 / 中标题 / 右占位 ===== */
+  .al-topbar {
+    position: relative;
+    z-index: 30;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 -16px;
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 12px 16px;
+  }
+  .al-top-left,
+  .al-top-right {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .al-top-left { justify-content: flex-start; }
+  .al-top-right { justify-content: flex-end; }
+  .al-circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .al-circle-btn:active { transform: scale(0.94); }
+  .al-circle-btn svg { width: 16px; height: 16px; stroke: #333333; }
+  .al-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #111111;
+  }
+
+  /* ===== 日志列表 ===== */
+  .al-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 16px;
+  }
+  .al-empty {
+    text-align: center;
+    font-size: 0.688rem;
+    color: #C7C7CC;
+    padding: 40px 0;
+  }
+  /* 单条日志卡片：纯白、圆角 14、极淡内敛 */
+  .al-log-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .al-log-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .al-log-icon svg { width: 15px; height: 15px; }
+  .al-log-info { flex: 1; min-width: 0; }
+  .al-log-title {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #111111;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .al-log-sub {
+    font-size: 0.688rem;
+    color: #8E8E93;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .al-log-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .al-log-dur {
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #111111;
+  }
+  .al-log-time {
+    font-size: 0.625rem;
+    color: #C7C7CC;
+    font-family: monospace;
+    margin-top: 2px;
+  }
+
+  /* ===== 底部固定：清空记录 ===== */
+  .al-footer {
+    flex-shrink: 0;
+    padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    background: #F7F7F9;
+  }
+  .al-clear-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .al-clear-btn:active { opacity: 0.85; }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="al-stage">
+
+      <!-- 顶部导航：返回键固定跳回设置页（file:// 协议下 history.back() 不可靠） -->
+      <div class="al-topbar">
+        <div class="al-top-left">
+          <button class="al-circle-btn" type="button" aria-label="返回" onclick="location.href='settings.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="al-title">API LOGS</span>
+        <div class="al-top-right"></div>
+      </div>
+
+      <!-- 日志列表（本步骨架，渲染逻辑下一步实现） -->
+      <div class="al-list" id="logList">
+        <div class="al-empty">暂无调用记录</div>
+      </div>
+
+    </main>
+
+    <!-- 底部固定：清空记录 -->
+    <div class="al-footer">
+      <button class="al-clear-btn" id="clearBtn" type="button">清空记录</button>
+    </div>
+
+  </div>
+
+  <script>
+    // HTML 转义：model 与 errorMsg 来自外部数据，防止注入
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // 渲染日志列表：读取 api_call_logs，倒序已由写入方保证（unshift），直接顺序渲染
+    function renderLogs() {
+      var listEl = document.getElementById('logList');
+      var logs = [];
+      try {
+        logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
+      } catch (e) { logs = []; }
+      if (!Array.isArray(logs) || !logs.length) {
+        listEl.innerHTML = '<div class="al-empty">暂无调用记录</div>';
+        return;
+      }
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+      var html = '';
+      logs.forEach(function (item) {
+        var d = new Date(item.time);
+        var timeStr = pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        var isErr = item.status === 'error';
+        var icon = isErr
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+        var sub = isErr ? (item.errorMsg || '调用失败') : '调用正常';
+        var dur = (item.duration != null ? Number(item.duration) : 0) + 'ms';
+        html += '<div class="al-log-card">'
+          + '<div class="al-log-icon">' + icon + '</div>'
+          + '<div class="al-log-info">'
+          + '<div class="al-log-title">' + escapeHtml(item.model || 'unknown') + '</div>'
+          + '<div class="al-log-sub">' + escapeHtml(sub) + '</div>'
+          + '</div>'
+          + '<div class="al-log-meta">'
+          + '<div class="al-log-dur">' + escapeHtml(dur) + '</div>'
+          + '<div class="al-log-time">' + timeStr + '</div>'
+          + '</div>'
+          + '</div>';
+      });
+      listEl.innerHTML = html;
+    }
+
+    // 清空记录：二次确认后移除 api_call_logs 并重新渲染
+    document.getElementById('clearBtn').addEventListener('click', function () {
+      if (!confirm('确定要清空所有 API 调用记录吗？')) return;
+      try { localStorage.removeItem('api_call_logs'); } catch (e) {}
+      renderLogs();
+    });
+
+    // 页面加载即渲染
+    renderLogs();
+  </script>
+<script src="statusbar-control.js"></script>
+</body>
+</html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>世界书 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    min-height: 0;
+    background-color: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;   /* 状态栏不拦截点击，避免遮挡返回键 */
+  }
+  /* 本页为全屏编辑类页面，隐藏全局悬浮导航（仅本页 CSS，不改 nav.js） */
+  .floating-nav { display: none !important; }
+
+  /* 主滚动区（顶部 50px 让状态栏高度由 .wb-topbar 承担；左右 16；底部避让固定按钮） */
+  .wb-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 84px !important;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #FFFFFF;
+  }
+  .wb-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：左返回 / 中标题 / 右操作，三栏严格水平对齐 ===== */
+  .wb-topbar {
+    position: relative !important;
+    z-index: 30 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 -16px !important;   /* 抵消 .wb-stage 的左右 16px，内边距由本栏自控 */
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 12px 16px !important;
+  }
+  /* 左右两栏强制等宽 72px，保证中间 WORLDBOOK 真正视觉居中 */
+  .wb-top-left,
+  .wb-top-actions {
+    width: 72px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+  }
+  .wb-top-left { justify-content: flex-start !important; }
+  .wb-top-actions { justify-content: flex-end !important; gap: 8px !important; }
+  .wb-en {
+    flex: 1 !important;
+    text-align: center !important;
+    font-size: 0.688rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    color: #8E8E93 !important;
+  }
+  .wb-circle-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative !important;
+    z-index: 30 !important;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  /* 隐形热区：把 32px 圆钮的可点区域扩大到约 44px，不影响视觉尺寸 */
+  .wb-circle-btn::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: -6px !important;
+  }
+  .wb-circle-btn:active { transform: scale(0.94); }
+  .wb-circle-btn.is-ghost { background: #F2F2F7; }
+  .wb-circle-btn.is-dark { background: #1C1C1E; }
+  .wb-circle-btn svg { width: 16px !important; height: 16px !important; }
+  .wb-circle-btn.is-ghost svg { stroke: #333333; }
+  .wb-circle-btn.is-dark svg { stroke: #FFFFFF; }
+
+  /* 搜索栏（默认收起） */
+  .wb-search-row {
+    display: none;
+    margin-top: 10px !important;
+  }
+  .wb-search-row.show { display: block; }
+  .wb-search-input {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: none;
+    background: #F2F2F7;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333333;
+  }
+  .wb-search-input::placeholder { color: #B0B0B5; }
+
+  /* ===== Tab 胶囊组 ===== */
+  .wb-tabs {
+    margin-top: 14px !important;
+    background: #F2F2F7;
+    border-radius: 999px;
+    padding: 2px !important;
+    height: 36px !important;
+    display: flex;
+    gap: 2px;
+  }
+  .wb-tab {
+    flex: 1;
+    height: 32px !important;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px !important;
+    font-size: 0.813rem !important;
+    font-weight: 600;
+    font-family: inherit;
+    color: #8E8E93;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .wb-tab svg { width: 15px !important; height: 15px !important; stroke: currentColor; }
+  .wb-tab.active {
+    background: #FFFFFF;
+    color: #111111;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* ===== 筛选区 ===== */
+  .wb-filter-head {
+    margin-top: 16px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wb-filter-titles { display: flex; flex-direction: column; gap: 2px; }
+  .wb-filter-title { font-size: 0.875rem !important; font-weight: 800; color: #111111; }
+  .wb-filter-sub { font-size: 0.625rem !important; color: #8E8E93; }
+  .wb-category-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px !important;
+    height: 24px !important;
+    padding: 0 10px !important;
+    border: none;
+    border-radius: 999px;
+    background: #F2F2F7;
+    font-size: 0.625rem !important;
+    font-weight: 500;
+    font-family: inherit;
+    color: #333333;
+    cursor: pointer;
+  }
+  .wb-category-pill:active { background: #E5E5EA; }
+  .wb-category-pill svg { width: 12px !important; height: 12px !important; stroke: #333333; }
+
+  .wb-filter-pills {
+    margin-top: 10px !important;
+    background: #F7F7F9;
+    border-radius: 14px;
+    padding: 4px !important;
+    display: flex;
+    gap: 4px !important;
+  }
+  .wb-filter-pill {
+    flex: 1;
+    height: 30px !important;
+    padding: 0 12px !important;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px !important;
+    font-size: 0.688rem !important;
+    font-weight: 600;
+    font-family: inherit;
+    color: #333333;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .wb-filter-pill svg { width: 12px !important; height: 12px !important; stroke: currentColor; }
+  .wb-filter-pill .wb-pill-count { color: #8E8E93; font-weight: 500; }
+  .wb-filter-pill.active { background: #48484A; color: #FFFFFF; }
+  .wb-filter-pill.active .wb-pill-count { color: rgba(255,255,255,0.75); }
+
+  /* ===== 列表 ===== */
+  .wb-list-title {
+    margin-top: 16px !important;
+    margin-bottom: 8px !important;
+    font-size: 0.875rem !important;
+    font-weight: 800;
+    color: #111111;
+  }
+  .wb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;          /* 卡片自带 margin-bottom: 8px，这里清零避免间距叠加 */
+    height: auto !important;
+    flex: none !important;
+    min-height: 0 !important;
+  }
+  /* ===== 世界书卡片（新模板类名：book-card / book-icon / book-info / book-title / book-desc / book-arrow） ===== */
+  .book-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 16px !important;
+    background: #FFFFFF !important;
+    border-radius: 16px !important;
+    margin-bottom: 8px !important;
+    height: 64px !important;              /* 死锁高度，内容再多也不会被撑高 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+    overflow: hidden !important;           /* 溢出直接裁掉，杜绝撑破卡片 */
+    cursor: pointer;
+  }
+  .book-icon {
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  .book-icon svg { width: 17px !important; height: 17px !important; stroke: #555555 !important; }
+  .book-info {
+    flex: 1 !important;
+    min-width: 0 !important;               /* 极其重要，不加这句文字无法折叠 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  .book-title {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.3 !important;
+  }
+  .book-desc {
+    font-size: 0.75rem !important;
+    color: #8E8E93 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-top: 2px !important;
+    line-height: 1.3 !important;
+  }
+  .book-arrow {
+    flex-shrink: 0 !important;
+    margin-left: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .book-arrow svg { width: 16px !important; height: 16px !important; stroke: #C7C7CC !important; }
+
+  .wb-empty {
+    text-align: center;
+    font-size: 0.75rem !important;
+    color: #8E8E93;
+    padding: 28px 20px !important;
+    height: auto !important;
+    flex: none !important;
+  }
+
+  /* ===== 底部固定按钮 ===== */
+  .wb-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px 16px 20px !important;
+    display: flex;
+    gap: 10px !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 30%);
+    z-index: 20;
+  }
+  .wb-footer-btn {
+    flex: 1;
+    height: 40px !important;
+    border: none;
+    border-radius: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px !important;
+    font-size: 0.813rem !important;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .wb-footer-btn:active { transform: scale(0.98); }
+  .wb-footer-btn svg { width: 15px !important; height: 15px !important; }
+  .wb-footer-btn.is-light { background: #F2F2F7; color: #111111; }
+  .wb-footer-btn.is-light svg { stroke: #111111; }
+  .wb-footer-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .wb-footer-btn.is-dark svg { stroke: #FFFFFF; }
+
+  /* ===== 通用底部抽屉 ===== */
+  .wb-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 600;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .wb-overlay.show { display: flex; }
+  .wb-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+  .wb-sheet {
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px 20px 0 0;
+    padding: 10px 16px 26px;
+    animation: wbSlideUp 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    max-height: 86%;
+  }
+  @keyframes wbSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .wb-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #E5E5EA;
+    margin: 0 auto 14px;
+    flex-shrink: 0;
+  }
+  .wb-sheet-title {
+    text-align: center;
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 14px;
+  }
+  .wb-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 14px 6px;
+    font-size: 0.938rem;
+    font-family: inherit;
+    color: #111111;
+    cursor: pointer;
+    text-align: left;
+    border-bottom: 1px solid #F2F2F7;
+  }
+  .wb-menu-item:last-of-type { border-bottom: none; }
+  .wb-menu-item .wb-menu-ico {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: #F7F7F9;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .wb-menu-item .wb-menu-ico svg { width: 16px; height: 16px; stroke: #333333; }
+
+  /* 编辑抽屉表单 */
+  .wb-field { margin-bottom: 12px; flex-shrink: 0; }
+  .wb-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #8E8E93;
+    margin-bottom: 6px;
+  }
+  .wb-field input, .wb-field textarea {
+    width: 100%;
+    background: #F2F2F7;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333333;
+  }
+  .wb-field input { height: 42px; padding: 0 14px; }
+  .wb-field textarea {
+    min-height: 160px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: none;
+  }
+  .wb-field input::placeholder, .wb-field textarea::placeholder { color: #B0B0B5; }
+  .wb-scope-row { display: flex; gap: 8px; }
+  .wb-scope-btn {
+    flex: 1;
+    height: 38px;
+    border: none;
+    border-radius: 10px;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.813rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: #333333;
+    cursor: pointer;
+  }
+  .wb-scope-btn svg { width: 15px; height: 15px; stroke: currentColor; }
+  .wb-scope-btn.active { background: #1C1C1E; color: #FFFFFF; }
+  .wb-sheet-actions { display: flex; gap: 10px; margin-top: 4px; flex-shrink: 0; }
+  .wb-btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .wb-btn.is-light { background: #F2F2F7; color: #333333; }
+  .wb-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .wb-btn:active { opacity: 0.9; }
+  .wb-delete-btn {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 69, 58, 0.08);
+    color: #FF453A;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .wb-delete-btn:active { background: rgba(255, 69, 58, 0.16); }
+
+  /* ===== 书本编辑表单：选择分类胶囊（单选） ===== */
+  .wb-book-cat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .wb-book-cat-pill {
+    height: 28px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 999px;
+    background: #F2F2F7;
+    color: #333333;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .wb-book-cat-pill.active {
+    background: #1C1C1E;
+    color: #FFFFFF;
+  }
+  .wb-book-cat-empty {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    line-height: 1.5;
+  }
+
+  /* ===== 分类管理抽屉（独立扩展，不影响现有两个抽屉） ===== */
+  .wb-sheet.is-category {
+    border-radius: 24px 24px 0 0 !important;
+  }
+  .wb-handle.is-dark { background: #1C1C1E !important; }
+  .wb-cat-add-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+  .wb-cat-input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    border: none;
+    outline: none;
+    background: #F2F2F7;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333333;
+  }
+  .wb-cat-input::placeholder { color: #B0B0B5; }
+  .wb-cat-add-btn {
+    flex-shrink: 0;
+    width: 64px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: #1C1C1E;
+    color: #FFFFFF;
+    font-size: 0.813rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .wb-cat-add-btn:active { opacity: 0.85; }
+  .wb-cat-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 46vh;
+    scrollbar-width: none;
+  }
+  .wb-cat-list::-webkit-scrollbar { display: none; }
+  .wb-cat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 8px 4px;
+    border-bottom: 1px solid #F2F2F7;
+    cursor: pointer;
+  }
+  .wb-cat-item:last-child { border-bottom: none; }
+  .wb-cat-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .wb-cat-name {
+    font-size: 0.875rem;
+    color: #333333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 12px;
+  }
+  /* 当前生效的筛选分类：纯黑加粗 */
+  .wb-cat-item.is-active .wb-cat-name {
+    color: #1C1C1E;
+    font-weight: 700;
+  }
+  .wb-cat-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+  .wb-cat-del {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .wb-cat-del svg {
+    width: 17px;
+    height: 17px;
+    stroke: #FF453A;
+  }
+  .wb-cat-del:active { opacity: 0.6; }
+  .wb-cat-empty {
+    text-align: center;
+    font-size: 0.813rem;
+    color: #8E8E93;
+    padding: 30px 20px;
+  }
+
+  /* Toast */
+  .wb-toast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 700;
+    background: rgba(28,28,30,0.9);
+    color: #FFFFFF;
+    font-size: 0.813rem;
+    padding: 12px 20px;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    max-width: 80%;
+    text-align: center;
+  }
+  .wb-toast.show { opacity: 1; }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="wb-stage">
+
+      <!-- 顶部导航栏：左侧返回 / 居中 WORLDBOOK / 右侧搜索+新建，三者同一水平线 -->
+      <div class="wb-topbar">
+        <div class="wb-top-left">
+          <button class="wb-circle-btn is-ghost" type="button" aria-label="返回"
+            onclick="window.location.href='index.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="wb-en">WORLDBOOK</span>
+        <div class="wb-top-actions">
+          <button class="wb-circle-btn is-ghost" id="btnSearch" type="button" aria-label="搜索">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <button class="wb-circle-btn is-dark" id="btnAddTop" type="button" aria-label="新建">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 搜索栏 -->
+      <div class="wb-search-row" id="searchRow">
+        <input class="wb-search-input" id="searchInput" type="text" placeholder="搜索世界书标题或内容…">
+      </div>
+
+      <!-- Tab -->
+      <div class="wb-tabs">
+        <button class="wb-tab active" id="tabWorldbook" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          世界书
+        </button>
+        <button class="wb-tab" id="tabStyle" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          预设
+        </button>
+      </div>
+
+      <!-- 筛选 -->
+      <div class="wb-filter-head">
+        <div class="wb-filter-titles">
+          <span class="wb-filter-title">筛选</span>
+          <span class="wb-filter-sub">按使用范围查看世界书</span>
+        </div>
+        <button class="wb-category-pill" id="btnCategory" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          分类
+        </button>
+      </div>
+
+      <div class="wb-filter-pills">
+        <button class="wb-filter-pill active" data-scope="all" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>
+          全部 <span class="wb-pill-count" id="countAll">0 本</span>
+        </button>
+        <button class="wb-filter-pill" data-scope="global" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          全局 <span class="wb-pill-count" id="countGlobal">0 本</span>
+        </button>
+        <button class="wb-filter-pill" data-scope="local" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          局部 <span class="wb-pill-count" id="countLocal">0 本</span>
+        </button>
+      </div>
+
+      <!-- 列表 -->
+      <div class="wb-list-title" id="listTitle">世界书列表</div>
+      <div class="wb-list" id="wbList"></div>
+
+    </main>
+
+    <!-- 底部固定按钮 -->
+    <div class="wb-footer">
+      <button class="wb-footer-btn is-light" id="btnNewCategory" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        新建分类
+      </button>
+      <button class="wb-footer-btn is-dark" id="btnAddFooter" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建世界书
+      </button>
+    </div>
+
+    <!-- 操作抽屉 -->
+    <div class="wb-overlay" id="actionOverlay">
+      <div class="wb-backdrop" data-close="actionOverlay"></div>
+      <div class="wb-sheet">
+        <div class="wb-handle"></div>
+        <div class="wb-sheet-title" id="actionSheetTitle">新建世界书</div>
+        <button class="wb-menu-item" id="menuCreateBlank" type="button">
+          <span class="wb-menu-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </span>
+          新建空白世界书
+        </button>
+        <button class="wb-menu-item" id="menuImport" type="button">
+          <span class="wb-menu-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </span>
+          导入本地文件
+        </button>
+        <button class="wb-menu-item" id="menuExport" type="button">
+          <span class="wb-menu-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </span>
+          导出所有世界书
+        </button>
+      </div>
+    </div>
+
+    <!-- 编辑抽屉 -->
+    <div class="wb-overlay" id="editOverlay">
+      <div class="wb-backdrop" data-close="editOverlay"></div>
+      <div class="wb-sheet">
+        <div class="wb-handle"></div>
+        <div class="wb-sheet-title" id="editSheetTitle">新建世界书</div>
+        <div class="wb-field">
+          <label for="editTitle">名称</label>
+          <input id="editTitle" type="text" maxlength="40" placeholder="输入世界书名称">
+        </div>
+        <div class="wb-field">
+          <label>选择分类</label>
+          <div class="wb-book-cat-row" id="editCategoryRow"></div>
+        </div>
+        <div class="wb-field">
+          <label for="editKeywords">触发关键词</label>
+          <input id="editKeywords" type="text" maxlength="100" placeholder="输入关键词，用逗号分隔，如：魔法,学院">
+        </div>
+        <div class="wb-field">
+          <label>使用范围</label>
+          <div class="wb-scope-row">
+            <button class="wb-scope-btn active" data-scope="global" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              全局
+            </button>
+            <button class="wb-scope-btn" data-scope="local" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              局部
+            </button>
+          </div>
+        </div>
+        <div class="wb-field">
+          <label for="editContent">内容</label>
+          <textarea id="editContent" maxlength="10000" placeholder="输入世界书内容…"></textarea>
+        </div>
+        <button class="wb-delete-btn" id="btnEditDelete" type="button" style="display:none;">删除本书</button>
+        <div class="wb-sheet-actions">
+          <button class="wb-btn is-light" id="btnEditCancel" type="button">取消</button>
+          <button class="wb-btn is-dark" id="btnEditSave" type="button">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类管理抽屉 -->
+    <div class="wb-overlay" id="categoryOverlay">
+      <div class="wb-backdrop" data-close="categoryOverlay"></div>
+      <div class="wb-sheet is-category">
+        <div class="wb-handle is-dark"></div>
+        <div class="wb-sheet-title">分类管理</div>
+        <div class="wb-cat-add-row">
+          <input class="wb-cat-input" id="categoryInput" type="text" maxlength="20" placeholder="输入新分类名称">
+          <button class="wb-cat-add-btn" id="btnCategoryAdd" type="button">添加</button>
+        </div>
+        <div class="wb-cat-list" id="categoryList"></div>
+      </div>
+    </div>
+
+    <!-- 隐藏文件选择框 -->
+    <input type="file" id="importInput" accept=".json,.txt" style="display:none;">
+
+    <!-- Toast -->
+    <div class="wb-toast" id="wbToast"></div>
+
+    <script src="nav.js"></script>
+  </div>
+
+<script>
+  var STORAGE_KEY = 'phone_worldbooks';
+
+  /* ================= 数据层 ================= */
+  function loadBooks() {
+    var list = [];
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) list = arr;
+      }
+    } catch (e) { list = []; }
+
+    // 一次性清除历史脏数据并写回 localStorage，防止"12"等测试数据再次渲染到列表
+    var cleaned = list.filter(function (b) { return isValidBook(b); });
+    if (cleaned.length !== list.length) {
+      try { saveBooks(cleaned); } catch (e) {}
+    }
+    return cleaned;
+  }
+  function saveBooks(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function genId() {
+    return 'wb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+  function normalizeBook(raw, fallbackType) {
+    var b = raw && typeof raw === 'object' ? raw : {};
+    return {
+      id: b.id || genId(),
+      title: String(b.title || b.name || '未命名世界书'),
+      content: String(b.content == null ? (b.desc || b.text || '') : b.content),
+      scope: b.scope === 'local' ? 'local' : 'global',
+      type: b.type === 'style' ? 'style' : (fallbackType || 'worldbook'),
+      categoryId: b.categoryId == null ? '' : String(b.categoryId),
+      keywords: Array.isArray(b.keywords)
+        ? b.keywords.map(function (k) { return String(k == null ? '' : k).trim(); }).filter(Boolean)
+        : [],
+      createdAt: b.createdAt || Date.now()
+    };
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ================= 页面状态 ================= */
+  var state = {
+    tab: 'worldbook',   // worldbook | style
+    scope: 'all',       // all | global | local
+    keyword: '',
+    editingId: null
+  };
+
+  /* 当前生效的分类筛选：null = 不按分类筛选（显示全部）；有值 = 只显示该 categoryId 的书本 */
+  var currentCategoryFilter = null;
+
+  /* ================= 图标片段 ================= */
+  var SVG_GLOBAL = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  var SVG_LOCAL = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  var SVG_BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+  var SVG_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+
+  /* ================= 渲染 ================= */
+  var listEl = document.getElementById('wbList');
+  var countAllEl = document.getElementById('countAll');
+  var countGlobalEl = document.getElementById('countGlobal');
+  var countLocalEl = document.getElementById('countLocal');
+
+  /* 严格校验：只接受普通书本对象，排除数字 / 字符串 / 数组 / 空记录 / 历史测试数据 */
+  function isValidBook(b) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) return false;      // 非对象（裸数字、裸字符串）
+    var title = String(b.title == null ? '' : b.title).trim();
+    var content = String(b.content == null ? '' : b.content).trim();
+    if (!title && !content) return false;                                   // 标题与内容都为空
+    if (title === '12') return false;                                       // 历史测试记录
+    if (content.length >= 20 && /^[0-9\s]+$/.test(content)) return false;   // 纯数字测试串（如一堆 1）
+    return true;
+  }
+
+  function getVisibleBooks() {
+    var kw = state.keyword.trim().toLowerCase();
+    return loadBooks().filter(function (b) {
+      if (!isValidBook(b)) return false;
+      if ((b.type || 'worldbook') !== state.tab) return false;
+      if (state.scope !== 'all' && b.scope !== state.scope) return false;
+      if (kw && String(b.title || '').toLowerCase().indexOf(kw) === -1 &&
+          String(b.content || '').toLowerCase().indexOf(kw) === -1) return false;
+      // 分类筛选：仅当 currentCategoryFilter 有值时生效；老书本无 categoryId 兜底为空串
+      if (currentCategoryFilter &&
+          String(b.categoryId || '') !== String(currentCategoryFilter)) return false;
+      return true;
+    });
+  }
+
+  function renderCounts() {
+    var inTab = loadBooks().filter(function (b) {
+      if (!isValidBook(b)) return false;
+      if ((b.type || 'worldbook') !== state.tab) return false;
+      // 计数与列表口径一致：分类筛选生效时，只统计该分类下的书本
+      if (currentCategoryFilter &&
+          String(b.categoryId || '') !== String(currentCategoryFilter)) return false;
+      return true;
+    });
+    var globals = inTab.filter(function (b) { return b.scope === 'global'; }).length;
+    var locals = inTab.filter(function (b) { return b.scope === 'local'; }).length;
+    countAllEl.textContent = inTab.length + ' 本';
+    countGlobalEl.textContent = globals + ' 本';
+    countLocalEl.textContent = locals + ' 本';
+  }
+
+  function renderList() {
+    var books = getVisibleBooks();
+    document.getElementById('listTitle').textContent =
+      state.tab === 'style' ? '文风预设列表' : '世界书列表';
+    if (!books.length) {
+      listEl.innerHTML = '<div class="wb-empty">还没有世界书，点击下方新建</div>';
+      return;
+    }
+    listEl.innerHTML = books.map(function (b) {
+      var title = String(b.title == null ? '' : b.title).trim() || '未命名世界书';
+      var desc = String(b.content == null ? '' : b.content).replace(/\s+/g, ' ').trim();
+      if (!desc) desc = '暂无描述';
+      return '<div class="book-card" data-id="' + escapeHtml(b.id) + '">' +
+        '<div class="book-icon">' + SVG_BOOK + '</div>' +
+        '<div class="book-info">' +
+          '<div class="book-title">' + escapeHtml(title) + '</div>' +
+          '<div class="book-desc">' + escapeHtml(desc) + '</div>' +
+        '</div>' +
+        '<div class="book-arrow">' + SVG_ARROW + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderAll() {
+    renderCounts();
+    renderList();
+  }
+
+  /* ================= 抽屉通用 ================= */
+  function openOverlay(id) { document.getElementById(id).classList.add('show'); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+  document.querySelectorAll('.wb-backdrop[data-close]').forEach(function (el) {
+    el.addEventListener('click', function () { closeOverlay(el.getAttribute('data-close')); });
+  });
+
+  /* ================= Toast ================= */
+  var toastEl = document.getElementById('wbToast');
+  var toastTimer = null;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+  }
+
+  /* ================= 顶部 / Tab / 筛选 / 搜索 ================= */
+  document.getElementById('btnSearch').addEventListener('click', function () {
+    var row = document.getElementById('searchRow');
+    row.classList.toggle('show');
+    if (row.classList.contains('show')) {
+      setTimeout(function () { document.getElementById('searchInput').focus(); }, 120);
+    } else {
+      state.keyword = '';
+      document.getElementById('searchInput').value = '';
+      renderList();
+    }
+  });
+  document.getElementById('searchInput').addEventListener('input', function (e) {
+    state.keyword = e.target.value;
+    renderList();
+  });
+
+  document.getElementById('tabWorldbook').addEventListener('click', function () { switchTab('worldbook'); });
+  document.getElementById('tabStyle').addEventListener('click', function () { switchTab('style'); });
+  function switchTab(tab) {
+    state.tab = tab;
+    state.scope = 'all';
+    currentCategoryFilter = null;   // 切换 Tab 时一并清空分类筛选，避免残留
+    document.getElementById('tabWorldbook').classList.toggle('active', tab === 'worldbook');
+    document.getElementById('tabStyle').classList.toggle('active', tab === 'style');
+    document.querySelectorAll('.wb-filter-pill').forEach(function (p) {
+      p.classList.toggle('active', p.getAttribute('data-scope') === 'all');
+    });
+    var menuTitle = document.getElementById('actionSheetTitle');
+    renderAll();
+  }
+
+  document.querySelectorAll('.wb-filter-pill').forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      state.scope = pill.getAttribute('data-scope');
+      // 点「全部」必须清空分类筛选，恢复显示当前 Tab 的全部书本
+      if (state.scope === 'all') {
+        currentCategoryFilter = null;
+        renderAll();   // 重置了分类筛选，计数胶囊也要一并恢复
+      } else {
+        renderList();
+      }
+      document.querySelectorAll('.wb-filter-pill').forEach(function (p) {
+        p.classList.toggle('active', p === pill);
+      });
+    });
+  });
+
+  document.getElementById('btnCategory').addEventListener('click', function () {
+    categoryInputEl.value = '';
+    renderCategoryList();
+    openOverlay('categoryOverlay');
+  });
+  document.getElementById('btnNewCategory').addEventListener('click', function () {
+    categoryInputEl.value = '';
+    renderCategoryList();
+    openOverlay('categoryOverlay');
+  });
+
+  /* ================= 操作抽屉：新建 / 导入 / 导出 ================= */
+  function openActionSheet() {
+    document.getElementById('actionSheetTitle').textContent =
+      state.tab === 'style' ? '新建文风预设' : '新建世界书';
+    openOverlay('actionOverlay');
+  }
+  document.getElementById('btnAddTop').addEventListener('click', openActionSheet);
+  document.getElementById('btnAddFooter').addEventListener('click', openActionSheet);
+
+  /* ---- 新建空白：打开编辑抽屉 ---- */
+  document.getElementById('menuCreateBlank').addEventListener('click', function () {
+    closeOverlay('actionOverlay');
+    openEditDrawer(null);
+  });
+
+  /* ---- 编辑抽屉 ---- */
+  var editTitleInput = document.getElementById('editTitle');
+  var editContentInput = document.getElementById('editContent');
+  var editKeywordsInput = document.getElementById('editKeywords');
+  var editCategoryRowEl = document.getElementById('editCategoryRow');
+  var editScope = 'global';
+  var editCategory = '';   // 当前编辑书本选中的分类 ID，空字符串表示无分类
+
+  /* 触发关键词：字符串按中英文逗号分割 → 去空格 → 去空项 → 去重；空输入返回 [] */
+  function parseKeywords(raw) {
+    var arr = String(raw == null ? '' : raw).split(/[,，]/);
+    var seen = {};
+    var result = [];
+    arr.forEach(function (item) {
+      var word = item.trim();
+      if (!word) return;
+      var key = word.toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      result.push(word);
+    });
+    return result;
+  }
+
+  /* 渲染书本表单里的分类单选胶囊：固定首项「无分类」，其后为 worldbook_categories 全部分类 */
+  function renderCategoryPills(selectedId) {
+    var cats = loadCategories();
+    editCategory = selectedId == null ? '' : String(selectedId);
+    if (!cats.length) {
+      editCategoryRowEl.innerHTML = '<span class="wb-book-cat-empty">暂无分类，请先去筛选栏创建分类</span>';
+      editCategory = '';
+      return;
+    }
+    // 若原 categoryId 指向的分类已被删除，则回落到「无分类」
+    var stillExists = cats.some(function (c) { return String(c.id) === editCategory; });
+    if (!stillExists) editCategory = '';
+
+    var html = '<button class="wb-book-cat-pill' + (editCategory === '' ? ' active' : '') +
+      '" type="button" data-book-cat-id="">无分类</button>';
+    html += cats.map(function (c) {
+      return '<button class="wb-book-cat-pill' +
+        (String(c.id) === editCategory ? ' active' : '') +
+        '" type="button" data-book-cat-id="' + escapeHtml(c.id) + '">' +
+        escapeHtml(c.name) + '</button>';
+    }).join('');
+    editCategoryRowEl.innerHTML = html;
+  }
+  /* 面板级事件委托：点胶囊切换单选高亮 */
+  editCategoryRowEl.addEventListener('click', function (e) {
+    var pill = e.target.closest ? e.target.closest('[data-book-cat-id]') : null;
+    if (!pill) return;
+    editCategory = pill.getAttribute('data-book-cat-id') || '';
+    editCategoryRowEl.querySelectorAll('.wb-book-cat-pill').forEach(function (p) {
+      p.classList.toggle('active', p === pill);
+    });
+  });
+
+  function openEditDrawer(book) {
+    state.editingId = book ? book.id : null;
+    document.getElementById('editSheetTitle').textContent = book
+      ? (state.tab === 'style' ? '编辑文风预设' : '编辑世界书')
+      : (state.tab === 'style' ? '新建文风预设' : '新建世界书');
+    editTitleInput.value = book ? book.title : '';
+    editContentInput.value = book ? book.content : '';
+    editKeywordsInput.value = (book && Array.isArray(book.keywords)) ? book.keywords.join(',') : '';
+    editScope = book ? book.scope : 'global';
+    renderCategoryPills(book ? (book.categoryId || '') : '');
+    document.getElementById('btnEditDelete').style.display = book ? 'block' : 'none';
+    document.querySelectorAll('.wb-scope-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-scope') === editScope);
+    });
+    openOverlay('editOverlay');
+    setTimeout(function () { editTitleInput.focus(); }, 260);
+  }
+
+  document.querySelectorAll('.wb-scope-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      editScope = btn.getAttribute('data-scope');
+      document.querySelectorAll('.wb-scope-btn').forEach(function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+    });
+  });
+
+  document.getElementById('btnEditCancel').addEventListener('click', function () {
+    closeOverlay('editOverlay');
+  });
+
+  /* 删除本书：二次确认后从 phone_worldbooks 移除 */
+  document.getElementById('btnEditDelete').addEventListener('click', function () {
+    if (!state.editingId) return;
+    if (!window.confirm('确定删除这本世界书吗？删除后不可恢复。')) return;
+    var list = loadBooks().filter(function (b) {
+      return String(b.id) !== String(state.editingId);
+    });
+    try {
+      saveBooks(list);
+    } catch (err) {
+      showToast('删除失败，请重试');
+      return;
+    }
+    closeOverlay('editOverlay');
+    renderAll();
+    showToast('已删除');
+  });
+
+  document.getElementById('btnEditSave').addEventListener('click', function () {
+    var title = editTitleInput.value.trim();
+    var content = editContentInput.value;
+    var keywords = parseKeywords(editKeywordsInput.value);
+    if (!title) { showToast('请填写名称'); editTitleInput.focus(); return; }
+
+    var list = loadBooks();
+    if (state.editingId) {
+      for (var i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(state.editingId)) {
+          list[i].title = title;
+          list[i].content = content;
+          list[i].scope = editScope;
+          list[i].categoryId = editCategory;
+          list[i].keywords = keywords;
+          break;
+        }
+      }
+    } else {
+      list.unshift({
+        id: genId(),
+        title: title,
+        content: content,
+        scope: editScope,
+        type: state.tab,
+        categoryId: editCategory,
+        keywords: keywords,
+        createdAt: Date.now()
+      });
+    }
+    try {
+      saveBooks(list);
+    } catch (err) {
+      if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+        showToast('存储空间不足，请压缩内容');
+      } else {
+        showToast('保存失败，请重试');
+      }
+      return;
+    }
+    closeOverlay('editOverlay');
+    renderAll();
+    showToast(state.editingId ? '已保存' : '新建成功');
+  });
+
+  /* 点击卡片进入编辑 */
+  listEl.addEventListener('click', function (e) {
+    var card = e.target.closest('.book-card');
+    if (!card) return;
+    var book = null;
+    var list = loadBooks();
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(card.getAttribute('data-id'))) { book = list[i]; break; }
+    }
+    if (book) openEditDrawer(book);
+  });
+
+  /* ---- 导入 ---- */
+  var importInput = document.getElementById('importInput');
+  document.getElementById('menuImport').addEventListener('click', function () {
+    closeOverlay('actionOverlay');
+    importInput.value = '';
+    importInput.click();
+  });
+
+  importInput.addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var fileName = file.name || '导入的世界书';
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var text = String(ev.target.result || '');
+      var added = [];
+      var isJson = /\.json$/i.test(fileName);
+      try {
+        if (isJson) {
+          var parsed = JSON.parse(text);
+          var arr = null;
+          if (Array.isArray(parsed)) arr = parsed;
+          else if (parsed && Array.isArray(parsed.books)) arr = parsed.books;
+          else if (parsed && Array.isArray(parsed.worldbooks)) arr = parsed.worldbooks;
+          else if (parsed && typeof parsed === 'object') arr = [parsed];
+          if (!arr) throw new Error('JSON 结构无法识别');
+          arr.forEach(function (item) { added.push(normalizeBook(item, state.tab)); });
+        } else {
+          // txt：纯文本生成一本新世界书，标题取文件名
+          var title = fileName.replace(/\.[^.]+$/, '').trim() || '导入的文本';
+          added.push(normalizeBook({ title: title, content: text, scope: 'global' }, state.tab));
+        }
+      } catch (err) {
+        showToast('导入失败：JSON 解析错误');
+        return;
+      }
+
+      var list = loadBooks();
+      added.forEach(function (b) { list.push(b); });
+      try {
+        saveBooks(list);
+      } catch (err) {
+        showToast('存储空间不足，导入未完成');
+        return;
+      }
+      renderAll();
+      showToast('导入成功，新增 ' + added.length + ' 本');
+    };
+    reader.onerror = function () { showToast('文件读取失败'); };
+    reader.readAsText(file);
+  });
+
+  /* ---- 导出 ---- */
+  document.getElementById('menuExport').addEventListener('click', function () {
+    closeOverlay('actionOverlay');
+    var list = loadBooks();
+    if (!list.length) { showToast('还没有世界书可导出'); return; }
+
+    var d = new Date();
+    var ymd = '' + d.getFullYear() +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      String(d.getDate()).padStart(2, '0');
+
+    var blob;
+    try {
+      blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json;charset=utf-8' });
+    } catch (err) {
+      showToast('导出失败');
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '世界书备份_' + ymd + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('已开始导出');
+  });
+
+  /* ================= 分类管理（独立键 worldbook_categories，与书本数据完全隔离） ================= */
+  var CATEGORY_KEY = 'worldbook_categories';
+  var categoryListEl = document.getElementById('categoryList');
+  var categoryInputEl = document.getElementById('categoryInput');
+
+  function genCategoryId() {
+    return 'cat_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+  /* 读取分类；无数据 / 解析失败 / 旧脏数据时一律兜底为空数组，绝不抛出 */
+  function loadCategories() {
+    var list = [];
+    try {
+      var raw = localStorage.getItem(CATEGORY_KEY);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          list = arr
+            .filter(function (c) {
+              return c && typeof c === 'object' &&
+                String(c.name == null ? '' : c.name).trim() !== '';
+            })
+            .map(function (c) {
+              return {
+                id: c.id != null ? String(c.id) : genCategoryId(),   // 兼容纯数字 id 的旧数据
+                name: String(c.name).trim()
+              };
+            });
+        }
+      }
+    } catch (e) { list = []; }
+    return list;
+  }
+  function saveCategories(list) {
+    localStorage.setItem(CATEGORY_KEY, JSON.stringify(list));
+  }
+  function renderCategoryList() {
+    var cats = loadCategories();
+    if (!cats.length) {
+      categoryListEl.innerHTML = '<div class="wb-cat-empty">暂无分类</div>';
+      return;
+    }
+    categoryListEl.innerHTML = cats.map(function (c) {
+      var isActive = currentCategoryFilter != null &&
+        String(currentCategoryFilter) === String(c.id);
+      return '<div class="wb-cat-item' + (isActive ? ' is-active' : '') +
+        '" data-cat-id="' + escapeHtml(c.id) + '">' +
+        '<span class="wb-cat-name-wrap">' +
+          '<span class="wb-cat-name">' + escapeHtml(c.name) + '</span>' +
+          (isActive ? '<svg class="wb-cat-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="#1C1C1E"/></svg>' : '') +
+        '</span>' +
+        '<button class="wb-cat-del" type="button" aria-label="删除分类" data-cat-del="' + escapeHtml(c.id) + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>' +
+        '</button>' +
+      '</div>';
+    }).join('');
+  }
+  function addCategory() {
+    var name = categoryInputEl.value.trim();
+    if (!name) { showToast('请输入分类名称'); categoryInputEl.focus(); return; }
+    var list = loadCategories();
+    var exists = list.some(function (c) { return c.name.toLowerCase() === name.toLowerCase(); });
+    if (exists) { showToast('分类已存在'); return; }
+    list.push({ id: genCategoryId(), name: name });
+    try {
+      saveCategories(list);
+    } catch (err) {
+      if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+        showToast('存储空间不足，请稍后再试');
+      } else {
+        showToast('保存失败，请重试');
+      }
+      return;
+    }
+    categoryInputEl.value = '';
+    renderCategoryList();
+    showToast('已添加');
+  }
+  document.getElementById('btnCategoryAdd').addEventListener('click', addCategory);
+  categoryInputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); addCategory(); }
+  });
+  /* 分类列表面板级事件委托：点垃圾桶=删除；点行其他区域=按该分类筛选书本 */
+  categoryListEl.addEventListener('click', function (e) {
+    /* 1) 删除按钮优先，阻止冒泡到行筛选逻辑 */
+    var delBtn = e.target.closest ? e.target.closest('[data-cat-del]') : null;
+    if (delBtn) {
+      var id = delBtn.getAttribute('data-cat-del');
+      var list = loadCategories();
+      var target = null;
+      for (var i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(id)) { target = list[i]; break; }
+      }
+      if (!target) return;
+      if (!window.confirm('确定删除分类「' + target.name + '」吗？')) return;
+      var next = list.filter(function (c) { return String(c.id) !== String(id); });
+      try {
+        saveCategories(next);
+      } catch (err) {
+        showToast('删除失败，请重试');
+        return;
+      }
+      // 若删的正是当前生效的筛选分类，则清空筛选，避免列表被锁空
+      if (currentCategoryFilter != null && String(currentCategoryFilter) === String(id)) {
+        currentCategoryFilter = null;
+        renderAll();
+      } else {
+        renderCategoryList();
+      }
+      showToast('已删除');
+      return;
+    }
+
+    /* 2) 点击分类行：设定筛选 → 关闭抽屉 → 重新渲染书本列表 */
+    var row = e.target.closest ? e.target.closest('.wb-cat-item') : null;
+    if (!row) return;
+    currentCategoryFilter = row.getAttribute('data-cat-id');
+    closeOverlay('categoryOverlay');
+    renderAll();
+  });
+
+  /* ================= 初始化 ================= */
+  renderAll();
+</script>
+<script src="statusbar-control.js"></script>
+</body>
+</html>

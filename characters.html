@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>角色管理</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #DCDCDC;
+            background-color: #FFFFFF;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
-            color: #222222;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+            color: #111111;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -21,9 +23,9 @@
             position: relative;
             width: min(390px, calc(100vw - 24px));
             height: min(844px, calc(100vh - 24px));
-            background-color: #EBEBEB;
+            background-color: #FFFFFF;
             border-radius: 45px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             border: 8px solid #ffffff;
             display: flex;
@@ -34,116 +36,129 @@
             top: 0;
             width: 100%;
             padding: 14px 28px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #000;
+            font-size: 0.813rem;
+            font-weight: 500;
+            color: #111111;
             z-index: 50;
             pointer-events: none;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            letter-spacing: .03em;
         }
-        /* Header：极简标题区（透明底、无分割线） */
+
+        /* 顶部：圆形返回 + 大英文标题靠左 + 右侧小按钮 */
         .header {
-            padding: 50px 16px 12px 16px;
-            background-color: transparent;
+            padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 16px;
+            background-color: #FFFFFF;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        /* 编辑视图 header 与表单背景衔接 */
         #editorView .header {
-            background-color: #F8F9FA;
+            background-color: #FFFFFF;
         }
-        .back-link {
-            display: inline-flex;
+        .back-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F8F8FA;
+            display: flex;
             align-items: center;
-            gap: 2px;
-            color: #666666;
-            font-size: 14px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .back-link .arrow { font-size: 24px; line-height: 14px; }
-        .header-title {
-            font-size: 17px;
-            font-weight: 800;
+            justify-content: center;
             color: #111111;
-            letter-spacing: -0.4px;
+            text-decoration: none;
+            font-size: 1.25rem;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: transform .2s ease, background .2s ease;
         }
-        /* “+ 添加”黑色小药丸按钮（原样保留新稿规格） */
+        .back-circle:active {
+            transform: scale(0.95);
+            background: #EEEEF0;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            flex: 1;
+            margin-left: 14px;
+        }
         .btn-header {
             background: #111111;
             color: #FFFFFF;
-            font-size: 9.5px;
+            font-size: 0.75rem;
             font-weight: 600;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 14px;
             border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: none;
+            flex-shrink: 0;
+            transition: transform .2s ease;
         }
         .btn-header:active { transform: scale(0.95); }
         .btn-header svg { display: block; }
-        /* 角色列表视图 */
+
+        /* 列表视图 */
         .view-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        /* 列表容器（对应新稿 .role-stage） */
         .role-list {
             flex: 1;
             overflow-y: auto;
-            padding: 0 12px 24px !important;
+            padding: 0 16px 24px !important;
             display: flex;
             flex-direction: column;
-            gap: 6px; /* 极紧凑缝隙 */
+            gap: 10px;
             scrollbar-width: none;
         }
         .role-list::-webkit-scrollbar { display: none; }
 
-        /* 极致纤细紧凑的细长条卡片 (Slim Bar) */
+        /* 列表卡片：纯净灰底，无玻璃拟态 */
         .role-slim-bar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 14px;
-            padding: 8px 10px; /* 紧凑内边距 */
-            border: 1px solid rgba(255, 255, 255, 0.85);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.015);
+            background: #F8F8FA;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: none;
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: background 0.15s ease, transform 0.15s ease;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
         .role-slim-bar:active {
-            background: rgba(255, 255, 255, 0.95);
-            transform: scale(0.985);
+            background: #EEEEF0;
+            transform: scale(0.98);
         }
         .role-slim-bar.active-role {
-            background: rgba(255, 255, 255, 0.95);
+            background: #F0F0F2;
         }
 
         .bar-left {
             display: flex;
             align-items: center;
-            gap: 9px;
+            gap: 12px;
             overflow: hidden;
             flex: 1;
         }
 
-        /* 精致小巧头像（img 或占位 div 共用同一规格） */
         .slim-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #F0F0F0 0%, #E2E2E2 100%);
+            width: 40px;
+            height: 40px;
+            background: #EEEEF0;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border: none;
             flex-shrink: 0;
             object-fit: cover;
         }
@@ -151,19 +166,19 @@
         .slim-meta {
             display: flex;
             flex-direction: column;
-            gap: 1px;
+            gap: 2px;
             overflow: hidden;
         }
 
         .slim-name-row {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .slim-name {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 0.875rem;
+            font-weight: 600;
             color: #111111;
             white-space: nowrap;
             overflow: hidden;
@@ -171,71 +186,71 @@
         }
 
         .slim-tag {
-            font-size: 8px;
-            font-weight: 600;
-            color: #777777;
-            background: rgba(0, 0, 0, 0.04);
-            padding: 1px 4px;
-            border-radius: 4px;
-            font-family: monospace;
+            font-size: 0.625rem;
+            font-weight: 500;
+            color: #999999;
+            background: #EEEEF0;
+            padding: 2px 6px;
+            border-radius: 6px;
             flex-shrink: 0;
         }
 
         .slim-desc {
-            font-size: 9.5px;
-            color: #888888;
+            font-size: 0.75rem;
+            color: #999999;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* 右侧极简操作项 */
         .bar-right {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 9px;
-            font-weight: 600;
+            gap: 10px;
+            font-size: 0.688rem;
+            font-weight: 500;
             color: #666666;
-            font-family: monospace;
             flex-shrink: 0;
         }
 
         .bar-right .act-opt {
             background: none;
             border: none;
-            padding: 0;
+            padding: 4px 6px;
             font: inherit;
             color: #666666;
             cursor: pointer;
-            transition: color 0.15s;
+            transition: color 0.2s;
         }
 
+        /* 删除按钮改灰阶，不用红色 */
         .bar-right .act-opt.del {
-            color: #B55555;
+            color: #999999;
+        }
+        .bar-right .act-opt.del:active {
+            color: #666666;
         }
 
-        .empty-tip { text-align: center; color: #999999; font-size: 11px; padding: 30px 0; }
+        .empty-tip { text-align: center; color: #999999; font-size: 0.875rem; padding: 40px 0; }
 
         /* 编辑页面表单视图 */
         .editor-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 18px 24px;
+            padding: 0 22px 24px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
             scrollbar-width: none;
-            background-color: #F8F9FA;
+            background-color: #FFFFFF;
         }
         .editor-container::-webkit-scrollbar { display: none; }
 
-        /* 头像上传区 */
         .avatar-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 4px 0 0;
+            padding: 8px 0 0;
         }
         .avatar-bubble-wrapper {
             position: relative;
@@ -250,10 +265,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
+            color: #FFFFFF;
             font-weight: 600;
-            font-size: 30px;
-            transition: transform 0.15s ease;
+            font-size: 1.875rem;
+            transition: transform 0.2s ease;
             user-select: none;
             object-fit: cover;
         }
@@ -266,124 +281,194 @@
             right: 0;
             width: 26px;
             height: 26px;
-            background: #ffffff;
+            background: #FFFFFF;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-            font-size: 12px;
-            color: #555;
-            border: 1.5px solid #F8F9FA;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            font-size: 0.75rem;
+            color: #666666;
+            border: 1px solid #EEEEF0;
         }
 
-        /* 表单组 */
         .editor-field-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
         .field-label {
-            font-size: 12px;
-            font-weight: 400;
-            color: #888;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #999999;
             padding-left: 2px;
+            letter-spacing: 0.02em;
         }
 
-        /* 统一输入框 */
         .form-input {
             width: 100%;
-            height: 44px;
-            background-color: #F2F2F7;
+            height: 48px;
+            background-color: #F8F8FA;
             border: none;
-            border-radius: 12px;
-            padding: 0 14px;
-            font-size: 15px;
-            color: #1C1C1E;
+            border-radius: 16px;
+            padding: 0 16px;
+            font-size: 0.938rem;
+            color: #111111;
             outline: none;
             font-family: inherit;
-            transition: box-shadow 0.15s ease;
+            transition: background 0.2s ease;
         }
         .form-input:focus {
-            box-shadow: 0 0 0 1.5px #333333;
-            background-color: #fff;
+            background-color: #FFFFFF;
+            box-shadow: inset 0 0 0 1px #E5E5EA;
         }
 
-        /* 统一文本框 */
         .form-textarea {
             width: 100%;
             min-height: 120px;
-            background-color: #F2F2F7;
+            background-color: #F8F8FA;
             border: none;
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 14px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 0.875rem;
             line-height: 1.6;
-            color: #1C1C1E;
+            color: #111111;
             outline: none;
             font-family: inherit;
             resize: none;
-            transition: box-shadow 0.15s ease;
+            transition: background 0.2s ease;
         }
         .form-textarea.tone {
             min-height: 100px;
         }
         .form-textarea:focus {
-            box-shadow: 0 0 0 1.5px #333333;
-            background-color: #fff;
+            background-color: #FFFFFF;
+            box-shadow: inset 0 0 0 1px #E5E5EA;
         }
         .form-textarea::placeholder {
-            color: #C0C0C8;
-            font-size: 13px;
+            color: #B0B0B5;
+            font-size: 0.813rem;
         }
 
-        /* 底部固定保存按钮 */
         .btn-save-fixed {
-            height: 48px;
-            background-color: #1C1C1E;
+            height: 52px;
+            background-color: #111111;
             color: #ffffff;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 500;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             margin-top: auto;
-            transition: opacity 0.15s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
         .btn-save-fixed:active {
             opacity: 0.85;
+            transform: scale(0.98);
         }
 
-        /* 取消按钮 */
         .btn-header-cancel {
-            color: #6B7280;
-            font-size: 14px;
-            background: none;
+            color: #111111;
+            font-size: 1.25rem;
+            background: #F8F8FA;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             border: none;
             cursor: pointer;
             font-family: inherit;
-            padding: 4px 6px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: transform .2s ease, background .2s ease;
+        }
+        .btn-header-cancel:active {
+            transform: scale(0.95);
+            background: #EEEEF0;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* 本页不需要任何底部导航栏：隐藏 nav.js 注入的全站悬浮导航（仅本页 CSS，不改 nav.js） */
         .floating-nav {
             display: none !important;
         }
 
-        /* body 禁止选中文本，但编辑表单内恢复正常文本选择 */
         .editor-container,
         .editor-container input,
         .editor-container textarea {
             user-select: text;
             -webkit-user-select: text;
         }
+
+        /* 绑定世界书：极简多选列表 */
+        .wb-bind-list {
+            display: flex;
+            flex-direction: column;
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            border-radius: 16px;
+        }
+        .wb-bind-list::-webkit-scrollbar { display: none; }
+        .wb-bind-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 48px;
+            padding: 0 16px;
+            background: #F8F8FA;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .wb-bind-item:last-child { margin-bottom: 0; }
+        .wb-bind-item:active { background: #EEEEF0; }
+        .wb-bind-name {
+            font-size: 0.875rem;
+            color: #111111;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 12px;
+        }
+        .wb-bind-circle {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1.5px solid #E5E5EA;
+            background: transparent;
+            position: relative;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .wb-bind-item.is-checked { background: #F0F0F2; }
+        .wb-bind-item.is-checked .wb-bind-circle {
+            background: #111111;
+            border-color: #111111;
+        }
+        .wb-bind-item.is-checked .wb-bind-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FFFFFF;
+        }
+        .wb-bind-empty {
+            font-size: 0.75rem;
+            color: #999999;
+            padding: 12px 4px;
+        }
     </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
@@ -392,11 +477,8 @@
         <!-- 角色列表界面 -->
         <div class="view-section" id="listView">
             <header class="header">
-                <a class="back-link" href="index.html" aria-label="返回主屏幕">
-                    <span class="arrow">‹</span>
-                    <span>返回</span>
-                </a>
-                <h1 class="header-title">角色管理</h1>
+                <a class="back-circle" href="index.html" aria-label="返回主屏幕">‹</a>
+                <h1 class="header-title">Contacts</h1>
                 <button class="btn-header" id="btnAddRole" type="button"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>添加</span></button>
             </header>
             <main class="role-list" id="roleListContainer"></main>
@@ -405,12 +487,9 @@
         <!-- 角色卡编辑/新增界面 -->
         <div class="view-section hidden" id="editorView">
             <header class="header">
-                <button class="btn-header-cancel" id="btnCancelEdit" type="button" aria-label="取消并返回">
-                    <span style="font-size: 20px; line-height: 14px; margin-right: 2px;">‹</span>
-                    <span>取消</span>
-                </button>
-                <h1 class="header-title" id="editorTitle">角色卡</h1>
-                <span style="width: 48px;"></span>
+                <button class="btn-header-cancel" id="btnCancelEdit" type="button" aria-label="取消并返回">‹</button>
+                <h1 class="header-title" id="editorTitle">Character</h1>
+                <span style="width: 36px;"></span>
             </header>
             <main class="editor-container">
                 <input type="hidden" id="editRoleId" value="">
@@ -450,12 +529,19 @@
                     ></textarea>
                 </div>
 
-                <!-- 5. 保存按钮 -->
+                <!-- 5. 绑定世界书（多选） -->
+                <div class="editor-field-group">
+                    <label class="field-label" style="color: #8E8E93;">绑定世界书</label>
+                    <div class="wb-bind-list" id="worldBookBindList"></div>
+                </div>
+
+                <!-- 6. 保存按钮 -->
                 <button class="btn-save-fixed" id="btnSaveRole" type="button">保存设定</button>
             </main>
         </div>
     </div>
     <script src="characters-manager.js"></script>
     <script src="nav.js"></script>
+<script src="statusbar-control.js"></script>
 </body>
 </html>

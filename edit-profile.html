@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑资料 · 小手机</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
+    <script src="mask.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -44,7 +47,7 @@
             justify-content: flex-start;
             align-items: center;
             padding: 14px 28px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #000;
             z-index: 50;
@@ -74,7 +77,7 @@
         }
         .ep-back svg { width: 22px; height: 22px; }
         .ep-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             color: #1C1C1E;
         }
@@ -116,7 +119,7 @@
             align-items: center;
             gap: 4px;
             color: #8E8E93;
-            font-size: 11px;
+            font-size: 0.688rem;
         }
         .ep-cover .upload-hint svg { width: 20px; height: 20px; }
 
@@ -151,7 +154,7 @@
         .ep-field { margin-bottom: 14px; }
         .ep-field label {
             display: block;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #8E8E93;
             margin-bottom: 6px;
         }
@@ -165,7 +168,7 @@
             border-radius: 12px;
             height: 44px;
             padding: 0 14px;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #333333;
             font-family: inherit;
         }
@@ -211,6 +214,20 @@
             pointer-events: none;
         }
 
+        /* 当前设定入口 */
+        .mask-entry {
+            display: flex; align-items: center;
+            margin: 4px 4px 16px;
+            padding: 14px 16px;
+            background: #F8F8FA;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .mask-entry:active { background: #EFEFF2; }
+        .mask-entry-label { font-size: 0.875rem; color: #666; flex-shrink: 0; }
+        .mask-entry-value { flex: 1; text-align: right; font-size: 0.938rem; font-weight: 700; color: #111; margin-right: 8px; }
+        .mask-entry-arrow { color: #B0B0B5; font-size: 18px; }
+
         /* 底部固定保存按钮（flex 底栏，与内容区左右对齐） */
         .ep-footer {
             flex-shrink: 0;
@@ -226,7 +243,7 @@
             color: #FFFFFF;
             border: none;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 0.938rem;
             font-weight: 500;
             font-family: inherit;
             cursor: pointer;
@@ -239,6 +256,7 @@
             cursor: default;
         }
     </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
 
@@ -312,6 +330,13 @@
                 </div>
             </form>
 
+            <!-- 当前设定（身份面具）入口 -->
+            <div class="mask-entry" id="maskEntry" role="button" tabindex="0" onclick="window.location.href='mask.html'">
+                <span class="mask-entry-label">当前设定</span>
+                <span class="mask-entry-value" id="maskEntryValue">日常小桃</span>
+                <span class="mask-entry-arrow">›</span>
+            </div>
+
         </main>
 
         <!-- 底部固定按钮 -->
@@ -327,6 +352,15 @@
         // 图片数据独立暂存（编辑中），保存时合并进 myProfile
         var pendingAvatar = '';
         var pendingCover = '';
+
+        /* 当前设定入口显示 */
+        (function initMaskEntry() {
+            if (typeof MaskSystem === 'undefined') return;
+            MaskSystem.ensureDefault();
+            var m = MaskSystem.getActiveMask();
+            var el = document.getElementById('maskEntryValue');
+            if (el && m) el.textContent = m.name;
+        })();
 
         function loadProfile() {
             try {
@@ -482,5 +516,6 @@
             }, 350);
         });
     </script>
+<script src="statusbar-control.js"></script>
 </body>
 </html>

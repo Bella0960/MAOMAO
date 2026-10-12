@@ -1,0 +1,25 @@
+{
+  "slug": "chip",
+  "schemaVersion": 2,
+  "name": "Chip",
+  "category": "filter",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "semanticTypeCandidates": [
+    { "type": "input.chip", "evidence": "Compact toggle for filter rows and tag display" }
+  ],
+  "variantDimensions": [
+    { "dim": "state", "values": ["default", "selected"] },
+    { "dim": "content", "values": ["label", "label+icon"] }
+  ],
+  "representativeVariants": [
+    { "name": "default", "whySelected": "Resting filter chip", "traits": { "height": "32px", "radius": "var(--radius-full)", "border": "1px solid var(--color-border)", "text": "var(--color-text)" }, "childrenDigest": ["label"] },
+    { "name": "selected", "whySelected": "Active filter state with check icon", "traits": { "bg": "var(--color-primary-50)", "text": "var(--color-primary-700)", "border": "1px solid var(--color-primary-200)" }, "childrenDigest": ["label", "check icon"] }
+  ],
+  "anatomy": ["container", "label", "optional check/close icon"],
+  "structurePatterns": ["horizontal scroll row, gap --space-2"],
+  "usageHints": { "priorityHint": "medium", "copySource": "short tags like 推荐/关注" },
+  "doNotInvent": ["multi-line chips", "dropdown menus inside chips"],
+  "unknowns": ["whether the real app uses filled or outlined selected state"],
+  "keyInsightSeed": "Pill chips, selected = primary tint fill, horizontal scroll"
+}

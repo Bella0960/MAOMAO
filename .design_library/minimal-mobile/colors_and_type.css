@@ -1,0 +1,287 @@
+/* @group-priority: primary, accent, success, info, warning */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+/* ============================================
+   Lumen Design Tokens — 现代极简移动端
+   Light Theme (default)
+   ============================================ */
+:root {
+  /* primary */
+  --lumen-blue-50: #eef6ff; /* AI-generated */
+  --lumen-blue-100: #d9ecff; /* AI-generated */
+  --lumen-blue-200: #bcdcff; /* AI-generated */
+  --lumen-blue-300: #8ec6ff; /* AI-generated */
+  --lumen-blue-400: #59a8ff; /* AI-generated */
+  --lumen-blue-500: #2f8bfd; /* AI-generated */
+  --lumen-blue-600: #1668f0; /* AI-generated @primary */
+  --lumen-blue-700: #1050d6; /* AI-generated */
+  --lumen-blue-800: #123ea8; /* AI-generated */
+  --lumen-blue-900: #133680; /* AI-generated */
+
+  /* accent */
+  --lumen-teal-50: #ebfdfa; /* AI-generated */
+  --lumen-teal-100: #d1f8f1; /* AI-generated */
+  --lumen-teal-200: #a7efe3; /* AI-generated */
+  --lumen-teal-300: #71e0d0; /* AI-generated */
+  --lumen-teal-400: #3ecab6; /* AI-generated */
+  --lumen-teal-500: #1fb3a1; /* AI-generated */
+  --lumen-teal-600: #129185; /* AI-generated @primary */
+  --lumen-teal-700: #12746b; /* AI-generated */
+  --lumen-teal-800: #135c57; /* AI-generated */
+  --lumen-teal-900: #144c49; /* AI-generated */
+
+  /* success */
+  --lumen-green-50: #ecfdf3; /* AI-generated */
+  --lumen-green-100: #d1fadf; /* AI-generated */
+  --lumen-green-200: #a6f4c5; /* AI-generated */
+  --lumen-green-300: #6ce9a6; /* AI-generated */
+  --lumen-green-400: #32d583; /* AI-generated */
+  --lumen-green-500: #12b76a; /* AI-generated */
+  --lumen-green-600: #039855; /* AI-generated @primary */
+  --lumen-green-700: #027a48; /* AI-generated */
+  --lumen-green-800: #05603a; /* AI-generated */
+  --lumen-green-900: #054f31; /* AI-generated */
+
+  /* warning */
+  --lumen-amber-50: #fffaeb; /* AI-generated */
+  --lumen-amber-100: #fef0c7; /* AI-generated */
+  --lumen-amber-200: #fedf89; /* AI-generated */
+  --lumen-amber-300: #fec84b; /* AI-generated */
+  --lumen-amber-400: #fdb022; /* AI-generated */
+  --lumen-amber-500: #f79009; /* AI-generated */
+  --lumen-amber-600: #dc6803; /* AI-generated @primary */
+  --lumen-amber-700: #b54708; /* AI-generated */
+  --lumen-amber-800: #93370d; /* AI-generated */
+  --lumen-amber-900: #7a2e0e; /* AI-generated */
+
+  /* danger */
+  --lumen-red-50: #fef3f2; /* AI-generated */
+  --lumen-red-100: #fee4e2; /* AI-generated */
+  --lumen-red-200: #fecdca; /* AI-generated */
+  --lumen-red-300: #fda29b; /* AI-generated */
+  --lumen-red-400: #f97066; /* AI-generated */
+  --lumen-red-500: #f04438; /* AI-generated */
+  --lumen-red-600: #d92d20; /* AI-generated @primary */
+  --lumen-red-700: #b42318; /* AI-generated */
+  --lumen-red-800: #912018; /* AI-generated */
+  --lumen-red-900: #7a271a; /* AI-generated */
+
+  /* info */
+  --lumen-sky-50: #f0f9ff; /* AI-generated */
+  --lumen-sky-100: #e0f2fe; /* AI-generated */
+  --lumen-sky-200: #b9e6fe; /* AI-generated */
+  --lumen-sky-300: #7cd4fd; /* AI-generated */
+  --lumen-sky-400: #36bffa; /* AI-generated */
+  --lumen-sky-500: #0ba5ec; /* AI-generated */
+  --lumen-sky-600: #0086c9; /* AI-generated @primary */
+  --lumen-sky-700: #026aa2; /* AI-generated */
+  --lumen-sky-800: #065986; /* AI-generated */
+  --lumen-sky-900: #0b4a6f; /* AI-generated */
+
+  /* neutral */
+  --lumen-gray-50: #f9fafb; /* AI-generated */
+  --lumen-gray-100: #f2f4f7; /* AI-generated */
+  --lumen-gray-200: #e4e7ec; /* AI-generated */
+  --lumen-gray-300: #d0d5dd; /* AI-generated */
+  --lumen-gray-400: #98a2b3; /* AI-generated */
+  --lumen-gray-500: #667085; /* AI-generated */
+  --lumen-gray-600: #475467; /* AI-generated */
+  --lumen-gray-700: #344054; /* AI-generated */
+  --lumen-gray-800: #1d2939; /* AI-generated */
+  --lumen-gray-900: #101828; /* AI-generated @primary */
+
+  /* surface */
+  --lumen-surface: #ffffff; /* AI-generated @primary */
+  --lumen-surface-dim: #f2f4f7; /* AI-generated */
+  --lumen-surface-card: #ffffff; /* AI-generated */
+  --lumen-surface-sunken: #f9fafb; /* AI-generated */
+  --lumen-inverse-surface: #1d2939; /* AI-generated */
+
+  /* border */
+  --lumen-border-default: #e4e7ec; /* AI-generated @primary */
+  --lumen-border-strong: #d0d5dd; /* AI-generated */
+  --lumen-border-subtle: #f2f4f7; /* AI-generated */
+  --lumen-border-focus: #1668f0; /* AI-generated */
+
+  /* text */
+  --lumen-text-primary: #101828; /* AI-generated @primary */
+  --lumen-text-secondary: #475467; /* AI-generated */
+  --lumen-text-muted: #667085; /* AI-generated */
+  --lumen-text-disabled: #98a2b3; /* AI-generated */
+  --lumen-text-inverse: #ffffff; /* AI-generated */
+  --lumen-text-brand: #1668f0; /* AI-generated */
+
+  /* interactive */
+  --lumen-state-hover: rgba(16,24,40,0.08); /* AI-generated @primary */
+  --lumen-state-focus: rgba(16,24,40,0.12); /* AI-generated */
+  --lumen-state-press: rgba(16,24,40,0.16); /* AI-generated */
+  --lumen-state-drag: rgba(16,24,40,0.16); /* AI-generated */
+
+  /* typography */
+  --font-display: 'Inter', 'Noto Sans SC', sans-serif;
+  --font-heading: 'Inter', 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Sans SC', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-size-display: 32px;
+  --font-size-h1: 28px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --font-size-h4: 17px;
+  --font-size-body: 15px;
+  --font-size-lead: 17px;
+  --font-size-caption: 13px;
+  --font-size-eyebrow: 11px;
+  --font-size-mono: 13px;
+  --font-weight-display: 700;
+  --font-weight-h1: 700;
+  --font-weight-h2: 600;
+  --font-weight-h3: 600;
+  --font-weight-h4: 600;
+  --font-weight-body: 400;
+  --font-weight-lead: 400;
+  --font-weight-caption: 400;
+  --font-weight-eyebrow: 600;
+  --font-weight-mono: 400;
+  --line-height-display: 1.15;
+  --line-height-h1: 1.2;
+  --line-height-h2: 1.25;
+  --line-height-h3: 1.3;
+  --line-height-h4: 1.4;
+  --line-height-body: 1.65;
+  --line-height-lead: 1.7;
+  --line-height-caption: 1.5;
+  --line-height-eyebrow: 1.4;
+  --line-height-mono: 1.6;
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* sizing */
+  --size-icon-sm: 16px;
+  --size-icon-md: 20px;
+  --size-icon-lg: 24px;
+  --size-input-height: 44px;
+  --size-button-height-sm: 32px;
+  --size-button-height-md: 40px;
+  --size-button-height-lg: 48px;
+  --size-tab-bar-height: 56px;
+  --size-nav-height: 44px;
+  --size-cell-height: 52px;
+  --size-avatar-sm: 24px;
+  --size-avatar-md: 40px;
+  --size-avatar-lg: 56px;
+
+  /* radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* shadows */
+  --shadow-1: 0 1px 2px rgba(16,24,40,0.05); /* Card */
+  --shadow-2: 0 2px 6px rgba(16,24,40,0.08); /* Card Hover */
+  --shadow-3: 0 8px 20px -4px rgba(16,24,40,0.14); /* Float */
+  --shadow-4: 0 16px 36px -8px rgba(16,24,40,0.18); /* Modal */
+  --shadow-5: 0 24px 56px -12px rgba(16,24,40,0.24); /* Overlay */
+
+  /* motion */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+  /* ============================================
+     SEMANTIC ALIAS LAYER
+     ============================================ */
+  --color-primary: var(--lumen-blue-600);
+  --color-primary-hover: var(--lumen-blue-700);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--lumen-gray-200);
+  --color-secondary-foreground: var(--lumen-gray-800);
+  --color-accent: var(--lumen-teal-600);
+  --color-background: var(--lumen-surface-sunken);
+  --color-surface: var(--lumen-surface);
+  --color-surface-dim: var(--lumen-surface-dim);
+  --color-card: var(--lumen-surface-card);
+  --color-text: var(--lumen-text-primary);
+  --color-text-muted: var(--lumen-text-muted);
+  --color-text-inverse: var(--lumen-text-inverse);
+  --color-success: var(--lumen-green-600);
+  --color-warning: var(--lumen-amber-600);
+  --color-danger: var(--lumen-red-600);
+  --color-info: var(--lumen-sky-600);
+  --color-border: var(--lumen-border-default);
+  --color-border-strong: var(--lumen-border-strong);
+  --type-display: var(--font-size-display) / var(--line-height-display) var(--font-display);
+  --type-h1: var(--font-size-h1) / var(--line-height-h1) var(--font-heading);
+  --type-h2: var(--font-size-h2) / var(--line-height-h2) var(--font-heading);
+  --type-h3: var(--font-size-h3) / var(--line-height-h3) var(--font-heading);
+  --type-h4: var(--font-size-h4) / var(--line-height-h4) var(--font-heading);
+  --type-body: var(--font-size-body) / var(--line-height-body) var(--font-body);
+  --type-caption: var(--font-size-caption) / var(--line-height-caption) var(--font-body);
+  --font-family-base: var(--font-body);
+}
+
+/* ============================================
+   Dark Theme
+   ============================================ */
+.dark {
+  --lumen-surface: #101828;
+  --lumen-surface-dim: #1d2939;
+  --lumen-surface-card: #161d2b;
+  --lumen-surface-sunken: #0b1220;
+  --lumen-inverse-surface: #f2f4f7;
+  --lumen-border-default: #344054;
+  --lumen-border-strong: #475467;
+  --lumen-border-subtle: #1d2939;
+  --lumen-border-focus: #59a8ff;
+  --lumen-text-primary: #f2f4f7;
+  --lumen-text-secondary: #d0d5dd;
+  --lumen-text-muted: #98a2b3;
+  --lumen-text-disabled: #667085;
+  --lumen-text-inverse: #101828;
+  --lumen-text-brand: #8ec6ff;
+  --lumen-state-hover: rgba(242,244,247,0.08);
+  --lumen-state-focus: rgba(242,244,247,0.12);
+  --lumen-state-press: rgba(242,244,247,0.16);
+  --lumen-state-drag: rgba(242,244,247,0.16);
+  --color-primary: var(--lumen-blue-400);
+  --color-primary-hover: var(--lumen-blue-300);
+  --color-accent: var(--lumen-teal-400);
+  --color-background: var(--lumen-surface-sunken);
+  --color-surface: var(--lumen-surface);
+  --color-card: var(--lumen-surface-card);
+  --color-text: var(--lumen-text-primary);
+  --color-text-muted: var(--lumen-text-muted);
+  --color-text-inverse: var(--lumen-text-inverse);
+  --color-success: var(--lumen-green-400);
+  --color-warning: var(--lumen-amber-400);
+  --color-danger: var(--lumen-red-400);
+  --color-info: var(--lumen-sky-400);
+  --color-border: var(--lumen-border-default);
+  --color-border-strong: var(--lumen-border-strong);
+}
+
+/* ============================================
+   Typography Classes
+   ============================================ */
+.lumen-display { font-family: var(--font-display); font-size: 2rem; font-weight: var(--font-weight-display); line-height: var(--line-height-display); letter-spacing: -0.02em; }
+.lumen-h1 { font-family: var(--font-heading); font-size: 1.75rem; font-weight: var(--font-weight-h1); line-height: var(--line-height-h1); }
+.lumen-h2 { font-family: var(--font-heading); font-size: 1.5rem; font-weight: var(--font-weight-h2); line-height: var(--line-height-h2); }
+.lumen-h3 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: var(--font-weight-h3); line-height: var(--line-height-h3); }
+.lumen-h4 { font-family: var(--font-heading); font-size: 1.0625rem; font-weight: var(--font-weight-h4); line-height: var(--line-height-h4); }
+.lumen-body { font-family: var(--font-body); font-size: 0.9375rem; font-weight: var(--font-weight-body); line-height: var(--line-height-body); }
+.lumen-lead { font-family: var(--font-body); font-size: 1.0625rem; font-weight: var(--font-weight-lead); line-height: var(--line-height-lead); }
+.lumen-caption { font-family: var(--font-body); font-size: 0.8125rem; font-weight: var(--font-weight-caption); line-height: var(--line-height-caption); }
+.lumen-eyebrow { font-family: var(--font-body); font-size: 0.6875rem; font-weight: var(--font-weight-eyebrow); line-height: var(--line-height-eyebrow); letter-spacing: 0.08em; text-transform: uppercase; }
+.lumen-mono { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: var(--font-weight-mono); line-height: var(--line-height-mono); }

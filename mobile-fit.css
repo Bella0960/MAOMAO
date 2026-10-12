@@ -1,0 +1,86 @@
+/* ============================================================
+ * mobile-fit.css —— 真机浏览器全屏适配
+ * 在手机（窄屏 + 触摸设备）上打开时：
+ *   去掉模拟器外壳（圆角/边框/阴影），内容 100% 全屏铺满
+ *   状态栏与顶部标题避让刘海 / 灵动岛安全区
+ *   底部控件避让 Home 指示条
+ * 电脑 / 平板预览不受影响，仍显示手机模拟器外壳。
+ * ============================================================ */
+@media (max-width: 520px) and (pointer: coarse) {
+
+  body {
+    background: #FFFFFF !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100% !important;
+  }
+
+  /* 去掉模拟器外壳，全屏 */
+  .phone-mockup,
+  .home-screen,
+  .phone {
+    width: 100vw !important;
+    width: 100dvw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 首页舞台去留白 */
+  .simulator-stage {
+    display: block !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+  }
+  .phone-screen {
+    flex: 1 !important;
+  }
+
+  /* 状态栏：时间 / 图标整体避让刘海与灵动岛 */
+  .status-bar {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+  }
+
+  /* 模拟刘海条在真机上无意义，隐藏 */
+  .phone-camera,
+  .notch {
+    display: none !important;
+  }
+
+  /* 各页面顶部标题区统一避让安全区（多数已带 env，这里兜底） */
+  .bt-topbar,
+  .cs-topbar,
+  .topbar,
+  .header,
+  .home-topbar,
+  .chat-header {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 44px) !important;
+  }
+
+  /* 底部控件避让 Home 指示条（真机全面屏手势条） */
+  .bt-actions,
+  .bt-reset-card,
+  .chat-input-wrap,
+  .input-wrap,
+  .bottom-bar,
+  .dock,
+  .tab-bar,
+  .floating-nav {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px) !important;
+  }
+
+  /* 触控目标加大，点按更跟手 */
+  .action-row,
+  .menu-row,
+  .bt-action-btn,
+  .bt-shape-btn,
+  .btn,
+  .btn-action {
+    min-height: 46px !important;
+  }
+}

@@ -17,19 +17,19 @@ function applyHomeTheme() {
       document.documentElement.style.setProperty('--desktop-bg-img', 'none');
     }
 
-    // 2. 图标底色与磨砂样式
+    // 2. 图标底色（默认纯净灰底，无玻璃拟态）
     const iconStyle = localStorage.getItem('home_icon_style');
-    if (iconStyle === 'clean') {
-      document.documentElement.style.setProperty('--icon-bg', '#F2F2F7');
-      document.documentElement.style.setProperty('--icon-blur', 'none');
+    if (iconStyle === 'glass') {
+      document.documentElement.style.setProperty('--icon-bg', 'rgba(255, 255, 255, 0.6)');
+      document.documentElement.style.setProperty('--icon-blur', 'blur(12px)');
     } else {
       const iconBg = localStorage.getItem(ICON_BG_KEY);
       if (iconBg) {
         document.documentElement.style.setProperty('--icon-bg', iconBg);
       } else {
-        document.documentElement.style.removeProperty('--icon-bg');
+        document.documentElement.style.setProperty('--icon-bg', '#F8F8FA');
       }
-      document.documentElement.style.setProperty('--icon-blur', 'blur(12px)');
+      document.documentElement.style.setProperty('--icon-blur', 'none');
     }
 
     // 3. 挂件文字
@@ -64,7 +64,7 @@ function initWidgetEditor() {
     leftWidget.addEventListener('click', () => {
       currentEditingWidget = 'left';
       if (widgetModalTitle) widgetModalTitle.textContent = '修改左侧挂件';
-      if (widgetModalInput) widgetModalInput.value = leftTextEl ? leftTextEl.textContent : '( ˃ ᵕ ˂ )';
+      if (widgetModalInput) widgetModalInput.value = leftTextEl ? leftTextEl.textContent : 'HELLO';
       if (widgetModal) widgetModal.style.display = 'flex';
       setTimeout(() => widgetModalInput?.focus(), 50);
     });
@@ -74,7 +74,7 @@ function initWidgetEditor() {
     rightWidget.addEventListener('click', () => {
       currentEditingWidget = 'right';
       if (widgetModalTitle) widgetModalTitle.textContent = '修改右侧挂件';
-      if (widgetModalInput) widgetModalInput.value = rightTextEl ? rightTextEl.textContent : '행운이🤍';
+      if (widgetModalInput) widgetModalInput.value = rightTextEl ? rightTextEl.textContent : 'MONOCHROME';
       if (widgetModal) widgetModal.style.display = 'flex';
       setTimeout(() => widgetModalInput?.focus(), 50);
     });
@@ -187,7 +187,7 @@ document.querySelectorAll('.app-card, .dock-item').forEach((app) => {
       window.location.href = 'chat.html';
       return;
     }
-    if (app.dataset.app === '角色管理') {
+    if (app.dataset.app === '角色管理' || app.dataset.app === '联系人') {
       window.location.href = 'characters.html';
       return;
     }
@@ -197,6 +197,10 @@ document.querySelectorAll('.app-card, .dock-item').forEach((app) => {
     }
     if (app.dataset.app === '记忆') {
       window.location.href = 'memory.html';
+      return;
+    }
+    if (app.dataset.app === '钱包') {
+      window.location.href = 'wallet.html';
       return;
     }
 

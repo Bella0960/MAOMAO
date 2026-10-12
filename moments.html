@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>空间 · 小手机</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -45,7 +47,7 @@
             justify-content: flex-start;
             align-items: center;
             padding: 14px 28px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #000;
             z-index: 50;
@@ -154,8 +156,8 @@
 
         /* 左侧头像（复用 avatarHTML 输出的 .moment-avatar 钩子） */
         .post-item .moment-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background-color: #E5E5EA;
             border-radius: 10px;
             overflow: hidden;
@@ -185,10 +187,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .post-name { font-size: 12.5px; font-weight: 700; color: #111; }
-        .post-time { font-size: 9.5px; color: #999; font-family: monospace; }
+        .post-name { font-size: 0.781rem; font-weight: 700; color: #111; }
+        .post-time { font-size: 0.625rem; color: #999; font-family: monospace; }
         .post-text {
-            font-size: 12px;
+            font-size: 0.813rem;
             line-height: 1.5;
             color: #333;
             word-break: break-word;
@@ -196,7 +198,7 @@
         }
         .post-image {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 10px;
             display: block;
         }
 
@@ -217,7 +219,7 @@
             border: none;
             background: none;
             font-family: inherit;
-            font-size: 10.5px;
+            font-size: 0.656rem;
             color: #666;
             cursor: pointer;
             transition: color 0.15s ease, transform 0.1s ease;
@@ -230,7 +232,7 @@
 
         .empty-tip {
             text-align: center;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #999999;
             padding: 30px 0;
         }
@@ -246,13 +248,13 @@
             gap: 5px;
         }
         .comment-row {
-            font-size: 11px;
+            font-size: 0.688rem;
             line-height: 1.45;
             color: #333;
             word-break: break-word;
         }
         .comment-row .comment-name { color: #999; font-weight: 600; margin-right: 4px; }
-        .comment-row .comment-time { color: #B0B0B5; font-size: 9.5px; margin-left: 6px; font-family: monospace; }
+        .comment-row .comment-time { color: #B0B0B5; font-size: 0.594rem; margin-left: 6px; font-family: monospace; }
 
         /* ===== 封面 AI 隐形入口（细线条四角星，右下角半透明白圆） ===== */
         .cover-ai-btn {
@@ -300,7 +302,7 @@
         .comment-list::-webkit-scrollbar { display: none; }
         .comment-list .comment-empty {
             text-align: center;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #999;
             padding: 18px 0;
         }
@@ -319,19 +321,19 @@
         }
         .comment-list-item .cli-body { min-width: 0; }
         .comment-list-item .cli-head {
-            font-size: 11px;
+            font-size: 0.688rem;
             color: #999;
             font-weight: 600;
         }
         .comment-list-item .cli-head span {
             font-weight: 400;
             color: #B0B0B5;
-            font-size: 9.5px;
+            font-size: 0.594rem;
             margin-left: 6px;
             font-family: monospace;
         }
         .comment-list-item .cli-text {
-            font-size: 13px;
+            font-size: 0.813rem;
             line-height: 1.5;
             color: #333;
             margin-top: 2px;
@@ -351,7 +353,7 @@
             background-color: #F2F2F7;
             border-radius: 10px;
             padding: 0 14px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-family: inherit;
             color: #333;
         }
@@ -405,7 +407,7 @@
         }
         .post-title {
             text-align: center;
-            font-size: 15px;
+            font-size: 0.938rem;
             font-weight: 600;
             color: #222222;
             margin-bottom: 14px;
@@ -418,7 +420,7 @@
             outline: none;
             border-radius: 12px;
             padding: 12px 14px;
-            font-size: 14px;
+            font-size: 0.875rem;
             line-height: 1.6;
             color: #333333;
             font-family: inherit;
@@ -440,7 +442,7 @@
             cursor: pointer;
             overflow: hidden;
             color: #8E8E93;
-            font-size: 12px;
+            font-size: 0.75rem;
             transition: background-color 0.2s ease;
             flex-shrink: 0;
         }
@@ -461,7 +463,7 @@
             color: #FFFFFF;
             border: none;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 0.938rem;
             font-weight: 500;
             font-family: inherit;
             cursor: pointer;
@@ -484,7 +486,7 @@
             z-index: 700;
             background: rgba(28,28,30,0.9);
             color: #FFFFFF;
-            font-size: 13px;
+            font-size: 0.813rem;
             padding: 12px 20px;
             border-radius: 12px;
             pointer-events: none;
@@ -493,6 +495,7 @@
         }
         .moments-toast.show { opacity: 1; }
     </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
 
@@ -576,11 +579,23 @@
                 if (raw) {
                     var list = JSON.parse(raw);
                     if (Array.isArray(list)) {
-                        // 一次性清理旧版本写入的演示种子（不影响用户自己发布的 m_ 时间戳 id）
-                        var cleaned = list.filter(function (item) {
-                            return !item || String(item.id || '').indexOf('m_seed_') !== 0;
-                        });
-                        if (cleaned.length !== list.length) {
+                        // 一次性清理脏数据：演示种子 / 测试注入 / 测试前缀 / 假图（SVG 占位）
+                        var cleaned = [];
+                        var changed = false;
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            if (!item || typeof item !== 'object' || Array.isArray(item)) { changed = true; continue; }
+                            var id = String(item.id || '');
+                            // 1) 丢弃演示种子与测试注入数据（真实动态 id 为 m_<时间戳>_<随机数>）
+                            if (id.indexOf('m_seed_') === 0 || id.indexOf('m_test_') === 0) { changed = true; continue; }
+                            // 2) 丢弃带测试前缀的脏动态
+                            if (typeof item.content === 'string' && item.content.indexOf('用户动态：') !== -1) { changed = true; continue; }
+                            // 3) 假图（SVG data URI）清空图片字段，保留动态本身
+                            if (typeof item.imageData === 'string' && item.imageData.indexOf('data:image/svg') === 0) { item.imageData = ''; changed = true; }
+                            if (typeof item.image === 'string' && item.image.indexOf('data:image/svg') === 0) { item.image = ''; changed = true; }
+                            cleaned.push(item);
+                        }
+                        if (changed) {
                             try { localStorage.setItem(MOMENTS_KEY, JSON.stringify(cleaned)); } catch (e) {}
                         }
                         return cleaned;
@@ -673,15 +688,15 @@
                     }
                 }
                 if (role) {
-                    return { name: role.name || m.author || '匿名用户', avatar: role.avatar || m.avatar || '' };
+                    return { name: role.name || '', avatar: role.avatar || '' };
                 }
             } catch (e) {}
 
-            // 3) 兜底：帖子自身快照 → 匿名 + 灰头像
-            return { name: (m && m.author) || '匿名用户', avatar: (m && m.avatar) || '' };
+            // 3) 兜底：帖子自身快照（名字最终由渲染层兜底为「未知用户」）→ 空头像触发灰色 SVG
+            return { name: (m && m.author) || '', avatar: (m && m.avatar) || '' };
         }
 
-        // 相对时间
+        // 相对时间（评论等使用）
         function formatTime(ts) {
             var diff = Date.now() - ts;
             if (diff < 0) diff = 0;
@@ -696,18 +711,39 @@
             return (d.getMonth() + 1) + '月' + d.getDate() + '日';
         }
 
+        // 动态时间：绝对时间「月-日 时:分」（如 10-12 15:30）；时间缺失/非法返回空串，绝不出现 NaN
+        function formatPostTime(ts) {
+            var d = new Date(ts);
+            if (isNaN(d.getTime())) return '';
+            var month = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            var hour = String(d.getHours()).padStart(2, '0');
+            var minute = String(d.getMinutes()).padStart(2, '0');
+            return month + '-' + day + ' ' + hour + ':' + minute;
+        }
+
         /* ================= 列表渲染 ================= */
         var listEl = document.getElementById('momentsList');
 
         function renderMoments() {
             var list = loadMoments();
             if (!list.length) {
-                listEl.innerHTML = '<div class="empty-tip">还没有动态，点击右上角发布第一条吧</div>';
+                listEl.innerHTML = '<div class="empty-tip">还没有动态，快发一条吧</div>';
                 return;
             }
             listEl.innerHTML = list.map(function (m) {
                 var heartFill = m.liked ? ' liked' : '';
                 var poster = resolvePoster(m);
+                // 严格兜底：任何字段缺失都不报错、不白屏
+                var posterName = poster.name || m.authorName || m.name || m.author || '未知用户';
+                var posterAvatar = poster.avatar || m.authorAvatar || m.avatar || '';
+                // 正文：去掉测试前缀；[图片：xxx] → [配图：xxx]
+                var textContent = String(m.content == null ? '' : m.content)
+                    .replace(/用户动态：/g, '')
+                    .replace(/\[图片：/g, '[配图：');
+                // 只渲染真实位图（jpeg/png/webp/gif）；SVG 等假图一律不渲染，也不留空占位
+                var rawImage = m.image || m.imageData || '';
+                var imageSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(rawImage) ? rawImage : '';
                 var commentItems = Array.isArray(m.commentList) ? m.commentList : [];
                 var commentCount = commentItems.length || (m.comments || 0);
                 var commentsHTML = commentItems.length ? (
@@ -723,14 +759,14 @@
                 ) : '';
                 return '' +
                     '<article class="moment-card post-item" data-id="' + escapeHtml(m.id) + '">' +
-                        avatarHTML(poster.avatar) +
+                        avatarHTML(posterAvatar) +
                         '<div class="post-content-box">' +
                             '<div class="post-header">' +
-                                '<span class="post-name">' + escapeHtml(poster.name) + '</span>' +
-                                '<span class="post-time">' + formatTime(m.time) + '</span>' +
+                                '<span class="post-name">' + escapeHtml(posterName) + '</span>' +
+                                '<span class="post-time">' + formatPostTime(m.time != null ? m.time : m.timestamp) + '</span>' +
                             '</div>' +
-                            '<div class="post-text">' + escapeHtml(m.content) + '</div>' +
-                            (m.image ? '<img class="post-image" src="' + m.image + '" alt="">' : '') +
+                            '<div class="post-text">' + escapeHtml(textContent) + '</div>' +
+                            (imageSrc ? '<img class="post-image" src="' + imageSrc + '" alt="">' : '') +
                             commentsHTML +
                             '<div class="post-actions">' +
                                 '<button class="action-btn like-btn' + heartFill + '" type="button">' +
@@ -879,6 +915,24 @@
             return {};
         }
 
+        // API 调用记录：unshift 到 api_call_logs 最前，最多保留 50 条；异常静默，不影响主流程
+        function logApiCall(model, status, startTime, errorMsg) {
+            try {
+                var logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
+                var entry = {
+                    id: Date.now().toString(36),
+                    time: Date.now(),
+                    model: model || 'unknown',
+                    status: status,
+                    duration: Date.now() - startTime,
+                    errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
+                };
+                logs.unshift(entry);
+                while (logs.length > 50) logs.pop();
+                localStorage.setItem('api_call_logs', JSON.stringify(logs));
+            } catch (e) { /* 日志失败不影响主流程 */ }
+        }
+
         aiBtn.addEventListener('click', function () {
             var characters = loadCharacters();
             if (!characters.length) {
@@ -903,11 +957,13 @@
                 '。现在要以第一人称发布一条社交空间动态。';
             var userPrompt = '请结合你的人设，写一条此刻想发的生活动态（朋友圈风格）。' +
                 '要求：只输出动态正文本身，50个字以内，一句话，口语化、自然真实；' +
-                '不要使用任何表情符号，不要加引号或括号，不要解释，不要出现“动态：”之类的前缀。';
+                '不要使用任何表情符号，不要加引号或括号，不要解释，不要出现“动态：”之类的前缀。' +
+                '如果你想发一张图片，请直接在正文里用文字描述这张图片（比如：今天阳光很好，桌上摆着一杯热气腾腾的咖啡），不要输出图片代码。';
 
             aiBtn.disabled = true;
             showToast((role.name || 'TA') + ' 正在构思…');
 
+            var momentApiStart = Date.now();
             var controller = new AbortController();
             var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
 
@@ -961,10 +1017,12 @@
                 list.unshift(post);
                 saveMoments(list);
                 renderMoments();
+                logApiCall(model, 'success', momentApiStart);
                 showToast((role.name || 'TA') + ' 发布了新动态');
             }).catch(function (err) {
                 var msg = (err && err.name === 'AbortError') ? '请求超时，请稍后再试' : ('生成失败：' + (err && err.message ? err.message : '未知错误'));
                 showToast(msg);
+                logApiCall(model, 'error', momentApiStart, (err && err.message) ? err.message : '未知错误');
             }).finally(function () {
                 clearTimeout(timeoutId);
                 aiBtn.disabled = false;
@@ -1226,5 +1284,6 @@
 
         renderMoments();
     </script>
+<script src="statusbar-control.js"></script>
 </body>
 </html>

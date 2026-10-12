@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的 · 小手机</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -44,7 +46,7 @@
             justify-content: flex-start;
             align-items: center;
             padding: 14px 28px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #000;
             z-index: 50;
@@ -62,15 +64,19 @@
         }
         .profile-content::-webkit-scrollbar { display: none; }
 
-        /* ===== 顶部封面图（全宽贴边） ===== */
+        /* ===== 朋友圈主页式：封面 + 骑上去的信息行 ===== */
+        .profile-hero {
+            display: block;
+            padding: 0 !important;
+        }
         .profile-cover {
-            height: 190px !important;
+            height: 180px !important;
             flex-shrink: 0;
             width: calc(100% + 32px);
             margin-left: -16px;
             margin-right: -16px;
             margin-top: -64px;
-            background: linear-gradient(135deg, #F2F2F7 0%, #E5E5EA 100%);
+            background: linear-gradient(135deg, #DDDDE3 0%, #C4C4CC 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -89,30 +95,31 @@
         .profile-cover .cover-placeholder {
             width: 28px;
             height: 28px;
-            color: #C7C7CC;
+            color: rgba(255, 255, 255, 0.5);
         }
-
-        /* ===== 顶部个人信息区（居中，紧凑版） ===== */
-        .profile-hero {
+        /* 信息行：margin-top 负值骑上封面下沿 */
+        .info-row {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            padding: 0 0 18px !important;
+            gap: 14px;
+            padding: 0 24px;
+            margin-top: -44px;
+            position: relative;
+            z-index: 5;
         }
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             background-color: #F2F2F7;
-            border: 3px solid #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             user-select: none;
             flex-shrink: 0;
-            margin-top: -40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
         .profile-avatar img {
             width: 100%;
@@ -121,61 +128,67 @@
             display: block;
         }
         .profile-avatar svg {
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
+        }
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
         }
         .profile-name {
-            margin-top: 8px !important;
-            margin-bottom: 0 !important;
-            font-size: 20px;
+            margin: 0 !important;
+            font-size: 1.25rem;
             line-height: 1.2;
-            font-weight: 600;
-            color: #333333;
+            font-weight: 700;
+            color: #FFFFFF;
             letter-spacing: 0.2px;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .profile-sign {
-            margin-top: 4px !important;
-            margin-bottom: 0 !important;
+            margin: 0 !important;
             line-height: 1.3;
-            font-size: 12px !important;
-            color: #8E8E93;
-            max-width: 240px;
-            text-align: center;
+            font-size: 0.688rem !important;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+            max-width: 190px;
+            text-align: left;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .profile-stats {
-            margin-top: 6px !important;
-            margin-bottom: 0 !important;
-            line-height: 1.3;
-            font-size: 12px;
-            color: #8E8E93;
-        }
         .profile-edit-btn {
-            margin-top: 8px !important;
-            margin-bottom: 0 !important;
-            background: #F2F2F7;
-            color: #333333;
+            background: transparent;
+            color: #111111;
             border: none;
-            border-radius: 20px;
-            padding: 6px 16px !important;
-            font-size: 13px;
-            line-height: 1.4;
+            border-radius: 8px;
+            padding: 4px 2px !important;
+            font-size: 0.813rem;
+            line-height: 1.2;
             font-family: inherit;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            transition: background-color 0.2s ease;
+            flex-shrink: 0;
+            margin-top: 34px;
+            transition: opacity 0.2s ease;
         }
-        .profile-edit-btn:hover { background-color: #E5E5EA; }
-        .profile-edit-btn:active { transform: scale(0.97); }
+        .profile-edit-btn:hover { opacity: 0.6; }
+        .profile-edit-btn:active { opacity: 0.4; }
 
         /* ===== 菜单卡片 ===== */
         .menu-card {
             background-color: #FFFFFF;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            margin-top: 16px;
             margin-bottom: 12px;
             overflow: hidden;
         }
@@ -184,7 +197,7 @@
             align-items: center;
             gap: 12px;
             padding: 14px 16px;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #333333;
             cursor: pointer;
             text-decoration: none;
@@ -227,7 +240,7 @@
             z-index: 700;
             background: rgba(28, 28, 30, 0.9);
             color: #FFFFFF;
-            font-size: 13px;
+            font-size: 0.813rem;
             padding: 12px 20px;
             border-radius: 12px;
             pointer-events: none;
@@ -236,6 +249,7 @@
         }
         .profile-toast.show { opacity: 1; }
     </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
 
@@ -248,33 +262,43 @@
 
         <main class="profile-content">
 
-            <!-- 封面图（点击可上传） -->
-            <div class="profile-cover" id="profileCover" title="点击更换封面">
-                <svg class="cover-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            </div>
-            <input type="file" id="coverInput" accept="image/*" style="display:none;">
-
-            <!-- 顶部个人信息区 -->
+            <!-- 朋友圈主页式信息区：封面 + 骑上去的信息行 -->
             <section class="profile-hero">
-                <div class="profile-avatar" id="profileAvatar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                <div class="profile-cover" id="profileCover" title="点击更换封面">
+                    <svg class="cover-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                 </div>
-                <h1 class="profile-name" id="profileName">未设置昵称</h1>
-                <p class="profile-sign" id="profileSign">这个人很懒，什么都没有留下</p>
-                <p class="profile-stats" id="profileStats">0 位好友 · 12 篇帖子</p>
-                <a class="profile-edit-btn" href="edit-profile.html">编辑资料</a>
+                <input type="file" id="coverInput" accept="image/*" style="display:none;">
+
+                <div class="info-row">
+                    <div class="profile-avatar" id="profileAvatar" onclick="location.href='edit-profile.html'" style="cursor: pointer;" title="编辑资料">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="profile-info">
+                        <h1 class="profile-name" id="profileName">未设置昵称</h1>
+                        <p class="profile-sign" id="profileSign">这个人很懒，什么都没有留下</p>
+                    </div>
+                    <a class="profile-edit-btn" href="edit-profile.html">编辑资料</a>
+                </div>
             </section>
 
             <!-- 菜单卡片 -->
             <section class="menu-card">
+                <a class="menu-row" href="my-moments.html">
+                    <span class="menu-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/></svg>
+                    </span>
+                    <span class="menu-text">我的主页</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <div class="menu-divider"></div>
                 <div class="menu-row" id="menuWallet">
                     <span class="menu-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M16 15h2"/></svg>
                     </span>
-                    <span class="menu-text">我的钱包</span>
+                    <span class="menu-text">钱包</span>
                     <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
                 <div class="menu-divider"></div>
@@ -285,6 +309,14 @@
                     <span class="menu-text">我的收藏</span>
                     <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
+                <div class="menu-divider"></div>
+                <a class="menu-row" href="sticker-manager.html">
+                    <span class="menu-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    </span>
+                    <span class="menu-text">表情包</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
                 <div class="menu-divider"></div>
                 <a class="menu-row" href="settings.html">
                     <span class="menu-icon">
@@ -339,13 +371,12 @@
                 avatarBox.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
             }
 
-            // 好友数实时读取角色数组，帖子写死演示
+            // 好友数实时读取角色数组（统计行已移除，好友数仅保留变量兼容）
             var friendCount = 0;
             try {
                 var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
                 if (Array.isArray(roles)) friendCount = roles.length;
             } catch (e) {}
-            document.getElementById('profileStats').textContent = friendCount + ' 位好友 · 12 篇帖子';
         }
 
         // 钱包 / 收藏占位提示（不接业务逻辑）
@@ -357,7 +388,7 @@
             if (toastTimer) clearTimeout(toastTimer);
             toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1500);
         }
-        document.getElementById('menuWallet').addEventListener('click', function () { showToast('功能开发中'); });
+        document.getElementById('menuWallet').addEventListener('click', function () { window.location.href = 'wallet.html'; });
         document.getElementById('menuFavorites').addEventListener('click', function () { showToast('功能开发中'); });
 
         /* ===== 封面图点击上传（Canvas 压缩，与编辑页同规格：最大 600x400 / JPEG 0.7） ===== */
@@ -413,5 +444,6 @@
         // 从编辑页 history.back() 返回时刷新数据
         window.addEventListener('pageshow', renderProfile);
     </script>
+<script src="statusbar-control.js"></script>
 </body>
 </html>

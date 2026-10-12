@@ -3,76 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>设置</title>
+    <title>Settings · 设置</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
+    <script src="statusbar-control.js"></script>
     <link rel="stylesheet" href="settings.css">
+    <script>
+    (function () {
+        try {
+            if (localStorage.getItem('settings_dark_mode') === '1') {
+                document.documentElement.classList.add('dark');
+            }
+        } catch (e) {}
+    })();
+    </script>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
-        <div class="status-bar"><span>09:41</span></div>
+        <div class="status-bar">
+            <span class="status-time">09:41</span>
+            <div class="status-icons">
+                <svg width="15" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 8.5V3.5M5.5 9.5V2.5M10 10V1.5M14.5 8V4"/></svg>
+                <svg width="18" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="8" rx="2"/><path d="M16 5v2"/></svg>
+            </div>
+        </div>
+
+        <!-- 主页面：设置菜单 -->
         <header class="header">
-            <a class="back-link" href="index.html" aria-label="返回主屏幕">
-                <span class="arrow">‹</span>
-                <span>返回</span>
-            </a>
-            <h1 class="header-title">设置</h1>
-            <div class="header-placeholder"></div>
+            <div class="header-left">
+                <button type="button" class="icon-btn back-btn" onclick="location.href='index.html'" aria-label="返回主屏幕">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h1 class="header-title">Settings</h1>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="icon-btn" aria-label="搜索">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+                </button>
+                <button type="button" class="icon-btn" aria-label="添加">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            </div>
         </header>
+
         <main class="content">
-            <!-- 菜单列表：5 张独立卡片 -->
-            <section class="card menu-card" onclick="document.getElementById('api-panel').style.display='flex'" role="button" tabindex="0">
-                <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-                <div class="menu-info">
-                    <div class="menu-title">API 设置</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </section>
-
-            <section class="card menu-card" id="openCustomizeBtn" role="button" tabindex="0">
-                <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
-                <div class="menu-info">
-                    <div class="menu-title">美化设置</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </section>
-
-            <section class="card menu-card" id="openIconStyleBtn" role="button" tabindex="0">
-                <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></div>
-                <div class="menu-info">
-                    <div class="menu-title">图标底色</div>
-                </div>
-                <div class="menu-meta">
-                    <span id="iconStyleStatus">毛玻璃</span>
-                    <span class="menu-arrow">›</span>
+            <!-- ACCOUNT 分组 -->
+            <div class="group-title">ACCOUNT</div>
+            <section class="card">
+                <div class="menu-row user-row" onclick="location.href='profile.html'" role="button" tabindex="0">
+                    <div class="avatar" id="settingsAvatar">简</div>
+                    <div class="menu-info">
+                        <div class="menu-title" id="settingsName">未设置昵称</div>
+                        <div class="menu-sub" id="settingsId">ID 未设置</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
                 </div>
             </section>
 
-            <section class="card menu-card" onclick="document.getElementById('wallpaper-panel').style.display='flex'; initCustomizeUI();" role="button" tabindex="0">
-                <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
-                <div class="menu-info">
-                    <div class="menu-title">壁纸设置</div>
+            <!-- AI 分组 -->
+            <div class="group-title">AI</div>
+            <section class="card">
+                <div class="menu-row" onclick="document.getElementById('api-panel').style.display='flex'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2z"/><path d="M9 21h6"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">API 设置</span><span class="t-en">API</span></div>
+                    <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-arrow">›</div>
+                <div class="menu-row" onclick="window.location.href='api-logs.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">API 调用记录</span><span class="t-en">Logs</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
             </section>
 
-            <section class="card menu-card" onclick="document.getElementById('font-panel').style.display='flex'" role="button" tabindex="0">
-                <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></div>
-                <div class="menu-info">
-                    <div class="menu-title">字体大小</div>
+            <!-- 外观分组 -->
+            <div class="group-title">APPEARANCE</div>
+            <section class="card">
+                <div class="menu-row" onclick="window.location.href='appearance.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">外观</span><span class="t-en">Appearance</span></div>
+                    <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-arrow">›</div>
+                <div class="menu-row" onclick="window.location.href='bubble-theme.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">气泡设置</span><span class="t-en">Bubble</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+                <div class="menu-row" onclick="window.location.href='font-settings.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">字体设置</span><span class="t-en">Font</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+                <div class="menu-row" onclick="window.location.href='sound-settings.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">音效设置</span><span class="t-en">Sound</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+                <div class="menu-row">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">深色模式</span><span class="t-en">Dark Mode</span></div>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </section>
+
+            <!-- 状态栏分组 -->
+            <div class="group-title">STATUS BAR</div>
+            <section class="card">
+                <div class="menu-row">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">状态栏时间</span><span class="t-en">Time</span></div>
+                    <label class="switch">
+                        <input type="checkbox" id="statusbar-time-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="menu-row">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M12 11v4"/><path d="M12 7.5h.01"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">状态栏电量</span><span class="t-en">Battery</span></div>
+                    <label class="switch">
+                        <input type="checkbox" id="statusbar-battery-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- 协议分组 -->
+            <div class="group-title">PROTOCOL</div>
+            <section class="card">
+                <div class="menu-row" onclick="window.location.href='rp-protocol.html'" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">角色扮演协议</span><span class="t-en">Protocol</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+            </section>
+
+            <div class="footnote">极简黑白灰 · Monochrome Minimal</div>
         </main>
 
         <!-- ========== API 设置弹窗 ========== -->
         <div id="api-panel" class="customize-panel" style="display: none;">
-            <div class="status-bar"><span>09:41</span></div>
+            <div class="status-bar">
+                <span class="status-time">09:41</span>
+                <div class="status-icons">
+                    <svg width="15" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 8.5V3.5M5.5 9.5V2.5M10 10V1.5M14.5 8V4"/></svg>
+                    <svg width="18" height="10" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="8" rx="2"/><path d="M16 5v2"/></svg>
+                </div>
+            </div>
             <header class="header">
-                <button type="button" class="panel-back-btn" onclick="document.getElementById('api-panel').style.display='none'" aria-label="返回">
-                    <span class="arrow">‹</span>
-                    <span>返回</span>
-                </button>
-                <h1 class="header-title">API 设置</h1>
-                <div class="header-placeholder"></div>
+                <div class="header-left">
+                    <button type="button" class="icon-btn back-btn" onclick="document.getElementById('api-panel').style.display='none'" aria-label="返回">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <h1 class="header-title">API</h1>
+                </div>
             </header>
             <main class="content">
                 <form id="settingsForm" class="card">
@@ -112,7 +198,8 @@
                     <div class="api-row">
                         <label for="api-model">默认模型</label>
                         <div class="model-input-row">
-                            <input id="api-model" value="gpt-3.5-turbo" placeholder="点击选择或手动输入">
+                            <input id="api-model" value="gpt-3.5-turbo" placeholder="点击选择或手动输入" list="model-list">
+                            <datalist id="model-list"></datalist>
                             <button type="button" id="btn-fetch-models" class="btn-fetch-models" onclick="fetchModels()">拉取模型</button>
                         </div>
                         <div id="model-fetch-msg" class="model-fetch-msg">输入 API Key 后点击拉取</div>
@@ -138,11 +225,6 @@
                         </label>
                     </div>
 
-                    <div class="api-row">
-                        <label for="api-prompt">系统人设</label>
-                        <input id="api-prompt" placeholder="你是一个温柔的助手...">
-                    </div>
-
                     <button type="submit" class="btn-save">保存全部设置</button>
                 </form>
                 <div class="btn-group">
@@ -151,112 +233,6 @@
                 <div id="test-msg" class="model-fetch-msg"></div>
                 <p class="tip-text">配置保存在本地（localStorage），用于大模型对话。</p>
             </main>
-        </div>
-
-        <!-- ========== 壁纸设置弹窗 ========== -->
-        <div id="wallpaper-panel" class="customize-panel" style="display: none;">
-            <div class="status-bar"><span>09:41</span></div>
-            <header class="header">
-                <button type="button" class="panel-back-btn" onclick="document.getElementById('wallpaper-panel').style.display='none'" aria-label="返回">
-                    <span class="arrow">‹</span>
-                    <span>返回</span>
-                </button>
-                <h1 class="header-title">壁纸设置</h1>
-                <div class="header-placeholder"></div>
-            </header>
-            <main class="content">
-                <section class="card">
-                    <h2 class="section-title">桌面壁纸</h2>
-                    <p class="section-subtitle">默认纯白极简，支持自定义图片</p>
-
-                    <div class="wallpaper-preview-box" id="wallpaperPreviewBox">
-                        <div class="wallpaper-preview-empty" id="wallpaperEmptyText">当前：纯白默认</div>
-                    </div>
-
-                    <div class="wallpaper-actions">
-                        <label class="btn-action btn-upload" for="wallpaperInput">
-                            <span>上传壁纸</span>
-                            <input type="file" id="wallpaperInput" accept="image/*" style="display: none;" />
-                        </label>
-                        <button type="button" class="btn-action btn-reset" id="resetWallpaperBtn">恢复默认纯白</button>
-                    </div>
-                </section>
-            </main>
-        </div>
-
-        <!-- ========== 字体大小弹窗（占位） ========== -->
-        <div id="font-panel" class="customize-panel" style="display: none;">
-            <div class="status-bar"><span>09:41</span></div>
-            <header class="header">
-                <button type="button" class="panel-back-btn" onclick="document.getElementById('font-panel').style.display='none'" aria-label="返回">
-                    <span class="arrow">‹</span>
-                    <span>返回</span>
-                </button>
-                <h1 class="header-title">字体大小</h1>
-                <div class="header-placeholder"></div>
-            </header>
-            <main class="content">
-                <p class="tip-text">功能开发中…</p>
-            </main>
-        </div>
-
-        <!-- ========== 美化设置面板（只留色卡） ========== -->
-        <div class="customize-panel" id="customizePanel" style="display: none;">
-            <div class="status-bar"><span>09:41</span></div>
-            <header class="header">
-                <button type="button" class="panel-back-btn" id="closeCustomizeBtn" aria-label="返回">
-                    <span class="arrow">‹</span>
-                    <span>返回</span>
-                </button>
-                <h1 class="header-title">美化设置</h1>
-                <div class="header-placeholder"></div>
-            </header>
-            <main class="content">
-                <section class="card">
-                    <h2 class="section-title">图标底色</h2>
-                    <p class="section-subtitle">选择桌面磨砂玻璃图标背景色</p>
-
-                    <div class="color-palette" id="colorPalette">
-                        <div class="color-chip" data-color="rgba(255, 255, 255, 0.6)" title="纯白 (默认)">
-                            <div class="color-circle" style="background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd;"></div>
-                            <span>纯白</span>
-                        </div>
-                        <div class="color-chip" data-color="rgba(235, 237, 240, 0.65)" title="浅灰">
-                            <div class="color-circle" style="background: #e9ecef;"></div>
-                            <span>浅灰</span>
-                        </div>
-                        <div class="color-chip" data-color="rgba(244, 227, 227, 0.65)" title="莫兰迪粉">
-                            <div class="color-circle" style="background: #eecbc9;"></div>
-                            <span>柔粉</span>
-                        </div>
-                        <div class="color-chip" data-color="rgba(224, 234, 242, 0.65)" title="莫兰迪蓝">
-                            <div class="color-circle" style="background: #c7d8e6;"></div>
-                            <span>雾蓝</span>
-                        </div>
-                        <div class="color-chip" data-color="rgba(228, 236, 227, 0.65)" title="莫兰迪绿">
-                            <div class="color-circle" style="background: #ccdbcc;"></div>
-                            <span>灰绿</span>
-                        </div>
-                        <div class="color-chip" data-color="rgba(247, 238, 224, 0.65)" title="奶油杏">
-                            <div class="color-circle" style="background: #faeed9;"></div>
-                            <span>奶油</span>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        </div>
-
-        <!-- ========== 图标底色切换弹窗（毛玻璃 / 纯净） ========== -->
-        <div class="icon-style-modal" id="iconStyleModal" style="display: none;">
-            <div class="icon-style-backdrop" id="iconStyleBackdrop"></div>
-            <div class="icon-style-sheet">
-                <h3 class="icon-modal-title">图标底色</h3>
-                <div class="icon-btn-group">
-                    <button type="button" class="icon-btn-choice" id="btnChoiceGlass">毛玻璃</button>
-                    <button type="button" class="icon-btn-choice" id="btnChoiceClean">纯净</button>
-                </div>
-                <button type="button" class="icon-modal-close" id="btnCloseIconModal">取消</button>
-            </div>
         </div>
 
         <!-- ========== 模型选择弹窗 ========== -->
@@ -272,5 +248,54 @@
         <div class="toast-msg" id="toastMsg">已保存设置</div>
     </div>
     <script src="settings.js"></script>
+    <script>
+    // 设置页用户卡片 + 深色模式开关
+    (function () {
+        try {
+            var profile = {};
+            try { profile = JSON.parse(localStorage.getItem('myProfile') || '{}') || {}; } catch (e) {}
+            var name = profile.nickname || '未设置昵称';
+            var id = profile.wechatId ? ('ID ' + profile.wechatId) : 'ID 未设置';
+            var nameEl = document.getElementById('settingsName');
+            var idEl = document.getElementById('settingsId');
+            var avatarEl = document.getElementById('settingsAvatar');
+            if (nameEl) nameEl.textContent = name;
+            if (idEl) idEl.textContent = id;
+            if (avatarEl) avatarEl.textContent = (name || '简').trim().charAt(0);
+        } catch (e) {}
+
+        var darkToggle = document.getElementById('dark-mode-toggle');
+        if (darkToggle) {
+            darkToggle.checked = document.documentElement.classList.contains('dark');
+            darkToggle.addEventListener('change', function () {
+                document.documentElement.classList.toggle('dark', darkToggle.checked);
+                try {
+                    localStorage.setItem('settings_dark_mode', darkToggle.checked ? '1' : '0');
+                } catch (e) {}
+            });
+        }
+
+        // 状态栏 时间/电量 开关（全局生效，存 localStorage）
+        var timeToggle = document.getElementById('statusbar-time-toggle');
+        var batteryToggle = document.getElementById('statusbar-battery-toggle');
+        function readSbPref(key, def) {
+            try { return localStorage.getItem(key) === null ? def : localStorage.getItem(key); } catch (e) { return def; }
+        }
+        if (timeToggle) {
+            timeToggle.checked = readSbPref('settings_statusbar_time', '1') === '1';
+            timeToggle.addEventListener('change', function () {
+                try { localStorage.setItem('settings_statusbar_time', timeToggle.checked ? '1' : '0'); } catch (e) {}
+                if (window.__statusbarControlApply) window.__statusbarControlApply();
+            });
+        }
+        if (batteryToggle) {
+            batteryToggle.checked = readSbPref('settings_statusbar_battery', '1') === '1';
+            batteryToggle.addEventListener('change', function () {
+                try { localStorage.setItem('settings_statusbar_battery', batteryToggle.checked ? '1' : '0'); } catch (e) {}
+                if (window.__statusbarControlApply) window.__statusbarControlApply();
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

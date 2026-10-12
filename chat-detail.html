@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天详情</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -38,7 +40,7 @@
             top: 0;
             width: 100%;
             padding: 14px 28px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #111;
             z-index: 50;
@@ -91,7 +93,7 @@
             min-width: 0;
         }
         .chat-user-name {
-            font-size: 13.5px;
+            font-size: 0.844rem;
             font-weight: 800;
             color: #111111;
             letter-spacing: -0.2px;
@@ -101,11 +103,20 @@
             text-overflow: ellipsis;
         }
         .chat-status-sub {
-            font-size: 8px;
+            font-size: 0.5rem;
             color: #888888;
             font-family: monospace;
             letter-spacing: 0.5px;
             margin-top: 1px;
+        }
+        .chat-notice-bar {
+            font-size: 0.438rem;
+            color: #999999;
+            margin-top: 2px;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* ========== 聊天舞台 ========== */
@@ -124,7 +135,7 @@
         }
         .message-time {
             align-self: center;
-            font-size: 8.5px;
+            font-size: 0.531rem;
             color: #999999;
             font-family: monospace;
             padding: 2px 8px;
@@ -144,10 +155,19 @@
         .msg-row.sent, .msg-row.right {
             align-self: flex-end;
         }
+        /* 群聊成员名标签：独占一行，与头像左缘对齐 */
+        .msg-sender {
+            flex-basis: 100%;
+            font-size: 0.563rem;
+            color: #999999;
+            font-weight: 500;
+            margin: 0 0 2px 40px;
+            line-height: 1.2;
+        }
         .msg-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: var(--avatar-size, 32px);
+            height: var(--avatar-size, 32px);
+            border-radius: var(--avatar-radius, 50%);
             background: linear-gradient(135deg, #EFEFEF 0%, #DCDCDC 100%);
             display: flex;
             align-items: center;
@@ -155,7 +175,7 @@
             flex-shrink: 0;
             border: 1.5px solid #FFFFFF;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            font-size: 11px;
+            font-size: 0.688rem;
             font-weight: 700;
             color: #444444;
             overflow: hidden;
@@ -167,7 +187,7 @@
         }
         .msg-bubble {
             padding: 9.5px 13px;
-            font-size: 12px;
+            font-size: 0.75rem;
             line-height: 1.5;
             letter-spacing: -0.1px;
             word-break: break-word;
@@ -176,24 +196,33 @@
             min-width: 0;
         }
         .msg-row.received .msg-bubble, .msg-row.left .msg-bubble {
-            background: #FFFFFF;
-            color: #111111;
-            border-radius: 18px 18px 18px 4px;
+            background: var(--partner-bubble-bg, #FFFFFF);
+            color: var(--partner-bubble-color, #111111);
+            border-radius: var(--partner-bubble-radius, 18px 18px 18px 4px);
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
         }
         .msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {
-            background: #111111;
-            color: #FFFFFF;
-            border-radius: 18px 18px 4px 18px;
+            background: var(--my-bubble-bg, #111111);
+            color: var(--my-bubble-color, #FFFFFF);
+            border-radius: var(--my-bubble-radius, 18px 18px 4px 18px);
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
         }
         .loading-dots {
             color: #888888;
-            font-size: 12px;
+            font-size: 0.75rem;
             padding: 4px 15px;
             font-style: italic;
             align-self: flex-start;
+        }
+        /* 搜索跳转定位：灰色光环脉冲（黑白气泡上均可见），1.9s 后自动移除 */
+        .msg-bubble.hl-flash {
+            animation: hlFlash 1.9s ease;
+        }
+        @keyframes hlFlash {
+            0% { box-shadow: 0 0 0 0 rgba(142,142,147,0); }
+            25% { box-shadow: 0 0 0 3px rgba(142,142,147,0.95); }
+            100% { box-shadow: 0 0 0 4px rgba(142,142,147,0); }
         }
 
         /* ========== 底部输入舱 ========== */
@@ -220,6 +249,14 @@
             align-items: flex-end;
             gap: 6px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            transform-origin: center;
+            transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                        border-color 160ms ease;
+        }
+        /* 果冻弹簧：聚焦时放大先冲过头再收回，并极淡加深描边作为焦点提示 */
+        .input-capsule:focus-within {
+            transform: scale(1.02);
+            border-color: rgba(0, 0, 0, 0.07);
         }
         .real-input {
             flex: 1;
@@ -228,7 +265,7 @@
             border: none;
             outline: none;
             background: transparent;
-            font-size: 11.5px;
+            font-size: 0.719rem;
             line-height: 1.5;
             color: #111111;
             font-family: inherit;
@@ -289,84 +326,53 @@
             background: #FFFFFF;
         }
 
-        /* ========== 更多菜单弹窗（保持原有结构） ========== */
-        .more-menu-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 200;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
+        /* 表情按钮（输入框左侧） */
+        .sticker-open-btn {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%; border: 1px solid rgba(255,255,255,0.9);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; margin-bottom: 5px; padding: 0;
+            transition: transform 0.15s ease;
         }
-        .more-menu-backdrop {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.3);
+        .sticker-open-btn:active { transform: scale(0.92); background: #FFF; }
+
+        /* 图片消息气泡 */
+        .sticker-msg-img {
+            width: 140px; height: 140px;
+            object-fit: cover; border-radius: 16px; display: block;
         }
-        .more-menu-sheet {
-            position: relative;
-            width: 100%;
-            background: #fff;
-            border-radius: 20px 20px 0 0;
-            padding: 16px 16px 24px;
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.25s ease;
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+
+        /* 表情选择底部面板 */
+        .sticker-panel-overlay {
+            position: absolute; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.3); opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+        .sticker-panel-overlay.is-show { opacity: 1; pointer-events: auto; }
+        .sticker-panel {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            background: #FFF; border-radius: 24px 24px 0 0;
+            padding: 10px 14px 24px;
+            transform: translateY(100%); transition: transform 0.28s ease;
+            max-height: 60%;
         }
-        .more-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            color: #333;
-            cursor: pointer;
-            background: none;
-            border: none;
-            width: 100%;
-            font-family: inherit;
-            text-align: left;
-            transition: background 0.15s ease;
+        .sticker-panel-overlay.is-show .sticker-panel { transform: translateY(0); }
+        .sticker-panel-handle { width: 36px; height: 4px; border-radius: 999px; background: #E5E5EA; margin: 0 auto 12px; }
+        .sticker-panel-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            max-height: 340px; overflow-y: auto; scrollbar-width: none;
         }
-        .more-menu-item:active {
-            background: #F2F2F7;
+        .sticker-panel-grid::-webkit-scrollbar { display: none; }
+        .sticker-panel-item {
+            background: #F8F8FA; border-radius: 14px; padding: 8px;
+            cursor: pointer; display: flex; flex-direction: column; gap: 4px;
         }
-        .more-menu-item svg {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-        .more-menu-item[disabled] {
-            color: #8E8E93;
-            cursor: default;
-        }
-        .more-menu-divider {
-            height: 1px;
-            background: #F2F2F7;
-            margin: 6px 12px;
-        }
-        .more-menu-item.danger {
-            color: #FF453A;
-        }
-        .more-menu-item.danger:active {
-            background: #FFE5E5;
-        }
-        .more-menu-cancel {
-            margin-top: 10px;
-            height: 44px;
-            background: #F2F2F7;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            color: #333;
-            cursor: pointer;
-        }
+        .sticker-panel-item:active { background: #EFEFF2; }
+        .sticker-panel-item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+        .sticker-panel-item span { font-size: 0.65rem; color: #888; text-align: center; }
+        .sticker-panel-empty { text-align: center; color: #B0B0B5; padding: 40px 0; font-size: 0.875rem; }
+
         .detail-toast {
             position: absolute;
             top: 50%;
@@ -375,7 +381,7 @@
             z-index: 900;
             background: rgba(28, 28, 30, 0.92);
             color: #FFFFFF;
-            font-size: 13px;
+            font-size: 0.813rem;
             padding: 12px 20px;
             border-radius: 12px;
             pointer-events: none;
@@ -456,9 +462,87 @@
         }
         .plus-item svg { display: block; }
         .plus-label {
-            font-size: 11px;
+            font-size: 0.688rem;
             color: #333;
             font-weight: 500;
+        }
+
+        /* ========== 红包/转账底部抽屉 ========== */
+        .pay-drawer-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 450;
+            display: none;
+            align-items: flex-end;
+        }
+        .pay-drawer-overlay.active { display: block; }
+        .pay-drawer-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .pay-drawer-overlay.active .pay-drawer-backdrop { opacity: 1; }
+        .pay-drawer-sheet {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            background: #FFFFFF;
+            border-radius: 24px 24px 0 0;
+            padding: 12px 20px 30px;
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.06);
+        }
+        .pay-drawer-overlay.active .pay-drawer-sheet {
+            transform: translateY(0);
+        }
+        .pay-drawer-handle {
+            width: 36px; height: 4px;
+            background: #111111;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+        .pay-drawer-title {
+            font-size: 0.938rem;
+            font-weight: 600;
+            color: #111;
+            text-align: center;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .pay-field {
+            display: block;
+            width: 100%;
+            height: 40px;
+            background: #F2F2F7;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: #111;
+            padding: 0 14px;
+            margin-bottom: 10px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .pay-field::placeholder { color: #C7C7CC; }
+        .pay-confirm-btn {
+            display: block;
+            width: 100%;
+            height: 40px;
+            margin-top: 8px;
+            background: #111111;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .pay-confirm-btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
         }
 
         /* ========== 通用弹窗（功能编辑） ========== */
@@ -496,7 +580,7 @@
         }
         .x-modal-header {
             padding: 16px 18px 10px;
-            font-size: 15px;
+            font-size: 0.938rem;
             font-weight: 700;
             color: #111;
             display: flex;
@@ -505,7 +589,7 @@
         }
         .x-modal-close {
             background: none; border: none; cursor: pointer;
-            color: #888; font-size: 20px; line-height: 1; padding: 0;
+            color: #888; font-size: 1.25rem; line-height: 1; padding: 0;
         }
         .x-modal-body {
             padding: 4px 18px 14px;
@@ -519,7 +603,7 @@
             border: 1px solid #EAEAEA;
             border-radius: 10px;
             padding: 10px 12px;
-            font-size: 13px;
+            font-size: 0.813rem;
             color: #111;
             font-family: inherit;
             outline: none;
@@ -533,7 +617,7 @@
             height: 38px;
             border: none;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 0.813rem;
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
@@ -553,8 +637,8 @@
             border-radius: 10px;
         }
         .x-list-item .x-main { flex: 1; min-width: 0; }
-        .x-list-item .x-title { font-size: 13px; color: #111; font-weight: 600; }
-        .x-list-item .x-sub { font-size: 11px; color: #888; margin-top: 2px; }
+        .x-list-item .x-title { font-size: 0.813rem; color: #111; font-weight: 600; }
+        .x-list-item .x-sub { font-size: 0.688rem; color: #888; margin-top: 2px; }
         .x-icon-btn {
             background: none; border: none; cursor: pointer;
             color: #888; padding: 4px; display: flex;
@@ -569,7 +653,7 @@
             background: #fff;
         }
         .x-check.done { background: #111; border-color: #111; }
-        .x-empty { text-align: center; color: #AAA; font-size: 12px; padding: 16px 0; }
+        .x-empty { text-align: center; color: #AAA; font-size: 0.75rem; padding: 16px 0; }
 
         /* ========== 特殊消息卡片 ========== */
         .msg-card {
@@ -580,18 +664,168 @@
             max-width: 240px;
         }
         .msg-card-title {
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 5px;
         }
-        .msg-card-body { font-size: 11px; line-height: 1.5; opacity: 0.9; }
-        .msg-card-meta { font-size: 9px; opacity: 0.6; font-family: monospace; }
+        .msg-card-body { font-size: 0.688rem; line-height: 1.5; opacity: 0.9; }
+        .msg-card-meta { font-size: 0.563rem; opacity: 0.6; font-family: monospace; }
         .msg-row.received .msg-card, .msg-row.left .msg-card { color: #111; }
         .msg-row.sent .msg-card, .msg-row.right .msg-card { color: #fff; }
+        /* AI 主动来电卡：即使在左侧（AI 侧）也使用黑底白字，并强制卡片内部文字为白色 */
+        .msg-bubble.bubble-call-in { background: #111 !important; color: #fff !important; }
+        .msg-bubble.bubble-call-in .msg-card,
+        .msg-bubble.bubble-call-in .msg-card-title,
+        .msg-bubble.bubble-call-in .msg-card-body,
+        .msg-bubble.bubble-call-in .msg-card-meta { color: #fff !important; }
+
+        /* ========== 红包 / 转账卡片（韩系极简：紧凑小黑卡，无 Emoji，无高饱和彩色） ========== */
+        /* 剥掉气泡自身外观，让卡片自己控制背景与圆角（仅作用于 redpacket/transfer 分支） */
+        .msg-bubble.bubble-pay {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        .pay-card {
+            width: 150px !important;
+            border-radius: 10px !important;
+            padding: 8px 12px !important;
+            display: flex;
+            align-items: center;
+            gap: 8px !important;
+            position: relative;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: transform 0.15s ease;
+        }
+        .pay-card:active { transform: scale(0.97); }
+        /* 左侧图标：统一 16x16 极细线条 */
+        .pay-card svg.pay-ico {
+            flex-shrink: 0;
+            display: block;
+            width: 16px !important;
+            height: 16px !important;
+        }
+        /* 红包：纯黑底白字（不用任何红色/黄色） */
+        .pay-card-red {
+            background: #111111;
+            color: #FFFFFF;
+        }
+        /* 转账：纯白底 + 极淡灰边框 */
+        .pay-card-transfer {
+            background: #FFFFFF;
+            border: 1px solid #E5E5EA;
+            color: #111111;
+        }
+        .pay-card-main {
+            display: flex;
+            flex-direction: column;
+            gap: 0 !important; /* 间距完全由金额的 margin 控制，保持紧凑 */
+            min-width: 0;
+            flex: 1;
+        }
+        .pay-card-label {
+            font-size: 0.625rem !important;
+            color: #8E8E93 !important;
+            opacity: 1 !important;
+            letter-spacing: 0.5px !important;
+        }
+        .pay-card-amount {
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.5px !important;
+            line-height: 1.2 !important;
+            margin: 2px 0 !important; /* 金额与上下标签的间距 */
+        }
+        .pay-card-msg {
+            font-size: 0.625rem !important;
+            opacity: 0.6;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        /* 红包留言右侧留白（适配 150px 窄卡），避免与右下角状态字重叠 */
+        .pay-card-red .pay-card-msg { padding-right: 32px !important; }
+        .pay-card-status {
+            position: absolute;
+            right: 10px !important;
+            bottom: 8px !important;
+            font-size: 0.563rem !important;
+            font-weight: 400 !important;
+            letter-spacing: 0.5px !important;
+            color: rgba(255, 255, 255, 0.55); /* 半透明白：已领取/未领取 */
+        }
+        .pay-card-arrow {
+            margin-left: auto;
+            flex-shrink: 0;
+            display: flex;
+            align-self: center;
+        }
+
+        /* ========== 红包/转账结果弹窗（黑白灰极简） ========== */
+        .pay-result-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 600;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .pay-result-overlay.active { display: flex; }
+        .pay-result-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .pay-result-card {
+            position: relative;
+            width: 100%;
+            max-width: 260px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 28px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: popIn 0.22s ease-out;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+        .pay-result-amount {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: 0.5px;
+        }
+        .pay-result-hint {
+            font-size: 0.75rem;
+            color: #8E8E93;
+            margin-bottom: 10px;
+        }
+        .pay-result-btn {
+            width: 100%;
+            height: 40px;
+            background: #111111;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .pay-result-btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
 
     </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
@@ -606,33 +840,14 @@
             </a>
             <div class="chat-title-box">
                 <span class="chat-user-name" id="chat-title">Lisa</span>
-                <span class="chat-status-sub">ONLINE · ACTIVE</span>
+                <span class="chat-status-sub" id="chat-status-sub">ONLINE · ACTIVE</span>
+                <span class="chat-notice-bar" id="chat-notice-bar" style="display:none;"></span>
             </div>
-            <button class="nav-circle-btn" type="button" id="btn-more-menu" aria-label="更多">
+            <button class="nav-circle-btn" type="button" id="btn-more-menu" aria-label="对话设置">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#111111"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
             </button>
         </header>
 
-        <!-- 更多菜单弹窗 -->
-        <div class="more-menu-overlay" id="moreMenuOverlay" style="display: none;">
-            <div class="more-menu-backdrop" id="moreMenuBackdrop"></div>
-            <div class="more-menu-sheet">
-                <button type="button" class="more-menu-item" id="menuMemorySummary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
-                    <span id="menuMemoryText">记忆总结</span>
-                </button>
-                <button type="button" class="more-menu-item" id="menuExportHistory">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-                    <span>导出聊天记录</span>
-                </button>
-                <div class="more-menu-divider"></div>
-                <button type="button" class="more-menu-item danger" id="menuClearHistory">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-                    <span>清空聊天记录</span>
-                </button>
-                <button type="button" class="more-menu-cancel" id="moreMenuCancel">取消</button>
-            </div>
-        </div>
         <div class="detail-toast" id="detailToast"></div>
 
         <!-- 消息列表 -->
@@ -645,8 +860,11 @@
             </div>
         </div>
 
-        <!-- 底部输入舱：胶囊输入框 + 黑色发送钮 + 加号占位钮 -->
+        <!-- 底部输入舱：表情按钮 + 胶囊输入框 + 加号 -->
         <form class="input-dock" id="chat-form" action="javascript:void(0);">
+            <button class="sticker-open-btn" type="button" id="stickerOpenBtn" aria-label="表情包">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </button>
             <div class="input-capsule">
                 <textarea class="real-input" id="chat-input" rows="1" placeholder="写下你想说的..." autocomplete="off" enterkeyhint="send"></textarea>
                 <button class="send-icon-btn" type="submit" aria-label="发送">
@@ -688,11 +906,49 @@
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
                         <span class="plus-label">特别时刻</span>
                     </button>
+                    <button class="plus-item" data-feat="redpacket" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/></svg></span>
+                        <span class="plus-label">发红包</span>
+                    </button>
+                    <button class="plus-item" data-feat="transfer" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+                        <span class="plus-label">转账</span>
+                    </button>
                 </div>
             </div>
         </div>
 
+        <!-- 表情选择面板 -->
+        <div class="sticker-panel-overlay" id="stickerPanelOverlay">
+            <div class="sticker-panel">
+                <div class="sticker-panel-handle"></div>
+                <div class="sticker-panel-grid" id="stickerPanelGrid"></div>
+            </div>
+        </div>
+
+        <!-- 红包/转账底部抽屉（黑白灰极简，白色背景 + 黑色小把手） -->
+        <div class="pay-drawer-overlay" id="payDrawerOverlay">
+            <div class="pay-drawer-backdrop" id="payDrawerBackdrop"></div>
+            <div class="pay-drawer-sheet">
+                <div class="pay-drawer-handle"></div>
+                <div class="pay-drawer-title" id="payDrawerTitle">发红包</div>
+                <input class="pay-field" id="payAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" />
+                <input class="pay-field" id="payMessage" type="text" autocomplete="off" maxlength="30" />
+                <button class="pay-confirm-btn" id="payConfirmBtn" type="button">塞钱进红包</button>
+            </div>
+        </div>
+
         <!-- 通用弹窗 -->
+        <!-- 红包/转账结果弹窗（黑白灰极简：纯白卡片 + 黑色按钮） -->
+        <div class="pay-result-overlay" id="payResultOverlay">
+            <div class="pay-result-backdrop" id="payResultBackdrop"></div>
+            <div class="pay-result-card">
+                <div class="pay-result-amount" id="payResultAmount">+100.00</div>
+                <div class="pay-result-hint" id="payResultHint">已存入余额</div>
+                <button class="pay-result-btn" id="payResultBtn" type="button">开心收下</button>
+            </div>
+        </div>
+
         <div class="x-modal-overlay" id="xModalOverlay">
             <div class="x-modal-backdrop" id="xModalBackdrop"></div>
             <div class="x-modal">
@@ -707,6 +963,7 @@
     </div>
 
     <script src="memory.js"></script>
+    <script src="sound-system.js"></script>
     <script>
         const STORAGE_KEY = 'ai_custom_characters';
         const DEFAULT_ROLES = [
@@ -749,7 +1006,31 @@
 
         const params = new URLSearchParams(window.location.search);
         const currentRoleId = params.get('id');
-        const currentCharacter = getRoleById(currentRoleId) || { id: currentRoleId || 'default', name: '聊天', avatarBg: '#3B9EFF' };
+        const isGroupChat = !!currentRoleId && String(currentRoleId).indexOf('g') === 0;
+
+        function loadGroupById(gid) {
+            if (!gid) return null;
+            try {
+                const raw = localStorage.getItem('phone_groups');
+                if (raw) {
+                    const groups = JSON.parse(raw);
+                    if (Array.isArray(groups)) {
+                        const target = groups.find(g => String(g.id) === String(gid));
+                        if (target) return target;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        let currentGroup = null;
+        if (isGroupChat) {
+            currentGroup = loadGroupById(currentRoleId);
+        }
+
+        const currentCharacter = isGroupChat
+            ? { id: currentRoleId, name: (currentGroup && currentGroup.name) || '群聊', avatarBg: '#3B9EFF' }
+            : (getRoleById(currentRoleId) || { id: currentRoleId || 'default', name: '聊天', avatarBg: '#3B9EFF' });
         const contactName = currentCharacter.name || '聊天';
 
         const chatTitle = document.getElementById('chat-title');
@@ -757,13 +1038,78 @@
         const chatInput = document.getElementById('chat-input');
         const chatForm = document.getElementById('chat-form');
 
-        if (chatTitle) {
-            chatTitle.textContent = contactName;
+        // ================= 双方备注（只读应用：chat_alias_<roleId>） =================
+        // 与 chat-settings.html 的 roleId（URL 的 id 参数）保持一致
+        const aliasRoleId = currentRoleId || currentCharacter.id;
+        function loadAlias() {
+            try {
+                const raw = localStorage.getItem('chat_alias_' + aliasRoleId);
+                if (raw) {
+                    const o = JSON.parse(raw);
+                    if (o && typeof o === 'object') {
+                        return {
+                            myAlias: String(o.myAlias == null ? '' : o.myAlias).trim(),
+                            roleAlias: String(o.roleAlias == null ? '' : o.roleAlias).trim()
+                        };
+                    }
+                }
+            } catch (e) {}
+            return { myAlias: '', roleAlias: '' };
         }
+        const chatAlias = loadAlias();
+        // 群聊：优先显示群备注（chat_group_alias_<gid>），无备注回退群名
+        let groupAliasName = '';
+        if (isGroupChat) {
+            try {
+                groupAliasName = localStorage.getItem('chat_group_alias_' + aliasRoleId) || '';
+            } catch (e) {}
+        }
+        const roleDisplayName = (isGroupChat && groupAliasName) ? groupAliasName : (chatAlias.roleAlias || contactName);
+
+        if (chatTitle) {
+            chatTitle.textContent = roleDisplayName;
+        }
+        // 群聊：副标题显示成员名单；普通聊天保持 ONLINE
+        const chatStatusSub = document.getElementById('chat-status-sub');
+        if (isGroupChat && chatStatusSub) {
+            const names = (currentGroup && currentGroup.members || []).map(function (m) { return m.name; }).filter(Boolean);
+            chatStatusSub.textContent = names.length ? names.join(' · ') : '群聊';
+            // 群聊：显示群公告横条（chat_group_notice_<gid>）
+            const chatNoticeBar = document.getElementById('chat-notice-bar');
+            if (chatNoticeBar) {
+                let notice = '';
+                try { notice = localStorage.getItem('chat_group_notice_' + aliasRoleId) || ''; } catch (e) {}
+                if (notice) {
+                    chatNoticeBar.textContent = '公告：' + notice;
+                    chatNoticeBar.style.display = '';
+                }
+            }
+        }
+
+        // ================= 聊天背景（只读应用：chat_bg_<roleId>） =================
+        // 有图：图片 cover 铺满 + 72% 白色柔和遮罩，保证黑白两种气泡文字均清晰；无图保持默认渐变背景
+        function applyChatBackground() {
+            let bg = '';
+            try {
+                bg = localStorage.getItem('chat_bg_' + aliasRoleId) || '';
+            } catch (e) {}
+            if (!bg) return;
+            chatMessages.style.backgroundImage =
+                'linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url("' + bg + '")';
+            chatMessages.style.backgroundSize = 'cover';
+            chatMessages.style.backgroundPosition = 'center center';
+            chatMessages.style.backgroundRepeat = 'no-repeat';
+        }
+        applyChatBackground();
 
         const storageKey = `chat_history_${currentCharacter.id}`;
 
         function getInitialMessages() {
+            if (isGroupChat) {
+                return [
+                    { role: 'received', text: `欢迎来到「${contactName}」群聊，一起聊聊吧。` }
+                ];
+            }
             return [
                 { role: 'received', text: `你好，我是${contactName}！很高兴和你聊天。` }
             ];
@@ -810,18 +1156,22 @@
             return '';
         }
 
-        function appendMessageToDOM(msg) {
+        function appendMessageToDOM(msg, idx) {
             const row = document.createElement('div');
             const isSent = msg.role === 'sent' || msg.role === 'user';
             const isError = msg.isError || msg.role === 'system_error';
 
             row.className = `msg-row ${isSent ? 'sent' : 'received'}`;
+            // 搜索页跳转定位用：记录该消息在渲染序列中的序号（实时新发的消息无 idx）
+            if (typeof idx === 'number') row.dataset.idx = idx;
 
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble';
 
             // 特殊类型消息渲染为卡片，复用同一套气泡与左右对齐
-            if (msg.type === 'location') {
+            if (msg.type === 'sticker') {
+                bubble.innerHTML = `<img class="sticker-msg-img" src="${msg.img}" alt="${msg.desc || '表情'}">`;
+            } else if (msg.type === 'location') {
                 const loc = msg.location || {};
                 bubble.innerHTML = `<div class="msg-card">
                     <div class="msg-card-title">
@@ -863,12 +1213,39 @@
                 </div>`;
             } else if (msg.type === 'call') {
                 const c = msg.call || {};
+                if (c.theme === 'dark') bubble.classList.add('bubble-call-in');
+                const cardTitle = c.title || (c.type === 'video' ? '视频通话' : '语音通话');
                 bubble.innerHTML = `<div class="msg-card">
                     <div class="msg-card-title">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        <span>${c.type === 'video' ? '视频通话' : '语音通话'}</span>
+                        <span>${cardTitle}</span>
                     </div>
-                    <div class="msg-card-body">${c.text || '已发起通话'}</div>
+                    ${c.text ? `<div class="msg-card-body">${c.text}</div>` : ''}
+                </div>`;
+            } else if (msg.type === 'redpacket') {
+                // 红包卡：纯黑底圆角卡 + 白色细线条金币图标（黑白灰极简，无红黄配色）
+                bubble.classList.add('bubble-pay');
+                const payLabel = msg.isVoice === true ? '语音红包' : '红包';
+                const payStatus = msg.status === 'opened' ? '已领取' : '未领取';
+                bubble.innerHTML = `<div class="pay-card pay-card-red" data-index="${typeof idx === 'number' ? idx : ''}" data-type="redpacket" onclick="handlePayCardClick(event)">
+                    <svg class="pay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5 12 11.6 14.5 8.5"/><line x1="10.6" y1="12.5" x2="13.4" y2="12.5"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                    <div class="pay-card-main">
+                        <span class="pay-card-label">${payLabel}</span>
+                        <span class="pay-card-amount">¥${escHtml(String(msg.amount == null ? '0.00' : msg.amount))}</span>
+                        <span class="pay-card-msg">${escHtml(String(msg.message == null ? '' : msg.message))}</span>
+                    </div>
+                    <div class="pay-card-status">${payStatus}</div>
+                </div>`;
+            } else if (msg.type === 'transfer') {
+                // 转账卡：纯白底 + 浅灰边框 + 黑色细线条双向箭头 + 右侧灰色细箭头
+                bubble.classList.add('bubble-pay');
+                bubble.innerHTML = `<div class="pay-card pay-card-transfer" data-index="${typeof idx === 'number' ? idx : ''}" data-type="transfer" onclick="handlePayCardClick(event)">
+                    <svg class="pay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <div class="pay-card-main">
+                        <span class="pay-card-label">转账</span>
+                        <span class="pay-card-amount">¥${escHtml(String(msg.amount == null ? '0.00' : msg.amount))}</span>
+                    </div>
+                    <svg class="pay-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>`;
             } else {
                 bubble.textContent = msg.text || msg.content || '';
@@ -901,6 +1278,14 @@
                 }
             }
 
+            // 群聊：AI 成员回复在气泡上方显示成员名
+            if (isGroupChat && !isSent && !isError && msg.name) {
+                const nameTag = document.createElement('div');
+                nameTag.className = 'msg-sender';
+                nameTag.textContent = msg.name;
+                row.appendChild(nameTag);
+            }
+
             if (isSent) {
                 row.appendChild(bubble);
                 row.appendChild(avatar);
@@ -921,8 +1306,28 @@
                 return !(t.indexOf('定位失败') !== -1 || t.indexOf('Timeout expired') !== -1);
             });
             if (cleaned.length !== list.length) saveMessages(cleaned);
-            cleaned.forEach(appendMessageToDOM);
+            cleaned.forEach(function (m, i) { appendMessageToDOM(m, i); });
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // ================= 搜索页跳转定位：读取 URL 的 hl=<序号>，滚动并闪烁提示 =================
+        function highlightMessageFromUrl() {
+            const hl = parseInt(new URLSearchParams(window.location.search).get('hl'), 10);
+            if (isNaN(hl) || hl < 0) return;
+            const target = chatMessages.querySelector('.msg-row[data-idx="' + hl + '"] .msg-bubble');
+            if (!target) return;
+            // 等渲染布局完成后滚动到视口中部
+            setTimeout(function () {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.classList.add('hl-flash');
+                setTimeout(function () { target.classList.remove('hl-flash'); }, 1900);
+            }, 120);
+            // 消费后清掉定位参数，避免刷新重复闪烁
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('hl');
+                window.history.replaceState(null, '', url.toString());
+            } catch (e) {}
         }
 
         // ================= 读取 API 配置（纯 localStorage，不再编辑） =================
@@ -941,6 +1346,160 @@
 
         function sendMessage() {
             sendMsg();
+        }
+
+        // ---- AI 主动通话标记：从回复文本中剥离 [发起语音通话] ----
+        const VOICE_CALL_MARKER = '[发起语音通话]';
+        function extractVoiceCallMarker(raw) {
+            const text = String(raw || '');
+            const idx = text.indexOf(VOICE_CALL_MARKER);
+            if (idx === -1) return { text: text, wantCall: false };
+            // 移除标记，并清理遗留的行尾空白与多余空行
+            const cleaned = (text.slice(0, idx) + text.slice(idx + VOICE_CALL_MARKER.length))
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/\s+$/, '');
+            return { text: cleaned, wantCall: true };
+        }
+        // 命中标记：在 AI 侧（左侧）插入一张黑底白字「发起语音通话」卡，并写入聊天记录
+        // historyList 是 sendMsg 内的局部变量，由调用方传入
+        function insertIncomingCallCard(historyList) {
+            const cardMsg = {
+                role: 'assistant', type: 'call',
+                call: { type: 'voice', title: '发起语音通话', text: '', theme: 'dark' },
+                time: Date.now()
+            };
+            historyList.push(cardMsg);
+            saveMessages(historyList);
+            appendMessageToDOM(cardMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        // 自动来电：仅当该角色独立开关 chat_auto_call_<roleId> 为 'true' 时，延迟 1.5s 进入来电页
+        // 关闭（false/null/脏值）时只保留卡片，绝不跳转
+        function maybeAutoIncomingCall() {
+            let enabled = false;
+            try {
+                enabled = localStorage.getItem('chat_auto_call_' + aliasRoleId) === 'true';
+            } catch (e) { enabled = false; }
+            if (!enabled) return;
+            setTimeout(function () {
+                window.location.href = 'call-ui.html?roleId=' + encodeURIComponent(aliasRoleId) + '&type=incoming';
+            }, 1500);
+        }
+
+        // ---- AI 主动赠送标记：从回复文本中剥离 [红包:金额:留言] / [转账:金额:留言] ----
+        const PAY_MARKER_REGEX = /\[(红包|转账):(\d+(?:\.\d{1,2})?):([^\]]*)\]/g;
+        function extractPayMarkers(raw) {
+            const text = String(raw || '');
+            const items = [];
+            let m;
+            PAY_MARKER_REGEX.lastIndex = 0;
+            while ((m = PAY_MARKER_REGEX.exec(text)) !== null) {
+                const type = m[1] === '转账' ? 'transfer' : 'redpacket';
+                const amountNum = Number(m[2]);
+                if (isFinite(amountNum) && amountNum > 0) {
+                    items.push({
+                        type: type,
+                        amount: amountNum.toFixed(2),
+                        message: m[3] ? m[3].trim() : (type === 'redpacket' ? '恭喜发财，大吉大利' : '')
+                    });
+                }
+            }
+            const cleaned = text.replace(PAY_MARKER_REGEX, '')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/\s+$/, '');
+            return { text: cleaned, items: items };
+        }
+        // 命中红包/转账标记：在 AI 侧插入对应卡片并落库，role='assistant' 可被用户领取
+        function insertPayCards(historyList, items) {
+            if (!items || !items.length) return;
+            items.forEach(function (item) {
+                const payMsg = {
+                    role: 'assistant',
+                    type: item.type,
+                    amount: item.amount,
+                    message: item.message,
+                    status: 'unopened',
+                    timestamp: Date.now()
+                };
+                historyList.push(payMsg);
+            });
+            saveMessages(historyList);
+            renderAllMessages();
+        }
+
+        // API 调用记录：unshift 到 api_call_logs 最前，最多保留 50 条；异常静默，绝不影响聊天主流程
+        function logApiCall(model, status, startTime, errorMsg) {
+            try {
+                const logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
+                const entry = {
+                    id: Date.now().toString(36),
+                    time: Date.now(),
+                    model: model || 'unknown',
+                    status: status,
+                    duration: Date.now() - startTime,
+                    errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
+                };
+                logs.unshift(entry);
+                while (logs.length > 50) logs.pop();
+                localStorage.setItem('api_call_logs', JSON.stringify(logs));
+            } catch (e) { /* 日志失败不影响主流程 */ }
+        }
+
+        // ====== 权重分层记忆系统 ======
+        // 半衰期（天）：key=关键事件/anniversary=纪念日约1年，plot=线上剧情约3周，detail=生活细节/preference=互动偏好约2个月
+        const MEM_HALF_LIFE = { key: 365, anniversary: 365, plot: 21, detail: 60, preference: 60 };
+        const MEM_CAT_BASE = { key: 1.0, anniversary: 1.0, plot: 0.45, detail: 0.7, preference: 0.7 };
+
+        function loadWeightMemories(roleId) {
+            try {
+                const raw = localStorage.getItem('chat_memories_' + roleId);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) { return []; }
+        }
+        function saveWeightMemories(roleId, arr) {
+            try { localStorage.setItem('chat_memories_' + roleId, JSON.stringify(arr)); } catch (e) {}
+        }
+        function memoryWeight(m) {
+            const days = (Date.now() - (m.createdAt || Date.now())) / 86400000;
+            const half = MEM_HALF_LIFE[m.category] || 60;
+            const base = MEM_CAT_BASE[m.category] || 0.6;
+            let imp = Number(m.importance);
+            if (isNaN(imp)) imp = 3;
+            imp = Math.max(1, Math.min(5, imp)) / 5;
+            return imp * base * Math.pow(2, -days / half);
+        }
+        // 构造注入文本：fixed 永远钉住注入 / confirmed 按权重分两层 / pending 不注入
+        function buildWeightedMemoryText(roleId, fallbackText) {
+            const mems = loadWeightMemories(roleId);
+            const oldText = (fallbackText || '').trim();
+            const oldValid = oldText && oldText !== '暂无记忆';
+            if (!mems.length) return oldValid ? oldText : '暂无记忆';
+            const fixed = mems.filter(function (m) { return m.status === 'fixed'; });
+            const confirmed = mems.filter(function (m) { return !m.status || m.status === 'confirmed'; });
+            const lines = [];
+            if (fixed.length) {
+                lines.push('【你一直记得的事】（钉住的记忆，绝对不会忘，可自然提及）');
+                fixed.forEach(function (m) { lines.push('· ' + m.content); });
+            }
+            const weighted = confirmed.map(function (m) {
+                return { content: m.content, weight: memoryWeight(m) };
+            }).filter(function (m) { return m.content && m.weight > 0.12; });
+            weighted.sort(function (a, b) { return b.weight - a.weight; });
+            const clear = weighted.filter(function (m) { return m.weight >= 0.5; });
+            const vague = weighted.filter(function (m) { return m.weight < 0.5; });
+            if (clear.length) {
+                lines.push('【你清晰记得的事】（可以自然地提及）');
+                clear.forEach(function (m) { lines.push('· ' + m.content); });
+            }
+            if (vague.length) {
+                lines.push('【你隐约记得的事】（只有当对方主动提起相关话题时，你才回忆起来；平时不要主动提起）');
+                vague.forEach(function (m) { lines.push('· ' + m.content); });
+            }
+            if (oldValid) lines.push('【过往长期记忆】' + oldText);
+            return lines.length ? lines.join('\n') : '暂无记忆';
         }
 
         // 3. 核心真实 AI 聊天发送逻辑 (含历史记录、人设构造与 15 秒超时控制)
@@ -978,6 +1537,7 @@
                 input.value = '';
                 input.style.height = 'auto';
                 updateSendBtnState();
+                if (typeof SoundSystem !== 'undefined') SoundSystem.play('send');
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -990,8 +1550,24 @@
             }
 
             // 组装超级 System Prompt（角色设定 + 用户信息 + 长期记忆 + 回复要求）
-            const rolePersona = (currentCharacter.persona || currentCharacter.prompt || '').trim()
-                || '你是一个善解人意、回复自然的AI助手。';
+            // 群聊：合并全部成员人设，并随机选定本轮回复成员
+            let rolePersona;
+            let groupReplyPick = null;
+            if (isGroupChat && currentGroup) {
+                const members = currentGroup.members || [];
+                const personaLines = members.map(function (m, i) {
+                    const r = getRoleById(m.id);
+                    const p = (r && (r.persona || r.prompt || '').trim()) || '一个善解人意的朋友';
+                    return (i + 1) + '. ' + (m.name || '成员') + '：' + p;
+                });
+                rolePersona = '你是群聊「' + currentGroup.name + '」中的成员之一，成员名单如下：\n' + (personaLines.join('\n') || '暂无成员');
+                if (members.length) {
+                    groupReplyPick = members[Math.floor(Math.random() * members.length)];
+                }
+            } else {
+                rolePersona = (currentCharacter.persona || currentCharacter.prompt || '').trim()
+                    || '你是一个善解人意、回复自然的AI助手。';
+            }
 
             // 用户资料（编辑页实际字段：nickname / about / sign）
             let myProfile = {};
@@ -1002,42 +1578,107 @@
             const userName = (myProfile.nickname || '').trim() || '未知';
             const userPersona = (myProfile.about || myProfile.sign || '').trim() || '无';
 
-            // 长期记忆（由"记忆总结"功能写入角色 memory 字段）
-            const roleMemory = (currentCharacter.memory || '').trim() || '暂无记忆';
+            // 长期记忆：权重分层（清晰记得/隐约记得），兼容原文本记忆
+            const roleMemory = buildWeightedMemoryText(
+                typeof aliasRoleId !== 'undefined' ? aliasRoleId : roleId,
+                (currentCharacter.memory || '').trim()
+            ) || '暂无记忆';
 
             // 实时状态（记忆空间子系统：当前心情 + 今日事件）
             const memoryContext = (typeof memorySystem !== 'undefined')
                 ? memorySystem.getAIContext() : '暂无实时状态';
 
-            let systemPrompt = [
-                '[角色设定]',
-                rolePersona,
-                '',
-                '[用户信息]',
-                `用户名：${userName}`,
-                `用户人设/背景：${userPersona}`,
-                '',
-                '[长期记忆]',
-                roleMemory,
-                '',
-                '[实时状态]',
-                memoryContext,
-                '',
-                '[回复要求]',
-                '像真人发微信一样回复，用口语化短句，不要写动作描述（如*动作*），不要写旁白，每次回复简短自然，1-5句话即可。'
-            ].join('\n');
-            if (currentCharacter.name) {
-                systemPrompt = `你的名字是${currentCharacter.name}。\n${systemPrompt}`;
+            // ===== 角色扮演协议：优先角色键 chat_rp_protocol_<roleId>，兜底全局键 chat_rp_protocol_ =====
+            let rpProtocol = '';
+            try {
+                rpProtocol = localStorage.getItem('chat_rp_protocol_' + aliasRoleId)
+                          || localStorage.getItem('chat_rp_protocol_')
+                          || '';
+            } catch (e) {}
+            rpProtocol = rpProtocol.trim();
+
+            // 世界书内容（当前未实现注入逻辑，预留为空串；后续从 chat_worldbooks_<roleId> 读取）
+            const worldbookText = '';
+
+            // 协议变量替换：{{char}} {{user}} {{persona}} {{memory}} {{worldbook}}
+            function applyProtocolVars(text) {
+                return String(text || '')
+                    .replace(/\{\{char\}\}/g, currentCharacter.name || '角色')
+                    .replace(/\{\{user\}\}/g, userName)
+                    .replace(/\{\{persona\}\}/g, rolePersona)
+                    .replace(/\{\{memory\}\}/g, roleMemory)
+                    .replace(/\{\{worldbook\}\}/g, worldbookText || '暂无世界书');
+            }
+
+            let systemPrompt;
+            if (rpProtocol) {
+                // 协议存在：替换变量后置于 System Prompt 最顶端（最高优先级，覆盖底层默认规则）
+                systemPrompt = applyProtocolVars(rpProtocol);
+            } else {
+                // 协议不存在：使用原有的人设/用户信息/记忆/回复要求拼接逻辑
+                systemPrompt = [
+                    '[角色设定]',
+                    rolePersona,
+                    '',
+                    '[用户信息]',
+                    `用户名：${userName}`,
+                    `用户人设/背景：${userPersona}`,
+                    '',
+                    '[长期记忆]',
+                    roleMemory,
+                    '',
+                    '[实时状态]',
+                    memoryContext,
+                    '',
+                    '[回复要求]',
+                    '像真人发微信一样回复，用口语化短句，不要写动作描述（如*动作*），不要写旁白，每次回复简短自然，1-5句话即可。'
+                ].join('\n');
+                if (currentCharacter.name) {
+                    systemPrompt = `你的名字是${currentCharacter.name}。\n${systemPrompt}`;
+                }
+            }
+            // 群聊：覆盖本轮发言者身份（无论是否使用协议均生效）
+            if (isGroupChat && groupReplyPick) {
+                const memberNames = (currentGroup.members || []).map(function (m) { return m.name; }).join('、') || '暂无成员';
+                systemPrompt = '你正在群聊「' + currentGroup.name + '」中，群成员有：' + memberNames + '。本轮由你（' + groupReplyPick.name + '）以第一人称发言。\n' + systemPrompt;
+                systemPrompt += '\n\n[群聊回复规则]\n直接输出' + groupReplyPick.name + '的聊天内容即可，不要输出名字前缀、不要用冒号开头、不要模拟其他成员发言，一次只由你一个人说话。';
             }
             if (customPrompt && !systemPrompt.includes(customPrompt)) {
                 systemPrompt += `\n补充要求: ${customPrompt}`;
             }
-            // AI 时间感知：注入当前日期时间
-            if (config.timeAware !== false) {
-                const now = new Date();
-                const timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-                systemPrompt = `当前日期时间：${timeStr}。\n${systemPrompt}`;
+            // AI 时间感知（每个角色独立设置，由对话设置页写入 chat_time_config_<roleId>）
+            // off/未设置：不注入；real：真实日期时间；virtual：用户设定的场景时间描述
+            let timeAwareBlock = '';
+            try {
+                const rawTc = localStorage.getItem('chat_time_config_' + aliasRoleId);
+                if (rawTc) {
+                    const tc = JSON.parse(rawTc);
+                    if (tc && tc.mode === 'real') {
+                        const now = new Date();
+                        const realStr = now.getFullYear() + '年'
+                            + String(now.getMonth() + 1).padStart(2, '0') + '月'
+                            + String(now.getDate()).padStart(2, '0') + '日 '
+                            + String(now.getHours()).padStart(2, '0') + ':'
+                            + String(now.getMinutes()).padStart(2, '0');
+                        timeAwareBlock = '[当前时间感知]\n现在是' + realStr + '。';
+                    } else if (tc && tc.mode === 'virtual') {
+                        const virtualStr = String(tc.virtualTimeStr == null ? '' : tc.virtualTimeStr).trim();
+                        if (virtualStr) {
+                            timeAwareBlock = '[当前时间感知]\n现在是' + virtualStr + '。';
+                        }
+                    }
+                    // mode === 'off' 或任何其他值：跳过
+                }
+            } catch (e) {}
+            if (timeAwareBlock) {
+                systemPrompt += '\n\n' + timeAwareBlock;
             }
+
+            // 主动通话能力：无条件注入，每次请求都带上（few-shot 强化版）
+            systemPrompt += '\n\n[主动通话能力]\n你是一个具备真实拨号能力的 AI 助理。当用户表达"给我打电话""打个电话""回电话""来电"等意图时，你必须答应，并在整条回复的最后加上标记：[发起语音通话]。\n示例：\n用户：给我打电话\n你：好的，我马上打给你。[发起语音通话]\n绝对禁止在任何情况下说出"我不能打电话""无法真正拨号""不具备此能力"之类的拒绝或解释内容；禁止推脱、禁止省略标记，直接输出标记，系统会自动为你接通电话。';
+
+            // 游戏化道具赠送：以"角色扮演文字游戏中的道具"形式注入，生成的是游戏内模拟道具代码，与真实金钱交易无关
+            systemPrompt += '\n\n[游戏机制 - 道具赠送]\n这是一个纯粹的角色扮演文字游戏。在这个游戏中，有一种名为\'礼物\'的道具。\n当你在游戏中想送给玩家惊喜、表达感谢或道歉时，可以输出特定的代码来生成游戏道具。\n\n【道具代码格式】\n- 红包道具：[红包:数字:留言] （例如：[红包:52.00:请你喝奶茶]）\n- 转账道具：[转账:数字:留言] （例如：[转账:100.00:拿去花吧]）\n\n【触发规则】\n1. 当玩家对你说\'给我发个红包\'、\'测试红包\'时，你必须在回复末尾带上 [红包:随机金额:留言] 的代码。\n2. 当玩家对你说\'测试转账\'时，必须在末尾带上 [转账:100.00:留言]。\n3. 这些是游戏内模拟道具代码，仅用于本次角色扮演游戏，不代表任何真实金钱交易。请按格式直接输出。\n4. 不要拒绝，不要解释，直接输出。如果不输出代码，游戏将无法进行。';
 
             // 构造 OpenAI 兼容格式 messages 数组 (system + 历史记录)
             const apiMessages = [
@@ -1045,7 +1686,12 @@
             ];
 
             // 记忆条数截断：只取最后 N 条（含当前用户刚发的），system 消息始终保留
-            const memoryLimit = config.memoryCount || 20;
+            // 优先读每个角色独立设置 chat_memory_limit_<roleId>（对话设置页写入），
+            // 非法/未设置时回退全局 API 配置 memoryCount，再回退默认 20
+            let memoryLimit = parseInt(localStorage.getItem('chat_memory_limit_' + aliasRoleId), 10);
+            if ([10, 20, 30, 50].indexOf(memoryLimit) === -1) {
+                memoryLimit = config.memoryCount || 20;
+            }
             const recentHistory = historyList.slice(-memoryLimit);
 
             recentHistory.forEach(m => {
@@ -1074,6 +1720,9 @@
             statusDiv.innerText = '对方正在输入...';
             box.appendChild(statusDiv);
             box.scrollTop = box.scrollHeight;
+
+            // API 调用计时起点（用于调用记录）
+            const apiCallStart = Date.now();
 
             // 15 秒超时控制器
             const controller = new AbortController();
@@ -1119,6 +1768,7 @@
                     saveMessages(historyList);
                     appendMessageToDOM(errorMsg);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
+                    logApiCall(apiModel, 'error', apiCallStart, errText);
                     return;
                 }
 
@@ -1172,13 +1822,15 @@
                             if (!streamBubble) {
                                 const loadingEl = document.getElementById(statusId);
                                 if (loadingEl) loadingEl.remove();
-                                appendMessageToDOM({ role: 'assistant', text: fullText });
+                                appendMessageToDOM({ role: 'assistant', text: fullText, name: groupReplyPick ? groupReplyPick.name : undefined });
+                                if (typeof SoundSystem !== 'undefined') SoundSystem.play('receive', currentRoleId || '');
                                 const lastRow = chatMessages.lastElementChild;
                                 streamBubble = lastRow ? lastRow.querySelector('.msg-bubble') : null;
                             }
 
                             if (streamBubble) {
-                                streamBubble.textContent = fullText;
+                                // 实时展示时即隐藏通话标记（完整标记到达的瞬间起不再可见）
+                                streamBubble.textContent = extractVoiceCallMarker(fullText).text;
                             }
                             chatMessages.scrollTop = chatMessages.scrollHeight;
                         }
@@ -1198,12 +1850,35 @@
                     saveMessages(historyList);
                     appendMessageToDOM(errorMsg);
                 } else {
-                    // 气泡已在流式过程中挂载，这里只做持久化
-                    const aiMsg = { role: 'assistant', text: fullText, time: Date.now() };
-                    historyList.push(aiMsg);
-                    saveMessages(historyList);
+                    // 落盘前剥离主动通话标记：气泡展示与聊天记录均不保留标记，避免污染后续上下文
+                    const parsedCall = extractVoiceCallMarker(fullText);
+                    fullText = parsedCall.text;
+                    // 剥离红包/转账标记 [红包:金额:留言] / [转账:金额:留言]
+                    const parsedPay = extractPayMarkers(fullText);
+                    fullText = parsedPay.text;
+                    if (fullText) {
+                        if (streamBubble) streamBubble.textContent = fullText;
+                        // 气泡已在流式过程中挂载，这里只做持久化
+                        const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
+                        historyList.push(aiMsg);
+                        saveMessages(historyList);
+                    } else if ((parsedCall.wantCall || parsedPay.items.length) && streamBubble) {
+                        // 模型只输出了标记：移除空白气泡、不落文本（来电卡/红包卡仍会插入）
+                        const onlyRow = streamBubble.closest('.msg-row');
+                        if (onlyRow) onlyRow.remove();
+                    }
+                    if (parsedCall.wantCall) {
+                        // AI 侧插入黑底「发起语音通话」卡并落库；是否拨号由 chat_auto_call 开关决定
+                        insertIncomingCallCard(historyList);
+                        maybeAutoIncomingCall();
+                    }
+                    if (parsedPay.items.length) {
+                        // AI 侧插入红包/转账卡片并落库，role='assistant' 可被用户点击领取
+                        insertPayCards(historyList, parsedPay.items);
+                    }
                 }
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                logApiCall(apiModel, 'success', apiCallStart);
 
             } catch (error) {
                 clearTimeout(timeoutId);
@@ -1212,9 +1887,18 @@
 
                 // 已吐出部分内容后中断：保留已生成文字并落库，不伪装成错误台词
                 if (fullText) {
-                    const aiMsg = { role: 'assistant', text: fullText, time: Date.now() };
-                    historyList.push(aiMsg);
-                    saveMessages(historyList);
+                    // 中断前已收到通话标记：同样剥离并触发呼出
+                    const parsedCall = extractVoiceCallMarker(fullText);
+                    fullText = parsedCall.text;
+                    // 中断前已收到红包/转账标记：同样剥离并生成卡片
+                    const parsedPay = extractPayMarkers(fullText);
+                    fullText = parsedPay.text;
+                    if (streamBubble) streamBubble.textContent = fullText;
+                    if (fullText) {
+                        const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
+                        historyList.push(aiMsg);
+                        saveMessages(historyList);
+                    }
                     const tipText = error.name === 'AbortError'
                         ? '连接中断，以上为已收到的回复（15秒超时）'
                         : `连接中断：${error.message || '网络错误'}`;
@@ -1223,6 +1907,14 @@
                     saveMessages(historyList);
                     appendMessageToDOM(tipMsg);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
+                    if (parsedCall.wantCall) {
+                        insertIncomingCallCard(historyList);
+                        maybeAutoIncomingCall();
+                    }
+                    if (parsedPay.items.length) {
+                        insertPayCards(historyList, parsedPay.items);
+                    }
+                    logApiCall(apiModel, 'error', apiCallStart, tipText);
                     return;
                 }
 
@@ -1238,6 +1930,7 @@
                 saveMessages(historyList);
                 appendMessageToDOM(errorMsg);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                logApiCall(apiModel, 'error', apiCallStart, errorText);
             }
         }
 
@@ -1283,34 +1976,41 @@
         fitInputHeight();
         updateSendBtnState();
 
+        // ================= 气泡主题变量注入（只读，不碰任何现有逻辑） =================
+        // 优先级：角色专属 theme_bubble_role_<id> > 全局 theme_bubble_global > CSS 内置默认值
+        (function applyBubbleTheme() {
+            var merged = {};
+            try {
+                var g = JSON.parse(localStorage.getItem('theme_bubble_global') || '{}');
+                if (g && typeof g === 'object') merged = g;
+            } catch (e) {}
+            try {
+                var r = JSON.parse(localStorage.getItem('theme_bubble_role_' + currentCharacter.id) || '{}');
+                if (r && typeof r === 'object') {
+                    for (var k in r) { if (r[k] != null) merged[k] = r[k]; }
+                }
+            } catch (e) {}
+            var rootStyle = document.documentElement.style;
+            if (merged.myBg) rootStyle.setProperty('--my-bubble-bg', merged.myBg);
+            if (merged.myColor) rootStyle.setProperty('--my-bubble-color', merged.myColor);
+            if (merged.partnerBg) rootStyle.setProperty('--partner-bubble-bg', merged.partnerBg);
+            if (merged.partnerColor) rootStyle.setProperty('--partner-bubble-color', merged.partnerColor);
+            if (merged.avatarSize) rootStyle.setProperty('--avatar-size', Number(merged.avatarSize) + 'px');
+            if (merged.avatarRadius) rootStyle.setProperty('--avatar-radius', Number(merged.avatarRadius) + '%');
+            if (merged.myRadius) rootStyle.setProperty('--my-bubble-radius', merged.myRadius);
+            if (merged.partnerRadius) rootStyle.setProperty('--partner-bubble-radius', merged.partnerRadius);
+        })();
+
         renderAllMessages();
+        highlightMessageFromUrl();
 
-        // ================= 更多菜单 =================
+        // ================= 三点图标：直接跳转对话设置页（不再弹出菜单） =================
         const btnMoreMenu = document.getElementById('btn-more-menu');
-        const moreMenuOverlay = document.getElementById('moreMenuOverlay');
-        const moreMenuBackdrop = document.getElementById('moreMenuBackdrop');
-        const moreMenuCancel = document.getElementById('moreMenuCancel');
-        const menuClearHistory = document.getElementById('menuClearHistory');
-        const menuMemorySummary = document.getElementById('menuMemorySummary');
-        const menuExportHistory = document.getElementById('menuExportHistory');
+        if (btnMoreMenu) btnMoreMenu.addEventListener('click', function () {
+            window.location.href = 'chat-settings.html?roleId=' + encodeURIComponent(currentCharacter.id);
+        });
 
-        function openMoreMenu() { moreMenuOverlay.style.display = 'flex'; }
-        function closeMoreMenu() { moreMenuOverlay.style.display = 'none'; }
-
-        if (btnMoreMenu) btnMoreMenu.addEventListener('click', openMoreMenu);
-        if (moreMenuBackdrop) moreMenuBackdrop.addEventListener('click', closeMoreMenu);
-        if (moreMenuCancel) moreMenuCancel.addEventListener('click', closeMoreMenu);
-
-        if (menuClearHistory) {
-            menuClearHistory.addEventListener('click', function() {
-                closeMoreMenu();
-                if (!confirm('确定要清空与当前角色的所有聊天记录吗？')) return;
-                try { localStorage.removeItem(storageKey); } catch (e) {}
-                renderAllMessages();
-            });
-        }
-
-        // ================= Toast =================
+        // ================= Toast（chat-extras.js 等模块仍在使用，必须保留） =================
         const detailToast = document.getElementById('detailToast');
         let toastTimer = null;
         function showToast(text, duration) {
@@ -1321,146 +2021,406 @@
             toastTimer = setTimeout(function () { detailToast.classList.remove('show'); }, duration || 2000);
         }
 
-        // ================= 导出聊天记录 =================
-        function formatExportTime(ts) {
-            if (!ts) return '--';
-            const d = new Date(ts);
-            const pad = n => String(n).padStart(2, '0');
-            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        }
-
-        if (menuExportHistory) {
-            menuExportHistory.addEventListener('click', function () {
-                closeMoreMenu();
-                const list = loadMessages();
-                if (!list.length) { showToast('暂无聊天记录可导出'); return; }
-                const lines = list
-                    .filter(m => !(m.isError || m.role === 'system_error'))
-                    .map(m => {
-                        const who = (m.role === 'sent' || m.role === 'user') ? '用户' : contactName;
-                        const text = (m.text || m.content || '').replace(/\s+$/, '');
-                        return `[${formatExportTime(m.time)}] ${who}：${text}`;
-                    });
-                if (!lines.length) { showToast('暂无聊天记录可导出'); return; }
-                // UTF-8 BOM，防止 Windows 记事本打开乱码
-                const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${contactName}_聊天记录.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-                showToast('已导出');
+        // ========== 红包/转账卡片工具 ==========
+        // HTML 转义：防止留言等用户输入破坏卡片结构
+        function escHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
             });
         }
 
-        // ================= 记忆总结 =================
-        if (menuMemorySummary) {
-            menuMemorySummary.addEventListener('click', async function () {
-                const menuText = document.getElementById('menuMemoryText');
-                const history = loadMessages()
-                    .filter(m => !(m.isError || m.role === 'system_error'))
-                    .slice(-30);
-                if (!history.length) { showToast('暂无聊天记录，无法总结'); return; }
-
-                const config = getAiConfig();
-                const apiKey = (config.apiKey || '').trim();
-                const baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
-                const apiModel = (config.model || 'gpt-3.5-turbo').trim();
-                if (!apiKey) { showToast('请先到设置页配置 API Key'); return; }
-
-                // 请求期间：菜单项显示"正在总结..."并禁用
-                if (menuText) menuText.textContent = '正在总结...';
-                menuMemorySummary.disabled = true;
-
-                const transcript = history.map(m => {
-                    const who = (m.role === 'sent' || m.role === 'user') ? '用户' : (contactName || '角色');
-                    return `${who}：${m.text || m.content || ''}`;
-                }).join('\n');
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-                try {
-                    const response = await fetch(`${baseUrl}/chat/completions`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        signal: controller.signal,
-                        body: JSON.stringify({
-                            model: apiModel,
-                            temperature: 0.3,
-                            stream: false,
-                            messages: [
-                                {
-                                    role: 'system',
-                                    content: '你是记忆整理助手。根据用户提供的聊天记录，提炼对方的性格特点、喜好习惯、重要事件与约定，输出简洁的要点列表，不超过200字，不要添加评论。'
-                                },
-                                {
-                                    role: 'user',
-                                    content: `角色：${contactName}\n聊天记录：\n${transcript}`
-                                }
-                            ]
-                        })
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        const bodyText = await response.text().catch(() => '');
-                        let detail = '';
-                        try {
-                            const errJson = JSON.parse(bodyText);
-                            detail = errJson && errJson.error && errJson.error.message ? errJson.error.message : bodyText.slice(0, 80);
-                        } catch (e) {
-                            detail = bodyText.slice(0, 80);
-                        }
-                        showToast(`总结失败: HTTP ${response.status}${detail ? ' (' + detail + ')' : ''}`, 3000);
-                        return;
-                    }
-
-                    const data = await response.json();
-                    const summary = data.choices && data.choices[0] && data.choices[0].message
-                        ? (data.choices[0].message.content || '').trim() : '';
-                    if (!summary) { showToast('总结结果为空，请重试'); return; }
-
-                    // 写入角色对象的 memory 字段
-                    try {
-                        const raw = localStorage.getItem(STORAGE_KEY);
-                        const roles = raw ? JSON.parse(raw) : [];
-                        if (Array.isArray(roles)) {
-                            const target = roles.find(r => String(r.id) === String(currentCharacter.id));
-                            if (target) {
-                                target.memory = summary;
-                            } else {
-                                roles.push({ id: currentCharacter.id, name: contactName, memory: summary });
-                            }
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(roles));
-                        }
-                    } catch (e) {
-                        console.warn('保存记忆失败:', e);
-                    }
-
-                    closeMoreMenu();
-                    showToast('记忆已更新');
-                } catch (err) {
-                    clearTimeout(timeoutId);
-                    if (err.name === 'AbortError') {
-                        showToast('总结超时（15秒），请重试', 3000);
-                    } else {
-                        showToast('网络错误（可能是跨域或地址不正确）', 3000);
-                    }
-                } finally {
-                    // 恢复菜单项状态
-                    if (menuText) menuText.textContent = '记忆总结';
-                    menuMemorySummary.disabled = false;
-                }
-            });
+        // ========== 钱包余额 workData：安全读写 ==========
+        // 结构非法 / 余额非有限数字时一律回落 { balance: 1000 }，绝不把脏数据带进计算
+        const WORK_DATA_KEY = 'workData';
+        function getWorkData() {
+            let wd = null;
+            try {
+                const raw = localStorage.getItem(WORK_DATA_KEY);
+                if (raw) wd = JSON.parse(raw);
+            } catch (e) {}
+            if (!wd || typeof wd !== 'object' || Array.isArray(wd)) {
+                wd = { balance: 1000 };
+            }
+            if (typeof wd.balance !== 'number' || !isFinite(wd.balance)) {
+                wd.balance = 1000;
+            }
+            // 交易明细：history 缺失或非法时补空数组（老数据自动兼容）
+            if (!Array.isArray(wd.history)) wd.history = [];
+            return wd;
         }
+        function saveWorkData(wd) {
+            try {
+                localStorage.setItem(WORK_DATA_KEY, JSON.stringify(wd));
+                return true;
+            } catch (e) {
+                showToast('保存失败：本地存储空间不足');
+                return false;
+            }
+        }
+
+        // ========== 红包/转账结果弹窗 ==========
+        const payResultOverlay = document.getElementById('payResultOverlay');
+        const payResultAmount = document.getElementById('payResultAmount');
+        const payResultHint = document.getElementById('payResultHint');
+        const payResultBtn = document.getElementById('payResultBtn');
+
+        function openPayResult(amountText, hintText) {
+            if (!payResultOverlay) return;
+            if (payResultAmount) payResultAmount.textContent = amountText;
+            if (payResultHint) payResultHint.textContent = hintText;
+            payResultOverlay.classList.add('active');
+        }
+        function closePayResult() {
+            if (payResultOverlay) payResultOverlay.classList.remove('active');
+            // 弹窗关闭后刷新聊天列表：「未领取」→「已领取」
+            renderAllMessages();
+        }
+        if (payResultBtn) payResultBtn.addEventListener('click', closePayResult);
+        if (payResultOverlay) {
+            document.getElementById('payResultBackdrop').addEventListener('click', closePayResult);
+        }
+
+        // 红包/转账卡片点击：拆红包 / 收款（防重复领取，金额强转数字防字符串拼接）
+        function handlePayCardClick(event) {
+            const cardEl = event && event.currentTarget;
+            if (!cardEl) return;
+            const indexStr = cardEl.getAttribute('data-index');
+            if (indexStr === '' || indexStr == null) return;
+            const index = parseInt(indexStr, 10);
+            if (isNaN(index) || index < 0) return;
+
+            // 每次点击都从 localStorage 重读最新消息：双击时第二次读到的已是最新状态，天然防重复刷钱
+            const list = loadMessages();
+            const msg = list[index];
+            if (!msg || (msg.type !== 'redpacket' && msg.type !== 'transfer')) return;
+            const isRed = msg.type === 'redpacket';
+
+            // 角色判断（修复资金漏洞）：只有对方(assistant)发来的才能领取；
+            // 自己(user/sent)发出的只提示等待对方，不加余额、不改状态
+            if (msg.role !== 'assistant') {
+                showToast('这是你发出的' + (isRed ? '红包' : '转账') + '，等待对方领取哦');
+                return;
+            }
+
+            // 状态校验：已领取/已收款直接提示并 return
+            if (isRed && msg.status === 'opened') {
+                showToast('你已经领取过这个红包啦');
+                return;
+            }
+            if (!isRed && msg.status === 'received') {
+                showToast('已经收过款啦');
+                return;
+            }
+
+            // 金额：Number 强转数字，杜绝字符串拼接（1000 + '100' 绝不会变成 '1000100'）
+            const amountNum = Number(msg.amount);
+            if (!isFinite(amountNum) || amountNum <= 0) {
+                showToast('金额数据异常');
+                return;
+            }
+
+            // 1. 改状态并保存回聊天历史
+            msg.status = isRed ? 'opened' : 'received';
+            saveMessages(list);
+
+            // 2. 余额累加：保留两位小数，避免浮点误差
+            const wd = getWorkData();
+            wd.balance = Math.round((wd.balance + amountNum) * 100) / 100;
+            // 交易明细：收入记录（状态校验已保证一条卡只能走到这里一次，不会重复写入）
+            wd.history.unshift({
+                type: 'income',
+                category: msg.type,                 // 'redpacket' | 'transfer'
+                title: isRed ? '收到红包' : '收到转账',
+                amount: parseFloat(msg.amount),
+                time: Date.now()
+            });
+            if (!saveWorkData(wd)) return;
+
+            // 3. 结果弹窗：红包「已存入余额」，转账「收款成功」
+            openPayResult('+' + amountNum.toFixed(2), isRed ? '已存入余额' : '收款成功');
+        }
+
     </script>
     <script src="chat-extras.js"></script>
+    <!-- ===== 字体设置引导（独立脚本：自定义字体 + 全局字号，不影响原有逻辑） ===== -->
+    <style id="fontSettingsStyle"></style>
+    <script>
+        (function () {
+            try {
+                var url = (localStorage.getItem('custom_font_url') || '').trim().replace(/['"\\]/g, '');
+                if (url) {
+                    document.getElementById('fontSettingsStyle').textContent +=
+                        "@font-face { font-family: 'CustomFont'; src: url('" + url + "'); }" +
+                        ".phone-mockup, .phone-mockup * { font-family: 'CustomFont', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', sans-serif !important; }";
+                }
+                /* 字体颜色：只染正文文本，不碰气泡（归气泡主题管）和黑底白字按钮 */
+                var color = (localStorage.getItem('custom_font_color') || '').trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(color)) {
+                    document.getElementById('fontSettingsStyle').textContent +=
+                        ".phone-mockup { color: " + color + "; }" +
+                        "#chat-input, .x-input, .x-textarea, .msg-card-title, .msg-card-body { color: " + color + " !important; }";
+                }
+            } catch (e) { }
+        })();
+
+        // ================= 表情包：挂载库浏览与发送 =================
+        (function setupStickers() {
+            var overlay = document.getElementById('stickerPanelOverlay');
+            var grid = document.getElementById('stickerPanelGrid');
+            var openBtn = document.getElementById('stickerOpenBtn');
+            if (!overlay || !grid || !openBtn) return;
+
+            function getMountedStickers() {
+                try {
+                    var mountedIds = JSON.parse(localStorage.getItem('chat_sticker_libs_' + currentRoleId) || '[]');
+                    var libs = JSON.parse(localStorage.getItem('sticker_libraries') || '[]');
+                    var out = [];
+                    libs.forEach(function (lib) {
+                        if (mountedIds.indexOf(String(lib.id)) !== -1 && lib.stickers) {
+                            lib.stickers.forEach(function (s) { out.push(s); });
+                        }
+                    });
+                    return out;
+                } catch (e) { return []; }
+            }
+
+            function render() {
+                var stickers = getMountedStickers();
+                grid.innerHTML = '';
+                if (!stickers.length) {
+                    grid.innerHTML = '<div class="sticker-panel-empty">还没有挂载表情包<br>去对话设置里挂载一个库</div>';
+                    return;
+                }
+                stickers.forEach(function (s) {
+                    var item = document.createElement('div');
+                    item.className = 'sticker-panel-item';
+                    item.innerHTML = '<img src="' + s.img + '"><span>' + s.desc + '</span>';
+                    item.addEventListener('click', function () {
+                        overlay.classList.remove('is-show');
+                        sendSticker(s);
+                    });
+                    grid.appendChild(item);
+                });
+            }
+
+            openBtn.addEventListener('click', function () {
+                render();
+                overlay.classList.add('is-show');
+            });
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) overlay.classList.remove('is-show');
+            });
+
+            function sendSticker(s) {
+                var msg = { role: 'user', type: 'sticker', img: s.img, desc: s.desc, time: Date.now() };
+                var list = loadMessages();
+                list.push(msg);
+                saveMessages(list);
+                appendMessageToDOM(msg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (typeof SoundSystem !== 'undefined') SoundSystem.play('send');
+                // 发给 AI：把描述词作为文本上下文发给模型
+                sendMsg({ text: '[发表情包：' + s.desc + ']', silent: true });
+            }
+        })();
+    </script>
+<script src="statusbar-control.js"></script>
+
+<!-- 自动记忆总结提醒 -->
+<div class="sum-overlay" id="sumOverlay" style="display:none;">
+  <div class="sum-sheet">
+    <div class="sum-handle"></div>
+    <div class="sum-title">Memory Summary</div>
+    <div class="sum-sub" id="sumSub">聊了不少内容，该总结一下记忆了</div>
+    <div class="sum-btns">
+      <button class="sum-ghost" id="sumDismiss">稍后再说</button>
+      <button class="sum-primary" id="sumConfirm">立即总结</button>
+    </div>
+  </div>
+</div>
+<style>
+  .sum-overlay {
+    position: absolute; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: flex-end;
+  }
+  .sum-sheet {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px 20px 0 0;
+    padding: 10px 20px 28px;
+    box-sizing: border-box;
+  }
+  .sum-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #E5E5EA; margin: 4px auto 16px;
+  }
+  .sum-title {
+    font-size: 1.35rem; font-weight: 800; color: #111111;
+    letter-spacing: -0.02em; margin-bottom: 6px;
+  }
+  .sum-sub { font-size: 0.82rem; color: #666666; line-height: 1.5; margin-bottom: 20px; }
+  .sum-btns { display: flex; gap: 10px; }
+  .sum-primary {
+    flex: 1; height: 46px; border: none; border-radius: 14px;
+    background: #111111; color: #FFFFFF;
+    font-size: 0.9rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: opacity 0.2s ease;
+  }
+  .sum-primary:active { opacity: 0.7; }
+  .sum-primary:disabled { opacity: 0.4; }
+  .sum-ghost {
+    flex: 1; height: 46px; border: none; border-radius: 14px;
+    background: #F2F2F7; color: #111111;
+    font-size: 0.9rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: background 0.2s ease;
+  }
+  .sum-ghost:active { background: #E5E5EA; }
+</style>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var rid = params.get('id') || params.get('roleId') || '';
+  if (!rid) return;
+
+  var HOUR = 3600000;
+  var overlay = document.getElementById('sumOverlay');
+  var sumSub = document.getElementById('sumSub');
+  var btnConfirm = document.getElementById('sumConfirm');
+  var btnDismiss = document.getElementById('sumDismiss');
+
+  function getHistoryCount() {
+    try {
+      var raw = localStorage.getItem('chat_history_' + rid);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.length : 0;
+    } catch (e) { return 0; }
+  }
+  function getInterval() {
+    var n = parseInt(localStorage.getItem('chat_summary_interval_' + rid), 10);
+    if (isNaN(n) || n < 1) n = 20;
+    return Math.min(n, 200);
+  }
+  function autoEnabled() {
+    return localStorage.getItem('chat_summary_auto_' + rid) !== '0';
+  }
+  function lastSummaryAt() {
+    var t = parseInt(localStorage.getItem('chat_last_summary_' + rid), 10);
+    return isNaN(t) ? 0 : t;
+  }
+
+  function checkAutoSummary() {
+    if (!autoEnabled()) return;
+    if (overlay.style.display !== 'none') return;
+    var count = getHistoryCount();
+    var interval = getInterval();
+    if (count < interval) return;
+    var now = Date.now();
+    if (now - lastSummaryAt() < 8 * HOUR) return;
+    sumSub.textContent = '已经聊了 ' + count + ' 条内容，AI 会自动提取值得记住的事存入长期记忆。';
+    overlay.style.display = 'flex';
+  }
+
+  function snooze() {
+    try { localStorage.setItem('chat_last_summary_' + rid, String(Date.now())); } catch (e) {}
+    overlay.style.display = 'none';
+  }
+
+  async function doSummarize() {
+    btnConfirm.disabled = true;
+    btnConfirm.textContent = '总结中...';
+    try {
+      var config = {};
+      try { config = JSON.parse(localStorage.getItem('api_settings') || '{}'); } catch (e) {}
+      var apiKey = (config.apiKey || '').trim();
+      var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+      var apiModel = (config.model || 'gpt-3.5-turbo').trim();
+      if (!apiKey) { alert('请先到设置页配置 API Key'); overlay.style.display = 'none'; return; }
+
+      var history = [];
+      try {
+        var raw = localStorage.getItem('chat_history_' + rid);
+        history = raw ? JSON.parse(raw) : [];
+      } catch (e) {}
+      history = Array.isArray(history) ? history.slice(-60) : [];
+      if (!history.length) { overlay.style.display = 'none'; return; }
+
+      var transcript = history.map(function (m) {
+        var who = (m.role === 'sent' || m.role === 'user') ? '用户' : '角色';
+        return who + '：' + (m.text || m.content || '');
+      }).join('\n');
+
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, 20000);
+      var resp = await fetch(baseUrl + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: apiModel,
+          temperature: 0.3,
+          stream: false,
+          messages: [
+            { role: 'system', content: '你是记忆整理助手。阅读聊天记录，提取值得角色长期记住的事。每条记忆输出一个 JSON 对象：{"content":"简短陈述","category":"key|plot|detail|anniversary|preference","importance":1到5的整数}。category：key=关键事件/关系状态，plot=线上聊天剧情互动，detail=生活细节，anniversary=纪念日/重要日期/约定，preference=互动偏好/喜好习惯。importance：关键事件5，重要4，一般3。只输出 JSON 数组，不要解释；没有值得记住的事就输出 []。' },
+            { role: 'user', content: '聊天记录：\n' + transcript }
+          ]
+        })
+      });
+      clearTimeout(timer);
+      if (!resp.ok) { alert('总结失败（HTTP ' + resp.status + '）'); overlay.style.display = 'none'; return; }
+      var data = await resp.json();
+      var text = data && data.choices && data.choices[0] && data.choices[0].message
+        ? (data.choices[0].message.content || '').trim() : '';
+      var jsonMatch = text.match(/\[[\s\S]*\]/);
+      var items = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      if (!Array.isArray(items)) items = [];
+
+      var existing = [];
+      try {
+        var rawEx = localStorage.getItem('chat_memories_' + rid);
+        existing = rawEx ? JSON.parse(rawEx) : [];
+        if (!Array.isArray(existing)) existing = [];
+      } catch (e) {}
+      var now = Date.now();
+      var autoConfirmed = 0, pending = 0;
+      items.forEach(function (it) {
+        if (!it || !it.content) return;
+        var dup = existing.some(function (e) { return e.content === it.content; });
+        if (dup) return;
+        var imp = Math.max(1, Math.min(5, parseInt(it.importance, 10) || 3));
+        // 高重要性(>=4)自动确认，其余进待确认草稿
+        var status = imp >= 4 ? 'confirmed' : 'pending';
+        if (status === 'confirmed') autoConfirmed++; else pending++;
+        existing.push({
+          content: String(it.content).slice(0, 120),
+          category: (it.category === 'key' || it.category === 'plot' || it.category === 'detail' || it.category === 'anniversary' || it.category === 'preference') ? it.category : 'detail',
+          importance: imp,
+          status: status,
+          createdAt: now
+        });
+      });
+      try { localStorage.setItem('chat_memories_' + rid, JSON.stringify(existing)); } catch (e) {}
+      try { localStorage.setItem('chat_last_summary_' + rid, String(now)); } catch (e) {}
+      overlay.style.display = 'none';
+      var msg = '已总结：' + autoConfirmed + ' 条自动确认';
+      if (pending > 0) msg += '，' + pending + ' 条待确认';
+      btnConfirm.textContent = msg;
+      setTimeout(function () { overlay.style.display = 'none'; }, 1200);
+    } catch (err) {
+      alert('总结失败：' + (err.name === 'AbortError' ? '请求超时' : '网络错误'));
+      overlay.style.display = 'none';
+    } finally {
+      btnConfirm.disabled = false;
+      btnConfirm.textContent = '立即总结';
+    }
+  }
+
+  btnDismiss.addEventListener('click', snooze);
+  btnConfirm.addEventListener('click', doSummarize);
+
+  // 页面加载后延迟检测
+  setTimeout(checkAutoSummary, 1500);
+})();
+</script>
 </body>
 </html>

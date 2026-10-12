@@ -59,11 +59,12 @@ const memorySystem = {
         if (!text || !text.trim()) return;
         const newMem = {
             id: Date.now(),
+            date: new Date().toDateString(),
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             content: text.trim()
         };
         this.data.memories.unshift(newMem);
-        if (this.data.memories.length > 20) {
+        if (this.data.memories.length > 60) {
             this.data.memories.pop();
         }
         this.save();
@@ -80,6 +81,12 @@ const memorySystem = {
         localStorage.setItem('phone_memory_data', JSON.stringify(this.data));
     },
 
+    escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    },
+
     renderMemoryPage() {
         const moodEl = document.getElementById('mem-daily-mood');
         const eventEl = document.getElementById('mem-daily-event');
@@ -92,15 +99,72 @@ const memorySystem = {
             listEl.innerHTML = '<div style="text-align:center;color:#c7c7cc;padding:30px 0;font-size:13px;">还没有记忆<br>聊天时会自动沉淀</div>';
             return;
         }
-        listEl.innerHTML = this.data.memories.map(m => `
-            <div class="mem-item">
-                <div class="mem-item-time">
-                    <span>${m.time}</span>
-                    <button class="mem-item-delete" onclick="memorySystem.deleteMemory(${m.id})">删除</button>
+
+        // 按日期分组（旧数据用 id 时间戳推断日期）
+        const groups = {};
+        this.data.memories.forEach(m => {
+            const d = m.date || (m.id ? new Date(m.id).toDateString() : '未知');
+            if (!groups[d]) groups[d] = [];
+            groups[d].push(m);
+        });
+        const dates = Object.keys(groups).sort((a, b) => new Date(b) - new Date(a));
+        const todayStr = new Date().toDateString();
+        const yestStr = new Date(Date.now() - 86400000).toDateString();
+
+        listEl.innerHTML = dates.map(date => {
+            const items = groups[date];
+            const label = date === todayStr ? '今天'
+                : (date === yestStr ? '昨天'
+                    : (function () { const d = new Date(date); return (d.getMonth() + 1) + '月' + d.getDate() + '日'; })());
+            const visible = items.slice(0, 3);
+            const more = items.length - 3;
+            return `
+            <div class="mem-group">
+                <div class="mem-group-head">
+                    <span class="mem-group-date">${this.escapeHtml(label)}</span>
+                    <span class="mem-group-count">${items.length} 条</span>
                 </div>
-                <div class="mem-item-content">${m.content}</div>
-            </div>
-        `).join('');
+                ${visible.map(m => this.memLineHTML(m)).join('')}
+                ${more > 0
+                    ? '<div class="mem-group-more" onclick="memorySystem.toggleGroupRest(this)">展开其余 ' + more + ' 条</div>'
+                    + '<div class="mem-group-rest" style="display:none;">' + items.slice(3).map(m => this.memLineHTML(m)).join('') + '</div>'
+                    : ''}
+            </div>`;
+        }).join('');
+        this.bindLineDelete();
+    },
+
+    memLineHTML(m) {
+        return `
+            <div class="mem-line">
+                <span class="mem-line-time">${this.escapeHtml(m.time)}</span>
+                <span class="mem-line-content">${this.escapeHtml(m.content)}</span>
+                <button class="mem-line-del" data-id="${m.id}" aria-label="删除">×</button>
+            </div>`;
+    },
+
+    bindLineDelete() {
+        const listEl = document.getElementById('mem-list');
+        if (!listEl) return;
+        listEl.querySelectorAll('.mem-line-del').forEach(btn => {
+            btn.onclick = function (e) {
+                e.stopPropagation();
+                const id = parseInt(this.getAttribute('data-id'), 10);
+                if (confirm('删除这条记忆？')) memorySystem.deleteMemory(id);
+            };
+        });
+    },
+
+    toggleGroupRest(el) {
+        const rest = el.nextElementSibling;
+        if (!rest) return;
+        if (rest.style.display === 'none') {
+            rest.style.display = 'block';
+            el.textContent = '收起';
+        } else {
+            rest.style.display = 'none';
+            el.textContent = '展开其余 ' + (rest.children.length) + ' 条';
+        }
     },
 
     getAIContext() {

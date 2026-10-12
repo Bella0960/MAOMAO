@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════════
+   components.css — Design System Component Definitions
+   Auto-extracted from preview/component-*.html
+   DO NOT EDIT MANUALLY — regenerate via extract-components-css.mjs
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Avatar ────────────────────────────────────────────────── */
+/* @anatomy
+   <span class="label">列表头像</span><span class="avatar avatar-md" data-evidence-sample="md-image">林</span><span class="avatar avatar-md" data-evidence-sample="md-image">陈</span><span class="avatar avatar-md" data-evidence-sample="md-image">苏</span>
+*/
+/* Component definitions — extracted to components.css */
+.avatar { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: var(--radius-full); background: var(--lumen-blue-50); color: var(--lumen-blue-700); font-weight: var(--font-weight-h4); line-height: 1; white-space: nowrap; }
+.avatar-md { width: var(--size-avatar-md); height: var(--size-avatar-md); font-size: var(--font-size-h4); }
+.avatar-lg { width: var(--size-avatar-lg); height: var(--size-avatar-lg); font-size: var(--font-size-h2); }
+.avatar-dot { position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: var(--radius-full); background: var(--color-success); }
+
+/* ── Bottom Nav ────────────────────────────────────────────── */
+/* @anatomy
+   <span class="label">default-4tabs</span><nav class="bnav" data-evidence-sample="default-4tabs"><a class="btab on" href="#"><span class="bicon"><svg class="ticn"><use href="#i-home"/></svg></span><span class="btxt">首页</span></a><a class="btab" href="#"><span class="bicon"><svg class="ticn"><use href="#i-compass"/></svg></span><span class="btxt">发现</span></a><a class="btab" href="#"><span class="...
+*/
+.bnav { display: flex; flex: 1; min-width: 0; height: var(--size-tab-bar-height); background: var(--color-surface); border-top: 1px solid var(--color-border); }
+.btab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-width: 0; color: var(--color-text-muted); text-decoration: none; cursor: pointer; transition: background var(--duration-fast) var(--easing-standard); }
+.btab:hover { background: var(--lumen-state-hover); }
+.btab.on { color: var(--color-primary); }
+.bicon { position: relative; width: var(--size-icon-lg); height: var(--size-icon-lg); flex-shrink: 0; }
+.ticn { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btxt { font-size: var(--font-size-eyebrow); font-weight: var(--font-weight-body); line-height: var(--line-height-eyebrow); white-space: nowrap; }
+.bbadge { position: absolute; top: calc(-1 * var(--space-1)); right: calc(-1 * var(--space-2)); min-width: var(--size-icon-sm); height: var(--size-icon-sm); padding: 0 var(--space-1); border-radius: var(--radius-full); background: var(--color-danger); color: var(--color-text-inverse); font-size: var(--font-size-eyebrow); font-weight: var(--font-weight-eyebrow); line-height: var(--size-icon-sm); text-align: center; box-sizing: border-box; }
+
+/* ── Button ────────────────────────────────────────────────── */
+/* @anatomy
+   <span class="label">主要</span><button class="btn btn-md btn-primary" data-evidence-sample="primary-md">开始使用</button><button class="btn btn-md btn-primary" data-evidence-sample="primary-md" disabled>开始使用</button>
+*/
+/* Component definitions — extracted to components.css by deterministic script */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); border: none; cursor: pointer; border-radius: var(--radius-full); padding: 0 var(--space-5); font-family: var(--font-family-base); font-size: var(--font-size-body); font-weight: 500; white-space: nowrap; transition: background var(--duration-fast), opacity var(--duration-fast), filter var(--duration-fast); }
+.btn:active { opacity: .85; }
+.btn:disabled { cursor: not-allowed; color: var(--lumen-text-disabled); }
+.btn-md { height: var(--size-button-height-md); min-width: var(--size-button-height-md); }
+.btn-lg { height: var(--size-button-height-lg); min-width: var(--size-button-height-lg); }
+.btn-primary { background: var(--color-primary); color: var(--color-primary-foreground); }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-primary:disabled { background: var(--color-surface-dim); }
+.btn-secondary { background: var(--lumen-blue-50); color: var(--lumen-blue-700); }
+.btn-secondary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--color-text); }
+.btn-ghost:hover { background: var(--lumen-state-hover); }
+.btn-block { flex: 1 1 auto; }
+
+/* ── Card ──────────────────────────────────────────────────── */
+/* @anatomy
+   <span class="label">基础卡片</span><div class="card"><div class="card-pad"><h3 class="card-title">开始使用</h3><p class="card-body">在首页浏览为你精选的内容，随时发现新灵感。</p>
+*/
+.card { flex: 1; min-width: 0; max-width: 344px; overflow: hidden; background: var(--color-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); }
+.card-pad { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.card-title { margin: 0; font: var(--type-h4); font-weight: var(--font-weight-h4); color: var(--color-text); }
+.card-body { margin: 0; font: var(--type-body); color: var(--color-text-muted); overflow-wrap: break-word; }
+.card-cover { aspect-ratio: 16 / 9; background: var(--color-surface-dim); }
+.card-meta { display: flex; align-items: center; gap: var(--space-2); font: var(--type-caption); color: var(--color-text-muted); }
+.card-avatar { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: var(--size-avatar-md); height: var(--size-avatar-md); border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-primary-foreground); font-size: var(--font-size-caption); font-weight: var(--font-weight-h4); }
+.card-meta-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-value { font: var(--type-h2); font-weight: var(--font-weight-h2); color: var(--color-text); }
+.card-caption { font: var(--type-caption); color: var(--color-text-muted); }
+.card-tap { cursor: pointer; transition: filter var(--duration-fast) var(--easing-standard); }
+.card-tap:hover { filter: brightness(0.97); }
+.card-tap:active { filter: brightness(0.94); }
+
+/* ── Chip ──────────────────────────────────────────────────── */
+/* @anatomy
+   <button class="chip" type="button">推荐</button> <button class="chip" type="button">关注</button> <button class="chip" type="button">热门</button> <button class="chip" type="button">数码</button>
+*/
+.chip { display: inline-flex; align-items: center; gap: var(--space-1); height: var(--size-button-height-sm); min-width: var(--size-button-height-sm); padding: 0 var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-full); background: transparent; color: var(--color-text); font-family: var(--font-body); font-size: var(--font-size-caption); line-height: 1; white-space: nowrap; flex-shrink: 0; cursor: pointer; appearance: none; transition: background var(--duration-fast) var(--easing-standard), filter var(--duration-fast) var(--easing-standard); }
+.chip:hover { background: var(--lumen-state-hover); }
+.chip:focus-visible { outline: 2px solid var(--lumen-border-focus); outline-offset: 2px; }
+.chip--selected { background: var(--lumen-blue-50); border-color: var(--lumen-blue-200); color: var(--lumen-blue-700); }
+.chip--selected:hover { background: var(--lumen-blue-50); filter: brightness(0.96); }
+.chip-icon { width: var(--size-icon-sm); height: var(--size-icon-sm); flex-shrink: 0; }
+
+/* ── Input ─────────────────────────────────────────────────── */
+/* @anatomy
+   <span class="label">默认</span><div class="field"><input class="input" type="text" placeholder="请输入">
+*/
+/* Component definitions — extracted to components.css by deterministic script */
+.field { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-width: 120px; }
+.field-label { font: var(--type-caption); color: var(--color-text-muted); white-space: nowrap; }
+.input { width: 100%; height: var(--size-input-height); padding: 0 var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font: var(--type-body); outline: none; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+.input::placeholder { color: var(--color-text-muted); }
+.input:hover { border-color: var(--color-border-strong); }
+.input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--lumen-blue-100); }
+.input-error { border-color: var(--color-danger); }
+.input:disabled { background: var(--color-surface-dim); color: var(--color-text-disabled); border-color: var(--color-border); cursor: not-allowed; }
+.input:disabled::placeholder { color: var(--color-text-disabled); }
+.helper { font: var(--type-caption); color: var(--color-danger); white-space: nowrap; }

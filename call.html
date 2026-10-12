@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>通话中 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #FFFFFF;
+  }
+  .floating-nav { display: none !important; }
+
+  /* 手机外壳：通话页全屏深色 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background: #0A0A0C;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+
+  .call-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  /* ===== 视频背景三种模式（读 call_video_bg） ===== */
+  .video-bg { position: absolute; inset: 0; background: #0A0A0C; }
+  .video-bg.bg-gradient {
+    background: radial-gradient(120% 90% at 50% 20%, #3A3A40 0%, #17171A 55%, #0A0A0C 100%);
+  }
+  .video-bg.bg-blur { background: #0C0C0F; overflow: hidden; }
+  .video-bg.bg-blur::before,
+  .video-bg.bg-blur::after {
+    content: '';
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+  }
+  .video-bg.bg-blur::before {
+    background: #4A4A52;
+    top: -60px;
+    left: -70px;
+    animation: blobA 7s ease-in-out infinite alternate;
+  }
+  .video-bg.bg-blur::after {
+    background: #2E2E34;
+    bottom: -80px;
+    right: -60px;
+    animation: blobB 8s ease-in-out infinite alternate;
+  }
+  @keyframes blobA { to { transform: translate(60px, 70px) scale(1.15); } }
+  @keyframes blobB { to { transform: translate(-70px, -50px) scale(0.9); } }
+
+  /* ===== 远端画面（视频通话：角色头像大图模拟） ===== */
+  .remote-view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .remote-avatar {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #2A2A2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .remote-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .remote-avatar span { font-size: 2.875rem; font-weight: 600; color: #FFFFFF; }
+  .voice-only .remote-view { display: none; }
+
+  /* ===== 我方小窗 PIP（视频通话） ===== */
+  .self-pip {
+    position: absolute;
+    right: 18px;
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    width: 96px;
+    height: 132px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1C1C1F;
+    border: 1px solid rgba(255,255,255,0.18);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .self-pip img { width: 100%; height: 100%; object-fit: cover; }
+  .self-pip span { font-size: 1.875rem; font-weight: 600; color: #FFFFFF; }
+  .self-pip.is-off { background: #000000; }
+  .self-pip.is-off img,
+  .self-pip.is-off span { display: none; }
+  .self-pip.is-off::after {
+    content: '';
+    width: 26px;
+    height: 26px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M23 7l-7 5 7 5V7z'/><rect x='1' y='5' width='15' height='14' rx='2'/><line x1='2' y1='2' x2='22' y2='22'/></svg>") center/contain no-repeat;
+  }
+  .voice-only .self-pip { display: none; }
+
+  /* ===== 中央信息区（语音通话） ===== */
+  .call-info {
+    position: relative;
+    z-index: 5;
+    padding-top: calc(118px + env(safe-area-inset-top, 0px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .voice-only .call-info { padding-top: calc(150px + env(safe-area-inset-top, 0px)); }
+  .video-mode .call-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-top: calc(72px + env(safe-area-inset-top, 0px));
+    pointer-events: none;
+  }
+
+  .avatar-wrap {
+    position: relative;
+    width: 124px;
+    height: 124px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .video-mode .avatar-wrap { display: none; }
+  .main-avatar {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #2A2A2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.16);
+    position: relative;
+    z-index: 2;
+  }
+  .main-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .main-avatar span { font-size: 2.375rem; font-weight: 600; color: #FFFFFF; }
+  .breath-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.35);
+    animation: breath 1.8s ease-out infinite;
+  }
+  .breath-ring.r2 { animation-delay: 0.9s; }
+  @keyframes breath {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.22); opacity: 0; }
+  }
+  .connected .breath-ring { display: none; }
+
+  .call-name {
+    margin-top: 22px;
+    font-size: 1.313rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    letter-spacing: 0.5px;
+  }
+  .video-mode .call-name { margin-top: 0; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+  .call-status {
+    margin-top: 8px;
+    font-size: 0.813rem;
+    color: #AEAEB2;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+  .video-mode .call-status { text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+
+  /* ===== 底部控制区 ===== */
+  .call-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(46px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    z-index: 20;
+  }
+  .ctl-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: #2A2A2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .ctl-btn:active { transform: scale(0.92); }
+  .ctl-btn svg { width: 22px; height: 22px; stroke: #FFFFFF; }
+  .ctl-btn.is-off { background: #FFFFFF; }
+  .ctl-btn.is-off svg { stroke: #111111; }
+  .ctl-hangup {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: #FF453A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .ctl-hangup:active { transform: scale(0.92); }
+  .ctl-hangup svg { width: 28px; height: 28px; stroke: #FFFFFF; }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+
+<div class="phone-mockup">
+  <div class="status-bar"><span>4:41</span></div>
+
+  <div class="call-stage voice-only" id="callStage">
+
+    <!-- 视频背景（仅视频通话可见） -->
+    <div class="video-bg" id="videoBg"></div>
+
+    <!-- 远端画面 -->
+    <div class="remote-view">
+      <div class="remote-avatar" id="remoteAvatar"></div>
+    </div>
+
+    <!-- 我方小窗 -->
+    <div class="self-pip" id="selfPip"></div>
+
+    <!-- 头像 / 名字 / 状态 -->
+    <div class="call-info">
+      <div class="avatar-wrap">
+        <span class="breath-ring"></span>
+        <span class="breath-ring r2"></span>
+        <div class="main-avatar" id="mainAvatar"></div>
+      </div>
+      <div class="call-name" id="callName">联系人</div>
+      <div class="call-status" id="callStatus">正在呼叫…</div>
+    </div>
+
+    <!-- 控制按钮 -->
+    <div class="call-controls">
+      <!-- 静音 -->
+      <button class="ctl-btn" type="button" id="btnMute" aria-label="静音">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      </button>
+
+      <!-- 语音：扬声器 / 视频：摄像头开关 -->
+      <button class="ctl-btn" type="button" id="btnSecondary" aria-label="扬声器">
+        <svg id="icoSpeaker" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <svg id="icoCamera" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </button>
+
+      <!-- 翻转摄像头（仅视频） -->
+      <button class="ctl-btn" type="button" id="btnFlip" aria-label="翻转摄像头" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+
+      <!-- 挂断 -->
+      <button class="ctl-hangup" type="button" id="btnHangup" aria-label="挂断">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" transform="rotate(135 12 12)"/></svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ================= 参数与数据 =================
+  var params = new URLSearchParams(window.location.search);
+  var roleId = params.get('id') || '';
+  var callType = params.get('type') === 'video' ? 'video' : 'voice';
+
+  function readJSON(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  var character = null;
+  var list = readJSON('ai_custom_characters');
+  if (Array.isArray(list)) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].id === roleId) { character = list[i]; break; }
+    }
+  }
+  var myProfile = readJSON('myProfile') || {};
+
+  var displayName = (character && character.name) ? character.name : '未知联系人';
+  var avatarSrc = character && character.avatar ? character.avatar : '';
+  var myAvatarSrc = myProfile.avatar || '';
+  var myInitial = (myProfile.nickname || '我').trim().charAt(0) || '我';
+  var roleInitial = displayName.charAt(0) || '?';
+
+  function avatarHTML(src, initial) {
+    return src ? '<img src="' + src + '" alt="">' : '<span>' + initial + '</span>';
+  }
+
+  // ================= 渲染基础信息 =================
+  document.getElementById('callName').textContent = displayName;
+  document.getElementById('mainAvatar').innerHTML = avatarHTML(avatarSrc, roleInitial);
+  document.getElementById('remoteAvatar').innerHTML = avatarHTML(avatarSrc, roleInitial);
+  document.getElementById('selfPip').innerHTML = avatarHTML(myAvatarSrc, myInitial);
+
+  var stage = document.getElementById('callStage');
+  if (callType === 'video') {
+    stage.classList.remove('voice-only');
+    stage.classList.add('video-mode');
+    // 视频背景模式：plain(默认) / gradient / blur
+    var bgMode = localStorage.getItem('call_video_bg') || 'plain';
+    var bg = document.getElementById('videoBg');
+    if (bgMode === 'gradient') bg.classList.add('bg-gradient');
+    if (bgMode === 'blur') bg.classList.add('bg-blur');
+    // 视频模式下显示摄像头/翻转按钮
+    document.getElementById('icoSpeaker').style.display = 'none';
+    document.getElementById('icoCamera').style.display = '';
+    document.getElementById('btnSecondary').setAttribute('aria-label', '摄像头');
+    document.getElementById('btnFlip').style.display = '';
+  }
+
+  // ================= 通话状态机：呼叫 5s -> 自动接通 -> 计时 =================
+  var statusEl = document.getElementById('callStatus');
+  var connected = false;
+  var connectTimer = null;
+  var tickTimer = null;
+  var seconds = 0;
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function formatTime(s) { return pad(Math.floor(s / 60)) + ':' + pad(s % 60); }
+
+  function setConnected() {
+    connected = true;
+    stage.classList.add('connected');
+    statusEl.textContent = formatTime(0);
+    tickTimer = setInterval(function () {
+      seconds++;
+      statusEl.textContent = formatTime(seconds);
+    }, 1000);
+  }
+  connectTimer = setTimeout(setConnected, 5000);
+
+  // ================= 控制按钮 =================
+  var muted = false;
+  var speakerOn = true;
+  var cameraOn = true;
+
+  document.getElementById('btnMute').addEventListener('click', function () {
+    muted = !muted;
+    this.classList.toggle('is-off', muted);
+  });
+
+  document.getElementById('btnSecondary').addEventListener('click', function () {
+    if (callType === 'video') {
+      cameraOn = !cameraOn;
+      this.classList.toggle('is-off', !cameraOn);
+      document.getElementById('selfPip').classList.toggle('is-off', !cameraOn);
+    } else {
+      speakerOn = !speakerOn;
+      this.classList.toggle('is-off', !speakerOn);
+    }
+  });
+
+  var flipped = false;
+  document.getElementById('btnFlip').addEventListener('click', function () {
+    flipped = !flipped;
+    var pip = document.getElementById('selfPip');
+    pip.style.transform = flipped ? 'scaleX(-1)' : '';
+  });
+
+  // ================= 挂断：写 sessionStorage 后返回聊天页 =================
+  function endCall() {
+    if (connectTimer) clearTimeout(connectTimer);
+    if (tickTimer) clearInterval(tickTimer);
+    try {
+      sessionStorage.setItem('call_result_' + roleId, JSON.stringify({
+        type: callType,
+        connected: connected,
+        duration: connected ? seconds : 0
+      }));
+    } catch (e) {}
+    window.location.href = 'chat-detail.html?id=' + encodeURIComponent(roleId);
+  }
+  document.getElementById('btnHangup').addEventListener('click', endCall);
+</script>
+<script src="statusbar-control.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "slug": "button",
+  "schemaVersion": 2,
+  "name": "Button",
+  "category": "action",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "semanticTypeCandidates": [
+    { "type": "action.button", "evidence": "Primary tap target in all mobile flows; triggers actions and submissions" },
+    { "type": "action.cta", "evidence": "Full-width variant used for onboarding '开始使用' screens" }
+  ],
+  "variantDimensions": [
+    { "dim": "variant", "values": ["primary", "secondary", "ghost", "danger"] },
+    { "dim": "size", "values": ["sm", "md", "lg"] },
+    { "dim": "state", "values": ["default", "pressed", "disabled"] },
+    { "dim": "block", "values": ["inline", "full-width"] }
+  ],
+  "representativeVariants": [
+    { "name": "primary-md", "whySelected": "Default tap target across the app", "traits": { "height": "var(--size-button-md)", "radius": "var(--radius-full)", "bg": "var(--color-primary)", "text": "var(--color-primary-foreground)" }, "childrenDigest": ["label"] },
+    { "name": "secondary-md", "whySelected": "Secondary actions placed beside primary", "traits": { "bg": "var(--color-primary-50)", "text": "var(--color-primary-700)" }, "childrenDigest": ["label"] },
+    { "name": "ghost-md", "whySelected": "Low-emphasis actions inside nav bars", "traits": { "bg": "transparent", "text": "var(--color-text)" }, "childrenDigest": ["label"] },
+    { "name": "primary-lg-block", "whySelected": "Onboarding bottom CTA '开始使用'", "traits": { "height": "var(--size-button-lg)", "width": "100%" }, "childrenDigest": ["label"] }
+  ],
+  "anatomy": ["container", "label", "optional leading icon"],
+  "structurePatterns": ["single-row flex centering", "icon+label gap uses --space-2", "pressed state lowers opacity slightly"],
+  "usageHints": { "priorityHint": "high", "copySource": "uiCopySamples", "touchTarget": "min 44px height on md/lg" },
+  "doNotInvent": ["multi-line button labels", "nested buttons"],
+  "unknowns": ["exact pressed-state opacity of the real app"],
+  "keyInsightSeed": "Filled pill primary CTA at 48px height; quiet secondary tints"
+}

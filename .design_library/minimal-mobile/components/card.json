@@ -1,0 +1,27 @@
+{
+  "slug": "card",
+  "schemaVersion": 2,
+  "name": "Card",
+  "category": "container",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "semanticTypeCandidates": [
+    { "type": "container.card", "evidence": "Groups related content in feed and list screens" },
+    { "type": "container.list-item", "evidence": "Card rows used as tappable list entries" }
+  ],
+  "variantDimensions": [
+    { "dim": "layout", "values": ["basic", "media", "stat"] },
+    { "dim": "interactive", "values": ["static", "tappable"] }
+  ],
+  "representativeVariants": [
+    { "name": "basic", "whySelected": "Default grouped content block", "traits": { "radius": "var(--radius-lg)", "bg": "var(--color-card)", "shadow": "var(--shadow-1)", "padding": "var(--space-4)" }, "childrenDigest": ["title", "body"] },
+    { "name": "media", "whySelected": "Feed card with cover image and meta row", "traits": { "cover": "16:9 rounded top", "title": "var(--type-h3)", "meta": "var(--color-text-muted)" }, "childrenDigest": ["cover", "title", "meta", "avatar"] },
+    { "name": "stat", "whySelected": "Numeric summary block for overview screens", "traits": { "value": "var(--type-h2)", "label": "var(--color-text-muted)" }, "childrenDigest": ["value", "label"] }
+  ],
+  "anatomy": ["container", "optional cover", "title", "body", "meta row"],
+  "structurePatterns": ["vertical stack, gap --space-3", "tappable cards dim slightly on press"],
+  "usageHints": { "priorityHint": "high", "copySource": "uiCopySamples", "maxPerRow": 1 },
+  "doNotInvent": ["nested scrollable cards", "cards wider than screen minus 32px margins"],
+  "unknowns": ["exact corner radius used by the real app"],
+  "keyInsightSeed": "Quiet cards: soft shadow or 1px border, never both heavy"
+}

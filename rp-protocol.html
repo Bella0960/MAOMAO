@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>角色扮演协议 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<script src="statusbar-control.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+  .floating-nav { display: none !important; }
+
+  .cs-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 18px 100px 18px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #FFFFFF;
+  }
+  .cs-stage::-webkit-scrollbar { display: none; }
+
+  .cs-topbar {
+    position: relative;
+    z-index: 30;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 14px;
+    margin: 0 -18px;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 16px 22px;
+  }
+  .cs-top-left, .cs-top-right {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .cs-top-left { justify-content: flex-start; }
+  .cs-top-right { justify-content: flex-end; display: none; }
+  .cs-circle-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: #F4F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  .cs-circle-btn:active { transform: scale(0.97); background: #B0B0B5; }
+  .cs-circle-btn svg { width: 14px; height: 14px; stroke: #111111; }
+  .cs-title {
+    flex: 1;
+    text-align: left;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+    color: #111111;
+  }
+
+  .rp-card {
+    background: #F8F8FA;
+    border-radius: 20px;
+    padding: 16px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rp-desc {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    line-height: 1.6;
+  }
+  .rp-textarea {
+    width: 100%;
+    min-height: 250px;
+    resize: none;
+    border: none;
+    border-radius: 12px;
+    background: #F2F2F7;
+    padding: 12px 14px;
+    font-size: 0.813rem;
+    line-height: 1.6;
+    color: #111111;
+    font-family: inherit;
+    outline: none;
+  }
+  .rp-textarea::placeholder { color: #C7C7CC; }
+  .rp-hint {
+    font-size: 0.625rem;
+    color: #8E8E93;
+    line-height: 1.6;
+  }
+
+  /* 底部固定保存按钮 */
+  .rp-save-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px;
+    background: linear-gradient(to top, #F7F7F9 60%, rgba(247,247,249,0));
+    z-index: 40;
+  }
+  .rp-save-btn {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 999px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .rp-save-btn:active { transform: scale(0.98); opacity: 0.92; }
+  .rp-preview-btn {
+    width: 100%;
+    height: 44px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 999px;
+    background: #F4F4F6;
+    color: #111111;
+    font-size: 0.813rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .rp-preview-btn:active { transform: scale(0.98); opacity: 0.85; }
+
+  /* 预览模态框 */
+  .rp-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .rp-modal.show { display: flex; }
+  .rp-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .rp-modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    max-height: 80%;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: popIn 0.22s ease-out;
+  }
+  .rp-modal-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111111;
+    text-align: center;
+  }
+  .rp-modal-content {
+    flex: 1;
+    overflow-y: auto;
+    background: #F7F7F9;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.719rem;
+    line-height: 1.6;
+    color: #333333;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    max-height: 400px;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* 极简 Toast */
+  .rp-toast {
+    position: absolute;
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%);
+    background: rgba(17,17,17,0.88);
+    color: #FFFFFF;
+    font-size: 0.813rem;
+    padding: 10px 18px;
+    border-radius: 12px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .rp-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+  }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="cs-stage">
+
+      <div class="cs-topbar">
+        <div class="cs-top-left">
+          <button class="cs-circle-btn" type="button" aria-label="返回" id="btnBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="cs-title">Protocol</span>
+        <div class="cs-top-right"></div>
+      </div>
+
+      <div class="rp-card">
+        <div class="rp-desc">这里编写的协议是 AI 的最高指令，决定了它的核心身份和游戏规则。</div>
+        <textarea id="protocolText" class="rp-textarea" placeholder="在此输入角色扮演协议…"></textarea>
+        <div class="rp-hint">可用变量：{{char}} = 角色名，{{user}} = 你的名字，{{persona}} = 角色人设，{{memory}} = 长期记忆，{{worldbook}} = 世界书。</div>
+      </div>
+
+    </main>
+
+    <div class="rp-save-wrap">
+      <button class="rp-save-btn" type="button" id="btnSave">保存协议</button>
+      <button class="rp-preview-btn" type="button" id="btnPreview">预览最终提示词</button>
+    </div>
+
+    <!-- 预览模态框 -->
+    <div class="rp-modal" id="previewModal">
+      <div class="rp-modal-backdrop" id="previewBackdrop"></div>
+      <div class="rp-modal-card">
+        <div class="rp-modal-title">最终 System Prompt 预览</div>
+        <pre class="rp-modal-content" id="previewContent"></pre>
+        <button class="rp-save-btn" type="button" id="btnClosePreview">关闭</button>
+      </div>
+    </div>
+
+    <div class="rp-toast" id="toast">协议已保存</div>
+
+  </div>
+
+<script>
+  // 返回上一页；无历史时兜底回对话设置
+  document.getElementById('btnBack').addEventListener('click', function () {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'chat-settings.html';
+    }
+  });
+
+  // 解析 roleId（URLSearchParams 已自动解码，不双重解码）
+  function getRoleIdFromUrl() {
+    try {
+      var id = new URLSearchParams(window.location.search).get('roleId');
+      return id ? id : '';
+    } catch (e) { return ''; }
+  }
+  var roleId = getRoleIdFromUrl();
+  var STORAGE_KEY = 'chat_rp_protocol_' + roleId;
+
+  // 页面加载回填
+  var textarea = document.getElementById('protocolText');
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved != null) textarea.value = saved;
+  } catch (e) {}
+
+  // 保存协议
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    if (msg) t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window.__rpToastTimer);
+    window.__rpToastTimer = setTimeout(function () { t.classList.remove('show'); }, 1500);
+  }
+
+  document.getElementById('btnSave').addEventListener('click', function () {
+    var content = textarea.value;
+    try {
+      localStorage.setItem(STORAGE_KEY, content);
+    } catch (e) {
+      showToast('保存失败：本地存储空间不足');
+      return;
+    }
+    showToast('协议已保存');
+  });
+
+  // 预览最终提示词：替换变量后展示完整 System Prompt
+  var previewModal = document.getElementById('previewModal');
+  var previewContent = document.getElementById('previewContent');
+
+  function applyPreviewVars(text) {
+    // {{user}} 从 myProfile 读取；其余变量因本页无角色上下文，显示占位说明
+    var userNick = '你的名字';
+    try {
+      var p = JSON.parse(localStorage.getItem('myProfile') || '{}');
+      if (p && p.nickname && p.nickname.trim()) userNick = p.nickname.trim();
+    } catch (e) {}
+    return String(text || '')
+      .replace(/\{\{char\}\}/g, '【角色名】')
+      .replace(/\{\{user\}\}/g, userNick)
+      .replace(/\{\{persona\}\}/g, '【角色人设】')
+      .replace(/\{\{memory\}\}/g, '【长期记忆】')
+      .replace(/\{\{worldbook\}\}/g, '【世界书内容】');
+  }
+
+  document.getElementById('btnPreview').addEventListener('click', function () {
+    var protocolText = textarea.value || '';
+    if (!protocolText.trim()) {
+      // 输入框为空时，尝试读已保存的协议
+      try { protocolText = localStorage.getItem(STORAGE_KEY) || ''; } catch (e) {}
+    }
+    if (!protocolText.trim()) {
+      showToast('请先输入或保存协议');
+      return;
+    }
+    // 模拟 chat-detail.html 的最终组装：协议在最顶端，追加系统功能块
+    var finalPrompt = applyPreviewVars(protocolText);
+    finalPrompt += '\n\n[主动通话能力]\n当用户表达打电话意图时，在回复末尾加上 [发起语音通话]。';
+    finalPrompt += '\n\n[游戏机制 - 道具赠送]\n可输出 [红包:金额:留言] / [转账:金额:留言] 代码。';
+    previewContent.textContent = finalPrompt;
+    previewModal.classList.add('show');
+  });
+
+  function closePreview() { previewModal.classList.remove('show'); }
+  document.getElementById('btnClosePreview').addEventListener('click', closePreview);
+  document.getElementById('previewBackdrop').addEventListener('click', closePreview);
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "slug": "input",
+  "schemaVersion": 2,
+  "name": "Input",
+  "category": "form",
+  "sourceKind": "from-scratch",
+  "confidence": "medium",
+  "semanticTypeCandidates": [
+    { "type": "form.textfield", "evidence": "Single-line text entry for login, search and settings forms" }
+  ],
+  "variantDimensions": [
+    { "dim": "state", "values": ["default", "focus", "error", "disabled"] },
+    { "dim": "decoration", "values": ["bare", "with-label", "with-icon"] }
+  ],
+  "representativeVariants": [
+    { "name": "default", "whySelected": "Base field style", "traits": { "height": "var(--size-input)", "radius": "var(--radius-md)", "border": "1px solid var(--color-border)", "bg": "var(--color-surface)", "placeholder": "var(--color-text-muted)" }, "childrenDigest": ["placeholder"] },
+    { "name": "with-label", "whySelected": "Labeled form row for settings", "traits": { "labelSize": "var(--type-caption)", "gap": "var(--space-2)" }, "childrenDigest": ["label", "field"] },
+    { "name": "error", "whySelected": "Validation feedback state", "traits": { "border": "1px solid var(--color-danger)", "helper": "var(--color-danger)" }, "childrenDigest": ["field", "helper-text"] }
+  ],
+  "anatomy": ["optional label", "field container", "optional leading icon", "optional helper/error text"],
+  "structurePatterns": ["vertical stack label→field→helper, gap --space-2", "focus state uses primary ring at low alpha"],
+  "usageHints": { "priorityHint": "high", "copySource": "conservative placeholders like 请输入" },
+  "doNotInvent": ["multiline textarea behavior", "inline validation on every keystroke"],
+  "unknowns": ["exact focus ring treatment"],
+  "keyInsightSeed": "48px fields, hairline borders, primary focus ring"
+}

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>字体设置</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<script src="statusbar-control.js"></script>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+        background-color: #E5E5E5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
+        color: #111111;
+        user-select: none;
+    }
+
+    /* 项目统一手机外壳 */
+    .phone-mockup {
+        position: relative;
+        width: min(390px, calc(100vw - 24px));
+        height: min(844px, calc(100vh - 24px));
+        background-color: #FFFFFF;
+        border-radius: 45px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+    }
+    .status-bar {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        padding: 14px 28px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #000;
+        z-index: 50;
+        pointer-events: none;
+    }
+
+    /* ===== 顶部导航：圆形返回 + 大英文标题左对齐 ===== */
+    .topbar {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 16px 22px;
+    }
+    .back-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: #F4F4F6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #111;
+        text-decoration: none;
+        flex-shrink: 0;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .back-btn:active { transform: scale(0.97); background: #B0B0B5; }
+    .back-btn svg { width: 14px; height: 14px; }
+    .topbar-title {
+        flex: 1;
+        text-align: left;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        line-height: 1.1;
+        text-transform: none;
+        color: #111;
+    }
+
+    /* ===== 可滚动内容区：卡片间距 12px ===== */
+    .stage {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 16px 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        scrollbar-width: none;
+    }
+    .stage::-webkit-scrollbar { display: none; }
+
+    /* ===== 卡片：内边距 14px 16px，圆角 16px ===== */
+    .card {
+        background: #F8F8FA;
+        border-radius: 20px;
+        padding: 14px 16px;
+        flex-shrink: 0;
+    }
+    .card-label {
+        display: block;
+        font-size: 0.75rem;
+        color: #8E8E93;
+        font-weight: 500;
+    }
+
+    /* ===== 卡片一：自定义字体 ===== */
+    .url-input {
+        display: block;
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px 12px;
+        background: #F2F2F7;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.813rem;
+        color: #111;
+        font-family: inherit;
+        outline: none;
+        user-select: text;
+        -webkit-user-select: text;
+    }
+    .url-input::placeholder { color: #AEAEB2; }
+    .apply-btn {
+        width: 100%;
+        margin-top: 10px;
+        height: 44px;
+        background: #000000;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 999px;
+        font-size: 0.813rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .apply-btn:active { opacity: 0.8; transform: scale(0.98); }
+    .hint {
+        display: none;
+        margin-top: 8px;
+        font-size: 0.75rem;
+        color: #8E8E93;
+        line-height: 1.5;
+    }
+    .hint.show { display: block; }
+    .preview-block {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #F0F0F0;
+    }
+    .preview-text {
+        margin-top: 6px;
+        font-size: 0.938rem;
+        color: #111;
+        font-weight: 500;
+        line-height: 1.5;
+        word-break: break-all;
+        user-select: text;
+        -webkit-user-select: text;
+    }
+
+    /* ===== 卡片二：全局字号（左 A- / 中预览 / 右 A+ 水平对齐） ===== */
+    .fs-row {
+        display: flex;
+        align-items: center;
+        margin-top: 12px;
+    }
+    .fs-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #F2F2F7;
+        border: none;
+        color: #111;
+        font-size: 0.813rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: opacity 0.15s ease;
+    }
+    .fs-btn:active { opacity: 0.7; }
+    .fs-btn:disabled { opacity: 0.35; cursor: default; }
+    .fs-center {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+    }
+    .fs-preview {
+        font-size: 0.875rem;
+        color: #111;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .fs-value {
+        font-size: 0.813rem;
+        color: #000;
+        font-weight: 700;
+    }
+
+    /* ===== 卡片三：字体颜色（色块水平对齐） ===== */
+    .color-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding: 0 4px;
+    }
+    .color-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    .color-dot {
+        display: block;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+        transition: box-shadow 0.15s ease;
+    }
+    .color-chip.active .color-dot {
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), 0 0 0 2px #FFFFFF, 0 0 0 3.5px #111111;
+    }
+    .color-name {
+        font-size: 0.75rem;
+        color: #8E8E93;
+    }
+    .color-chip.active .color-name {
+        color: #111;
+        font-weight: 600;
+    }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+    <div class="phone-mockup">
+        <div class="status-bar"><span>09:41</span></div>
+
+        <header class="topbar">
+            <a class="back-btn" href="settings.html" aria-label="返回">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+            <h1 class="topbar-title">Font Settings</h1>
+        </header>
+
+        <main class="stage">
+            <!-- 卡片一：自定义字体链接导入 -->
+            <section class="card">
+                <h2 class="card-label">自定义字体</h2>
+                <input id="fontUrlInput" class="url-input" type="text"
+                       placeholder="请输入 .TTF / .WOFF 字体链接 (URL)" autocomplete="off" spellcheck="false">
+                <button id="applyFontBtn" class="apply-btn" type="button">应用字体</button>
+                <p id="fontHint" class="hint"></p>
+                <div class="preview-block">
+                    <span class="card-label">预览</span>
+                    <p id="fontPreview" class="preview-text">预览文字 Aa Bb Cc 123</p>
+                </div>
+            </section>
+
+            <!-- 卡片二：全局字号调节 -->
+            <section class="card">
+                <h2 class="card-label">全局字号</h2>
+                <div class="fs-row">
+                    <button id="fontMinus" class="fs-btn" type="button">A-</button>
+                    <div class="fs-center">
+                        <span id="fontSizePreview" class="fs-preview">A</span>
+                        <span id="fontSizeValue" class="fs-value">14px</span>
+                    </div>
+                    <button id="fontPlus" class="fs-btn" type="button">A+</button>
+                </div>
+            </section>
+
+            <!-- 卡片三：字体颜色 -->
+            <section class="card">
+                <h2 class="card-label">字体颜色</h2>
+                <div class="color-row" id="colorRow">
+                    <button class="color-chip" type="button" data-color="#111111">
+                        <span class="color-dot" style="background: #111111;"></span>
+                        <span class="color-name">纯黑</span>
+                    </button>
+                    <button class="color-chip" type="button" data-color="#555555">
+                        <span class="color-dot" style="background: #555555;"></span>
+                        <span class="color-name">深灰</span>
+                    </button>
+                    <button class="color-chip" type="button" data-color="#8E8E93">
+                        <span class="color-dot" style="background: #8E8E93;"></span>
+                        <span class="color-name">中灰</span>
+                    </button>
+                    <button class="color-chip" type="button" data-color="#AEAEB2">
+                        <span class="color-dot" style="background: #AEAEB2;"></span>
+                        <span class="color-name">浅灰</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+    (function () {
+        var MIN = 12, MAX = 20, DEFAULT = 14, DEFAULT_COLOR = '#111111';
+        var input = document.getElementById('fontUrlInput');
+        var applyBtn = document.getElementById('applyFontBtn');
+        var hint = document.getElementById('fontHint');
+        var preview = document.getElementById('fontPreview');
+        var minusBtn = document.getElementById('fontMinus');
+        var plusBtn = document.getElementById('fontPlus');
+        var sizePreview = document.getElementById('fontSizePreview');
+        var sizeValue = document.getElementById('fontSizeValue');
+        var colorRow = document.getElementById('colorRow');
+        var colorChips = colorRow.querySelectorAll('.color-chip');
+        var FALLBACK_STACK = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', sans-serif";
+
+        /* ---------- 全局字号 ---------- */
+        function getSize() {
+            try {
+                var n = parseInt(localStorage.getItem('font_size_global'), 10);
+                if (!isNaN(n)) return Math.min(MAX, Math.max(MIN, n));
+                /* 旧键迁移（旧范围 10-20，钳制到 12-20） */
+                n = parseInt(localStorage.getItem('font_size'), 10);
+                if (!isNaN(n)) return Math.min(MAX, Math.max(MIN, n));
+            } catch (e) { }
+            return DEFAULT;
+        }
+
+        function renderSize(n) {
+            sizePreview.style.fontSize = n + 'px';
+            sizeValue.textContent = n + 'px';
+            minusBtn.disabled = n <= MIN;
+            plusBtn.disabled = n >= MAX;
+            document.documentElement.style.setProperty('--base-font-size', n + 'px');
+        }
+
+        function changeSize(delta) {
+            var n = Math.min(MAX, Math.max(MIN, getSize() + delta));
+            try { localStorage.setItem('font_size_global', String(n)); } catch (e) { }
+            renderSize(n);
+        }
+
+        /* ---------- 自定义字体注入 ---------- */
+        function injectFont(url) {
+            var tag = document.getElementById('customFontStyle');
+            if (!tag) {
+                tag = document.createElement('style');
+                tag.id = 'customFontStyle';
+                document.head.appendChild(tag);
+            }
+            /* 覆盖同一标签，换链接时旧的 @font-face 被替换掉 */
+            tag.textContent = "@font-face { font-family: 'CustomFont'; src: url('" + url + "'); }"
+                + "#fontPreview { font-family: 'CustomFont', " + FALLBACK_STACK + "; }";
+        }
+
+        function showHint(text) {
+            hint.textContent = text;
+            hint.classList.add('show');
+        }
+
+        function applyFont() {
+            var url = (input.value || '').trim();
+            if (!url) { showHint('请先输入字体链接'); return; }
+            url = url.replace(/['"\\]/g, '');
+            try { localStorage.setItem('custom_font_url', url); } catch (e) { }
+            injectFont(url);
+            showHint('已应用（若预览无变化，请检查链接是否有效）');
+        }
+
+        /* ---------- 字体颜色 ---------- */
+        function getColor() {
+            try { return (localStorage.getItem('custom_font_color') || '').trim(); } catch (e) { return ''; }
+        }
+
+        function renderColor(color) {
+            preview.style.color = color;
+            Array.prototype.forEach.call(colorChips, function (chip) {
+                chip.classList.toggle('active', chip.getAttribute('data-color') === color);
+            });
+        }
+
+        function pickColor(e) {
+            var color = e.currentTarget.getAttribute('data-color');
+            try { localStorage.setItem('custom_font_color', color); } catch (err) { }
+            renderColor(color);
+        }
+
+        Array.prototype.forEach.call(colorChips, function (chip) {
+            chip.addEventListener('click', pickColor);
+        });
+
+        minusBtn.addEventListener('click', function () { changeSize(-1); });
+        plusBtn.addEventListener('click', function () { changeSize(1); });
+        applyBtn.addEventListener('click', applyFont);
+        input.addEventListener('keydown', function (e) { if (e.key === 'Enter') applyFont(); });
+
+        /* ---------- 初始化：恢复已保存的设置 ---------- */
+        renderSize(getSize());
+        renderColor(getColor() || DEFAULT_COLOR);
+        try {
+            var savedUrl = (localStorage.getItem('custom_font_url') || '').trim().replace(/['"\\]/g, '');
+            if (savedUrl) {
+                input.value = savedUrl;
+                injectFont(savedUrl);
+            }
+        } catch (e) { }
+    })();
+</script>
+</body>
+</html>

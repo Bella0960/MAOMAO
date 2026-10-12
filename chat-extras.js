@@ -104,6 +104,7 @@
   window.addEventListener('popstate', function () {
     if (modalOverlay && modalOverlay.classList.contains('active')) closeModal();
     else if (panelOverlay && panelOverlay.classList.contains('active')) closePlusPanel();
+    else if (payOverlay && payOverlay.classList.contains('active')) closePayDrawer();
   });
 
   // ============================================================
@@ -265,16 +266,43 @@
   }
 
   // ============================================================
-  // 功能 4 / 5：语音 / 视频通话 —— 纯文本角色扮演演绎
-  // 不请求麦克风/摄像头，不弹出通话界面，无任何真实硬件调用
+  // 功能 4 / 5：语音 / 视频通话
+  // 语音跳 call-ui.html（白卡接听 UI）；视频跳 call.html（全屏模拟）
+  // 不调用真实麦克风/摄像头；视频挂断后仅插入通话卡片，不发 AI 指令
   // ============================================================
   function featCall(mode) {
-    const label = mode === 'video' ? '视频通话' : '语音通话';
-    // 展示：右侧通话卡片气泡（纯 SVG 图标 + 文字）
-    insertChatMessage({ role: 'user', type: 'call', call: { type: mode, text: '我发起了' + label } });
-    // 演绎：隐藏指令发给 AI，由 AI 按人设决定接不接、怎么接
-    sendSilentInstruction('[系统动作：我向你发起了' + label + '，请根据你的人设和当前关系自然地回应这个通话邀请]');
+    // 语音：跳转白卡接听 UI（call-ui.html）；视频：跳转全屏模拟通话页（call.html）
+    if (typeof currentCharacter === 'undefined' || !currentCharacter || !currentCharacter.id) return;
+    var cid = encodeURIComponent(currentCharacter.id);
+    if (mode === 'video') {
+      window.location.href = 'call.html?id=' + cid + '&type=video';
+    } else {
+      window.location.href = 'call-ui.html?roleId=' + cid;
+    }
   }
+
+  // ---------- 通话返回：读取 sessionStorage 结果，插入一张通话卡（不发 AI 指令） ----------
+  // 语音 call-ui.html 与视频 call.html 挂断时都会写 call_result_<roleId>，此处统一消费
+  function formatCallDuration(sec) {
+    function p(n) { return n < 10 ? '0' + n : '' + n; }
+    return p(Math.floor(sec / 60)) + ':' + p(sec % 60);
+  }
+  function consumeCallResult() {
+    if (typeof currentCharacter === 'undefined' || !currentCharacter || !currentCharacter.id) return;
+    var key = 'call_result_' + currentCharacter.id;
+    var raw = null;
+    try { raw = sessionStorage.getItem(key); } catch (e) { return; }
+    if (!raw) return;
+    try { sessionStorage.removeItem(key); } catch (e) {} // 读完即清，刷新不重复插入
+    var result = null;
+    try { result = JSON.parse(raw); } catch (e) { return; }
+    if (!result || (result.type !== 'voice' && result.type !== 'video')) return;
+    var text = result.connected
+      ? '通话时长 ' + formatCallDuration(result.duration || 0)
+      : '已取消';
+    insertChatMessage({ role: 'user', type: 'call', call: { type: result.type, text: text } });
+  }
+  window.addEventListener('load', consumeCallResult);
 
   // ============================================================
   // 功能 6：特别时刻
@@ -359,6 +387,104 @@
       case 'voice': featCall('voice'); break;
       case 'video': featCall('video'); break;
       case 'moment': featMoment(); break;
+      case 'redpacket': featRedpacket(); break;
+      case 'transfer': featTransfer(); break;
     }
   }
+
+  // ============================================================
+  // 功能 7 / 8：发红包 / 转账（第一阶段：UI 入口 + 消息数据结构，
+  // 不调用 sendMsg、不发任何 AI 请求，下一轮再做专属气泡 UI）
+  // ============================================================
+  const payOverlay = document.getElementById('payDrawerOverlay');
+  const payBackdrop = document.getElementById('payDrawerBackdrop');
+  const payTitle = document.getElementById('payDrawerTitle');
+  const payAmountInput = document.getElementById('payAmount');
+  const payMessageInput = document.getElementById('payMessage');
+  const payConfirmBtn = document.getElementById('payConfirmBtn');
+  const PAY_DEFAULT_MESSAGE = '恭喜发财，大吉大利';
+  let payMode = 'redpacket'; // 当前抽屉模式：'redpacket' | 'transfer'
+
+  function openPayDrawer(mode) {
+    payMode = mode === 'transfer' ? 'transfer' : 'redpacket';
+    if (payTitle) payTitle.textContent = payMode === 'transfer' ? '转账' : '发红包';
+    if (payAmountInput) payAmountInput.value = '';
+    if (payMessageInput) payMessageInput.value = PAY_DEFAULT_MESSAGE;
+    if (payConfirmBtn) payConfirmBtn.textContent = payMode === 'transfer' ? '确认转账' : '塞钱进红包';
+    if (payOverlay) payOverlay.classList.add('active');
+  }
+
+  function closePayDrawer() {
+    if (payOverlay) payOverlay.classList.remove('active');
+  }
+
+  // 金额输入框：只允许数字与一个小数点，小数最多两位
+  if (payAmountInput) {
+    payAmountInput.addEventListener('input', function () {
+      var v = payAmountInput.value;
+      v = String(v).replace(/[^\d.]/g, ''); // 清掉一切非数字/小数点字符
+      var dotIdx = v.indexOf('.');
+      if (dotIdx !== -1) {
+        v = v.slice(0, dotIdx + 1) + v.slice(dotIdx + 1).replace(/\./g, ''); // 只保留第一个小数点
+      }
+      var parts = v.split('.');
+      if (parts[1] && parts[1].length > 2) parts[1] = parts[1].slice(0, 2); // 小数位最多两位
+      payAmountInput.value = parts.join('.');
+    });
+  }
+  if (payBackdrop) payBackdrop.addEventListener('click', closePayDrawer);
+
+  // 提交：构造特殊格式消息直接入历史，不走 sendMsg / 不发任何 API
+  function submitPayMessage() {
+    if (typeof loadMessages !== 'function' || typeof saveMessages !== 'function') return;
+    var amountStr = String((payAmountInput && payAmountInput.value) || '').trim();
+    var amountNum = parseFloat(amountStr);
+    if (!amountStr || isNaN(amountNum) || amountNum <= 0) {
+      if (typeof showToast === 'function') showToast('请输入金额');
+      return;
+    }
+    var msgText = String((payMessageInput && payMessageInput.value) || PAY_DEFAULT_MESSAGE).trim();
+    // 发送即扣款（修复资金漏洞）：余额不足阻止发送，绝不先发红包后扣款
+    if (typeof getWorkData === 'function' && typeof saveWorkData === 'function') {
+      var wd = getWorkData();
+      if (!(wd.balance >= amountNum)) {
+        if (typeof showToast === 'function') showToast('余额不足');
+        return; // 不写消息、不关抽屉、不扣款
+      }
+      wd.balance = Math.round((wd.balance - amountNum) * 100) / 100; // 保留两位防浮点误差
+      // 交易明细：支出记录（amountNum 已是 parseFloat 后的数字，与扣款同一次写入原子落盘）
+      if (!Array.isArray(wd.history)) wd.history = [];
+      wd.history.unshift({
+        type: 'expense',
+        category: payMode,                              // 'redpacket' | 'transfer'
+        title: payMode === 'transfer' ? '发起转账' : '发出红包',
+        amount: amountNum,
+        time: Date.now()
+      });
+      if (!saveWorkData(wd)) return; // 扣款保存失败则中止发送
+    }
+    var specialMsg = {
+      role: 'user',
+      type: payMode,                    // 'redpacket' 或 'transfer'
+      amount: amountNum.toFixed(2),     // 统一两位小数，如 '100.00'
+      message: msgText,                 // 留言内容
+      status: 'unopened',               // 初始状态为未领取
+      timestamp: Date.now()
+    };
+    var list = loadMessages();
+    list.push(specialMsg);
+    saveMessages(list);
+    closePayDrawer();
+    // 立刻刷新聊天列表，让新消息以 [红包]/[转账] 占位文本渲染出来
+    if (typeof renderAllMessages === 'function') {
+      renderAllMessages();
+    } else if (typeof appendMessageToDOM === 'function') {
+      appendMessageToDOM(specialMsg);
+      if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+  if (payConfirmBtn) payConfirmBtn.addEventListener('click', submitPayMessage);
+
+  function featRedpacket() { openPayDrawer('redpacket'); }
+  function featTransfer() { openPayDrawer('transfer'); }
 })();

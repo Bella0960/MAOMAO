@@ -258,7 +258,8 @@ function loadConfig() {
                 apiUrlInput.value = parsed.baseUrl || 'https://api.openai.com/v1';
                 apiKeyInput.value = parsed.apiKey || '';
                 apiModelInput.value = parsed.model || 'gpt-3.5-turbo';
-                apiPromptInput.value = parsed.prompt || '';
+                window.__loadedPrompt = parsed.prompt || '';
+                if (apiPromptInput) apiPromptInput.value = parsed.prompt || '';
                 apiMemoryInput.value = parsed.memoryCount != null ? parsed.memoryCount : 20;
                 apiTemperatureInput.value = parsed.temperature != null ? parsed.temperature : 0.7;
                 apiTimeAwareInput.checked = parsed.timeAware !== false;
@@ -282,7 +283,7 @@ function loadConfig() {
     apiUrlInput.value = 'https://api.openai.com/v1';
     apiKeyInput.value = '';
     apiModelInput.value = 'gpt-3.5-turbo';
-    apiPromptInput.value = '';
+    if (apiPromptInput) apiPromptInput.value = '';
     apiMemoryInput.value = 20;
     apiTemperatureInput.value = 0.7;
     apiTimeAwareInput.checked = true;
@@ -303,7 +304,7 @@ settingsForm.addEventListener('submit', function(e) {
         baseUrl: apiUrlInput.value.trim() || 'https://api.openai.com/v1',
         apiKey: apiKey,
         model: apiModelInput.value.trim() || 'gpt-3.5-turbo',
-        prompt: apiPromptInput.value.trim(),
+        prompt: apiPromptInput ? apiPromptInput.value.trim() : (window.__loadedPrompt || ''),
         memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
         temperature: parseFloat(apiTemperatureInput.value) || 0.7,
         timeAware: apiTimeAwareInput.checked

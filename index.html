@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#10182f" />
     <title>手机模拟器 · 首页</title>
+    <script src="font-loader.js"></script>
+    <script src="native-feel.js"></script>
     <link rel="stylesheet" href="styles.css" />
-  </head>
+  <link rel="stylesheet" href="mobile-fit.css">
+</head>
   <body>
     <main class="simulator-stage">
       <section class="phone" aria-label="手机模拟器">
@@ -32,10 +35,10 @@
             <!-- 四、 桌面挂件区（韩系氛围） -->
             <div class="korean-widgets" aria-label="桌面小挂件">
               <div class="widget-card widget-left" id="widget-left-btn" role="button" tabindex="0" title="点击编辑挂件">
-                <span class="widget-kaomoji" id="widget-kaomoji-text">( ˃ ᵕ ˂ )</span>
+                <span class="widget-kaomoji" id="widget-kaomoji-text">HELLO</span>
               </div>
               <div class="widget-card widget-right" id="widget-right-btn" role="button" tabindex="0" title="点击编辑挂件">
-                <span class="widget-motto" id="widget-motto-text">행운이🤍</span>
+                <span class="widget-motto" id="widget-motto-text">MONOCHROME</span>
               </div>
             </div>
 
@@ -126,6 +129,26 @@
                 </span>
                 <span class="app-name">记忆</span>
               </button>
+              <button class="app-card" type="button" data-app="钱包">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+                    <path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
+                  </svg>
+                </span>
+                <span class="app-name">钱包</span>
+              </button>
+              <button class="app-card" type="button" data-app="世界书"
+                onclick="event.stopImmediatePropagation();window.location.href='worldbook.html'">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                </span>
+                <span class="app-name">世界书</span>
+              </button>
             </div>
           </section>
 
@@ -172,5 +195,6 @@
     </div>
 
     <script src="script.js"></script>
-  </body>
+  <script src="statusbar-control.js"></script>
+</body>
 </html>

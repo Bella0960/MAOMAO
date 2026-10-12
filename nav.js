@@ -39,49 +39,82 @@
         }
     ];
 
-    // 内联样式（韩系极简悬浮胶囊）
+    // 内联样式（极简毛玻璃 Dock 栏 · 紧凑居中自适应）
     var css = [
         '.floating-nav {',
         '    position: absolute;',
         '    bottom: 20px;',
-        '    left: 16px;',
-        '    right: 16px;',
+        '    left: 0 !important;',
+        '    right: 0 !important;',
+        '    width: fit-content !important;',
+        '    max-width: calc(100% - 32px);',
+        '    margin: 0 auto !important;',
         '    display: flex;',
-        '    padding: 6px;',
-        '    gap: 2px;',
-        '    background: rgba(255, 255, 255, 0.8);',
-        '    backdrop-filter: blur(20px);',
-        '    -webkit-backdrop-filter: blur(20px);',
-        '    border-radius: 28px;',
-        '    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);',
+        '    align-items: center;',
+        '    justify-content: center;',
+        '    padding: 10px 12px 6px 12px !important;',
+        '    gap: 8px !important;',
+        '    background: rgba(255, 255, 255, 0.75) !important;',
+        '    backdrop-filter: blur(12px) !important;',
+        '    -webkit-backdrop-filter: blur(12px) !important;',
+        '    border: 1px solid rgba(0, 0, 0, 0.05) !important;',
+        '    border-radius: 24px;',
+        '    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);',
         '    z-index: 500;',
         '}',
         '.nav-tab {',
-        '    flex: 1;',
+        '    flex: 0 0 auto !important;',
         '    display: flex;',
         '    flex-direction: column;',
         '    align-items: center;',
         '    justify-content: center;',
-        '    gap: 2px;',
-        '    height: 52px;',
-        '    border-radius: 22px;',
-        '    color: #8E8E93;',
+        '    gap: 2px !important;',
+        '    padding: 4px 6px !important;',
+        '    border-radius: 999px;',
+        '    color: #777777;',
         '    text-decoration: none;',
-        '    font-size: 10px;',
+        '    font-size: 8px !important;',
+        '    font-weight: 500;',
         '    line-height: 1;',
+        '    white-space: nowrap;',
         '    position: relative;',
-        '    transition: background 0.2s ease, color 0.2s ease;',
+        '    transition: color 0.2s ease;',
+        '    /* 手机端触摸优化：去掉点按灰光斑、禁止长按选中/呼出菜单、消除双击缩放延迟 */',
+        '    -webkit-tap-highlight-color: transparent;',
+        '    -webkit-touch-callout: none;',
+        '    -webkit-user-select: none;',
+        '    user-select: none;',
+        '    touch-action: manipulation;',
         '}',
-        '.nav-tab svg { width: 22px; height: 22px; display: block; }',
-        '.nav-tab.active { background: #1C1C1E; color: #ffffff; }',
-        '.nav-tab:active { transform: scale(0.96); }',
+        '/* 图标背后的小圆底（仅选中时显示极淡浅灰圆，不使用大黑块） */',
+        '.nav-ico {',
+        '    width: 22px;',
+        '    height: 22px;',
+        '    border-radius: 50%;',
+        '    display: flex;',
+        '    align-items: center;',
+        '    justify-content: center;',
+        '    transform-origin: center bottom;',
+        '    /* 松开手指：420ms 带过冲的回弹曲线，Q弹感来源 */',
+        '    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;',
+        '}',
+        '.nav-ico svg { width: 14px !important; height: 14px !important; display: block; stroke-width: 1.5 !important; }',
+        '/* 选中态：图标轻微浮起放大 + 文字加粗变黑 */',
+        '.nav-tab.active { color: #111111; font-weight: 700; }',
+        '.nav-tab.active .nav-ico { background: rgba(0, 0, 0, 0.06); transform: translateY(-1px) scale(1.06); }',
+        '/* 点按态：必须写在 .active 之后（两者优先级相同，靠书写顺序覆盖）。按下快速响应、不带过冲 */',
+        '.nav-tab:active .nav-ico,',
+        '.nav-tab.is-pressing .nav-ico {',
+        '    transform: translateY(-5px) scale(1.12);',
+        '    transition: transform 110ms ease-out, background 0.2s ease;',
+        '}',
         '.nav-badge {',
         '    position: absolute;',
-        '    top: 7px;',
-        '    right: calc(50% - 14px);',
-        '    width: 7px;',
-        '    height: 7px;',
-        '    background: #FF3B30;',
+        '    top: 2px;',
+        '    right: calc(50% - 12px);',
+        '    width: 6px;',
+        '    height: 6px;',
+        '    background: rgba(0, 0, 0, 0.35);',
         '    border-radius: 50%;',
         '}'
     ].join('\n');
@@ -95,7 +128,7 @@
     var tabsHTML = TABS.map(function (t) {
         var isActive = currentPage.indexOf(t.key) !== -1;
         return '<a class="nav-tab' + (isActive ? ' active' : '') + '" href="' + t.href + '">' +
-            t.svg +
+            '<span class="nav-ico">' + t.svg + '</span>' +
             '<span>' + t.label + '</span>' +
             (t.badge ? '<span class="nav-badge"></span>' : '') +
             '</a>';
@@ -112,5 +145,23 @@
         container.insertAdjacentHTML('beforeend', navHTML);
     } else {
         document.body.insertAdjacentHTML('beforeend', navHTML);
+    }
+
+    // 手机端触摸反馈：iOS 下 :active 可能延迟重绘，用类名保证按下立刻弹起
+    var navEl = document.querySelector('.floating-nav');
+    if (navEl) {
+        var clearPress = function () {
+            var pressed = navEl.querySelectorAll('.is-pressing');
+            for (var i = 0; i < pressed.length; i++) pressed[i].classList.remove('is-pressing');
+        };
+        navEl.addEventListener('touchstart', function (e) {
+            var tab = (e.target && e.target.closest) ? e.target.closest('.nav-tab') : null;
+            if (!tab) return;
+            clearPress(); // 防止多指同时按下时残留
+            tab.classList.add('is-pressing');
+        }, { passive: true });
+        // 监听在 document 上：手指滑出 Dock 后松开也能复位
+        document.addEventListener('touchend', clearPress, { passive: true });
+        document.addEventListener('touchcancel', clearPress, { passive: true });
     }
 })();

@@ -41,6 +41,68 @@ const AVATAR_COLORS = [
 
 let selectedColor = AVATAR_COLORS[0];
 let avatarDataUrl = ''; // 头像 base64（空串表示无图）
+let selectedWorldBookIds = []; // 当前编辑会话中勾选的世界书 ID
+
+// 读取世界书列表（phone_worldbooks），只读不写，异常/脏数据一律兜底为空数组
+function loadWorldBooks() {
+    try {
+        const raw = localStorage.getItem('phone_worldbooks');
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return [];
+        return arr.filter(b => b && typeof b === 'object' && b.id != null && String(b.title || '').trim() !== '');
+    } catch (e) {
+        return [];
+    }
+}
+
+// 渲染「绑定世界书」多选列表；selectedIds 为当前角色已勾选的世界书 ID 数组
+function renderWorldBookBinder(selectedIds) {
+    const container = document.getElementById('worldBookBindList');
+    if (!container) return;
+    const wanted = Array.isArray(selectedIds) ? selectedIds.map(String) : [];
+
+    const books = loadWorldBooks();
+    if (!books.length) {
+        selectedWorldBookIds = [];
+        container.innerHTML = '<div class="wb-bind-empty">暂无世界书，请先在世界书页面创建</div>';
+        return;
+    }
+
+    // 仅保留「仍存在的世界书」ID，自动剔除已被删除的失效绑定
+    const existingIds = books.map(b => String(b.id));
+    selectedWorldBookIds = wanted.filter(id => existingIds.indexOf(id) !== -1);
+
+    container.innerHTML = books.map(book => {
+        const id = String(book.id);
+        const checked = selectedWorldBookIds.indexOf(id) !== -1;
+        const title = String(book.title || '未命名世界书');
+        return `
+            <div class="wb-bind-item${checked ? ' is-checked' : ''}" data-book-id="${escapeHtml(id)}" role="checkbox" aria-checked="${checked}" tabindex="0">
+                <span class="wb-bind-name">${escapeHtml(title)}</span>
+                <span class="wb-bind-circle" aria-hidden="true"></span>
+            </div>
+        `;
+    }).join('');
+}
+
+// 面板级事件委托：点击行切换勾选（容器在脚本执行时已存在，直接绑定一次）
+const worldBookBindListEl = document.getElementById('worldBookBindList');
+if (worldBookBindListEl) {
+    worldBookBindListEl.addEventListener('click', function (e) {
+        const item = e.target.closest ? e.target.closest('.wb-bind-item') : null;
+        if (!item || !worldBookBindListEl.contains(item)) return;
+        const id = item.getAttribute('data-book-id');
+        const idx = selectedWorldBookIds.indexOf(id);
+        if (idx === -1) {
+            selectedWorldBookIds.push(id);
+        } else {
+            selectedWorldBookIds.splice(idx, 1);
+        }
+        item.classList.toggle('is-checked', idx === -1);
+        item.setAttribute('aria-checked', idx === -1 ? 'true' : 'false');
+    });
+}
 
 function getRandomColor() {
     return AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
@@ -96,7 +158,7 @@ function renderRoleList() {
             : `<div class="slim-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`;
 
         return `
-            <div class="role-slim-bar ${isCurrent ? 'active-role' : ''}" data-id="${role.id}" onclick="handleRoleCardClick(event, '${role.id}')">
+            <div class="role-slim-bar ${isCurrent ? 'active-role' : ''}" data-id="${role.id}" onclick="openEditRole('${role.id}')">
                 <div class="bar-left">
                     ${avatarHTML}
                     <div class="slim-meta">
@@ -108,7 +170,7 @@ function renderRoleList() {
                     </div>
                 </div>
                 <div class="bar-right">
-                    <button class="act-opt btn-edit" onclick="event.stopPropagation(); openEditRole('${role.id}')" type="button">编辑</button>
+                    ${isCurrent ? '' : '<button class="act-opt btn-use" onclick="event.stopPropagation(); selectRoleAndEnterPhone(\'' + role.id + '\')" type="button">使用</button>'}
                     <button class="act-opt del btn-delete" onclick="event.stopPropagation(); handleDeleteRole('${role.id}')" type="button">删除</button>
                 </div>
             </div>
@@ -182,7 +244,7 @@ function showView(view) {
 
 // 打开添加角色
 function openAddRole() {
-    document.getElementById('editorTitle').textContent = '添加角色';
+    document.getElementById('editorTitle').textContent = 'New Character';
     document.getElementById('editRoleId').value = '';
     document.getElementById('editRoleName').value = '';
     document.getElementById('editRolePersona').value = '';
@@ -190,6 +252,7 @@ function openAddRole() {
     selectedColor = getRandomColor();
     avatarDataUrl = '';
     updateAvatarPreview();
+    renderWorldBookBinder([]);   // 新角色默认不绑定任何世界书
     showView('editor');
 }
 
@@ -199,7 +262,7 @@ function openEditRole(id) {
     const target = roles.find(r => r.id === id);
     if (!target) return;
 
-    document.getElementById('editorTitle').textContent = '编辑角色卡';
+    document.getElementById('editorTitle').textContent = 'Edit Character';
     document.getElementById('editRoleId').value = target.id;
     document.getElementById('editRoleName').value = target.name || '';
     document.getElementById('editRolePersona').value = target.persona || '';
@@ -207,6 +270,8 @@ function openEditRole(id) {
     selectedColor = target.avatarBg || AVATAR_COLORS[0];
     avatarDataUrl = target.avatar || '';
     updateAvatarPreview();
+    // 回填已绑定的世界书：老角色无该字段时按空数组处理；已被删除的书因不在列表中不会被勾选
+    renderWorldBookBinder(Array.isArray(target.worldBookIds) ? target.worldBookIds : []);
     showView('editor');
 }
 
@@ -238,6 +303,7 @@ function handleSaveRole() {
                 target.avatar = '';
             }
             target.avatarBg = selectedColor;
+            target.worldBookIds = selectedWorldBookIds.slice();
         }
     } else {
         // 新增
@@ -247,7 +313,8 @@ function handleSaveRole() {
             avatar: avatarDataUrl || '',
             avatarBg: selectedColor,
             persona: personaVal,
-            tone: toneVal
+            tone: toneVal,
+            worldBookIds: selectedWorldBookIds.slice()
         };
         roles.unshift(newRole);
     }

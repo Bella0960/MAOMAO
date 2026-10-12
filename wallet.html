@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>钱包 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: #F7F7F9;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+  .floating-nav { display: none !important; }
+
+  /* 可滚动内容区：底部预留 40px 留白，无全局导航 */
+  .wl-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 40px 16px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #F7F7F9;
+  }
+  .wl-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：左返回 / 中标题 / 右占位 ===== */
+  .wl-topbar {
+    position: relative;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 -16px;
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 12px 16px;
+  }
+  .wl-top-left,
+  .wl-top-right {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .wl-top-left { justify-content: flex-start; }
+  .wl-top-right { justify-content: flex-end; }
+  .wl-circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .wl-circle-btn:active { transform: scale(0.94); }
+  .wl-circle-btn svg { width: 16px; height: 16px; stroke: #333333; }
+  .wl-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #111111;
+    letter-spacing: 2px;
+  }
+
+  /* ===== 余额卡片 ===== */
+  .wl-balance-card {
+    margin-top: 12px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .wl-balance-label {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    margin-bottom: 10px;
+  }
+  .wl-balance-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111111;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== 我的卡片：银行卡堆叠循环 ===== */
+  .wl-deck-wrap {
+    position: relative;
+    width: 320px;
+    height: 250px;
+    margin: 22px auto 4px;
+    overflow: visible;
+  }
+  .wl-deck-card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 320px;
+    height: 190px;
+    margin-left: -160px;
+    border-radius: 18px;
+    border: 0.5px solid rgba(17,17,17,0.10);
+    box-shadow: 0 10px 28px rgba(17,17,17,0.07);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    will-change: transform, opacity;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .wl-deck-card[data-deck="c1"] { background: linear-gradient(135deg, #FCFCFD, #F0F0F3); }
+  .wl-deck-card[data-deck="c2"] { background: linear-gradient(135deg, #F4F4F6, #E3E3E8); }
+  .wl-deck-card[data-deck="c3"] { background: linear-gradient(135deg, #3A3A41, #1E1E23); }
+  .wl-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wl-card-bank {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.688rem;
+    letter-spacing: 0.18em;
+    color: #666666;
+  }
+  .wl-deck-card.dark .wl-card-bank { color: rgba(255,255,255,0.85); }
+  .wl-card-chip {
+    width: 28px;
+    height: 20px;
+    border: 1px solid rgba(17,17,17,0.35);
+    border-radius: 5px;
+    position: relative;
+  }
+  .wl-card-chip::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 1px;
+    background: rgba(17,17,17,0.22);
+  }
+  .wl-card-chip::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 3px; bottom: 3px;
+    width: 1px;
+    background: rgba(17,17,17,0.18);
+  }
+  .wl-deck-card.dark .wl-card-chip { border-color: rgba(255,255,255,0.40); }
+  .wl-deck-card.dark .wl-card-chip::before { background: rgba(255,255,255,0.25); }
+  .wl-deck-card.dark .wl-card-chip::after { background: rgba(255,255,255,0.18); }
+  .wl-card-number {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.063rem;
+    letter-spacing: 0.12em;
+    color: #111111;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .wl-deck-card.dark .wl-card-number { color: rgba(255,255,255,0.95); }
+  .wl-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wl-card-holder, .wl-card-exp {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.688rem;
+    letter-spacing: 0.14em;
+    color: #999999;
+  }
+  .wl-deck-card.dark .wl-card-holder,
+  .wl-deck-card.dark .wl-card-exp { color: rgba(255,255,255,0.60); }
+
+  /* ===== 零钱卡片 ===== */
+  .wl-change-card {
+    margin-top: 4px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wl-change-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111111;
+  }
+  .wl-change-amount {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #111111;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== 功能卡片 ===== */
+  .wl-actions {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .wl-action-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .wl-action-card:active { transform: scale(0.985); background: #FAFAFA; }
+  .wl-action-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wl-action-icon svg { width: 16px; height: 16px; stroke: #555555; }
+  .wl-action-text {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111111;
+  }
+  .wl-action-arrow svg { width: 14px; height: 14px; stroke: #C7C7CC; display: block; }
+
+  /* ===== 交易明细展开面板 ===== */
+  .wl-action-arrow svg { transition: transform 0.2s ease; }
+  .wl-action-card.open .wl-action-arrow svg { transform: rotate(90deg); }
+  .wl-history-panel { display: none; }
+  .wl-history-panel.open { display: block; animation: wlFadeSlide 0.22s ease; }
+  @keyframes wlFadeSlide {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .wl-history-list { display: flex; flex-direction: column; gap: 10px; }
+  .wl-history-item {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .wl-history-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wl-history-icon svg { width: 14px; height: 14px; stroke: #555555; }
+  .wl-history-mid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .wl-history-title { font-size: 0.813rem; color: #333333; }
+  .wl-history-time { font-size: 0.625rem; color: #8E8E93; }
+  .wl-history-amount { font-size: 0.875rem; flex-shrink: 0; }
+  .wl-history-amount.is-income { font-weight: 600; color: #111111; }
+  .wl-history-amount.is-expense { font-weight: 500; color: #8E8E93; }
+  .wl-history-empty {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  /* ===== 自定义金额弹窗 ===== */
+  .wl-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+  }
+  .wl-modal-overlay.open { display: flex; }
+  .wl-modal {
+    width: calc(100% - 32px);
+    margin-bottom: 16px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 22px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: wlModalUp 0.22s ease;
+  }
+  @keyframes wlModalUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .wl-modal-title {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111111;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .wl-modal-input {
+    width: 100%;
+    height: 44px;
+    background: #F2F2F7;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 1rem;
+    color: #111111;
+  }
+  .wl-modal-input::placeholder { color: #C7C7CC; }
+  .wl-modal-error {
+    font-size: 0.688rem;
+    color: #8E8E93;
+    text-align: center;
+    min-height: 13px;
+    margin-top: -8px;
+  }
+  .wl-modal-btn {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .wl-modal-btn:active { opacity: 0.85; }
+</style>
+<link rel="stylesheet" href="mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="wl-stage">
+
+      <!-- 顶部导航 -->
+      <div class="wl-topbar">
+        <div class="wl-top-left">
+          <button class="wl-circle-btn" type="button" aria-label="返回" id="btnBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="wl-title">WALLET</span>
+        <div class="wl-top-right"></div>
+      </div>
+
+      <!-- 我的卡片：三张银行卡堆叠循环 -->
+      <div class="wl-deck-wrap" id="wlDeckWrap">
+        <div class="wl-deck-card" data-deck="c1">
+          <div class="wl-card-top">
+            <span class="wl-card-bank">MONO BANK</span>
+            <span class="wl-card-chip"></span>
+          </div>
+          <div class="wl-card-number">4580 1210 8823 9021</div>
+          <div class="wl-card-bottom">
+            <span class="wl-card-holder">MEMBER</span>
+            <span class="wl-card-exp">09/29</span>
+          </div>
+        </div>
+        <div class="wl-deck-card" data-deck="c2">
+          <div class="wl-card-top">
+            <span class="wl-card-bank">PEARL BANK</span>
+            <span class="wl-card-chip"></span>
+          </div>
+          <div class="wl-card-number">6217 0000 3315 8820</div>
+          <div class="wl-card-bottom">
+            <span class="wl-card-holder">MEMBER</span>
+            <span class="wl-card-exp">01/30</span>
+          </div>
+        </div>
+        <div class="wl-deck-card dark" data-deck="c3">
+          <div class="wl-card-top">
+            <span class="wl-card-bank">SLATE BANK</span>
+            <span class="wl-card-chip"></span>
+          </div>
+          <div class="wl-card-number">3566 0090 2144 7710</div>
+          <div class="wl-card-bottom">
+            <span class="wl-card-holder">MEMBER</span>
+            <span class="wl-card-exp">06/31</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 零钱：显示当前余额 -->
+      <div class="wl-change-card" id="changeCard">
+        <span class="wl-change-label">零钱</span>
+        <span class="wl-change-amount" id="balanceAmount">¥1000.00</span>
+      </div>
+
+      <!-- 功能卡片 -->
+      <div class="wl-actions">
+        <div class="wl-action-card" id="cardCharge">
+          <span class="wl-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          </span>
+          <span class="wl-action-text">充值</span>
+          <span class="wl-action-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </div>
+        <div class="wl-action-card" id="cardWithdraw">
+          <span class="wl-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </span>
+          <span class="wl-action-text">提现</span>
+          <span class="wl-action-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </div>
+        <div class="wl-action-card" id="cardTransactions">
+          <span class="wl-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2-3 2V4a1 1 0 0 1 1-1z"/><path d="M9 8h6"/><path d="M9 12h6"/><path d="M9 16h3"/></svg>
+          </span>
+          <span class="wl-action-text">交易明细</span>
+          <span class="wl-action-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </div>
+        <div class="wl-history-panel" id="historyPanel">
+          <div class="wl-history-list" id="historyList"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 自定义金额弹窗 -->
+    <div class="wl-modal-overlay" id="amountOverlay">
+      <div class="wl-modal">
+        <div class="wl-modal-title" id="amountTitle">充值</div>
+        <input class="wl-modal-input" id="amountInput" type="text" inputmode="decimal" placeholder="请输入金额" autocomplete="off">
+        <div class="wl-modal-error" id="amountError"></div>
+        <button class="wl-modal-btn" id="amountConfirm" type="button">确认修改</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== 银行卡堆叠循环 =====
+  (function () {
+    var wrap = document.getElementById('wlDeckWrap');
+    if (!wrap) return;
+    var cards = Array.prototype.slice.call(wrap.querySelectorAll('.wl-deck-card'));
+    var byId = {};
+    cards.forEach(function (c) { byId[c.getAttribute('data-deck')] = c; });
+
+    var SLOTS = [
+      { y: 0,  r: -2.5, s: 1,    o: 1,    z: 30 },
+      { y: 15, r: 1.8,  s: 0.95, o: 0.92, z: 20 },
+      { y: 30, r: -1.2, s: 0.9,  o: 0.75, z: 10 }
+    ];
+    var order = ['c1', 'c2', 'c3'];
+
+    function transformOf(s) { return 'translateY(' + s.y + 'px) rotate(' + s.r + 'deg) scale(' + s.s + ')'; }
+
+    function applySlot(id, instant) {
+      var idx = order.indexOf(id);
+      var s = SLOTS[idx];
+      var el = byId[id];
+      if (!el || !s) return;
+      if (instant) el.style.transition = 'none';
+      el.style.transform = transformOf(s);
+      el.style.opacity = s.o;
+      el.style.zIndex = s.z;
+      if (instant) {
+        void el.offsetWidth;
+        el.style.transition = '';
+      }
+    }
+    order.forEach(function (id) { applySlot(id, true); });
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function tick() {
+      var frontId = order[0];
+      var el = byId[frontId];
+      order.push(order.shift());
+
+      if (reduceMotion) {
+        order.forEach(function (id) { applySlot(id, true); });
+        return;
+      }
+      var anim = el.animate([
+        { transform: 'translateY(0px) rotate(-2.5deg) scale(1)',     opacity: 1,    zIndex: 30, offset: 0 },
+        { transform: 'translateY(-78px) rotate(2deg) scale(1.04)',  opacity: 0,    zIndex: 40, offset: 0.38 },
+        { transform: 'translateY(-78px) rotate(2deg) scale(1.04)',  opacity: 0,    zIndex: 5,  offset: 0.6 },
+        { transform: 'translateY(30px) rotate(-1.2deg) scale(0.9)', opacity: 0.75, zIndex: 10, offset: 1 }
+      ], { duration: 850, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'forwards' });
+      anim.onfinish = function () {
+        anim.cancel();
+        applySlot(frontId, true);
+      };
+      order.forEach(function (id, i) {
+        if (id === frontId) return;
+        var s = SLOTS[i];
+        var e2 = byId[id];
+        e2.style.zIndex = s.z;
+        e2.style.transform = transformOf(s);
+        e2.style.opacity = s.o;
+      });
+    }
+
+    var timer = null;
+    function start() { if (!timer) timer = setInterval(tick, 4000); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { en.isIntersecting ? start() : stop(); });
+      }, { threshold: 0.2 });
+      io.observe(wrap);
+    } else {
+      start();
+    }
+  })();
+</script>
+
+<script>
+  // 返回上一页；无历史时兜底回我的页面
+  document.getElementById('btnBack').addEventListener('click', function () {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'profile.html';
+    }
+  });
+
+  // ===== 交易明细：原地展开 + 渲染历史记录 =====
+  var txCard = document.getElementById('cardTransactions');
+  var historyPanel = document.getElementById('historyPanel');
+  var historyList = document.getElementById('historyList');
+
+  // 时间戳格式化：动态提取「月-日 时:分」（如 10-12 15:30）；时间缺失或非法返回空串（绝不出现 NaN）
+  function formatTime(ts) {
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    var month = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    var hour = String(d.getHours()).padStart(2, '0');
+    var minute = String(d.getMinutes()).padStart(2, '0');
+    return month + '-' + day + ' ' + hour + ':' + minute;
+  }
+
+  // 图标（纯细线条 SVG，颜色由 CSS 统一控制）
+  var ICON_CHARGE    = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>';
+  var ICON_WITHDRAW  = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
+  var ICON_REDPACKET = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M5 9c2.5 2 11.5 2 14 0"/><circle cx="12" cy="13.5" r="1.5"/></svg>';
+  var ICON_TRANSFER  = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13"/><path d="M14 5l3 3-3 3"/><path d="M20 16H7"/><path d="M10 13l-3 3 3 3"/></svg>';
+  var ICON_ADJUST    = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+
+  function renderHistory() {
+    historyList.textContent = ''; // 清空旧内容
+
+    // 读取 workData.history（不存在/非法一律按空数组处理）
+    var history = [];
+    try {
+      var wd = JSON.parse(localStorage.getItem('workData') || 'null');
+      if (wd && typeof wd === 'object' && Array.isArray(wd.history)) history = wd.history;
+    } catch (e) {}
+
+    if (!history.length) {
+      var empty = document.createElement('div');
+      empty.className = 'wl-history-empty';
+      empty.textContent = '暂无交易记录';
+      historyList.appendChild(empty);
+      return;
+    }
+
+    history.forEach(function (item) {
+      if (!item || typeof item !== 'object') return;
+      var n = Number(item.amount);
+      if (!isFinite(n) || n <= 0) return; // 金额非法跳过该条
+      var isIncome = item.type === 'income';
+
+      var row = document.createElement('div');
+      row.className = 'wl-history-item';
+
+      var iconWrap = document.createElement('span');
+      iconWrap.className = 'wl-history-icon';
+      iconWrap.innerHTML = item.category === 'transfer' ? ICON_TRANSFER
+        : (item.category === 'charge' ? ICON_CHARGE
+          : (item.category === 'withdraw' ? ICON_WITHDRAW
+            : (item.category === 'adjust' ? ICON_ADJUST : ICON_REDPACKET)));
+
+      var mid = document.createElement('span');
+      mid.className = 'wl-history-mid';
+      var titleEl = document.createElement('span');
+      titleEl.className = 'wl-history-title';
+      titleEl.textContent = String(item.title || (isIncome ? '收入' : '支出'));
+      var timeEl = document.createElement('span');
+      timeEl.className = 'wl-history-time';
+      timeEl.textContent = formatTime(item.time);
+      mid.appendChild(titleEl);
+      mid.appendChild(timeEl);
+
+      var amountEl = document.createElement('span');
+      amountEl.className = 'wl-history-amount ' + (isIncome ? 'is-income' : 'is-expense');
+      amountEl.textContent = (isIncome ? '+' : '-') + Math.abs(n).toFixed(2);
+
+      row.appendChild(iconWrap);
+      row.appendChild(mid);
+      row.appendChild(amountEl);
+      historyList.appendChild(row);
+    });
+  }
+
+  txCard.addEventListener('click', function () {
+    var willOpen = !historyPanel.classList.contains('open');
+    if (willOpen) renderHistory(); // 每次展开都重读 localStorage，保证显示最新记录
+    historyPanel.classList.toggle('open', willOpen);
+    txCard.classList.toggle('open', willOpen);
+  });
+
+  // ===== 余额：读取 workData 渲染（结构非法一律回落 1000，绝不把脏数据带进计算）=====
+  var balanceAmountEl = document.getElementById('balanceAmount');
+
+  function getWorkData() {
+    var wd = null;
+    try { wd = JSON.parse(localStorage.getItem('workData') || 'null'); } catch (e) {}
+    if (!wd || typeof wd !== 'object' || Array.isArray(wd)) wd = { balance: 1000, history: [] };
+    if (typeof wd.balance !== 'number' || !isFinite(wd.balance)) wd.balance = 1000;
+    if (!Array.isArray(wd.history)) wd.history = [];
+    return wd;
+  }
+
+  function renderBalance() {
+    balanceAmountEl.textContent = '¥' + getWorkData().balance.toFixed(2);
+  }
+
+  // ===== 充值 / 提现弹窗 =====
+  var cardCharge = document.getElementById('cardCharge');
+  var cardWithdraw = document.getElementById('cardWithdraw');
+  var amountOverlay = document.getElementById('amountOverlay');
+  var amountTitle = document.getElementById('amountTitle');
+  var amountInput = document.getElementById('amountInput');
+  var amountError = document.getElementById('amountError');
+  var amountConfirm = document.getElementById('amountConfirm');
+  var amountMode = 'charge'; // 'charge' | 'withdraw'
+
+  function openAmountModal(mode) {
+    amountMode = mode;
+    amountTitle.textContent = mode === 'charge' ? '充值' : '提现';
+    amountInput.value = '';
+    amountError.textContent = '';
+    amountInput.placeholder = mode === 'charge' ? '请输入充值金额' : '请输入提现金额';
+    amountOverlay.classList.add('open');
+    setTimeout(function () { amountInput.focus(); }, 50);
+  }
+  function closeAmountModal() {
+    amountOverlay.classList.remove('open');
+  }
+
+  cardCharge.addEventListener('click', function () { openAmountModal('charge'); });
+  cardWithdraw.addEventListener('click', function () { openAmountModal('withdraw'); });
+  // 点击遮罩空白处关闭
+  amountOverlay.addEventListener('click', function (e) {
+    if (e.target === amountOverlay) closeAmountModal();
+  });
+  // 输入过滤：只保留数字和一个小数点
+  amountInput.addEventListener('input', function () {
+    var v = amountInput.value.replace(/[^\d.]/g, '');
+    var i = v.indexOf('.');
+    if (i !== -1) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, '');
+    amountInput.value = v;
+    amountError.textContent = '';
+  });
+
+  // 确认：充值加余额、提现减余额（余额不足提示），并把这笔操作写进明细最前面
+  amountConfirm.addEventListener('click', function () {
+    var raw = amountInput.value.trim();
+    var val = parseFloat(raw);
+    if (raw === '' || !isFinite(val) || val <= 0) {
+      amountError.textContent = '请输入有效金额';
+      return;
+    }
+    val = Math.round(val * 100) / 100; // 金额保留两位
+
+    var wd = getWorkData();
+    if (amountMode === 'withdraw' && val > wd.balance) {
+      amountError.textContent = '余额不足';
+      return;
+    }
+    if (amountMode === 'charge') {
+      wd.balance = Math.round((wd.balance + val) * 100) / 100;
+      wd.history.unshift({ type: 'income', category: 'charge', title: '充值', amount: val, time: Date.now() });
+    } else {
+      wd.balance = Math.round((wd.balance - val) * 100) / 100;
+      wd.history.unshift({ type: 'expense', category: 'withdraw', title: '提现', amount: val, time: Date.now() });
+    }
+    try {
+      localStorage.setItem('workData', JSON.stringify(wd));
+    } catch (e) {
+      amountError.textContent = '保存失败：本地存储空间不足';
+      return;
+    }
+    renderBalance();
+    renderHistory();
+    closeAmountModal();
+  });
+
+  // 初始化：页面加载即渲染真实余额与交易明细
+  renderBalance();
+  renderHistory();
+</script>
+
+<script src="statusbar-control.js"></script>
+</body>
+</html>

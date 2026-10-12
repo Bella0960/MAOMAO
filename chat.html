@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>聊天 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
 <style>
   * {
     box-sizing: border-box;
@@ -44,7 +46,7 @@
     left: 0;
     width: 100%;
     padding: 14px 28px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #FFFFFF;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -74,7 +76,7 @@
     left: 12px;
     right: 12px;
     bottom: 0;
-    background: linear-gradient(180deg, #343434 0%, #777777 42%, #DADADA 100%);
+    background: linear-gradient(180deg, #343434 0%, #777777 38%, #B8B8B8 65%, #E8E8E8 88%, #F5F5F5 100%);
     border-radius: 20px;
     background-size: cover;
     background-position: center;
@@ -118,11 +120,12 @@
     margin: 0 12px;
     background: linear-gradient(180deg,
       #FFFFFF 0%,
-      rgba(255, 255, 255, 0.99) 18%,
-      rgba(255, 255, 255, 0.92) 34%,
-      rgba(255, 255, 255, 0.72) 52%,
-      rgba(255, 255, 255, 0.38) 74%,
-      rgba(255, 255, 255, 0.12) 100%);
+      rgba(255, 255, 255, 1) 15%,
+      rgba(255, 255, 255, 0.96) 30%,
+      rgba(255, 255, 255, 0.85) 48%,
+      rgba(255, 255, 255, 0.6) 68%,
+      rgba(255, 255, 255, 0.3) 85%,
+      rgba(255, 255, 255, 0.1) 100%);
     border-radius: 22px;
     margin-top: -26px;
     position: relative;
@@ -171,7 +174,7 @@
   }
 
   .user-id-text {
-    font-size: 13px;
+    font-size: 0.813rem;
     font-weight: 800;
     color: #111111;
     cursor: pointer;
@@ -227,11 +230,40 @@
     to { transform: rotate(360deg); }
   }
 
-  .disc-center {
-    width: 5px;
-    height: 5px;
-    background: #FFFFFF;
-    border-radius: 50%;
+  /* 返回箭头内嵌在黑胶碟片中心：白色细箭头，碟片转动时反向自转保持朝左 */
+  .chat-home-back {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .vinyl-disc.playing .chat-home-back {
+    animation: rotateDisc 6s linear infinite reverse;
+  }
+  .chat-home-back:active { opacity: 0.45; }
+  .chat-home-back svg {
+    width: 10px;
+    height: 10px;
+    stroke: rgba(255, 255, 255, 0.95);
+    display: block;
+  }
+  /* 隐形扩大触摸区：视觉仍是 20px 碟片，实际可点 44px */
+  .chat-home-back::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
   }
 
   .sound-wave {
@@ -261,14 +293,32 @@
     min-width: 0;
   }
   .m-title {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     color: #111111;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: text;
   }
-  .m-sub { font-size: 8px; color: #777777; font-family: monospace; }
+  .m-title-edit {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #111111;
+    background: #F0F0F2;
+    border: none;
+    border-radius: 8px;
+    padding: 3px 8px;
+    outline: none;
+    width: 170px;
+    font-family: inherit;
+    transition: background .2s ease;
+  }
+  .m-title-edit:focus {
+    background: #FFFFFF;
+    box-shadow: inset 0 0 0 1px #E5E5EA;
+  }
+  .m-sub { font-size: 0.5rem; color: #777777; font-family: monospace; }
 
   .music-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
@@ -278,6 +328,175 @@
     display: flex;
     align-items: center;
   }
+
+  /* 音乐卡片内的群聊入口（与旁边图标一致） */
+  .group-entry-btn {
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    outline: none;
+    transition: transform .2s ease;
+  }
+  .group-entry-btn:active {
+    transform: scale(0.92);
+  }
+  .group-entry-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: #333333;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* 创建群聊弹窗 */
+  .group-modal-backdrop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .group-modal-backdrop.show { display: flex; }
+  .group-modal-box {
+    width: 100%;
+    max-width: 260px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 16px 16px 14px;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .group-modal-title {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111111;
+    text-align: center;
+  }
+  .group-modal-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: none;
+    background: #F8F8FA;
+    font-size: 0.875rem;
+    color: #111111;
+    outline: none;
+    font-family: inherit;
+    transition: background .2s ease;
+  }
+  .group-modal-input:focus {
+    background: #FFFFFF;
+    box-shadow: inset 0 0 0 1px #E5E5EA;
+  }
+  .group-modal-label {
+    font-size: 0.688rem;
+    font-weight: 500;
+    color: #999999;
+    letter-spacing: 0.02em;
+  }
+  .group-modal-members {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 140px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .group-modal-members::-webkit-scrollbar { display: none; }
+  .group-member-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: #F8F8FA;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .group-member-item:active { background: #EEEEF0; }
+  .group-member-item.is-selected { background: #F0F0F2; }
+  .group-member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #EEEEF0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .group-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .group-member-avatar svg {
+    width: 14px;
+    height: 14px;
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+  .group-member-name {
+    flex: 1;
+    font-size: 0.813rem;
+    color: #111111;
+  }
+  .group-member-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid #E5E5EA;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
+  }
+  .group-member-item.is-selected .group-member-check {
+    background: #111111;
+    border-color: #111111;
+  }
+  .group-member-check svg {
+    width: 10px;
+    height: 10px;
+    stroke: #FFFFFF;
+    stroke-width: 2.5;
+    fill: none;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .group-member-item.is-selected .group-member-check svg { opacity: 1; }
+  .group-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .group-modal-btn {
+    flex: 1;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .group-modal-btn:active { opacity: 0.85; transform: scale(0.98); }
+  .gm-cancel { background: #F0F0F2; color: #666666; }
+  .gm-create { background: #111111; color: #FFFFFF; }
 
   /* 聊天卡流容器（动态渲染） */
   #chatListContainer {
@@ -322,6 +541,27 @@
     object-fit: cover;
   }
 
+  /* 群聊头像：成员小网格 */
+  .chat-avatar.group-avatar {
+    flex-wrap: wrap;
+    padding: 1px;
+    gap: 1px;
+  }
+  .chat-avatar.group-avatar img,
+  .chat-avatar.group-avatar svg {
+    width: 50%;
+    height: 50%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: 0.5px;
+    object-fit: cover;
+  }
+  .chat-avatar.group-avatar svg {
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+
   .chat-meta {
     flex: 1;
     overflow: hidden;
@@ -335,7 +575,7 @@
     align-items: center;
   }
   .chat-name {
-    font-size: 11.5px;
+    font-size: 0.719rem;
     font-weight: 700;
     color: #111111;
     white-space: nowrap;
@@ -343,14 +583,14 @@
     text-overflow: ellipsis;
   }
   .chat-time {
-    font-size: 8.5px;
+    font-size: 0.531rem;
     color: #888888;
     font-family: monospace;
     flex-shrink: 0;
     margin-left: 8px;
   }
   .chat-last-msg {
-    font-size: 9.5px;
+    font-size: 0.594rem;
     color: #666666;
     white-space: nowrap;
     overflow: hidden;
@@ -360,7 +600,7 @@
   .empty-tip {
     text-align: center;
     color: #999999;
-    font-size: 11px;
+    font-size: 0.688rem;
     padding: 24px 0;
   }
 
@@ -399,7 +639,7 @@
     justify-content: space-between;
     align-items: center;
   }
-  .drawer-title { font-size: 15px; font-weight: 800; color: #111111; }
+  .drawer-title { font-size: 0.938rem; font-weight: 800; color: #111111; }
   .drawer-close {
     color: #888888;
     cursor: pointer;
@@ -408,7 +648,7 @@
   }
 
   .field-group { display: flex; flex-direction: column; gap: 4px; }
-  .field-label { font-size: 9px; font-weight: 700; color: #888888; font-family: monospace; }
+  .field-label { font-size: 0.563rem; font-weight: 700; color: #888888; font-family: monospace; }
   .field-input-box {
     background: #F4F4F4;
     border-radius: 12px;
@@ -418,7 +658,7 @@
     border: none;
     background: transparent;
     outline: none;
-    font-size: 11px;
+    font-size: 0.688rem;
     color: #222222;
     width: 100%;
     font-family: inherit;
@@ -432,13 +672,14 @@
     text-align: center;
     padding: 10px;
     border-radius: 14px;
-    font-size: 11px;
+    font-size: 0.688rem;
     font-weight: 700;
     margin-top: 6px;
     cursor: pointer;
   }
   .save-btn:active { opacity: 0.85; }
 </style>
+<link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
 
@@ -470,7 +711,9 @@
           <div class="floating-music-card">
             <div class="music-left">
               <div class="vinyl-disc playing" id="vinylDisc">
-                <div class="disc-center"></div>
+                <div class="chat-home-back" id="chatHomeBack" role="button" aria-label="返回主页">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </div>
               </div>
               <div class="music-titles">
                 <span class="m-title" id="musicTitle">誓言是一场有时差的雨</span>
@@ -479,6 +722,9 @@
             </div>
 
             <div class="music-right">
+              <button class="group-entry-btn" id="groupEntryBtn" type="button" aria-label="创建群聊">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
               <div class="sound-wave playing" id="soundWave">
                 <div class="wave-bar"></div>
                 <div class="wave-bar"></div>
@@ -521,6 +767,12 @@
   </div>
 
   <script src="nav.js"></script>
+  <script>
+    /* ===== 返回主页 ===== */
+    document.getElementById('chatHomeBack').addEventListener('click', function () {
+      window.location.href = 'index.html';
+    });
+  </script>
   <script>
     /* ================= 数据键名（与项目现有逻辑一致） ================= */
     var PROFILE_KEY = 'myProfile';
@@ -715,6 +967,46 @@
       } catch (e) {}
     });
 
+    /* ================= 音乐文案可编辑 ================= */
+    function startEditMusicTitle() {
+      var titleEl = document.getElementById('musicTitle');
+      if (!titleEl || titleEl.parentNode.querySelector('.m-title-edit')) return;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.maxLength = 24;
+      input.value = musicState.title || DEFAULT_MUSIC_TITLE;
+      input.className = 'm-title-edit';
+      titleEl.style.display = 'none';
+      titleEl.parentNode.insertBefore(input, titleEl);
+      input.focus();
+      input.select();
+
+      var done = false;
+      function finish() {
+        if (done || !input.parentNode) return;
+        done = true;
+        var val = input.value.trim();
+        if (val) {
+          musicState.title = val;
+          titleEl.textContent = val;
+          try { localStorage.setItem(MUSIC_KEY, JSON.stringify(musicState)); } catch (e) {}
+          showToast('文案已更新');
+        }
+        input.remove();
+        titleEl.style.display = '';
+      }
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); finish(); }
+        if (e.key === 'Escape') {
+          input.remove();
+          titleEl.style.display = '';
+        }
+      });
+      input.addEventListener('blur', finish);
+    }
+
+    document.getElementById('musicTitle').addEventListener('click', startEditMusicTitle);
+
     /* ================= 聊天列表动态渲染 ================= */
     function loadCharacters() {
       try {
@@ -738,6 +1030,33 @@
       return [];
     }
 
+    function loadGroups() {
+      try {
+        var raw = localStorage.getItem('phone_groups');
+        var arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
+    }
+
+    /* 轻提示（本页自用，样式与其他页面一致） */
+    function showToast(msg) {
+      var t = document.getElementById('pageToast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'pageToast';
+        t.style.cssText = 'position:absolute;bottom:110px;left:50%;transform:translate(-50%,8px);padding:8px 16px;background:#111111;color:#FFFFFF;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:700;white-space:nowrap;';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = '1';
+      t.style.transform = 'translate(-50%,0)';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(function () {
+        t.style.opacity = '0';
+        t.style.transform = 'translate(-50%,8px)';
+      }, 1800);
+    }
+
     function getLastMessage(roleId, fallbackName) {
       try {
         var raw = localStorage.getItem('chat_history_' + roleId);
@@ -745,7 +1064,22 @@
           var arr = JSON.parse(raw);
           if (Array.isArray(arr) && arr.length > 0) {
             var last = arr[arr.length - 1];
-            if (last && last.text) return last.text;
+            if (last) {
+              if (last.text) return last.text;
+              // 无文本的特殊消息：按类型显示占位，避免显示兜底问候语
+              var placeholders = {
+                'redpacket': '[红包]',
+                'transfer': '[转账]',
+                'location': '[位置]',
+                'anniversary': '[纪念日]',
+                'todo': '[共享待办]',
+                'moment': '[特别时刻]'
+              };
+              if (placeholders[last.type]) return placeholders[last.type];
+              if (last.type === 'call') {
+                return last.call && last.call.type === 'video' ? '[视频通话]' : '[语音通话]';
+              }
+            }
           }
         }
       } catch (e) {}
@@ -765,12 +1099,56 @@
         return r && r.id != null && hiddenStr.indexOf(String(r.id)) === -1;
       });
 
-      if (roles.length === 0) {
+      // 置顶排序：chat_pin_<roleId> === 'true' 的排最前；组内保持原有顺序（稳定分区，不用 sort）
+      var pinnedRoles = roles.filter(function (r) {
+        return localStorage.getItem('chat_pin_' + r.id) === 'true';
+      });
+      var otherRoles = roles.filter(function (r) {
+        return localStorage.getItem('chat_pin_' + r.id) !== 'true';
+      });
+      roles = pinnedRoles.concat(otherRoles);
+
+      // 群聊（放最前面，像微信一样群聊在消息列表里）
+      var groups = loadGroups();
+
+      if (roles.length === 0 && groups.length === 0) {
         container.innerHTML = '<div class="empty-tip">暂无聊天消息</div>';
         return;
       }
 
-      container.innerHTML = roles.map(function (role) {
+      function groupAvatarHTML(g) {
+        var members = g.members || [];
+        if (members.length === 0) {
+          return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        }
+        return members.slice(0, 4).map(function(m) {
+          return m.avatar
+            ? '<img src="' + m.avatar + '" alt="">'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        }).join('');
+      }
+
+      var groupsHTML = groups.map(function (g) {
+        var gid = g.id;
+        var displayName = g.name || '群聊';
+        try {
+          var alias = localStorage.getItem('chat_group_alias_' + gid);
+          if (alias) displayName = alias;
+        } catch (e) {}
+        return '' +
+          '<div class="chat-slim-card chat-group-card" data-gid="' + escapeHtml(gid) + '">' +
+            '<div class="chat-avatar group-avatar">' + groupAvatarHTML(g) + '</div>' +
+            '<div class="chat-meta">' +
+              '<div class="chat-title-row">' +
+                '<span class="chat-name">' + escapeHtml(displayName) + '</span>' +
+                '<span class="chat-time">Just now</span>' +
+              '</div>' +
+              '<div class="chat-last-msg">' + escapeHtml((g.members || []).map(function(m) { return m.name; }).join('、')) + '</div>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+
+      var rolesHTML = roles.map(function (role) {
         var name = role.name || '角色';
         var avatarInner = role.avatar
           ? '<img src="' + role.avatar + '" alt="">'
@@ -790,8 +1168,20 @@
           '</div>';
       }).join('');
 
+      container.innerHTML = groupsHTML + rolesHTML;
+
+      /* 群聊点击：进入群聊聊天界面（复用 chat-detail 群聊模式） */
+      container.querySelectorAll('.chat-group-card').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var gid = item.getAttribute('data-gid');
+          if (gid) {
+            window.location.href = 'chat-detail.html?id=' + encodeURIComponent(gid);
+          }
+        });
+      });
+
       /* 原有跳转逻辑：带 roleId 进入聊天详情页 */
-      container.querySelectorAll('.chat-slim-card').forEach(function (item) {
+      container.querySelectorAll('.chat-slim-card:not(.chat-group-card)').forEach(function (item) {
         item.addEventListener('click', function () {
           var roleId = item.getAttribute('data-id');
           if (roleId) {
@@ -805,6 +1195,111 @@
     renderProfile();
     applyMusicState(musicState);
     renderChatList();
+  </script>
+<script src="statusbar-control.js"></script>
+
+  <!-- 创建群聊弹窗 -->
+  <div class="group-modal-backdrop" id="groupModalBackdrop">
+    <div class="group-modal-box">
+      <div class="group-modal-title">创建群聊</div>
+      <input class="group-modal-input" id="groupNameInput" type="text" placeholder="群聊名称" maxlength="20">
+      <div class="group-modal-label">选择成员</div>
+      <div class="group-modal-members" id="groupMembersList"></div>
+      <div class="group-modal-actions">
+        <button class="group-modal-btn gm-cancel" type="button" id="groupModalCancel">取消</button>
+        <button class="group-modal-btn gm-create" type="button" id="groupModalCreate">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 创建群聊弹窗逻辑 */
+    (function() {
+      var backdrop = document.getElementById('groupModalBackdrop');
+      var nameInput = document.getElementById('groupNameInput');
+      var membersList = document.getElementById('groupMembersList');
+      var selected = {};
+
+      function loadCharacters() {
+        try {
+          var raw = localStorage.getItem('ai_custom_characters');
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+
+      function renderMembers() {
+        var roles = loadCharacters();
+        if (!roles.length) {
+          membersList.innerHTML = '<div style="text-align:center;color:#999;font-size:13px;padding:14px 0;">暂无角色，先去通讯录添加</div>';
+          return;
+        }
+        membersList.innerHTML = roles.map(function(r) {
+          var id = String(r.id);
+          var av = r.avatar
+            ? '<img src="' + r.avatar + '" alt="">'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+          return '<div class="group-member-item" data-id="' + id + '">' +
+            '<div class="group-member-avatar">' + av + '</div>' +
+            '<div class="group-member-name">' + (r.name || '未命名') + '</div>' +
+            '<div class="group-member-check"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+            '</div>';
+        }).join('');
+        membersList.querySelectorAll('.group-member-item').forEach(function(item) {
+          item.addEventListener('click', function() {
+            var id = item.dataset.id;
+            if (selected[id]) { delete selected[id]; item.classList.remove('is-selected'); }
+            else { selected[id] = true; item.classList.add('is-selected'); }
+          });
+        });
+      }
+
+      function openModal() {
+        selected = {};
+        if (nameInput) nameInput.value = '';
+        renderMembers();
+        backdrop.classList.add('show');
+        setTimeout(function(){ if (nameInput) nameInput.focus(); }, 60);
+      }
+
+      function closeModal() {
+        backdrop.classList.remove('show');
+      }
+
+      document.getElementById('groupEntryBtn').addEventListener('click', openModal);
+      document.getElementById('groupModalCancel').addEventListener('click', closeModal);
+      backdrop.addEventListener('click', function(e) {
+        if (e.target === backdrop) closeModal();
+      });
+
+      document.getElementById('groupModalCreate').addEventListener('click', function() {
+        var name = nameInput ? nameInput.value.trim() : '';
+        if (!name) {
+          nameInput.focus();
+          nameInput.style.boxShadow = 'inset 0 0 0 1.5px #999';
+          setTimeout(function(){ nameInput.style.boxShadow = ''; }, 800);
+          return;
+        }
+        var roles = loadCharacters();
+        var memberIds = Object.keys(selected);
+        var members = roles.filter(function(r) { return memberIds.indexOf(String(r.id)) !== -1; });
+        var groups = [];
+        try {
+          var raw = localStorage.getItem('phone_groups');
+          if (raw) groups = JSON.parse(raw);
+          if (!Array.isArray(groups)) groups = [];
+        } catch(e) {}
+        groups.push({
+          id: 'g' + Date.now(),
+          name: name,
+          members: members.map(function(m) { return { id: String(m.id), name: m.name, avatar: m.avatar || '' }; }),
+          createdAt: Date.now()
+        });
+        localStorage.setItem('phone_groups', JSON.stringify(groups));
+        closeModal();
+        renderChatList();  // 群聊直接进入消息列表，不跳转
+      });
+    })();
   </script>
 </body>
 </html>

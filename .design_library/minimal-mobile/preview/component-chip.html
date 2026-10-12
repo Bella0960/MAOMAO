@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chip</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+/* Page scaffold — NOT extracted */
+body { margin: 0; padding: var(--space-3); background: var(--color-surface); color: var(--color-text); font-family: var(--font-body); }
+.row { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+.label { flex: 0 0 92px; font-size: var(--font-size-eyebrow); font-weight: var(--font-weight-eyebrow); letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+.rail { display: flex; align-items: center; gap: var(--space-2); overflow-x: auto; }
+.divider { width: 100%; height: 1px; margin: var(--space-3) 0; border: 0; background: var(--color-border); }
+/* @component-css-start */
+.chip { display: inline-flex; align-items: center; gap: var(--space-1); height: var(--size-button-height-sm); min-width: var(--size-button-height-sm); padding: 0 var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-full); background: transparent; color: var(--color-text); font-family: var(--font-body); font-size: var(--font-size-caption); line-height: 1; white-space: nowrap; flex-shrink: 0; cursor: pointer; appearance: none; transition: background var(--duration-fast) var(--easing-standard), filter var(--duration-fast) var(--easing-standard); }
+.chip:hover { background: var(--lumen-state-hover); }
+.chip:focus-visible { outline: 2px solid var(--lumen-border-focus); outline-offset: 2px; }
+.chip--selected { background: var(--lumen-blue-50); border-color: var(--lumen-blue-200); color: var(--lumen-blue-700); }
+.chip--selected:hover { background: var(--lumen-blue-50); filter: brightness(0.96); }
+.chip-icon { width: var(--size-icon-sm); height: var(--size-icon-sm); flex-shrink: 0; }
+/* @component-css-end */
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+
+<div class="row">
+  <span class="label">默认</span>
+  <div class="rail" data-evidence-sample="default">
+    <button class="chip" type="button">推荐</button>
+    <button class="chip" type="button">关注</button>
+    <button class="chip" type="button">热门</button>
+    <button class="chip" type="button">数码</button>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="row">
+  <span class="label">选中</span>
+  <div class="rail" data-evidence-sample="selected">
+    <button class="chip chip--selected" type="button"><svg class="chip-icon" aria-hidden="true"><use href="#icon-check"/></svg>推荐</button>
+    <button class="chip" type="button">关注</button>
+    <button class="chip chip--selected" type="button"><svg class="chip-icon" aria-hidden="true"><use href="#icon-check"/></svg>热门</button>
+    <button class="chip" type="button">数码</button>
+  </div>
+</div>
+</body>
+</html>
