@@ -1,11 +1,7 @@
 const STORAGE_KEY = 'ai_custom_characters';
 const CURRENT_CONTACT_KEY = 'currentPhoneContactId';
 
-const DEFAULT_ROLES = [
-    { id: 'role_1', name: '宝宝', avatarBg: '#FF6B81', avatar: '', persona: '可爱的恋人，说话温柔软萌，喜欢撒娇', tone: '软萌、撒娇、喜欢用颜文字' },
-    { id: 'role_2', name: '苏格拉底', avatarBg: '#3B9EFF', avatar: '', persona: '古希腊哲学家，喜欢用启发式提问引导思考', tone: '沉稳、反问式、富有哲理' },
-    { id: 'role_3', name: '灵感助手', avatarBg: '#10B981', avatar: '', persona: '创意策划专家，擅长头脑风暴与文字创作', tone: '热情、条理清晰、善于鼓励' }
-];
+const DEFAULT_ROLES = [];
 
 // 获取当前选中的角色 ID
 function getCurrentPhoneContactId() {

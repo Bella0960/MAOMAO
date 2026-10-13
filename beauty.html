@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>外观美化 · 小手机</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  body {
+    background: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .phone {
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar { padding: 14px 28px; font-size: 0.875rem; font-weight: 600; color: #000; }
+  .header { display: flex; align-items: center; gap: 12px; padding: 8px 20px 16px; }
+  .back-btn {
+    width: 32px; height: 32px; border-radius: 50%; background: #F4F4F6;
+    border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .back-btn svg { width: 16px; height: 16px; stroke: #111; }
+  .title { font-size: 24px; font-weight: 800; color: #111; letter-spacing: -0.3px; }
+  .content { flex: 1; overflow-y: auto; padding: 0 18px 120px; }
+
+  /* 顶部工具条 */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .circle-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #F4F4F6; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .circle-btn svg { width: 16px; height: 16px; stroke: #111; }
+  .circle-btn:active { background: #E5E5EA; }
+  .copy-btn {
+    background: #F4F4F6;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #111;
+    cursor: pointer;
+  }
+  .copy-btn:active { background: #E5E5EA; }
+
+  /* 目标选择胶囊 */
+  .target-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    padding: 8px 14px; border-radius: 999px; background: #F4F4F6;
+    font-size: 0.75rem; color: #666; cursor: pointer;
+    border: 1.5px solid transparent; transition: all 0.15s;
+  }
+  .pill.on { background: #111; color: #fff; }
+
+  .preset-list { display: flex; flex-direction: column; gap: 10px; }
+  .preset-item {
+    background: #F8F8FA;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+  }
+  .preset-item.active { border-color: #111; background: #fff; }
+  .preset-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #E5E5EA; flex-shrink: 0;
+  }
+  .preset-item.active .preset-dot { background: #111; }
+  .preset-info { flex: 1; min-width: 0; }
+  .preset-name { font-size: 0.938rem; font-weight: 600; color: #111; }
+  .preset-meta { font-size: 0.625rem; color: #B0B0B5; margin-top: 3px; }
+  .preset-del {
+    width: 28px; height: 28px; border-radius: 50%; background: transparent;
+    border: none; color: #C7C7CC; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preset-del:active { color: #FF3B30; }
+  .empty { text-align: center; padding: 60px 20px; color: #C7C7CC; font-size: 0.875rem; line-height: 1.6; }
+
+  .edit-view { display: none; }
+  .edit-view.show { display: block; }
+  .list-view.hide { display: none; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 0.75rem; color: #999; margin-bottom: 6px; }
+  .field input, .field textarea, .field select {
+    width: 100%; background: #F8F8FA; border: none; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.875rem; color: #111; font-family: inherit; outline: none;
+    appearance: none; -webkit-appearance: none;
+  }
+  .field textarea { min-height: 200px; font-family: "SF Mono", Menlo, monospace; font-size: 0.75rem; line-height: 1.6; resize: none; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+
+  .footer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 12px 16px calc(20px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, #fff 60%, rgba(255,255,255,0));
+    display: flex; gap: 10px;
+  }
+  .btn { flex: 1; height: 46px; border: none; border-radius: 999px; font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #111; color: #fff; }
+  .btn-secondary { background: #F4F4F6; color: #111; }
+  .toast {
+    position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%);
+    background: rgba(17,17,17,0.88); color: #fff; font-size: 0.813rem;
+    padding: 10px 18px; border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar"><span>4:41</span></div>
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="title">Beauty</div>
+  </div>
+  <div class="content">
+    <div class="list-view" id="listView">
+      <div class="toolbar">
+        <button class="circle-btn" onclick="document.getElementById('importFile').click()" title="导入CSS文件">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <button class="copy-btn" onclick="copyRef()">复制类名表</button>
+      </div>
+      <input type="file" id="importFile" accept=".css,.txt" style="display:none;">
+      <div class="preset-list" id="presetList"></div>
+    </div>
+    <div class="edit-view" id="editView">
+      <div class="field">
+        <label>名字</label>
+        <input type="text" id="presetName" placeholder="给这个美化起个名" maxlength="20">
+      </div>
+      <div class="field">
+        <label>用在哪</label>
+        <div class="target-pills" id="targetPills">
+          <div class="pill on" data-target="all">全局</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>CSS</label>
+        <textarea id="presetCss" placeholder=".chat-header { background: #fef0f5; }"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <button class="btn btn-secondary" id="btnLeft" onclick="leftAction()">新建</button>
+    <button class="btn btn-primary" id="btnRight" onclick="savePreset()">保存</button>
+  </div>
+  <div class="toast" id="toast">已保存</div>
+</div>
+<script>
+var LIST_KEY = 'beauty_presets';
+var ACTIVE_KEY = 'beauty_active';
+var editingIndex = -1;
+
+function getPresets(){ try { return JSON.parse(localStorage.getItem(LIST_KEY)||'[]'); } catch(e){ return []; } }
+function setPresets(p){ localStorage.setItem(LIST_KEY, JSON.stringify(p)); }
+function getActive(){ try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); } catch(e){ return {}; } }
+function setActive(o){ localStorage.setItem(ACTIVE_KEY, JSON.stringify(o)); }
+
+function loadRoleOptions(){
+  var box = document.getElementById('targetPills');
+  var roles = [];
+  try { roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]'); } catch(e){}
+  roles.forEach(function(r){
+    var p = document.createElement('div');
+    p.className = 'pill';
+    p.dataset.target = r.id;
+    p.textContent = r.name;
+    box.appendChild(p);
+  });
+  // 胶囊点击
+  box.addEventListener('click', function(e){
+    var pill = e.target.closest('.pill');
+    if (!pill) return;
+    box.querySelectorAll('.pill').forEach(function(x){ x.classList.remove('on'); });
+    pill.classList.add('on');
+  });
+}
+function getCurrentTarget(){
+  var on = document.querySelector('#targetPills .pill.on');
+  return on ? on.dataset.target : 'all';
+}
+function setCurrentTarget(t){
+  document.querySelectorAll('#targetPills .pill').forEach(function(x){
+    x.classList.toggle('on', x.dataset.target === t);
+  });
+}
+
+function targetLabel(t){
+  if (t === 'all') return '全局';
+  try {
+    var roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]');
+    var r = roles.find(function(x){ return x.id === t; });
+    return r ? r.name : '';
+  } catch(e){ return ''; }
+}
+
+function renderList(){
+  var list = getPresets();
+  var active = getActive();
+  var box = document.getElementById('presetList');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">还没有美化预设<br>点下面"新建"开始</div>';
+    return;
+  }
+  box.innerHTML = list.map(function(p, i){
+    var isActive = (active[p.target] === p.name);
+    return '<div class="preset-item '+(isActive?'active':'')+'" onclick="usePreset('+i+')">'+
+      '<div class="preset-dot"></div>'+
+      '<div class="preset-info">'+
+        '<div class="preset-name">'+esc(p.name)+'</div>'+
+        '<div class="preset-meta">'+targetLabel(p.target)+(isActive?' · 使用中':'')+'</div>'+
+      '</div>'+
+      '<button class="preset-del" onclick="delPreset(event,'+i+')">×</button>'+
+    '</div>';
+  }).join('');
+}
+function esc(s){ return String(s).replace(/</g,'&lt;'); }
+
+function usePreset(i){
+  var list = getPresets();
+  var p = list[i];
+  if (!p) return;
+  var active = getActive();
+  active[p.target] = p.name;
+  setActive(active);
+  localStorage.setItem('custom_css', p.css);
+  showToast('已启用');
+  setTimeout(function(){ location.reload(); }, 500);
+}
+function delPreset(e, i){
+  e.stopPropagation();
+  var list = getPresets();
+  var p = list[i];
+  list.splice(i,1);
+  setPresets(list);
+  var active = getActive();
+  if (active[p.target] === p.name) delete active[p.target];
+  setActive(active);
+  renderList();
+}
+
+function showEdit(idx){
+  editingIndex = idx;
+  document.getElementById('listView').classList.add('hide');
+  document.getElementById('editView').classList.add('show');
+  document.getElementById('btnLeft').textContent = '取消';
+  if (idx >= 0) {
+    var list = getPresets();
+    document.getElementById('presetName').value = list[idx].name;
+    setCurrentTarget(list[idx].target);
+    document.getElementById('presetCss').value = list[idx].css;
+  } else {
+    document.getElementById('presetName').value = '';
+    document.getElementById('presetCss').value = '';
+    setCurrentTarget('all');
+  }
+}
+function showList(){
+  editingIndex = -1;
+  document.getElementById('listView').classList.remove('hide');
+  document.getElementById('editView').classList.remove('show');
+  document.getElementById('btnLeft').textContent = '新建';
+  renderList();
+}
+function leftAction(){
+  if (document.getElementById('editView').classList.contains('show')) showList();
+  else showEdit(-1);
+}
+function goBack(){
+  if (document.getElementById('editView').classList.contains('show')) showList();
+  else history.back();
+}
+function savePreset(){
+  var name = document.getElementById('presetName').value.trim();
+  var css = document.getElementById('presetCss').value;
+  var target = getCurrentTarget();
+  if (!name) { showToast('起个名字'); return; }
+  var list = getPresets();
+  if (editingIndex >= 0) list[editingIndex] = { name: name, css: css, target: target };
+  else list.push({ name: name, css: css, target: target });
+  setPresets(list);
+  var active = getActive();
+  active[target] = name;
+  setActive(active);
+  localStorage.setItem('custom_css', css);
+  showToast('已保存');
+  setTimeout(function(){ showList(); }, 500);
+}
+
+function copyRef(){
+  var text = [
+    '/* ===== 小手机完整 CSS 模板 · 直接改 ===== */',
+    '',
+    '/* 顶栏 */',
+    '.chat-header {',
+    '  padding: 48px 14px 10px;',
+    '  display: flex; justify-content: space-between; align-items: center;',
+    '  background: rgba(244,244,246,0.85);',
+    '  backdrop-filter: blur(16px);',
+    '  border-bottom: 1px solid rgba(0,0,0,0.04);',
+    '}',
+    '.chat-user-name { font-size: 0.844rem; font-weight: 800; color: #111; }',
+    '.chat-status-sub { font-size: 0.5rem; color: #888; font-family: monospace; }',
+    '',
+    '/* 消息气泡 */',
+    '.msg-avatar {',
+    '  width: 32px; height: 32px; border-radius: 50%;',
+    '  background: linear-gradient(135deg,#EFEFEF,#DCDCDC);',
+    '}',
+    '.msg-bubble {',
+    '  padding: 9.5px 13px;',
+    '  font-size: 0.75rem; line-height: 1.5; font-weight: 500;',
+    '}',
+    '.msg-row.received .msg-bubble { background: #fff; color: #111; border-radius: 4px 18px 18px 18px; }',
+    '.msg-row.sent .msg-bubble { background: #111; color: #fff; border-radius: 18px 4px 18px 18px; }',
+    '',
+    '/* 输入栏 */',
+    '.input-capsule {',
+    '  background: #fff; border-radius: 20px; min-height: 36px;',
+    '}',
+    '.send-icon-btn {',
+    '  width: 26px; height: 26px; border-radius: 50%; background: #111;',
+    '}',
+    '',
+    '/* 卡片 */',
+    '.pay-card-red { background: #111; color: #fff; }',
+    '.pay-card-transfer { background: #fff; border: 1px solid #E5E5EA; color: #111; }',
+    '',
+    '/* ===== 改完上面的颜色/圆角就是你自己的美化 ===== */',
+    '/* 示例：淡粉顶栏 */',
+    '.chat-header { background: #fef0f5; }'
+  ].join('\n');
+  navigator.clipboard.writeText(text).then(function(){
+    showToast('已复制完整模板');
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制');
+  });
+}
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 1500);
+}
+loadRoleOptions();
+renderList();
+
+// 导入 CSS 文件：读取内容 → 跳到新建编辑页自动填好
+document.getElementById('importFile').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    showEdit(-1);
+    document.getElementById('presetCss').value = ev.target.result;
+    document.getElementById('presetName').value = file.name.replace(/\.(css|txt)$/,'');
+    showToast('已导入，起个名字保存');
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+</script>
+</body>
+</html>

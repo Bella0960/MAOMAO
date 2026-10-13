@@ -171,6 +171,24 @@ function updateTime() {
   });
   if (timeElement) timeElement.textContent = timeStr;
   if (largeClockElement) largeClockElement.textContent = timeStr;
+
+  // 玻璃时间卡：日期 + 问候 + 星期
+  const metaEl = document.getElementById('clock-meta');
+  if (metaEl && !metaEl.dataset.touched) {
+    const m = now.getMonth() + 1;
+    const d = now.getDate();
+    const weekEn = ['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()];
+    metaEl.textContent = `${m}月${d}日 ${weekEn}`;
+  }
+  const greetEl = document.getElementById('time-greeting');
+  if (greetEl) {
+    const h = now.getHours();
+    greetEl.textContent = h < 6 ? '夜深了' : h < 11 ? '上午好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
+  }
+  const weekEl = document.getElementById('time-weekday');
+  if (weekEl) {
+    weekEl.textContent = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][now.getDay()];
+  }
 }
 
 function showToast(message) {
@@ -203,6 +221,14 @@ document.querySelectorAll('.app-card, .dock-item').forEach((app) => {
       window.location.href = 'wallet.html';
       return;
     }
+    if (app.dataset.app === '音乐') {
+      window.location.href = 'music.html';
+      return;
+    }
+    if (app.dataset.app === '钱包') {
+      window.location.href = 'money.html';
+      return;
+    }
 
     showToast(app.dataset.app);
   });
@@ -221,3 +247,75 @@ setInterval(updateTime, 1000);
 renderHomeScreenRole();
 applyHomeTheme();
 initWidgetEditor();
+
+// ===== 玻璃小组件：双图上传 + 音乐按钮 =====
+(function initGlassWidgets() {
+  var input = document.getElementById('home-img-input');
+  var leftCard = document.getElementById('home-img-left');
+  var rightCard = document.getElementById('home-img-right');
+  if (!input || !leftCard || !rightCard) return;
+
+  var side = 'left';
+
+  function renderCard(card, sideName) {
+    var saved = localStorage.getItem('home_img_' + sideName);
+    if (saved) {
+      var img = card.querySelector('img');
+      if (!img) {
+        img = document.createElement('img');
+        card.appendChild(img);
+      }
+      img.src = saved;
+      var ph = card.querySelector('.img-placeholder');
+      if (ph) ph.style.display = 'none';
+    }
+  }
+
+  renderCard(leftCard, 'left');
+  renderCard(rightCard, 'right');
+
+  leftCard.addEventListener('click', function () { side = 'left'; input.value = ''; input.click(); });
+  rightCard.addEventListener('click', function () { side = 'right'; input.value = ''; input.click(); });
+
+  input.addEventListener('change', function () {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      // 压缩到 600px 宽，避免 localStorage 爆掉
+      var img = new Image();
+      img.onload = function () {
+        var canvas = document.createElement('canvas');
+        var maxW = 600;
+        var scale = Math.min(1, maxW / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        try {
+          localStorage.setItem('home_img_' + side, canvas.toDataURL('image/jpeg', 0.82));
+        } catch (err) {
+          try { localStorage.setItem('home_img_' + side, e.target.result); } catch (e2) {}
+        }
+        renderCard(side === 'left' ? leftCard : rightCard, side);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // 音乐播放按钮（视觉态）
+  var playBtn = document.getElementById('music-play-btn');
+  var cover = document.querySelector('.music-card');
+  var playIcon = document.getElementById('play-icon');
+  var playing = false;
+  if (playBtn && cover && playIcon) {
+    playBtn.addEventListener('click', function () {
+      playing = !playing;
+      cover.classList.toggle('playing', playing);
+      playIcon.innerHTML = playing
+        ? '<rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/>'
+        : '<polygon points="6 3 20 12 6 21"/>';
+      document.getElementById('music-title').textContent = playing ? '正在播放 · 示例曲目' : '暂无播放';
+    });
+  }
+})();

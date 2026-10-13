@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F7F9" />
+<title>店铺管理</title>
+<script src="native-feel.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  html { background: #E8E8EC; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+    background: #F7F7F9; color: #111;
+    min-height: 100vh; max-width: 390px; margin: 0 auto;
+    padding-bottom: 100px;
+  }
+
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+    position: sticky; top: 0; background: #F7F7F9; z-index: 10;
+  }
+  .back-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #fff; border: 1px solid #ECECEF;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .header h1 { font-size: 1.125rem; font-weight: 700; }
+
+  .stats {
+    display: flex; gap: 12px;
+    padding: 0 20px 16px;
+  }
+  .stat-card {
+    flex: 1; background: #fff; border: 1px solid #ECECEF;
+    border-radius: 14px; padding: 14px;
+  }
+  .stat-label { font-size: 0.688rem; color: #999; margin-bottom: 4px; }
+  .stat-value { font-size: 1.25rem; font-weight: 700; }
+
+  .section-title {
+    padding: 8px 20px 12px;
+    font-size: 0.813rem; font-weight: 700; color: #999;
+    letter-spacing: 0.05em;
+  }
+
+  .product-list { padding: 0 20px; }
+  .product-row {
+    background: #fff; border: 1px solid #ECECEF;
+    border-radius: 12px; padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .p-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #F4F4F6;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .p-info { flex: 1; min-width: 0; }
+  .p-name { font-size: 0.78rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p-cn { font-size: 0.68rem; color: #999; margin-top: 1px; }
+  .p-price-input {
+    width: 64px; border: none; border-bottom: 1.5px solid #111;
+    font-size: 0.875rem; font-weight: 700; padding: 2px 0;
+    outline: none; background: transparent; text-align: right;
+  }
+  .p-del {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: #F4F4F6; border: none;
+    color: #999; font-size: 0.75rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .p-del:active { background: #FFF0F0; color: #FF3B30; }
+
+  /* 底部添加 */
+  .add-btn {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 390px; max-width: 100%;
+    background: #111; color: #fff;
+    border: none; padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+
+  /* 添加商品弹层 */
+  .add-backdrop {
+    position: fixed; top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 390px; max-width: 100%;
+    background: rgba(0,0,0,0.3);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200;
+  }
+  .add-backdrop.show { display: flex; }
+  .add-card {
+    background: #fff; width: 90%;
+    border-radius: 20px; padding: 20px;
+  }
+  .add-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
+  .add-card input, .add-card select {
+    width: 100%; padding: 12px; margin-bottom: 10px;
+    border: 1px solid #ECECEF; border-radius: 10px;
+    font-size: 0.875rem; outline: none;
+  }
+  .add-card .row { display: flex; gap: 8px; }
+  .add-card .row input { flex: 1; }
+  .add-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .add-actions button { flex: 1; padding: 12px; border-radius: 12px; border: none; font-size: 0.938rem; font-weight: 600; cursor: pointer; }
+  .add-cancel { background: #F4F4F6; color: #666; }
+  .add-ok { background: #111; color: #fff; }
+
+  .toast {
+    position: fixed; bottom: 120px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111; color: #fff;
+    padding: 10px 18px; border-radius: 20px; font-size: 0.813rem;
+    opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <button class="back-btn" onclick="window.location.href='shop.html'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h1>店铺管理</h1>
+    <div style="width:36px"></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">在售商品</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">累计销售额</div>
+      <div class="stat-value" id="statSales">¥0</div>
+    </div>
+  </div>
+
+  <div class="section-title">商品列表 · 点价格直接改</div>
+  <div class="product-list" id="plist"></div>
+
+  <button class="add-btn" onclick="openAdd()">+ 添加新商品</button>
+
+  <div class="add-backdrop" id="addSheet">
+    <div class="add-card">
+      <h3>新商品</h3>
+      <input id="fName" type="text" placeholder="英文名（SONY...）">
+      <input id="fCn" type="text" placeholder="中文名">
+      <input id="fPrice" type="number" placeholder="价格 ¥">
+      <select id="fCat">
+        <option value="SONY">SONY</option>
+        <option value="APPLE">APPLE</option>
+        <option value="BOSE">BOSE</option>
+        <option value="HIRES">HIRES</option>
+      </select>
+      <div class="add-actions">
+        <button class="add-cancel" onclick="closeAdd()">取消</button>
+        <button class="add-ok" onclick="addProduct()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const DEFAULTS = [
+    { id: 1, name: 'SONY WH-1000XM5', cn: '索尼头戴降噪耳机', price: 2099, cat: 'SONY', icon: 'headphone', desc: '旗舰降噪头戴式耳机，30小时续航。' },
+    { id: 2, name: 'BOSE NC 100', cn: 'Bose 深度降噪耳塞', price: 1599, cat: 'BOSE', icon: 'earbud', desc: '深度降噪，通透模式。' },
+    { id: 3, name: 'ZINO SMR 56', cn: '便携蓝牙音箱', price: 459, cat: 'SONY', icon: 'speaker', desc: '360°环绕声。' },
+    { id: 4, name: 'NURIA 1000 RM', cn: '极简智能手表', price: 799, cat: 'APPLE', icon: 'watch', desc: '健康追踪。' },
+    { id: 5, name: 'AERO BAG', cn: '黑白帆布托特包', price: 299, cat: 'APPLE', icon: 'bag', desc: '大容量。' },
+    { id: 6, name: 'MECH KEY 87', cn: '客制化机械键盘', price: 699, cat: 'BOSE', icon: 'keyboard', desc: '热插拔轴体。' },
+    { id: 7, name: 'DESK LAMP', cn: '无极调光护眼台灯', price: 359, cat: 'HIRES', icon: 'lamp', desc: '护眼台灯。' },
+    { id: 8, name: 'GEL PEN 6PK', cn: '磨砂黑中性笔套装', price: 49, cat: 'HIRES', icon: 'pen', desc: '6支装。' },
+  ];
+
+  function load() {
+    let arr;
+    try { arr = JSON.parse(localStorage.getItem('shop_products') || 'null'); }
+    catch(e) { arr = null; }
+    if (!arr || !arr.length) {
+      arr = JSON.parse(JSON.stringify(DEFAULTS));
+      localStorage.setItem('shop_products', JSON.stringify(arr));
+    }
+    return arr;
+  }
+  function save(arr) { localStorage.setItem('shop_products', JSON.stringify(arr)); }
+
+  let list = load();
+
+  function iconSVG(type) {
+    const icons = {
+      headphone: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+      earbud: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M7 11v4a3 3 0 0 0 6 0v-1M17 11v4a3 3 0 0 1-6 0"/></svg>',
+      speaker: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="4"/></svg>',
+      watch: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><circle cx="12" cy="12" r="6"/><path d="M12 10v2l1 1"/></svg>',
+      bag: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M6 7h12l1 14H5L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>',
+      keyboard: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01"/></svg>',
+      lamp: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M9 18h6M12 3a6 6 0 0 0-4 10h8a6 6 0 0 0-4-10z"/></svg>',
+      pen: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M12 19l7-7 3 3-7 7-3-3z"/></svg>',
+    };
+    return icons[type] || icons.headphone;
+  }
+
+  function render() {
+    document.getElementById('plist').innerHTML = list.map((p,i) => `
+      <div class="product-row">
+        <div class="p-icon">${iconSVG(p.icon)}</div>
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-cn">${p.cn}</div>
+        </div>
+        <input class="p-price-input" type="number" value="${p.price}" onchange="setPrice(${i}, this.value)">
+        <button class="p-del" onclick="delProduct(${i})">×</button>
+      </div>
+    `).join('');
+    document.getElementById('statCount').textContent = list.length;
+    // 销售额 = 记账里"商店·"开头的支出累加
+    try {
+      const records = JSON.parse(localStorage.getItem('finance_records') || '[]');
+      let sales = 0;
+      records.forEach(r => { if (r.type==='expense' && r.note && r.note.indexOf('商店')===0) sales += r.amount; });
+      document.getElementById('statSales').textContent = '¥' + sales;
+    } catch(e) {}
+  }
+
+  function setPrice(i, v) {
+    list[i].price = parseFloat(v) || list[i].price;
+    save(list);
+    showToast('已保存');
+  }
+  function delProduct(i) {
+    if (!confirm('删除 ' + list[i].cn + ' ？')) return;
+    list.splice(i, 1);
+    save(list); render();
+    showToast('已删除');
+  }
+
+  function openAdd() { document.getElementById('addSheet').classList.add('show'); }
+  function closeAdd() { document.getElementById('addSheet').classList.remove('show'); }
+  function addProduct() {
+    const name = document.getElementById('fName').value.trim();
+    const cn = document.getElementById('fCn').value.trim() || '新商品';
+    const price = parseFloat(document.getElementById('fPrice').value) || 99;
+    const cat = document.getElementById('fCat').value;
+    if (!name) { showToast('填个英文名'); return; }
+    list.push({ id: Date.now(), name, cn, price, cat, icon: 'headphone', desc: '店主新品。' });
+    save(list);
+    closeAdd(); render();
+    document.getElementById('fName').value = '';
+    document.getElementById('fCn').value = '';
+    document.getElementById('fPrice').value = '';
+    showToast('已添加');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1200);
+  }
+
+  render();
+</script>
+</body>
+</html>

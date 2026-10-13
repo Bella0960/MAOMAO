@@ -108,4 +108,18 @@
             try { navigator.vibrate(15); } catch (err) { /* 不支持时忽略 */ }
         }
     }, true);
+
+    /* ---------- 五、Service Worker 更新后自动刷新一次 ----------
+       本地开发改了代码，浏览器可能仍被旧 SW 缓存命中。
+       新 SW 接管页面时 controllerchange 触发，自动刷新一次拿到最新版。
+       sessionStorage 标记防循环刷新。 */
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            try {
+                if (sessionStorage.getItem('sw_reloaded')) return;
+                sessionStorage.setItem('sw_reloaded', '1');
+                location.reload();
+            } catch (err) { /* 隐私模式等异常场景直接忽略 */ }
+        });
+    }
 })();

@@ -819,7 +819,7 @@
     </div>
 
     <!-- 隐藏文件选择框 -->
-    <input type="file" id="importInput" accept=".json,.txt" style="display:none;">
+    <input type="file" id="importInput" accept=".json,.txt,.csv,.md,.jsonl,.yaml,.yml" style="display:none;">
 
     <!-- Toast -->
     <div class="wb-toast" id="wbToast"></div>
@@ -1235,28 +1235,67 @@
     var file = e.target.files && e.target.files[0];
     if (!file) return;
     var fileName = file.name || '导入的世界书';
+    // 拒绝 Word 文档
+    if (/\.docx?$|\.doc$/i.test(fileName)) {
+      showToast('暂不支持 Word 文档，请先复制内容粘贴，或转为 TXT 文件');
+      importInput.value = '';
+      return;
+    }
     var reader = new FileReader();
     reader.onload = function (ev) {
-      var text = String(ev.target.result || '');
+      var buf = ev.target.result;
+      var text = '';
+      var ext = (fileName.split('.').pop() || '').toLowerCase();
+      // 先 UTF-8
+      try { text = new TextDecoder('utf-8', {fatal:false}).decode(buf); } catch (e) { text = ''; }
+      // 只要有乱码迹象（替换字符/连续高位字符）就试 GBK，不管扩展名
+      var looksGarbled = /\uFFFD/.test(text) || /[锟斤拷烫]/g.test(text) || /[\u00C0-\u00FF]{6,}/.test(text);
+      if (looksGarbled) {
+        try { text = new TextDecoder('gbk').decode(buf); } catch (e) {}
+      }
       var added = [];
-      var isJson = /\.json$/i.test(fileName);
       try {
-        if (isJson) {
+        if (ext === 'json' || text.trim().startsWith('{') || text.trim().startsWith('[')) {
           var parsed = JSON.parse(text);
           var arr = null;
           if (Array.isArray(parsed)) arr = parsed;
           else if (parsed && Array.isArray(parsed.books)) arr = parsed.books;
           else if (parsed && Array.isArray(parsed.worldbooks)) arr = parsed.worldbooks;
+          else if (parsed && Array.isArray(parsed.entries)) arr = parsed.entries;
+          else if (parsed && parsed.entries && typeof parsed.entries === 'object') {
+            // SillyTavern / 酒馆世界书：entries 是 {key: entryObj}
+            arr = Object.keys(parsed.entries).map(function (k) { return parsed.entries[k]; });
+          }
           else if (parsed && typeof parsed === 'object') arr = [parsed];
           if (!arr) throw new Error('JSON 结构无法识别');
-          arr.forEach(function (item) { added.push(normalizeBook(item, state.tab)); });
+          arr.forEach(function (item) {
+            if (!item) return;
+            // 兼容酒馆字段：content/comment/key/name/description
+            var title = item.title || item.name || item.comment || (item.key && (Array.isArray(item.key) ? item.key.join(' ') : item.key)) || '导入条目';
+            var content = item.content || item.text || item.description || item.body || '';
+            added.push(normalizeBook({ title: String(title), content: String(content), scope: 'global' }, state.tab));
+          });
+        } else if (ext === 'csv' || ext === 'jsonl') {
+          // CSV/JSONL：按行拆，每行一本
+          text.split(/\r?\n/).forEach(function (line, i) {
+            line = line.trim();
+            if (!line) return;
+            if (ext === 'jsonl') {
+              try {
+                var o = JSON.parse(line);
+                added.push(normalizeBook({ title: o.title || o.name || '行 ' + (i+1), content: o.content || o.text || JSON.stringify(o), scope: 'global' }, state.tab));
+              } catch(e) {}
+            } else {
+              added.push(normalizeBook({ title: '行 ' + (i+1), content: line, scope: 'global' }, state.tab));
+            }
+          });
         } else {
-          // txt：纯文本生成一本新世界书，标题取文件名
+          // txt/md/其他：纯文本生成一本新世界书，标题取文件名
           var title = fileName.replace(/\.[^.]+$/, '').trim() || '导入的文本';
           added.push(normalizeBook({ title: title, content: text, scope: 'global' }, state.tab));
         }
       } catch (err) {
-        showToast('导入失败：JSON 解析错误');
+        showToast('导入失败：文件格式无法识别');
         return;
       }
 
@@ -1272,7 +1311,7 @@
       showToast('导入成功，新增 ' + added.length + ' 本');
     };
     reader.onerror = function () { showToast('文件读取失败'); };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   });
 
   /* ---- 导出 ---- */

@@ -391,7 +391,7 @@
     reader.onload = function (e) {
       var img = new Image();
       img.onload = function () {
-        var MAX_W = 640, MAX_H = 1136;
+        var MAX_W = 800, MAX_H = 1422;
         var w = img.width, h = img.height;
         if (w > h) {
           if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
@@ -401,7 +401,7 @@
         var c = document.createElement('canvas');
         c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
-        cb(c.toDataURL('image/jpeg', 0.82));
+        cb(c.toDataURL('image/jpeg', 0.8));
       };
       img.src = e.target.result;
     };

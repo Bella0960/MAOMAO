@@ -6,19 +6,22 @@
  *   底部控件避让 Home 指示条
  * 电脑 / 平板预览不受影响，仍显示手机模拟器外壳。
  * ============================================================ */
-@media (max-width: 520px) and (pointer: coarse) {
+@media (max-width: 480px) {
 
-  body {
+  html, body {
     background: #FFFFFF !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
     min-height: 100% !important;
+    overscroll-behavior: none;
   }
 
   /* 去掉模拟器外壳，全屏 */
   .phone-mockup,
   .home-screen,
-  .phone {
+  .phone,
+  .app-frame {
     width: 100vw !important;
     width: 100dvw !important;
     height: 100vh !important;
@@ -28,6 +31,8 @@
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   /* 首页舞台去留白 */

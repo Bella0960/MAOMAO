@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>音乐 · Music</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #e8e8ec;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+
+  /* ===== 手机机身 390×844 ===== */
+  .phone {
+    width: 390px; height: 844px;
+    background: #fff;
+    border-radius: 48px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+    border: 3px solid #1a1a1a;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  /* 顶部摄像头开孔 */
+  .phone-camera {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 22px; border-radius: 14px;
+    background: #1a1a1a; z-index: 200;
+  }
+
+  /* 状态栏 */
+  .statusbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 28px 6px;
+    font-size: 15px; font-weight: 600; color: #000;
+    flex-shrink: 0;
+  }
+  .statusbar .right { display: flex; gap: 6px; align-items: center; }
+
+  /* ===== 音乐 App 主体 ===== */
+  .app {
+    flex: 1;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    background: #F8F8FA;
+    position: relative;
+  }
+
+  /* 页面切换 */
+  .page { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  .page.active { display: flex; }
+
+  /* 内容滚动区 */
+  .content { flex: 1; overflow-y: auto; padding: 10px 22px 140px; }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* 导航栏 */
+  .navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 22px 12px;
+    flex-shrink: 0;
+  }
+  .navbar .title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: none;
+  }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg,#333,#000);
+    color: #fff; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ===== Home ===== */
+  .greet { font-size: 14px; color: #999; margin-bottom: 2px; }
+  .greet-name { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 20px; }
+
+  .hero-card {
+    background: #0d0d0d; color: #fff;
+    border-radius: 26px; padding: 24px;
+    margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .hero-card .hero-left { flex: 1; min-width: 0; }
+  .hero-card .tag { font-size: 11px; letter-spacing: 1.5px; color: #888; }
+  .hero-card h2 { font-size: 24px; font-weight: 700; margin: 10px 0 4px; line-height: 1.2; }
+  .hero-card .sub { font-size: 13px; color: #aaa; margin-bottom: 18px; }
+  .hero-cover {
+    width: 110px; height: 110px; border-radius: 18px;
+    flex-shrink: 0; overflow: hidden;
+  }
+  .hero-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff; color: #000;
+    padding: 10px 20px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+  }
+
+  .section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 22px 0 14px;
+  }
+  .section-head h3 { font-size: 18px; font-weight: 700; }
+  .section-head .see-all { font-size: 12px; color: #999; cursor: pointer; }
+
+  .album-row { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; margin: 0 -22px; padding-left: 22px; padding-right: 22px; }
+  .album-row::-webkit-scrollbar { display: none; }
+  .album-item { flex-shrink: 0; width: 130px; cursor: pointer; }
+  .album-cover {
+    width: 130px; height: 130px; border-radius: 20px;
+    background: #e5e5ea; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+  .album-item .name { font-size: 14px; font-weight: 600; }
+  .album-item .artist { font-size: 12px; color: #999; margin-top: 2px; }
+
+  .track-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px; border-radius: 16px; cursor: pointer; margin-bottom: 4px;
+  }
+  .track-item:active { background: #fff; }
+  .t-cover {
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    background: #e5e5ea; display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .t-info { flex: 1; min-width: 0; }
+  .t-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .t-artist { font-size: 12px; color: #999; margin-top: 2px; }
+  .t-dur { font-size: 12px; color: #999; }
+
+  /* ===== Search ===== */
+  .search-box {
+    background: #fff; border-radius: 999px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    margin: 8px 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .search-box input { border: none; outline: none; flex: 1; font-size: 14px; background: transparent; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { background: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; color: #555; cursor: pointer; }
+  .chip.active { background: #000; color: #fff; }
+
+  /* ===== Library 专辑详情 ===== */
+  .album-head { text-align: center; padding: 10px 0 20px; }
+  .big-cover {
+    width: 220px; height: 220px; border-radius: 28px;
+    margin: 0 auto 20px; background: #111;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+  .a-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .a-meta { font-size: 14px; color: #999; margin-top: 6px; }
+  .play-btns { display: flex; gap: 12px; margin: 20px 0; }
+  .btn-dark {
+    flex: 1; background: #000; color: #fff; border: none;
+    padding: 15px; border-radius: 18px; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-light {
+    flex: 1; background: #fff; color: #000; border: none;
+    padding: 15px; border-radius: 18px; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .song-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 13px 8px; cursor: pointer; border-radius: 12px;
+  }
+  .song-row .num { font-size: 14px; color: #999; width: 20px; font-weight: 600; }
+  .song-row .s-name { font-size: 15px; font-weight: 600; }
+  .song-row .s-artist { font-size: 12px; color: #999; margin-top: 2px; }
+  .song-row .s-dur { margin-left: auto; font-size: 12px; color: #999; }
+  .song-row.playing { background: #fff; }
+
+  /* ===== Hotlist ===== */
+  .rank-item { display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+  .r-num { font-size: 22px; font-weight: 800; width: 32px; }
+
+  /* ===== 迷你播放条 ===== */
+  .mini-player {
+    position: absolute; left: 12px; right: 12px; bottom: 82px;
+    background: #0d0d0d; color: #fff;
+    border-radius: 24px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; z-index: 50;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .m-cover {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: #333; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .m-info { flex: 1; min-width: 0; }
+  .m-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m-artist { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .m-ctrl { cursor: pointer; display: flex; }
+  .mini-progress { position: absolute; left: 14px; right: 14px; bottom: 4px; height: 2px; background: #333; border-radius: 2px; overflow: hidden; }
+  .mini-progress i { display: block; height: 100%; width: 38%; background: #fff; }
+
+  /* ===== 底部 Tab ===== */
+  .tabbar {
+    background: #fff; border-top: 1px solid #f0f0f0;
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 12px 0 24px; flex-shrink: 0; z-index: 40;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; color: #b0b0b0; font-size: 11px; font-weight: 500;
+  }
+  .tab.active { color: #000; }
+
+  /* ===== Now Playing 全屏 ===== */
+  .np-overlay {
+    position: absolute; inset: 0; background: #F8F8FA; z-index: 100;
+    display: none; flex-direction: column;
+    animation: slideUp 0.3s ease;
+  }
+  .np-overlay.show { display: flex; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .np-cover-wrap { display: flex; justify-content: center; padding: 8px 30px 0; }
+  .np-cover {
+    width: 220px; height: 220px; border-radius: 24px; overflow: hidden;
+    background: #111; box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+  }
+  .np-song-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 26px 30px 0;
+  }
+  .np-title { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .np-artist { font-size: 16px; color: #999; margin-top: 4px; }
+  .np-wave { padding: 22px 30px 0; }
+  .np-bars { display: flex; align-items: center; height: 36px; gap: 2px; }
+  .np-bars span { flex: 1; background: #e2e2e2; border-radius: 2px; }
+  .np-bars span.done { background: #000; }
+  .np-time { display: flex; justify-content: space-between; font-size: 13px; color: #999; margin-top: 8px; }
+  .np-controls {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 40px 0;
+  }
+  .np-play {
+    width: 72px; height: 72px; background: #000; border-radius: 50%;
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  }
+  .np-side { color: #000; cursor: pointer; background: none; border: none; display: flex; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- 摄像头开孔 -->
+  <div class="phone-camera"></div>
+
+  <!-- 状态栏 -->
+  <div class="statusbar">
+    <span>8:00</span>
+    <div class="right">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="#000"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#000"><path d="M8.5 12 5 8.2a5 5 0 0 1 7 0L8.5 12zM3 5.5a8 8 0 0 1 11 0l-1.5 1.6a6 6 0 0 0-8 0L3 5.5zM.5 3a11.5 11.5 0 0 1 16 0l-1.5 1.6a9.5 9.5 0 0 0-13 0L.5 3z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" fill="none" stroke="#000" opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#000"/><path d="M23.5 4v4a2 2 0 0 0 0-4z" fill="#000" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <!-- ===== Home ===== -->
+    <div class="page active" id="page-home">
+      <div class="navbar">
+        <button class="icon-btn" onclick="window.location.href='index.html'" style="margin-left:-8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="flex:1;">
+          <div class="greet">晚上好</div>
+          <div class="greet-name">Discover</div>
+        </div>
+        <div class="avatar">M</div>
+      </div>
+      <div class="content">
+        <div class="hero-card">
+          <div class="hero-left">
+            <div class="tag">FEATURED ALBUM</div>
+            <h2>Charcoal<br>Brambles</h2>
+            <div class="sub">8 songs · 2012</div>
+            <button class="hero-btn" onclick="openAlbum()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Play Now
+            </button>
+          </div>
+          <div class="hero-cover">
+            <svg viewBox="0 0 110 110" width="100%" height="100%">
+              <rect width="110" height="110" fill="#1a1a1a"/>
+              <circle cx="55" cy="55" r="33" fill="none" stroke="#555" stroke-width="1.5"/>
+              <circle cx="55" cy="55" r="22" fill="none" stroke="#666" stroke-width="1.5"/>
+              <circle cx="55" cy="55" r="11" fill="none" stroke="#777" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="section-head"><h3>Made for you</h3><span class="see-all">See all</span></div>
+        <div class="album-row">
+          <div class="album-item" onclick="openAlbum()"><div class="album-cover"><svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" fill="#111"/><circle cx="50" cy="50" r="30" fill="none" stroke="#ddd" stroke-width="1.5"/><circle cx="50" cy="50" r="18" fill="none" stroke="#bbb" stroke-width="1.5"/><circle cx="50" cy="50" r="6" fill="none" stroke="#999" stroke-width="1.5"/></svg></div><div class="name">Charcoal</div><div class="artist">Brambles</div></div>
+          <div class="album-item"><div class="album-cover"><svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" fill="#1c1c1c"/><rect x="22" y="30" width="4" height="40" fill="#ddd"/><rect x="34" y="22" width="4" height="56" fill="#ccc"/><rect x="46" y="34" width="4" height="32" fill="#bbb"/><rect x="58" y="18" width="4" height="64" fill="#ddd"/><rect x="70" y="28" width="4" height="44" fill="#ccc"/></svg></div><div class="name">Nightfall</div><div class="artist">Loon Bird</div></div>
+          <div class="album-item"><div class="album-cover"><svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" fill="#161616"/><line x1="24" y1="40" x2="76" y2="40" stroke="#ddd" stroke-width="2"/><line x1="20" y1="52" x2="80" y2="52" stroke="#ccc" stroke-width="1.5"/><line x1="26" y1="64" x2="74" y2="64" stroke="#bbb" stroke-width="1.5"/></svg></div><div class="name">Grey Skies</div><div class="artist">Solitude</div></div>
+          <div class="album-item"><div class="album-cover"><svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" fill="#0e0e10"/><circle cx="32" cy="36" r="10" fill="none" stroke="#ddd" stroke-width="1.5"/><circle cx="62" cy="44" r="8" fill="none" stroke="#ccc" stroke-width="1.5"/><circle cx="45" cy="66" r="12" fill="none" stroke="#bbb" stroke-width="1.5"/><circle cx="74" cy="68" r="6" fill="none" stroke="#ddd" stroke-width="1.5"/></svg></div><div class="name">Deep Blue</div><div class="artist">Oceanic</div></div>
+        </div>
+
+        <div class="section-head"><h3>Recently played</h3><span class="see-all">See all</span></div>
+        <div id="recent-list"></div>
+      </div>
+    </div>
+
+    <!-- ===== Search ===== -->
+    <div class="page" id="page-search">
+      <div class="navbar"><div class="title">Search</div></div>
+      <div class="content">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input placeholder="Songs, artists, albums" id="searchInput" oninput="doSearch(this.value)">
+        </div>
+        <div class="section-head"><h3>Trending</h3></div>
+        <div class="chip-row" id="chipRow">
+          <div class="chip active" onclick="setChip(this)">All</div>
+          <div class="chip" onclick="setChip(this)">Lo-fi</div>
+          <div class="chip" onclick="setChip(this)">Ambient</div>
+          <div class="chip" onclick="setChip(this)">Piano</div>
+          <div class="chip" onclick="setChip(this)">Cinematic</div>
+          <div class="chip" onclick="setChip(this)">Focus</div>
+        </div>
+        <div id="search-results"></div>
+      </div>
+    </div>
+
+    <!-- ===== Library 专辑详情 ===== -->
+    <div class="page" id="page-library">
+      <div class="navbar">
+        <button class="icon-btn" onclick="switchTab('home')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="font-size:13px;color:#999;text-align:center">Album · 8 songs · 2012</div>
+        <button class="icon-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="content">
+        <div class="album-head">
+          <div class="big-cover">
+            <svg viewBox="0 0 220 220" width="100%" height="100%">
+              <rect width="220" height="220" fill="#111"/>
+              <circle cx="110" cy="110" r="66" fill="none" stroke="#ddd" stroke-width="2"/>
+              <circle cx="110" cy="110" r="44" fill="none" stroke="#ccc" stroke-width="2"/>
+              <circle cx="110" cy="110" r="20" fill="none" stroke="#bbb" stroke-width="2"/>
+              <path d="M110 110 L66 66 M110 110 L165 77 M110 110 L176 143 M110 110 L77 176" stroke="#111" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div class="a-title">Charcoal</div>
+          <div class="a-meta">Brambles</div>
+          <div class="play-btns">
+            <button class="btn-dark" onclick="playTrack(1)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Play
+            </button>
+            <button class="btn-light">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6"/></svg>
+              Shuffle
+            </button>
+          </div>
+        </div>
+        <div id="album-songs"></div>
+      </div>
+    </div>
+
+    <!-- ===== Hotlist ===== -->
+    <div class="page" id="page-hotlist">
+      <div class="navbar"><div class="title">Top Tracks</div></div>
+      <div class="content" id="hotlist"></div>
+    </div>
+
+    <!-- ===== 迷你播放条 ===== -->
+    <div class="mini-player" onclick="showNP()">
+      <div class="m-cover"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="m-info">
+        <div class="m-name" id="miniName">Unsayable</div>
+        <div class="m-artist" id="miniArtist">Brambles</div>
+      </div>
+      <div class="m-ctrl" onclick="event.stopPropagation();togglePlay()">
+        <svg id="miniPlayIcon" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="mini-progress"><i></i></div>
+    </div>
+
+    <!-- ===== 底部 Tab ===== -->
+    <div class="tabbar">
+      <div class="tab active" data-tab="home" onclick="switchTab('home')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+        Home
+      </div>
+      <div class="tab" data-tab="search" onclick="switchTab('search')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </div>
+      <div class="tab" data-tab="library" onclick="switchTab('library')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Library
+      </div>
+      <div class="tab" data-tab="hotlist" onclick="switchTab('hotlist')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21C5 15 2 10 2 6a6 6 0 0 1 10-4 6 6 0 0 1 10 4c0 4-3 9-10 15z"/></svg>
+        Hotlist
+      </div>
+    </div>
+
+    <!-- ===== Now Playing 全屏 ===== -->
+    <div class="np-overlay" id="npOverlay">
+      <div class="navbar">
+        <button class="icon-btn" onclick="hideNP()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div style="font-size:13px;color:#999">Now Playing</div>
+        <button class="icon-btn" onclick="showImportSheet()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="np-cover-wrap" style="position:relative;height:280px;padding:8px 30px 0;">
+        <div class="np-cover" id="npCover" style="cursor:pointer" title="点击更换封面" onclick="document.getElementById('coverUpload').click()">
+          <svg viewBox="0 0 300 300" width="100%" height="100%">
+            <rect width="300" height="300" fill="#0d0d10"/>
+            <circle cx="150" cy="155" r="22" fill="none" stroke="#e8e8e6" stroke-width="3"/>
+            <circle cx="150" cy="155" r="45" fill="none" stroke="#e8e8e6" stroke-width="3.5"/>
+            <circle cx="150" cy="155" r="70" fill="none" stroke="#e8e8e6" stroke-width="4"/>
+            <circle cx="150" cy="155" r="95" fill="none" stroke="#e8e8e6" stroke-width="4.5"/>
+            <circle cx="150" cy="155" r="118" fill="none" stroke="#e8e8e6" stroke-width="5"/>
+            <path d="M150 155 L110 90 M150 155 L200 100 M150 155 L240 170 M150 155 L120 230 M150 155 L180 240 M150 155 L70 180" stroke="#0d0d10" stroke-width="3"/>
+          </svg>
+        </div>
+        <!-- 歌词层：和封面重叠，默认隐藏，点"词"按钮切换 -->
+        <div id="lyricView" style="position:absolute;top:8px;left:30px;right:30px;height:264px;background:#fff;border-radius:16px;overflow-y:auto;padding:20px;display:none;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;">
+          <style>
+            #lyricView::-webkit-scrollbar { width: 0; height: 0; display: none; }
+          </style>
+          <div id="lyrics" style="text-align:center;font-size:14px;color:#999;line-height:1.8;"></div>
+        </div>
+      </div>
+      <div class="np-song-row">
+        <div>
+          <div class="np-title" id="npTitle">Unsayable</div>
+          <div class="np-artist" id="npArtist">Brambles</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <!-- 歌词切换按钮 -->
+          <div onclick="toggleLyrics()" style="width:44px;height:44px;border-radius:50%;background:#F8F8FA;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:600;color:#666;" title="切换歌词">词</div>
+          <div onclick="toggleHeart()" style="width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer" id="btnHeart">
+            <svg id="heartIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </div>
+        </div>
+      </div>
+      <!-- 简洁进度条 -->
+      <div style="padding:0 30px;margin:20px 0 10px;">
+        <div style="height:3px;background:#E5E5EA;border-radius:2px;position:relative;cursor:pointer;" id="progressBar">
+          <div id="progressFill" style="height:100%;width:0%;background:#000;border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:8px;">
+          <span id="curTime">1:04</span>
+          <span id="totalTime">2:52</span>
+        </div>
+      </div>
+      <div class="np-controls">
+        <button class="np-side" id="btnShuffle" onclick="toggleShuffle()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6"/></svg>
+        </button>
+        <button class="np-side" onclick="prevTrack()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M19 20 9 12l10-8v16zM5 4h2v16H5z"/></svg>
+        </button>
+        <button class="np-play" id="npPlayBtn" onclick="togglePlay()">
+          <svg id="npPlayIcon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="npPauseIcon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+        </button>
+        <button class="np-side" onclick="nextTrack()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4v16l10-8-10-8zM17 4h2v16h-2z"/></svg>
+        </button>
+        <button class="np-side" id="btnLoop" onclick="toggleLoop()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+        </button>
+      </div>
+
+      <!-- 歌曲操作：居中弹窗卡片 -->
+      <div id="importSheet" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);opacity:0;pointer-events:none;width:86%;max-width:320px;background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);transition:all .25s ease;z-index:110;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:16px;text-align:center;">歌曲操作</div>
+        <div onclick="document.getElementById('musicImport').click();closeImportSheet()" style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;cursor:pointer;background:#F8F8FA;margin-bottom:10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <div>
+            <div style="font-size:14px;font-weight:600;">导入本地音乐</div>
+            <div style="font-size:12px;color:#999;margin-top:2px;">选择 mp3 文件添加到歌单</div>
+          </div>
+        </div>
+        <div onclick="closeImportSheet()" style="display:flex;align-items:center;justify-content:center;padding:12px;border-radius:14px;cursor:pointer;color:#999;font-size:14px;">取消</div>
+      </div>
+      <!-- 遮罩 -->
+      <div id="sheetMask" onclick="closeImportSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity .25s;z-index:105;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 真实音频播放器 -->
+<audio id="audioPlayer" preload="metadata"></audio>
+<!-- 封面上传 -->
+<input type="file" id="coverUpload" accept="image/*" hidden>
+<!-- 导入本地音乐 -->
+<input type="file" id="musicImport" accept="audio/*" multiple hidden>
+
+<script>
+  // 音频播放器（最前面初始化，避免后面报错阻断）
+  window.audio = document.getElementById('audioPlayer');
+
+  // ===== 歌曲数据（带音频链接+歌词） =====
+  // url 是示例音频链接，可自行替换成你的真实歌曲 mp3
+  const tracks = [
+    { name: "To Speak Of Solitude", artist: "Brambles", dur: "4:21", durSec: 261,
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      lyrics: ["Speak to me in whispers", "Let the silence fall", "In the quiet of the morning", "I can hear it all", "", "Solitude, my old friend", "You stay with me until the end"] },
+    { name: "Unsayable", artist: "Brambles", dur: "2:52", durSec: 172,
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      lyrics: ["There are words I cannot say", "Things I keep inside", "Every memory fades away", "In the dark I hide", "", "Unsayable, unspoken", "Broken words unbroken"] },
+    { name: "In The Androgynous Dark", artist: "Brambles", dur: "4:43", durSec: 283,
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      lyrics: ["Step into the shadow", "Where the lines all blur", "Neither here nor there now", "Neither them nor her", "", "In the androgynous dark", "We forget who we are"] },
+    { name: "Salt Photographs", artist: "Brambles", dur: "6:54", durSec: 414,
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+      lyrics: ["Salt on the windows", "Fading photographs", "Memories in slow motion", "All coming back", "", "Salt photographs of you", "Every shade of blue"] },
+    { name: "Pink And Golden Billows", artist: "Brambles", dur: "2:58", durSec: 178,
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+      lyrics: ["Pink and golden billows", "Roll across the sky", "Watch them as they're falling", "Watch them drift by", "", "Pink and golden light", "Holding you tonight"] },
+  ];
+  const hotlist = [
+    { name: "Loon Bird Song", artist: "Loon Bird", plays: "2.3M" },
+    { name: "Deep Sleep", artist: "Ambient Lab", plays: "1.8M" },
+    { name: "Midnight Rain", artist: "Solitude", plays: "1.5M" },
+    { name: "Charcoal", artist: "Brambles", plays: "1.2M" },
+    { name: "Warm Light", artist: "Piano Co.", plays: "980K" },
+  ];
+
+  let currentIdx = 1, playing = false;
+  window.isShuffle = false;
+  window.isHeart = false;
+  window.lastLyricLine = -1;
+  let progress = 64; // 当前播放秒数
+  let playTimer = null;
+
+  // ===== 渲染最近播放 =====
+  const recentList = document.getElementById('recent-list');
+  tracks.forEach((t, i) => {
+    recentList.innerHTML += `<div class="track-item" onclick="playTrack(${i})">
+      <div class="t-cover"><svg viewBox="0 0 24 24" width="16" height="16" fill="#000"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="t-info"><div class="t-name">${t.name}</div><div class="t-artist">${t.artist}</div></div>
+      <div class="t-dur">${t.dur}</div></div>`;
+  });
+
+  // ===== 渲染专辑歌单 =====
+  const albumSongs = document.getElementById('album-songs');
+  function renderAlbum() {
+    albumSongs.innerHTML = '';
+    tracks.forEach((t, i) => {
+      const isCur = i === currentIdx;
+      const icon = isCur
+        ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="#000"><path d="M8 5v14l11-7z"/></svg>`
+        : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><path d="M5 8h14M5 12h14M5 16h14"/></svg>`;
+      albumSongs.innerHTML += `<div class="song-row ${isCur ? 'playing' : ''}" onclick="playTrack(${i})">
+        <div class="num">${String(i+1).padStart(2,'0')}</div>
+        <div><div class="s-name">${t.name}</div><div class="s-artist">${t.artist} · ${t.dur}</div></div>
+        <div class="s-dur">${icon}</div></div>`;
+    });
+  }
+  renderAlbum();
+
+  // ===== 渲染搜索结果 =====
+  const searchResults = document.getElementById('search-results');
+  function renderSearch(list) {
+    searchResults.innerHTML = '';
+    list.forEach((item) => {
+      const t = tracks.find(x => x.name === item.name);
+      const i = tracks.indexOf(t);
+      if (i < 0) return;
+      searchResults.innerHTML += `<div class="track-item" onclick="playTrack(${i})">
+        <div class="t-cover"><svg viewBox="0 0 24 24" width="16" height="16" fill="#000"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="t-info"><div class="t-name">${t.name}</div><div class="t-artist">${t.artist}</div></div></div>`;
+    });
+  }
+  renderSearch(tracks);
+
+  // ===== 渲染热门榜 =====
+  const hotlistEl = document.getElementById('hotlist');
+  hotlist.forEach((t, i) => {
+    hotlistEl.innerHTML += `<div class="rank-item">
+      <div class="r-num">${i+1}</div>
+      <div class="t-cover"><svg viewBox="0 0 24 24" width="16" height="16" fill="#000"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="t-info"><div class="t-name">${t.name}</div><div class="t-artist" style="font-size:12px;color:#999;margin-top:2px">${t.artist} · ${t.plays}</div></div></div>`;
+  });
+
+  // ===== 波形 =====
+  function renderBars(el, donePct) {
+    el.innerHTML = '';
+    for (let i = 0; i < 42; i++) {
+      const s = document.createElement('span');
+      s.style.height = (8 + Math.round(Math.abs(Math.sin(i*0.7) * 18) + Math.random()*6)) + 'px';
+      if (i / 42 < donePct) s.classList.add('done');
+      el.appendChild(s);
+    }
+  }
+  function updateWave() {
+    renderBars(document.getElementById('npBars'), progress / tracks[currentIdx].durSec);
+  }
+  updateWave();
+
+  // ===== Tab 切换 =====
+  function switchTab(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+  }
+
+  // ===== 真实音频播放 =====
+
+  function playTrack(i) {
+    currentIdx = i;
+    const t = tracks[i];
+    document.getElementById('miniName').textContent = t.name;
+    document.getElementById('miniArtist').textContent = t.artist;
+    document.getElementById('npTitle').textContent = t.name;
+    document.getElementById('npArtist').textContent = t.artist;
+    document.getElementById('lyrics').innerHTML = t.lyrics.map((l, idx) =>
+      l ? `<div class="lyric-line" data-idx="${idx}" style="padding:8px 0;transition:color .3s,font-weight .3s;">${l}</div>`
+        : `<div style="height:12px;"></div>`
+    ).join('');
+    window.lastLyricLine = -1;
+    window.audio.src = t.url;
+    window.audio.play().catch(() => {});
+    playing = true;
+    renderAlbum();
+    updatePlayIcon();
+    closeImportSheet();
+    showNP();
+  }
+
+  function prevTrack() {
+    let i = currentIdx - 1;
+    if (i < 0) i = tracks.length - 1;
+    playTrack(i);
+  }
+  function nextTrack() {
+    let i = currentIdx + 1;
+    if (i >= tracks.length) i = 0;
+    playTrack(i);
+  }
+
+  function togglePlay() {
+    if (playing) { window.audio.pause(); playing = false; }
+    else { window.audio.play().catch(() => {}); playing = true; }
+    updatePlayIcon();
+    const btn = document.getElementById('npPlayBtn');
+    btn.style.transform = 'scale(0.92)';
+    setTimeout(() => btn.style.transform = '', 150);
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  // 音频事件：进度更新
+  window.audio.addEventListener('timeupdate', () => {
+    if (!window.audio.duration) return;
+    const pct = window.audio.currentTime / window.audio.duration;
+    const m = Math.floor(window.audio.currentTime/60), s = Math.floor(window.audio.currentTime%60);
+    const tm = Math.floor(window.audio.duration/60), ts = Math.floor(window.audio.duration%60);
+    document.getElementById('curTime').textContent = `${m}:${String(s).padStart(2,'0')}`;
+    document.getElementById('totalTime').textContent = `${tm}:${String(ts).padStart(2,'0')}`;
+    document.getElementById('progressFill').style.width = (pct*100) + '%';
+    document.querySelector('.mini-progress i').style.width = (pct*100) + '%';
+    // 歌词高亮（只在切换行时更新样式+滚动）
+    const lines = document.querySelectorAll('.lyric-line');
+    if (lines.length > 0) {
+      const li = Math.min(lines.length - 1, Math.floor(pct * (lines.length + 1)));
+      if (li !== window.lastLyricLine) {
+        lines.forEach((l, i) => {
+          const active = i === li;
+          l.style.color = active ? '#000' : '#999';
+          l.style.fontWeight = active ? '700' : '400';
+        });
+        lines[li].scrollIntoView({ block: 'center', behavior: 'smooth' });
+        window.lastLyricLine = li;
+      }
+    }
+  });
+
+  // 点击"词"按钮切换歌词显示
+  window.showLyrics = false;
+  function toggleLyrics() {
+    window.showLyrics = !window.showLyrics;
+    document.getElementById('npCover').style.display = window.showLyrics ? 'none' : 'block';
+    document.getElementById('lyricView').style.display = window.showLyrics ? 'block' : 'none';
+  }
+
+  // 进度条点击跳转
+  document.getElementById('progressBar').addEventListener('click', function(e) {
+    const rect = this.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    if (window.audio.duration) window.audio.currentTime = pct * window.audio.duration;
+  });
+
+  // 播完自动切下一首
+  window.audio.addEventListener('ended', () => {
+    if (isLoop) { window.audio.currentTime = 0; window.audio.play(); }
+    else nextTrack();
+  });
+
+  function updatePlayIcon() {
+    document.getElementById('miniPlayIcon').innerHTML = playing ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+    document.getElementById('npPlayIcon').style.display = playing ? 'none' : 'block';
+    document.getElementById('npPauseIcon').style.display = playing ? 'block' : 'none';
+  }
+
+  // ===== Shuffle / Loop / Heart =====
+  window.loopState = 0; // 0=关闭 1=列表循环 2=单曲循环
+  function toggleShuffle() {
+    isShuffle = !isShuffle;
+    const el = document.getElementById('btnShuffle');
+    el.style.color = isShuffle ? '#000' : '#999';
+    el.style.opacity = isShuffle ? '1' : '0.4';
+    el.style.transform = 'scale(1.15)';
+    setTimeout(() => el.style.transform = '', 150);
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+  function toggleLoop() {
+    window.loopState = (window.loopState + 1) % 3;
+    const el = document.getElementById('btnLoop');
+    // 三态：0=灰(关) 1=黑(列表循环) 2=黑+小1(单曲循环)
+    if (window.loopState === 0) {
+      el.style.color = '#999';
+      el.style.opacity = '0.4';
+      el.title = '循环：关闭';
+    } else if (window.loopState === 1) {
+      el.style.color = '#000';
+      el.style.opacity = '1';
+      el.title = '循环：列表循环';
+    } else {
+      el.style.color = '#000';
+      el.style.opacity = '1';
+      el.title = '循环：单曲循环';
+    }
+    el.style.transform = 'scale(1.15)';
+    setTimeout(() => el.style.transform = '', 150);
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  // M 头像点击：弹提示
+  document.querySelector('.avatar').addEventListener('click', function() {
+    this.style.transform = 'scale(0.95)';
+    setTimeout(() => this.style.transform = '', 150);
+    alert('个人中心即将上线');
+  });
+
+  function toggleHeart() {
+    window.isHeart = !window.isHeart;
+    var p = document.querySelector('#heartIcon path');
+    if (window.isHeart) {
+      p.setAttribute('fill', '#000');
+      p.setAttribute('stroke', '#000');
+    } else {
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', '#ccc');
+    }
+    var btn = document.getElementById('btnHeart');
+    btn.style.transform = 'scale(1.2)';
+    setTimeout(() => btn.style.transform = '', 200);
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  // ===== 搜索 =====
+  function doSearch(q) {
+    q = q.toLowerCase().trim();
+    if (!q) { renderSearch(tracks); return; }
+    const matched = tracks.filter(t => t.name.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q));
+    renderSearch(matched);
+  }
+
+  // ===== Chip 标签 =====
+  function setChip(el) {
+    document.querySelectorAll('#chipRow .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ===== 换封面：点封面上传自定义图 =====
+  document.getElementById('npCover').addEventListener('click', () => {
+    document.getElementById('coverUpload').click();
+  });
+  document.getElementById('coverUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      // 替换封面 SVG 为自定义图片
+      document.getElementById('npCover').innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+      // 同时替换 hero 小封面和专辑大封面
+      document.querySelectorAll('.hero-cover, .big-cover').forEach(c => {
+        c.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ===== 页面切换 =====
+  function openAlbum() { switchTab('library'); }
+  function showNP() {
+    // 打开全屏播放时，确保歌词已渲染
+    if (!document.getElementById('lyrics').innerHTML) {
+      const t = tracks[currentIdx];
+      document.getElementById('lyrics').innerHTML = t.lyrics.map((l, idx) =>
+        l ? `<div class="lyric-line" data-idx="${idx}" style="padding:8px 0;transition:color .3s,font-weight .3s;">${l}</div>`
+          : `<div style="height:12px;"></div>`
+      ).join('');
+    }
+    document.getElementById('npOverlay').classList.add('show');
+  }
+  function hideNP() { document.getElementById('npOverlay').classList.remove('show'); }
+
+  // ===== 导入本地音乐 =====
+  function showImportSheet() {
+    document.getElementById('importSheet').style.transform = 'translate(-50%,-50%) scale(1)';
+    document.getElementById('importSheet').style.opacity = '1';
+    document.getElementById('importSheet').style.pointerEvents = 'auto';
+    document.getElementById('sheetMask').style.opacity = '1';
+    document.getElementById('sheetMask').style.pointerEvents = 'auto';
+  }
+  function closeImportSheet() {
+    document.getElementById('importSheet').style.transform = 'translate(-50%,-50%) scale(0.9)';
+    document.getElementById('importSheet').style.opacity = '0';
+    document.getElementById('importSheet').style.pointerEvents = 'none';
+    document.getElementById('sheetMask').style.opacity = '0';
+    document.getElementById('sheetMask').style.pointerEvents = 'none';
+  }
+
+  document.getElementById('musicImport').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const url = URL.createObjectURL(file);
+      const name = file.name.replace(/\.[^.]+$/, ''); // 去掉后缀
+      tracks.push({
+        name: name,
+        artist: '本地导入',
+        dur: '本地',
+        durSec: 0,
+        url: url,
+        lyrics: ['[ 本地导入歌曲 ]', '', '在手机里静静播放', '属于你的那一首']
+      });
+    });
+    // 重新渲染歌单
+    renderAlbum();
+    // 自动播放最后导入的那首
+    if (files.length > 0) {
+      playTrack(tracks.length - files.length);
+    }
+    e.target.value = ''; // 允许重复导入同一文件
+  });
+
+  // 初始渲染当前歌曲歌词
+  (function initLyrics() {
+    const t = tracks[currentIdx];
+    document.getElementById('lyrics').innerHTML = t.lyrics.map((l, idx) =>
+      l ? `<div class="lyric-line" data-idx="${idx}" style="font-size:16px;color:#ccc;padding:11px 0;transition:all .3s;">${l}</div>`
+        : `<div style="height:12px;"></div>`
+    ).join('');
+  })();
+</script>
+</body>
+</html>

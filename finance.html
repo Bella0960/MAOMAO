@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F7F9" />
+<title>记账</title>
+<script src="native-feel.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { background: #E8E8EC; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+    background: #F7F7F9;
+    color: #111;
+    min-height: 100vh;
+    max-width: 390px;
+    margin: 0 auto;
+    padding-bottom: 90px;
+    position: relative;
+  }
+
+  /* 顶部 */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 20px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #fff; border: 1px solid #ECECEF;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #111; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.938rem; font-weight: 600;
+  }
+  .hello { font-size: 0.75rem; color: #999; }
+  .name { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
+  .bell {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #fff; border: 1px solid #ECECEF;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    position: relative;
+  }
+  .bell::after {
+    content: ''; position: absolute; top: 9px; right: 10px;
+    width: 6px; height: 6px; border-radius: 50%; background: #FF3B30;
+  }
+
+  /* 主体：左竖排按钮 + 右黑卡堆叠 */
+  .main-row {
+    display: flex;
+    gap: 16px;
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+  .side-actions {
+    display: flex; flex-direction: column; gap: 20px;
+    padding-top: 20px;
+  }
+  .side-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .side-circle {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #fff; border: 1px solid #ECECEF;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .side-label { font-size: 0.688rem; color: #666; }
+
+  /* 银行卡堆叠：中间完整黑卡，上下各露一角 */
+  .card-stack {
+    flex: 1;
+    position: relative;
+    height: 200px;
+  }
+  .stack-peek {
+    position: absolute;
+    left: 12px; right: 12px;
+    height: 130px;
+    border-radius: 16px;
+    background: #D8D8DE;
+  }
+  .stack-peek.top {
+    top: 0;
+    background: #E4E4E9;
+  }
+  .stack-peek.bottom {
+    bottom: 0;
+    background: #C8C8CE;
+  }
+  .card {
+    position: absolute;
+    left: 6px; right: 6px;
+    top: 30px;
+    height: 140px;
+    background: #111;
+    border-radius: 20px;
+    padding: 22px 20px;
+    color: #fff;
+    z-index: 3;
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    overflow: hidden;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    right: -24px; bottom: -24px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.08);
+  }
+  .card-amount {
+    font-size: 1.625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .card-bank { font-size: 0.813rem; font-weight: 600; }
+  .card-no {
+    font-size: 0.625rem; opacity: 0.5;
+    letter-spacing: 0.1em; margin-top: 5px;
+  }
+  .card-logo { display: flex; }
+  .card-logo .l1 {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #EB001B; opacity: 0.9;
+  }
+  .card-logo .l2 {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #F79E1B; opacity: 0.9;
+    margin-left: -7px; mix-blend-mode: screen;
+  }
+
+  /* Recent Transactions */
+  .section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 20px 12px;
+  }
+  .section-head h3 { font-size: 1.063rem; font-weight: 700; }
+  .section-head .see { font-size: 0.75rem; color: #111; opacity: 0.4; }
+
+  .record-list { padding: 0 20px; }
+  .record-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #F0F0F3;
+  }
+  .record-item:last-child { border-bottom: none; }
+  .r-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: #F4F4F6;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .r-info { flex: 1; min-width: 0; }
+  .r-name { font-size: 0.875rem; font-weight: 600; }
+  .r-merchant { font-size: 0.72rem; color: #999; margin-top: 2px; }
+  .r-right { text-align: right; }
+  .r-amount { font-size: 0.875rem; font-weight: 700; }
+  .r-date { font-size: 0.688rem; color: #ccc; margin-top: 2px; }
+
+  .empty {
+    text-align: center; padding: 40px 20px; color: #999; font-size: 0.875rem;
+  }
+
+  /* 底部 dock */
+  .dock {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 390px; max-width: 100%;
+    background: #111;
+    border-radius: 24px 24px 0 0;
+    padding: 14px 20px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    display: flex; justify-content: space-around; align-items: center;
+    z-index: 100;
+  }
+  .dock-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; color: #fff;
+  }
+  .dock-item.active { opacity: 1; }
+  .dock-item:not(.active) { opacity: 0.6; }
+  .dock-label { font-size: 0.625rem; }
+  .dock-add {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #fff; color: #111;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; cursor: pointer;
+    margin-top: -20px;
+  }
+
+  /* 记账弹窗 */
+  .modal-backdrop {
+    position: fixed; top: 0; bottom: 0;
+    left: 50%; transform: translateX(-50%);
+    width: 390px; max-width: 100%;
+    background: rgba(0,0,0,0.3);
+    display: none; align-items: flex-end;
+    z-index: 200;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-sheet {
+    background: #fff; width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px 40px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+  .sheet-handle {
+    width: 36px; height: 4px; background: #E5E5EA;
+    border-radius: 2px; margin: 0 auto 18px;
+  }
+  .sheet-title { font-size: 1.063rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
+  .amount-input {
+    width: 100%; font-size: 2rem; font-weight: 700; text-align: center;
+    border: none; border-bottom: 2px solid #ECECEF;
+    padding: 10px; margin-bottom: 16px; outline: none; color: #111;
+  }
+  .cat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  .cat-chip { padding: 10px 4px; text-align: center; font-size: 0.75rem; border-radius: 12px; background: #F4F4F6; cursor: pointer; }
+  .cat-chip.active { background: #111; color: #fff; }
+  .sheet-input {
+    width: 100%; padding: 12px; border: 1px solid #ECECEF; border-radius: 12px;
+    font-size: 0.875rem; margin-bottom: 16px; outline: none;
+  }
+  .sheet-btns { display: flex; gap: 10px; }
+  .sheet-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-size: 0.938rem; font-weight: 600; cursor: pointer; }
+  .btn-cancel { background: #F4F4F6; color: #666; }
+  .btn-confirm { background: #111; color: #fff; }
+  .type-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+  .type-chip { flex: 1; padding: 8px; text-align: center; font-size: 0.813rem; border-radius: 10px; background: #F4F4F6; cursor: pointer; }
+  .type-chip.active { background: #111; color: #fff; }
+
+  .toast {
+    position: fixed; bottom: 120px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111; color: #fff;
+    padding: 10px 18px; border-radius: 20px; font-size: 0.813rem;
+    opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="avatar">我</div>
+      <div>
+        <div class="hello">Hello,</div>
+        <div class="name">我的账本</div>
+      </div>
+    </div>
+    <div class="bell">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+  </div>
+
+  <div class="main-row">
+    <div class="side-actions">
+      <div class="side-btn" onclick="openSheet('expense')">
+        <div class="side-circle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </div>
+        <div class="side-label">支出</div>
+      </div>
+      <div class="side-btn" onclick="openSheet('income')">
+        <div class="side-circle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+        <div class="side-label">收入</div>
+      </div>
+      <div class="side-btn" onclick="openSheet('expense')">
+        <div class="side-circle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v4"/></svg>
+        </div>
+        <div class="side-label">账单</div>
+      </div>
+    </div>
+
+    <div class="card-stack">
+      <div class="stack-peek top"></div>
+      <div class="stack-peek bottom"></div>
+      <div class="card">
+        <div class="card-amount" id="balanceNum">¥0.00</div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-bank">日常账户</div>
+            <div class="card-no">5292 •••• •••• 3123</div>
+          </div>
+          <div class="card-logo"><div class="l1"></div><div class="l2"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h3>Recent Transactions</h3>
+    <span class="see">See all</span>
+  </div>
+  <div class="record-list" id="recordList"></div>
+
+  <!-- 记账弹窗 -->
+  <div class="modal-backdrop" id="sheet">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">记一笔</div>
+      <div class="type-toggle">
+        <div class="type-chip active" data-type="expense" onclick="setType('expense')">支出</div>
+        <div class="type-chip" data-type="income" onclick="setType('income')">收入</div>
+      </div>
+      <input class="amount-input" id="amountInput" type="number" placeholder="0.00" step="0.01" />
+      <div class="cat-grid" id="catGrid"></div>
+      <input class="sheet-input" id="noteInput" type="text" placeholder="备注（可选）" maxlength="30" />
+      <div class="sheet-btns">
+        <button class="sheet-btn btn-cancel" onclick="closeSheet()">取消</button>
+        <button class="sheet-btn btn-confirm" onclick="saveRecord()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const CATS = ['餐饮','交通','购物','住房','娱乐','工资','医疗','其他'];
+  const CAT_ICONS = {
+    '餐饮': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v7M10 1v7"/></svg>',
+    '交通': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 19v2M16 19v2"/></svg>',
+    '购物': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    '住房': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    '娱乐': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>',
+    '工资': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+    '医疗': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+    '其他': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg>',
+  };
+
+  let currentType = 'expense';
+  let currentCat = '餐饮';
+
+  function loadRecords() {
+    try { return JSON.parse(localStorage.getItem('finance_records') || '[]'); }
+    catch(e) { return []; }
+  }
+  function saveRecords(list) { localStorage.setItem('finance_records', JSON.stringify(list)); }
+
+  function render() {
+    const list = loadRecords();
+    let balance = 0;
+    list.forEach(r => { balance += r.type === 'income' ? r.amount : -r.amount; });
+    document.getElementById('balanceNum').textContent = '¥' + balance.toFixed(2);
+
+    const box = document.getElementById('recordList');
+    if (list.length === 0) {
+      box.innerHTML = '<div class="empty">还没有记录，点底部 + 记一笔</div>';
+      return;
+    }
+    box.innerHTML = list.slice().reverse().slice(0, 20).map(r => `
+      <div class="record-item">
+        <div class="r-icon">${CAT_ICONS[r.category] || CAT_ICONS['其他']}</div>
+        <div class="r-info">
+          <div class="r-name">${r.category}</div>
+          <div class="r-merchant">${r.note || '—'}</div>
+        </div>
+        <div class="r-right">
+          <div class="r-amount">${r.type === 'income' ? '+' : '-'}¥${r.amount.toFixed(2)}</div>
+          <div class="r-date">${r.time}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderCats() {
+    document.getElementById('catGrid').innerHTML = CATS.map(c =>
+      `<div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="pickCat('${c}')">${c}</div>`
+    ).join('');
+  }
+  function pickCat(c) { currentCat = c; renderCats(); }
+  function setType(t) {
+    currentType = t;
+    document.querySelectorAll('.type-chip').forEach(el =>
+      el.classList.toggle('active', el.dataset.type === t));
+  }
+  function openSheet(type) {
+    currentType = type; setType(type); renderCats();
+    document.getElementById('amountInput').value = '';
+    document.getElementById('noteInput').value = '';
+    document.getElementById('sheet').classList.add('show');
+  }
+  function closeSheet() { document.getElementById('sheet').classList.remove('show'); }
+
+  function saveRecord() {
+    const amt = parseFloat(document.getElementById('amountInput').value);
+    if (!amt || amt <= 0) { showToast('请输入金额'); return; }
+    const note = document.getElementById('noteInput').value.trim();
+    const now = new Date();
+    const time = (now.getMonth()+1) + '月' + now.getDate() + '日';
+    const list = loadRecords();
+    list.push({ amount: amt, type: currentType, category: currentCat, note, time });
+    saveRecords(list);
+    closeSheet(); render(); showToast('已记录');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  render();
+</script>
+</body>
+</html>

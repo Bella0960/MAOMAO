@@ -378,9 +378,35 @@
     render();
   }
 
+  // ---------- 重玩/重新生成 ----------
+  const regenOverlay = document.getElementById('regenOverlay');
+  const regenMask = document.getElementById('regenMask');
+  const regenInput = document.getElementById('regenInput');
+  const regenCancel = document.getElementById('regenCancel');
+  const regenConfirm = document.getElementById('regenConfirm');
+
+  function openRegen() {
+    if (!regenOverlay) return;
+    regenInput.value = '';
+    regenOverlay.style.display = 'flex';
+  }
+  function closeRegen() {
+    if (regenOverlay) regenOverlay.style.display = 'none';
+  }
+  if (regenMask) regenMask.addEventListener('click', closeRegen);
+  if (regenCancel) regenCancel.addEventListener('click', closeRegen);
+  if (regenConfirm) regenConfirm.addEventListener('click', function () {
+    var dir = regenInput.value.trim();
+    closeRegen();
+    if (typeof window.regenerateReply === 'function') {
+      window.regenerateReply(dir);
+    }
+  });
+
   // ---------- 分发 ----------
   function handleFeature(feat) {
     switch (feat) {
+      case 'regenerate': openRegen(); break;
       case 'location': featLocation(); break;
       case 'anniversary': renderAnniversaryList(); break;
       case 'todo': featTodo(); break;

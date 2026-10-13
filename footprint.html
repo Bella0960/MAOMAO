@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F7F9" />
+<title>角色足迹</title>
+<script src="native-feel.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { background: #E8E8EC; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+    background: #F7F7F9;
+    color: #111;
+    min-height: 100vh;
+    max-width: 390px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+    position: relative;
+  }
+
+  /* 顶部导航 */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 8px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+  }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #ECECEF;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .nav-title { font-size: 1.063rem; font-weight: 600; }
+
+  /* 日期头部 */
+  .header {
+    padding: 8px 20px 16px;
+  }
+  .header-date {
+    font-size: 0.813rem;
+    color: #999;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* 周历条 */
+  .week-strip {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px 18px;
+  }
+
+  /* 角色切换头像条 */
+  .role-strip {
+    display: flex;
+    gap: 14px;
+    padding: 0 20px 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .role-strip::-webkit-scrollbar { display: none; }
+  .role-avatar {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.063rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .role-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .role-avatar.active {
+    border-color: #111;
+    transform: scale(1.08);
+  }
+  .role-avatar .r-name {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.625rem;
+    color: #999;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .role-avatar.active .r-name { opacity: 1; }
+  .role-name-label {
+    padding: 0 20px 14px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111;
+  }
+  .role-name-label small {
+    color: #999;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+  .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    border-radius: 16px;
+    min-width: 36px;
+  }
+  .day-cell .d-num {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #bbb;
+  }
+  .day-cell .d-week {
+    font-size: 0.625rem;
+    color: #bbb;
+    letter-spacing: 0.05em;
+  }
+  .day-cell.today {
+    background: #111;
+    border-radius: 18px;
+  }
+  .day-cell.today .d-num,
+  .day-cell.today .d-week { color: #fff; }
+  .day-cell.today .d-num { position: relative; }
+  .day-cell.today .d-num::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* 时间线 */
+  .timeline {
+    position: relative;
+    padding: 0 20px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 35px;
+    top: 12px;
+    bottom: 12px;
+    width: 1.5px;
+    background: #E0E0E5;
+  }
+  .tl-item {
+    position: relative;
+    padding-left: 48px;
+    margin-bottom: 16px;
+  }
+  .tl-dot {
+    position: absolute;
+    left: 28px;
+    top: 18px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #111;
+    z-index: 1;
+  }
+  .tl-card {
+    border-radius: 18px;
+    padding: 16px;
+  }
+  .tl-card.dark {
+    background: #111;
+    color: #fff;
+  }
+  .tl-card.light {
+    background: #fff;
+    border: 1px solid #ECECEF;
+  }
+  .tl-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tl-time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+  .tl-card.light .tl-time { color: #999; }
+  .tl-title {
+    font-size: 0.938rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tl-desc {
+    font-size: 0.781rem;
+    line-height: 1.5;
+    opacity: 0.7;
+  }
+  .tl-card.light .tl-desc { color: #888; }
+
+  /* 空状态 / 加载 */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 0.875rem;
+  }
+  .loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 0.813rem;
+  }
+  .spin {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border: 2px solid #E5E5EA;
+    border-top-color: #111;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 40px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111; color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 0.813rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="nav-left">
+      <button class="icon-btn" onclick="window.location.href='index.html'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="nav-title">角色足迹</div>
+    </div>
+    <button class="icon-btn" onclick="refreshDay()" title="补充生成">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
+  </div>
+
+  <div class="header">
+    <div class="header-date" id="dateStr"></div>
+    <div class="header-title">今日足迹</div>
+  </div>
+
+  <div class="week-strip" id="weekStrip"></div>
+
+  <div class="role-strip" id="roleStrip"></div>
+  <div class="role-name-label" id="roleNameLabel"></div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ===== 角色数据 =====
+  let ROLES = [];
+  let currentRoleId = null;
+
+  function loadRoles() {
+    try {
+      const raw = localStorage.getItem('ai_custom_characters');
+      if (raw) {
+        ROLES = JSON.parse(raw).filter(r => r && r.id);
+        return;
+      }
+    } catch(e) {}
+    // fallback 默认角色
+    ROLES = [
+      { id: 'role_1', name: '宝宝', avatarBg: '#FF6B81', avatar: '' },
+      { id: 'role_2', name: '苏格拉底', avatarBg: '#3B9EFF', avatar: '' },
+      { id: 'role_3', name: '灵感助手', avatarBg: '#10B981', avatar: '' },
+    ];
+  }
+
+  // ===== 工具：今天日期 key =====
+  function todayKey(roleId) {
+    const d = new Date();
+    return 'footprint_' + roleId + '_' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+
+  // ===== 默认一天行程模板（按角色人设变体） =====
+  const DEFAULT_DAY = [
+    { time: '07:30', title: '起床', desc: '闹钟响了两次才爬起来，伸了个懒腰，拉开窗帘看了看天。', dark: true },
+    { time: '08:00', title: '早餐', desc: '烤了片面包，冲了杯咖啡，边吃边刷了会儿手机。', dark: false },
+    { time: '09:30', title: '出门上班', desc: '挤上地铁，戴耳机听了一路歌，到站前提前挤到门口。', dark: false },
+    { time: '12:00', title: '午饭', desc: '跟同事一起去楼下吃了碗面，聊了聊周末的安排。', dark: true },
+    { time: '14:30', title: '开会', desc: '周会汇报进度，被问了几个问题，有点紧张但答上来了。', dark: false },
+    { time: '18:30', title: '下班', desc: '打卡下班，在楼下便利店买了瓶水，慢悠悠走回家。', dark: false },
+  ];
+
+  const EXTRA_POOL = [
+    { time: '07:45', title: '洗漱', desc: '刷牙洗脸，对着镜子发了会儿呆，然后开始挑今天穿什么。' },
+    { time: '08:20', title: '通勤路上', desc: '地铁上看了半集播客，旁边大爷在听京剧，声音开得挺大。' },
+    { time: '10:30', title: '摸鱼', desc: '躲在工位角落刷了五分钟短视频，听到脚步声赶紧切回表格。' },
+    { time: '15:00', title: '下午茶', desc: '点了杯奶茶，三分糖去冰，拿到手拍了张照发朋友圈。' },
+    { time: '16:00', title: '接了个电话', desc: '家里来的电话，聊了十分钟，被催了两句找对象的事。' },
+    { time: '19:00', title: '晚饭', desc: '一个人煮了碗泡面，加了个蛋和一根肠，觉得今天也算丰盛。' },
+    { time: '20:30', title: '追剧', desc: '窝在沙发上看了两集剧，剧情有点老套但还是想看下去。' },
+    { time: '22:00', title: '洗澡', desc: '热水冲了十分钟，把一天的疲惫都冲掉了，出来觉得很放松。' },
+    { time: '23:30', title: '睡觉', desc: '躺床上翻了半小时手机，定好明天闹钟，关灯睡了。' },
+    { time: '13:30', title: '午休', desc: '趴在工位上眯了二十分钟，被空调吹得有点冷，醒了拉了拉外套。' },
+    { time: '11:00', title: '买咖啡', desc: '下楼买了杯美式，顺便在门口站了会儿，晒了晒太阳。' },
+    { time: '21:00', title: '运动', desc: '跟着视频做了二十分钟拉伸，做完浑身酸痛，但感觉很舒服。' },
+  ];
+
+  // ===== 渲染日期 =====
+  function renderDate() {
+    const d = new Date();
+    const weeks = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    document.getElementById('dateStr').textContent =
+      (d.getMonth()+1) + '月' + d.getDate() + '日 · ' + weeks[d.getDay()];
+  }
+
+  // ===== 渲染周历条 =====
+  function renderWeek() {
+    const strip = document.getElementById('weekStrip');
+    const now = new Date();
+    const day = now.getDay() === 0 ? 7 : now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - day + 1);
+    const weekNames = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const isToday = d.toDateString() === now.toDateString();
+      html += `<div class="day-cell ${isToday ? 'today' : ''}">
+        <div class="d-num">${d.getDate()}</div>
+        <div class="d-week">${weekNames[i]}</div>
+      </div>`;
+    }
+    strip.innerHTML = html;
+  }
+
+  // ===== 渲染角色头像条 =====
+  function renderRoles() {
+    const strip = document.getElementById('roleStrip');
+    let html = '';
+    ROLES.forEach(r => {
+      const isActive = r.id === currentRoleId;
+      const inner = r.avatar
+        ? `<img src="${r.avatar}" alt="">`
+        : (r.name || '?').charAt(0);
+      const bg = r.avatarBg || '#888';
+      html += `<div class="role-avatar ${isActive ? 'active' : ''}" 
+        style="background:${bg}" onclick="switchRole('${r.id}')">
+        ${inner}
+        <span class="r-name">${r.name}</span>
+      </div>`;
+    });
+    strip.innerHTML = html;
+
+    const cur = ROLES.find(r => r.id === currentRoleId);
+    document.getElementById('roleNameLabel').innerHTML =
+      (cur ? cur.name : '') + '<small>今天的行程</small>';
+  }
+
+  function switchRole(roleId) {
+    currentRoleId = roleId;
+    localStorage.setItem('footprint_current_role', roleId);
+    renderRoles();
+    loadDayAndRender();
+  }
+
+  // ===== 读/写当天数据（按角色） =====
+  function loadDay() {
+    try {
+      const raw = localStorage.getItem(todayKey(currentRoleId));
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return null;
+  }
+  function saveDay(data) {
+    localStorage.setItem(todayKey(currentRoleId), JSON.stringify(data));
+  }
+
+  // ===== 渲染时间线 =====
+  function renderTimeline(items) {
+    const box = document.getElementById('timeline');
+    box.innerHTML = '';
+    items.sort((a,b) => a.time.localeCompare(b.time)).forEach(it => {
+      const el = document.createElement('div');
+      el.className = 'tl-item';
+      el.innerHTML = `
+        <div class="tl-dot"></div>
+        <div class="tl-card ${it.dark ? 'dark' : 'light'}">
+          <div class="tl-row">
+            <div>
+              <div class="tl-title">${it.title}</div>
+              <div class="tl-desc">${it.desc}</div>
+            </div>
+            <div class="tl-time">${it.time}</div>
+          </div>
+        </div>`;
+      box.appendChild(el);
+    });
+  }
+
+  function loadDayAndRender() {
+    let data = loadDay();
+    if (!data) {
+      data = { items: DEFAULT_DAY.slice(), generatedAt: Date.now() };
+      saveDay(data);
+    }
+    renderTimeline(data.items);
+  }
+
+  // ===== 初始化 =====
+  function init() {
+    loadRoles();
+    currentRoleId = localStorage.getItem('footprint_current_role') || (ROLES[0] && ROLES[0].id);
+    renderDate();
+    renderWeek();
+    renderRoles();
+    loadDayAndRender();
+  }
+
+  // ===== 右上角刷新 =====
+  function refreshDay() {
+    const box = document.getElementById('timeline');
+    box.innerHTML = '<div class="loading"><span class="spin"></span>正在生成…</div>';
+
+    setTimeout(() => {
+      const data = loadDay() || { items: [], generatedAt: Date.now() };
+      const existingTimes = data.items.map(i => i.time);
+      const pool = EXTRA_POOL.filter(p => !existingTimes.includes(p.time));
+      for (let i = 0; i < 2 && pool.length > 0; i++) {
+        const idx = Math.floor(Math.random() * pool.length);
+        const pick = pool.splice(idx, 1)[0];
+        data.items.push({ ...pick, dark: Math.random() < 0.3 });
+      }
+      saveDay(data);
+      renderTimeline(data.items);
+      showToast('已补充 ' + data.items.length + ' 条足迹');
+    }, 600);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  init();
+</script>
+</body>
+</html>
