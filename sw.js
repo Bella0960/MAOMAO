@@ -1,5 +1,5 @@
-// Service Worker v4：所有资源网络优先（本地开发永远最新），失败回退缓存（离线可用）
-const CACHE_NAME = 'phone-app-v4';
+// Service Worker v5：缓存优先 + 后台静默更新（页面秒开，最新版本下次打开自动生效）
+const CACHE_NAME = 'phone-app-v5';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -36,14 +36,17 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
 
-  // 一律网络优先：先拿最新的，失败再回退缓存（本地开发保证改动即时生效）
+  // 缓存优先：先秒开缓存版本，同时后台静默拉取最新版供下次使用（网络失败仍用缓存，离线可用）
   e.respondWith(
-    fetch(e.request).then((res) => {
-      if (res && res.status === 200) {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
-      }
-      return res;
-    }).catch(() => caches.match(e.request))
+    caches.match(e.request).then((cached) => {
+      const network = fetch(e.request).then((res) => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => cached);
+      return cached || network;
+    })
   );
 });
