@@ -46,8 +46,16 @@
     display: flex; align-items: center; justify-content: center; cursor: pointer;
     font-size: 1.25rem; flex-shrink: 0;
   }
-  .brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; flex: 1; text-align: center; }
+  .brand { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+  .brand-name { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; text-align: center; }
   .brand small { display: block; font-size: 0.625rem; font-weight: 700; opacity: 0.4; letter-spacing: 0.1em; }
+  /* 标题右侧的刷新按钮：与返回键同一套圆形按钮规格 */
+  .refresh-btn {
+    width: 28px; height: 28px; border-radius: 50%; padding: 0;
+    background: #F2F2F7; border: none; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .refresh-btn svg { width: 14px; height: 14px; display: block; }
 
   /* 热门话题横排3图 */
   .hot-row {
@@ -173,13 +181,24 @@
   }
   .btn-cancel { background: #F4F4F6; color: #666; }
   .btn-post { background: #111; color: #fff; }
-  /* 下拉刷新提示 */
+  /* 下拉刷新指示器：常态 0 高度（不占页面空间），拉动时跟手展开，松手后平滑收起 */
   .pull-refresh {
-    text-align: center; font-size: 0.75rem; color: #999;
-    padding: 10px 0; height: 0; overflow: hidden;
-    transition: height 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    height: 0; padding: 0; overflow: hidden;
+    font-size: 0.688rem; color: #8E8E93; letter-spacing: 0.02em;
+    transition: height 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
   }
-  .pull-refresh.show { height: 40px; }
+  .pull-refresh.show { height: 44px; }
+  .pull-refresh.pulling { transition: none; }        /* 手指拉动阶段不做过渡，保证跟手 */
+  .pr-spinner {
+    width: 13px; height: 13px; flex: 0 0 auto; border-radius: 50%;
+    border: 2px solid #E5E5EA; border-top-color: #111;
+    opacity: 0;
+  }
+  .pull-refresh.show .pr-spinner { opacity: 1; }
+  .pull-refresh.loading .pr-spinner { opacity: 1; animation: prSpin 0.8s linear infinite; }
+  .pull-refresh.done .pr-spinner { opacity: 0; }
+  @keyframes prSpin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -188,13 +207,19 @@
     <button class="back-btn" onclick="window.location.href='index.html'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="brand">FORUM<small>讨论区</small>
-      <svg onclick="refreshPosts()" style="width:14px;height:14px;margin-left:6px;cursor:pointer;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    <div class="brand">
+      <span class="brand-name">FORUM<small>讨论区</small></span>
+      <button class="refresh-btn" type="button" aria-label="刷新" onclick="refreshPosts()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
     </div>
     <div class="post-btn" onclick="openComposer()">+</div>
   </div>
 
-  <div class="pull-refresh" id="pullRefresh">下拉刷新</div>
+  <div class="pull-refresh" id="pullRefresh">
+    <span class="pr-spinner" id="pullRefreshSpinner" aria-hidden="true"></span>
+    <span class="pr-text" id="pullRefreshText">下拉刷新</span>
+  </div>
 
   <!-- 热门话题横排3图 -->
   <div class="hot-row" id="hotRow"></div>
@@ -418,29 +443,68 @@
     closeComposer(); render();
   }
 
-  // 下拉刷新
-  let startY = 0, pulling = false;
+  // 下拉刷新：跟手展开 → 松手转圈 → 平滑收起（只换 AI 内容，保留自己发的帖子）
+  let startY = 0, pulling = false, pullingReady = false;
+  const prEl = () => document.getElementById('pullRefresh');
+  const prText = () => document.getElementById('pullRefreshText');
+  const prSpinner = () => document.getElementById('pullRefreshSpinner');
+
+  function refreshFeed() {
+    const mine = loadPosts().filter(p => p.tag === 'me');
+    savePosts(mine.concat(seedPosts().filter(p => p.tag !== 'me')));
+    render();
+  }
+
+  function prFinish(el) {
+    setTimeout(() => {
+      el.classList.remove('loading');
+      el.classList.add('done');
+      prText().textContent = '已更新';
+      setTimeout(() => {
+        el.classList.remove('show', 'done');
+        prText().textContent = '下拉刷新';
+      }, 420);
+    }, 520);
+  }
+
   document.addEventListener('touchstart', e => {
-    if (window.scrollY === 0) { startY = e.touches[0].clientY; pulling = true; }
-  });
+    if (window.scrollY === 0) { startY = e.touches[0].clientY; pulling = true; pullingReady = false; }
+  }, { passive: true });
+
   document.addEventListener('touchmove', e => {
     if (!pulling) return;
     const dy = e.touches[0].clientY - startY;
-    const el = document.getElementById('pullRefresh');
-    if (dy > 50) { el.classList.add('show'); el.textContent = '松开刷新'; }
-    else if (dy > 0) { el.classList.add('show'); el.textContent = '下拉刷新'; }
-    else el.classList.remove('show');
-  });
+    const el = prEl();
+    if (dy <= 0) {
+      pullingReady = false;
+      el.classList.remove('show', 'pulling');
+      el.style.height = '';
+      return;
+    }
+    pullingReady = dy > 70;
+    el.classList.add('show', 'pulling');
+    el.style.height = Math.min(dy * 0.6, 58) + 'px';
+    prSpinner().style.transform = 'rotate(' + Math.min(dy * 3, 300) + 'deg)';
+    prText().textContent = pullingReady ? '松开刷新' : '下拉刷新';
+  }, { passive: true });
+
   document.addEventListener('touchend', () => {
-    const el = document.getElementById('pullRefresh');
-    if (el.classList.contains('show') && el.textContent === '松开刷新') {
-      localStorage.removeItem('forum_posts');
-      render();
-      el.textContent = '已更新';
-      setTimeout(() => el.classList.remove('show'), 800);
-    } else el.classList.remove('show');
+    const el = prEl();
+    el.classList.remove('pulling');
+    if (pulling && pullingReady) {
+      el.classList.add('show', 'loading');
+      el.style.height = '';
+      prSpinner().style.transform = '';
+      prText().textContent = '正在刷新';
+      refreshFeed();
+      prFinish(el);
+    } else if (el.classList.contains('show')) {
+      el.classList.remove('show');
+      el.style.height = '';
+    }
     pulling = false;
-  });
+    pullingReady = false;
+  }, { passive: true });
 
   function showHome() {
     document.getElementById('hotRow').style.display = 'flex';
@@ -477,8 +541,12 @@
   }
 
   function refreshPosts() {
-    localStorage.removeItem('forum_posts');
-    render();
+    const el = prEl();
+    el.classList.add('show', 'loading');
+    el.style.height = '';
+    prText().textContent = '正在刷新';
+    refreshFeed();
+    prFinish(el);
   }
 
   function renderHot() {
