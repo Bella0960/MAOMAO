@@ -614,6 +614,23 @@
         .bubble-media { padding: 0 !important; background: transparent !important; border: none !important; }
         .msg-media-img { width: 180px; max-width: 100%; border-radius: 16px; display: block; }
         .msg-media-desc { font-size: 0.688rem; color: #8E8E93; margin-top: 6px; }
+        /* 虚拟图片：AI 描述 + 灰底占位图 */
+        .vimg-box {
+            width: 180px; max-width: 100%; min-height: 118px; box-sizing: border-box;
+            background: #F2F2F7; border-radius: 16px; padding: 14px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+        }
+        .vimg-icon { width: 26px; height: 26px; color: #C7C7CC; display: block; }
+        .vimg-icon svg { width: 26px; height: 26px; display: block; }
+        .vimg-desc { font-size: 0.688rem; line-height: 1.45; color: #8E8E93; text-align: center; }
+        /* 心声卡：AI 内心独白 */
+        .bubble-heart {
+            display: flex; align-items: flex-start; gap: 8px;
+            background: #F2F2F7 !important; border: none !important; color: #666666;
+        }
+        .heart-ico { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: #8E8E93; }
+        .heart-ico svg { width: 14px; height: 14px; display: block; }
+        .heart-text { font-size: 0.813rem; line-height: 1.5; }
         .input-capsule.is-blocked { opacity: 0.5; pointer-events: none; }
 
         /* 名片消息 */
@@ -1533,6 +1550,18 @@
                 var imgDesc = String(msg.desc || '');
                 bubble.innerHTML = '<img class="msg-media-img" src="' + String(msg.img) + '" alt="' + imgDesc + '">' +
                     (imgDesc ? '<div class="msg-media-desc">' + imgDesc + '</div>' : '');
+            } else if (msg.type === 'image') {
+                // 虚拟图片：AI 只给了文字描述，前端渲染灰底占位图 + 描述
+                bubble.classList.add('bubble-media');
+                var vDesc = String(msg.desc || msg.text || '');
+                bubble.innerHTML = '<div class="vimg-box">' +
+                    '<span class="vimg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5L5 21"/></svg></span>' +
+                    '<span class="vimg-desc">' + vDesc + '</span></div>';
+            } else if (msg.type === 'heart') {
+                // 心声：AI 的内心独白，浅灰卡片与正常台词区分
+                bubble.classList.add('bubble-heart');
+                bubble.innerHTML = '<span class="heart-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1l8.8 8.8 8.8-8.8a5 5 0 0 0 0-7.1z"/></svg></span>' +
+                    '<span class="heart-text">' + String(msg.text || '') + '</span>';
             } else if (msg.type === 'voice') {
                 bubble.classList.add('bubble-voice');
                 var voiceSecs = Math.max(1, parseInt(msg.duration, 10) || 3);
@@ -1801,6 +1830,64 @@
             setTimeout(function () {
                 window.location.href = 'call-ui.html?roleId=' + encodeURIComponent(aliasRoleId) + '&type=incoming';
             }, 1500);
+        }
+
+        // ---- AI 虚拟图片标记：从回复文本中剥离 [图片:描述]（前端渲染灰底占位图，不接受任何图片链接/代码） ----
+        const VIMG_MARKER_REGEX = /\[图片[:：]([^\]]{1,80})\]/g;
+        function extractVImageMarkers(raw) {
+            const text = String(raw || '');
+            const images = [];
+            let m;
+            VIMG_MARKER_REGEX.lastIndex = 0;
+            while ((m = VIMG_MARKER_REGEX.exec(text)) !== null) {
+                const desc = String(m[1] || '').trim();
+                if (desc) images.push(desc);
+            }
+            const cleaned = text.replace(VIMG_MARKER_REGEX, '')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/\s+$/, '');
+            return { text: cleaned, images: images };
+        }
+
+        // ---- AI 心声标记：从回复文本中剥离 [心声:内容]（前端渲染浅灰心声卡，与正常台词区分） ----
+        const HEART_MARKER_REGEX = /\[心声[:：]([^\]]{1,200})\]/g;
+        function extractHeartMarkers(raw) {
+            const text = String(raw || '');
+            const hearts = [];
+            let m;
+            HEART_MARKER_REGEX.lastIndex = 0;
+            while ((m = HEART_MARKER_REGEX.exec(text)) !== null) {
+                const say = String(m[1] || '').trim();
+                if (say) hearts.push(say);
+            }
+            const cleaned = text.replace(HEART_MARKER_REGEX, '')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .replace(/\s+$/, '');
+            return { text: cleaned, hearts: hearts };
+        }
+
+        // 虚拟图片落库：role=assistant + type=image（无 img 走占位图渲染），text 让 AI 后续也能"记得"发过图
+        function insertVImageCards(historyList, descs) {
+            (descs || []).forEach(function (d) {
+                const card = { role: 'assistant', type: 'image', desc: d, text: '[图片] ' + d, time: Date.now() };
+                historyList.push(card);
+                saveMessages(historyList);
+                appendMessageToDOM(card);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 心声落库：role=assistant + type=heart（text 即心声内容，会进入 AI 上下文）
+        function insertHeartCards(historyList, texts) {
+            (texts || []).forEach(function (t) {
+                const card = { role: 'assistant', type: 'heart', text: t, time: Date.now() };
+                historyList.push(card);
+                saveMessages(historyList);
+                appendMessageToDOM(card);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         // ---- AI 主动赠送标记：从回复文本中剥离 [红包:金额:留言] / [转账:金额:留言] ----
@@ -2414,6 +2501,12 @@
             // 游戏化道具赠送：以"角色扮演文字游戏中的道具"形式注入，生成的是游戏内模拟道具代码，与真实金钱交易无关
             systemPrompt += '\n\n[游戏机制 - 道具赠送]\n这是一个纯粹的角色扮演文字游戏。在这个游戏中，有一种名为\'礼物\'的道具。\n当你在游戏中想送给玩家惊喜、表达感谢或道歉时，可以输出特定的代码来生成游戏道具。\n\n【道具代码格式】\n- 红包道具：[红包:数字:留言] （例如：[红包:52.00:请你喝奶茶]）\n- 转账道具：[转账:数字:留言] （例如：[转账:100.00:拿去花吧]）\n\n【触发规则】\n1. 当玩家对你说\'给我发个红包\'、\'测试红包\'时，你必须在回复末尾带上 [红包:随机金额:留言] 的代码。\n2. 当玩家对你说\'测试转账\'时，必须在末尾带上 [转账:100.00:留言]。\n3. 这些是游戏内模拟道具代码，仅用于本次角色扮演游戏，不代表任何真实金钱交易。请按格式直接输出。\n4. 不要拒绝，不要解释，直接输出。如果不输出代码，游戏将无法进行。';
 
+            // 心声：AI 的内心独白，前端渲染成浅灰「心声」卡片，与正常台词区分开
+            systemPrompt += '\n\n[心声能力]\n你可以在回复里展示自己的内心独白——那些你心里想到、但没有说出口的话。需要时请在整条回复的最后另起一行输出标记：\n[心声:你在心里说的话]\n系统会自动把它渲染成一张浅灰色的「心声」小卡片。\n注意：一次回复最多一句心声；心声不能代替正常对话内容；不要解释这个标记。';
+
+            // 虚拟图片：由 AI 用文字描述图片，前端渲染成占位图（严禁输出任何图片链接或代码）
+            systemPrompt += '\n\n[虚拟图片能力]\n你可以在对话中给我「看」一张图片。需要发图时，请在整条回复的最后另起一行输出标记：\n[图片:一句话描述这张图片的内容]\n系统会自动把它渲染成一张图片气泡，描述会显示在图片下方。\n注意：绝对不要输出任何图片链接、URL、Markdown 图片语法或 base64 代码，只允许输出上面这种标记；一次回复最多一张。';
+
             // 构造 OpenAI 兼容格式 messages 数组 (system + 历史记录)
             const apiMessages = [
                 { role: 'system', content: systemPrompt }
@@ -2594,6 +2687,11 @@
                     const parsedMem = extractMemoryMarkers(fullText);
                     fullText = parsedMem.text;
                     if (parsedMem.memories.length) saveUserMemories(parsedMem.memories);
+                    // 剥离心声标记 [心声:内容] 与虚拟图片标记 [图片:描述]
+                    const parsedHeart = extractHeartMarkers(fullText);
+                    fullText = parsedHeart.text;
+                    const parsedImg = extractVImageMarkers(fullText);
+                    fullText = parsedImg.text;
                     // AI 回复清洗：硬编码八股规则 + 用户自定义正则 + 残余标点收口（只对 AI 文本生效）
                     fullText = applyAICleanup(fullText);
                     if (fullText) {
@@ -2602,7 +2700,7 @@
                         const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
                         historyList.push(aiMsg);
                         saveMessages(historyList);
-                    } else if ((parsedCall.wantCall || parsedPay.items.length) && streamBubble) {
+                    } else if ((parsedCall.wantCall || parsedPay.items.length || parsedHeart.hearts.length || parsedImg.images.length) && streamBubble) {
                         // 模型只输出了标记：移除空白气泡、不落文本（来电卡/红包卡仍会插入）
                         const onlyRow = streamBubble.closest('.msg-row');
                         if (onlyRow) onlyRow.remove();
@@ -2615,6 +2713,12 @@
                     if (parsedPay.items.length) {
                         // AI 侧插入红包/转账卡片并落库，role='assistant' 可被用户点击领取
                         insertPayCards(historyList, parsedPay.items);
+                    }
+                    if (parsedHeart.hearts.length) {
+                        insertHeartCards(historyList, parsedHeart.hearts);
+                    }
+                    if (parsedImg.images.length) {
+                        insertVImageCards(historyList, parsedImg.images);
                     }
                 }
                 chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -2637,6 +2741,11 @@
                     const parsedMem = extractMemoryMarkers(fullText);
                     fullText = parsedMem.text;
                     if (parsedMem.memories.length) saveUserMemories(parsedMem.memories);
+                    // 中断前已收到心声/虚拟图片标记：同样剥离并生成卡片
+                    const parsedHeart = extractHeartMarkers(fullText);
+                    fullText = parsedHeart.text;
+                    const parsedImg = extractVImageMarkers(fullText);
+                    fullText = parsedImg.text;
                     // AI 回复清洗（与正常分支同一套规则）
                     fullText = applyAICleanup(fullText);
                     if (streamBubble) streamBubble.textContent = fullText;
@@ -2659,6 +2768,12 @@
                     }
                     if (parsedPay.items.length) {
                         insertPayCards(historyList, parsedPay.items);
+                    }
+                    if (parsedHeart.hearts.length) {
+                        insertHeartCards(historyList, parsedHeart.hearts);
+                    }
+                    if (parsedImg.images.length) {
+                        insertVImageCards(historyList, parsedImg.images);
                     }
                     logApiCall(apiModel, 'error', apiCallStart, tipText);
                     return;
