@@ -1522,6 +1522,52 @@
           </button>
         </div>
 
+        <!-- 拉黑 / 删除会话 -->
+        <div class="settings-card" id="blockCard">
+          <button type="button" class="action-row" id="actionBlock">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">拉黑 TA</span>
+              <span class="action-sub">拉黑后 TA 不会收到也不会回复消息</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="deleteChatCard">
+          <button type="button" class="action-row" id="actionDeleteChat">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">删除会话</span>
+              <span class="action-sub">从消息列表移除，聊天记录保留</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="deleteChatForeverCard">
+          <button type="button" class="action-row" id="actionDeleteChatForever">
+            <span class="action-icon danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title danger">删除会话并清空记录</span>
+              <span class="action-sub">会话与聊天记录一起消失，不可恢复</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
         <!-- 群聊专属：清理群记录 / 解散群聊（置底，仅群聊显示） -->
         <div class="settings-card" id="gpClearRecordCard" style="display:none;">
           <button type="button" class="action-row" id="actionGpClearRecord">
@@ -2042,6 +2088,68 @@
     refreshMeta();
     showToast('已清空聊天记录');
   });
+
+  // ================= 拉黑 / 删除会话（拉黑=不能聊；删除=不在列表；两者正交） =================
+  var BLOCKED_KEY = 'chat_blocked_ids';
+  var HIDDEN_KEY = 'hidden_chat_dialog_ids';
+
+  function readIdList(key) {
+    try {
+      var arr = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(arr) ? arr.map(String) : [];
+    } catch (e) { return []; }
+  }
+  function writeIdList(key, arr) {
+    try { localStorage.setItem(key, JSON.stringify(arr)); return true; }
+    catch (e) { showToast('保存失败：本地存储空间不足'); return false; }
+  }
+  function refreshBlockUI() {
+    var blocked = readIdList(BLOCKED_KEY).indexOf(String(roleId)) !== -1;
+    var btn = document.getElementById('actionBlock');
+    if (!btn) return;
+    var t = btn.querySelector('.action-title');
+    var s = btn.querySelector('.action-sub');
+    if (t) t.textContent = blocked ? '解除拉黑' : '拉黑 TA';
+    if (s) s.textContent = blocked ? '当前已拉黑，TA 不会回复你的消息' : '拉黑后 TA 不会收到也不会回复消息';
+  }
+
+  var actionBlockBtn = document.getElementById('actionBlock');
+  if (actionBlockBtn) {
+    actionBlockBtn.addEventListener('click', function () {
+      var arr = readIdList(BLOCKED_KEY);
+      var idx = arr.indexOf(String(roleId));
+      if (idx === -1) arr.push(String(roleId)); else arr.splice(idx, 1);
+      if (!writeIdList(BLOCKED_KEY, arr)) return;
+      refreshBlockUI();
+      showToast(idx === -1 ? '已拉黑「' + contactName + '」' : '已解除拉黑');
+    });
+  }
+
+  var actionDeleteChatBtn = document.getElementById('actionDeleteChat');
+  if (actionDeleteChatBtn) {
+    actionDeleteChatBtn.addEventListener('click', function () {
+      var arr = readIdList(HIDDEN_KEY);
+      if (arr.indexOf(String(roleId)) === -1) arr.push(String(roleId));
+      if (!writeIdList(HIDDEN_KEY, arr)) return;
+      showToast('已从消息列表移除');
+      setTimeout(function () { window.location.href = 'chat.html'; }, 600);
+    });
+  }
+
+  var actionDeleteForeverBtn = document.getElementById('actionDeleteChatForever');
+  if (actionDeleteForeverBtn) {
+    actionDeleteForeverBtn.addEventListener('click', function () {
+      if (!confirm('删除后「' + contactName + '」的会话与聊天记录都会消失，且不可恢复。确定继续？')) return;
+      var arr = readIdList(HIDDEN_KEY);
+      if (arr.indexOf(String(roleId)) === -1) arr.push(String(roleId));
+      if (!writeIdList(HIDDEN_KEY, arr)) return;
+      try { localStorage.removeItem(storageKey); } catch (e) {}
+      showToast('已删除会话');
+      setTimeout(function () { window.location.href = 'chat.html'; }, 600);
+    });
+  }
+
+  refreshBlockUI();
 
   // ================= API 调用记录（unshift 到 api_call_logs 最前，最多 50 条；异常静默不影响主流程） =================
   function logApiCall(model, status, startTime, errorMsg) {

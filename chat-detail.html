@@ -505,6 +505,103 @@
         .regen-cancel { background: #F2F2F7; color: #666666; }
         .regen-confirm { background: #111111; color: #FFFFFF; }
 
+        /* ========== 消息操作面板 / 转发面板 / 编辑抽屉（统一底部抽屉风格） ========== */
+        .msg-sheet-overlay, .fw-overlay, .edit-overlay {
+            position: absolute; inset: 0; z-index: 420;
+            display: none; align-items: flex-end;
+        }
+        .msg-sheet-overlay.active, .fw-overlay.active, .edit-overlay.active { display: flex; }
+        .msg-sheet-backdrop, .fw-backdrop, .edit-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.32); }
+        .msg-sheet, .fw-sheet, .edit-sheet {
+            position: relative; width: 100%; box-sizing: border-box;
+            background: #FFFFFF;
+            border-radius: 22px 22px 0 0;
+            padding: 0 0 calc(12px + env(safe-area-inset-bottom));
+            animation: sheetUp 0.22s ease-out;
+        }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .msg-sheet-handle, .fw-handle, .edit-handle {
+            width: 36px; height: 4px; border-radius: 999px; background: #111111;
+            margin: 8px auto 10px; opacity: 0.9;
+        }
+        .msg-sheet-list { max-height: 46vh; overflow-y: auto; }
+        .msg-sheet-item {
+            display: flex; align-items: center; gap: 14px;
+            width: 100%; height: 52px; padding: 0 22px;
+            background: none; border: none; cursor: pointer;
+            font-size: 0.875rem; font-family: inherit; color: #333333; text-align: left;
+        }
+        .msg-sheet-item:active { background: #F7F7F9; }
+        .msg-sheet-item.danger { color: #FF453A; }
+        .msg-sheet-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .msg-sheet-cancel {
+            display: block; width: calc(100% - 40px); margin: 10px 20px 0; height: 48px;
+            background: #F2F2F7; border: none; border-radius: 14px;
+            font-size: 0.938rem; font-family: inherit; color: #666666; cursor: pointer;
+        }
+        .fw-title, .edit-title {
+            font-size: 0.875rem; font-weight: 700; color: #111111;
+            padding: 0 22px 10px; margin: 0;
+        }
+        .fw-list { max-height: 50vh; overflow-y: auto; padding: 0 8px; }
+        .fw-item {
+            display: flex; align-items: center; gap: 12px;
+            width: 100%; height: 60px; padding: 0 14px;
+            background: none; border: none; cursor: pointer; text-align: left; font-family: inherit;
+        }
+        .fw-item:active { background: #F7F7F9; }
+        .fw-avatar {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+            background: #F2F2F7; color: #8E8E93; font-size: 0.875rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fw-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .fw-name { flex: 1; font-size: 0.938rem; color: #111111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .fw-empty { text-align: center; color: #B0B0B5; font-size: 0.875rem; padding: 36px 0; }
+        .edit-input {
+            display: block; width: calc(100% - 40px); margin: 0 20px; box-sizing: border-box;
+            min-height: 88px; max-height: 40vh;
+            background: #F2F2F7; border: none; border-radius: 12px;
+            padding: 12px 14px; font-size: 0.875rem; font-family: inherit;
+            color: #111111; outline: none; resize: none;
+        }
+        .edit-actions { display: flex; gap: 10px; padding: 14px 20px 0; }
+        .edit-cancel, .edit-confirm {
+            flex: 1; border: none; border-radius: 12px; padding: 13px;
+            font-size: 0.938rem; font-family: inherit; font-weight: 600; cursor: pointer;
+        }
+        .edit-cancel { background: #F2F2F7; color: #666666; }
+        .edit-confirm { background: #111111; color: #FFFFFF; }
+
+        /* 译文小字 / 已编辑标记 */
+        .msg-translation { font-size: 0.688rem; line-height: 1.45; color: #8E8E93; margin-top: 6px; padding-top: 6px; border-top: 0.5px solid rgba(0,0,0,0.08); }
+        .msg-edited { font-size: 0.625rem; color: #C7C7CC; margin-top: 4px; }
+
+        /* 语音气泡 / 图片气泡 / 拉黑输入态 */
+        .bubble-voice { min-width: 108px; padding: 8px 12px; }
+        .voice-row { display: flex; align-items: center; gap: 8px; }
+        .voice-wave { display: flex; align-items: flex-end; gap: 2px; height: 18px; }
+        .voice-wave i { width: 2px; border-radius: 1px; background: currentColor; opacity: 0.4; }
+        .voice-wave i.on { opacity: 1; }
+        .voice-dur { font-size: 0.688rem; opacity: 0.7; }
+        .voice-transcript { font-size: 0.688rem; opacity: 0.75; margin-top: 6px; line-height: 1.4; }
+        .bubble-media { padding: 0 !important; background: transparent !important; border: none !important; }
+        .msg-media-img { width: 180px; max-width: 100%; border-radius: 16px; display: block; }
+        .msg-media-desc { font-size: 0.688rem; color: #8E8E93; margin-top: 6px; }
+        .input-capsule.is-blocked { opacity: 0.5; pointer-events: none; }
+
+        /* 名片消息 */
+        .card-share { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+        .card-avatar {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+            background: #F2F2F7; color: #8E8E93; font-size: 0.875rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .card-info { min-width: 0; }
+        .card-name { font-size: 0.875rem; font-weight: 600; color: #111111; }
+        .card-label { font-size: 0.688rem; color: #8E8E93; margin-top: 2px; }
+
         .detail-toast {
             position: absolute;
             top: 50%;
@@ -759,6 +856,13 @@
         .x-btn-primary { background: #111; color: #fff; }
         .x-btn-ghost { background: #F2F2F7; color: #333; }
         .x-btn-danger { background: transparent; color: #FF453A; }
+        .x-chips { display: flex; gap: 8px; }
+        .x-chip {
+            flex: 1; height: 40px; border-radius: 10px; border: none;
+            background: #F2F2F7; color: #666666; font-size: 0.813rem;
+            font-family: inherit; cursor: pointer;
+        }
+        .x-chip.active { background: #111111; color: #FFFFFF; font-weight: 600; }
         .x-list { display: flex; flex-direction: column; gap: 8px; }
         .x-list-item {
             display: flex;
@@ -1060,6 +1164,18 @@
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
                         <span class="plus-label">转账</span>
                     </button>
+                    <button class="plus-item" data-feat="img" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5L5 21"/></svg></span>
+                        <span class="plus-label">图片</span>
+                    </button>
+                    <button class="plus-item" data-feat="voice-msg" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/></svg></span>
+                        <span class="plus-label">语音</span>
+                    </button>
+                    <button class="plus-item" data-feat="card" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16c.8-1.4 1.8-2 3-2s2.2.6 3 2"/><path d="M14.5 10h4M14.5 13.5h4"/></svg></span>
+                        <span class="plus-label">名片</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1081,6 +1197,40 @@
                 <div class="regen-actions">
                     <button class="regen-cancel" type="button" id="regenCancel">取消</button>
                     <button class="regen-confirm" type="button" id="regenConfirm">确认重玩</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 消息操作面板（长按消息弹出） -->
+        <div class="msg-sheet-overlay" id="msgSheetOverlay">
+            <div class="msg-sheet-backdrop" id="msgSheetBackdrop"></div>
+            <div class="msg-sheet">
+                <div class="msg-sheet-handle"></div>
+                <div class="msg-sheet-list" id="msgSheetList"></div>
+                <button class="msg-sheet-cancel" id="msgSheetCancel" type="button">取消</button>
+            </div>
+        </div>
+
+        <!-- 转发面板：选择其他会话 -->
+        <div class="fw-overlay" id="fwOverlay">
+            <div class="fw-backdrop" id="fwBackdrop"></div>
+            <div class="fw-sheet">
+                <div class="fw-handle"></div>
+                <div class="fw-title">转发给</div>
+                <div class="fw-list" id="fwList"></div>
+            </div>
+        </div>
+
+        <!-- 编辑消息抽屉 -->
+        <div class="edit-overlay" id="editOverlay">
+            <div class="edit-backdrop" id="editBackdrop"></div>
+            <div class="edit-sheet">
+                <div class="edit-handle"></div>
+                <div class="edit-title" id="editTitle">修改内容</div>
+                <textarea class="edit-input" id="editInput" rows="4"></textarea>
+                <div class="edit-actions">
+                    <button class="edit-cancel" type="button" id="editCancel">取消</button>
+                    <button class="edit-confirm" type="button" id="editConfirm">保存</button>
                 </div>
             </div>
         </div>
@@ -1226,6 +1376,32 @@
             }
         }
 
+        // ================= 拉黑态（键 chat_blocked_ids：会话仍在列表，但不能聊） =================
+        function isBlocked(id) {
+            try {
+                var arr = JSON.parse(localStorage.getItem('chat_blocked_ids') || '[]');
+                if (!Array.isArray(arr)) return false;
+                return arr.map(String).indexOf(String(id)) !== -1;
+            } catch (e) { return false; }
+        }
+
+        function applyBlockUI() {
+            var blocked = isBlocked(aliasRoleId);
+            var bar = document.getElementById('chat-notice-bar');
+            if (bar) {
+                if (blocked) {
+                    bar.textContent = '你已把 TA 拉黑，TA 不会再回复你（可在对话设置里解除）';
+                    bar.style.display = '';
+                } else if (!isGroupChat) {
+                    bar.style.display = 'none';
+                }
+            }
+            var cap = document.querySelector('.input-capsule');
+            if (cap) cap.classList.toggle('is-blocked', blocked);
+            if (chatInput) chatInput.disabled = blocked;
+        }
+        applyBlockUI();
+
         // ================= 聊天背景（只读应用：chat_bg_<roleId>） =================
         // 有图：图片 cover 铺满 + 72% 白色柔和遮罩，保证黑白两种气泡文字均清晰；无图保持默认渐变背景
         function applyChatBackground() {
@@ -1296,6 +1472,25 @@
             return '';
         }
 
+        // ================= 消息稳定标识：单条操作（复制/转发/翻译/编辑/删除）都依赖 mid =================
+        function ensureMid(msg) {
+            if (!msg || typeof msg !== 'object') return '';
+            // 老数据（含欢迎消息）可能没有 time：补一个，使长按/多选/删除都能正常工作
+            if (!msg.time) msg.time = Date.now();
+            if (!msg.mid) {
+                msg.mid = 'm' + (msg.time || Date.now()) + Math.random().toString(36).slice(2, 5);
+            }
+            return msg.mid;
+        }
+
+        function findByMid(mid) {
+            var list = loadMessages();
+            for (var i = 0; i < list.length; i++) {
+                if (ensureMid(list[i]) === mid) return list[i];
+            }
+            return null;
+        }
+
         function appendMessageToDOM(msg, idx) {
             const row = document.createElement('div');
             const isSent = msg.role === 'sent' || msg.role === 'user';
@@ -1306,12 +1501,29 @@
             if (typeof idx === 'number') row.dataset.idx = idx;
             // 多选删除用：消息唯一标识
             row.dataset.time = String(msg.time || '');
+            // 单条操作用：稳定标识（不存在时自动补齐）
+            row.dataset.mid = ensureMid(msg);
 
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble';
 
             // 特殊类型消息渲染为卡片，复用同一套气泡与左右对齐
-            if (msg.type === 'sticker') {
+            if (msg.type === 'image' && msg.img) {
+                bubble.classList.add('bubble-media');
+                var imgDesc = String(msg.desc || '');
+                bubble.innerHTML = '<img class="msg-media-img" src="' + String(msg.img) + '" alt="' + imgDesc + '">' +
+                    (imgDesc ? '<div class="msg-media-desc">' + imgDesc + '</div>' : '');
+            } else if (msg.type === 'voice') {
+                bubble.classList.add('bubble-voice');
+                var voiceSecs = Math.max(1, parseInt(msg.duration, 10) || 3);
+                var voiceBars = '';
+                for (var vb = 0; vb < 16; vb++) {
+                    voiceBars += '<i style="height:' + (5 + Math.round(Math.random() * 13)) + 'px"></i>';
+                }
+                bubble.innerHTML = '<div class="voice-row"><span class="voice-wave" data-bars="1">' + voiceBars + '</span>' +
+                    '<span class="voice-dur">' + voiceSecs + '"</span></div>' +
+                    (msg.text ? '<div class="voice-transcript">' + String(msg.text) + '</div>' : '');
+            } else if (msg.type === 'sticker') {
                 bubble.classList.add('bubble-sticker');
                 var safeDesc = String(msg.desc || '表情');
                 var safeImg = String(msg.img || '');
@@ -1409,8 +1621,26 @@
                         <span class="pay-card-msg">${escHtml(String(status))}</span>
                     </div>
                 </div>`;
+            } else if (msg.type === 'card' && msg.card) {
+                const cd = msg.card;
+                const cdAv = cd.avatar && String(cd.avatar).length > 20
+                    ? '<img src="' + String(cd.avatar) + '" alt="">'
+                    : String(cd.name || '?').slice(0, 1);
+                bubble.innerHTML = '<div class="msg-card card-share">' +
+                    '<div class="card-avatar">' + cdAv + '</div>' +
+                    '<div class="card-info"><div class="card-name">' + String(cd.name || '') + '</div>' +
+                    '<div class="card-label">个人名片</div></div>' +
+                    '</div>';
             } else {
                 bubble.textContent = msg.text || msg.content || '';
+            }
+
+            // 译文小字（AI 翻译结果落库后随消息一起渲染）
+            if (msg.translation) {
+                const trEl = document.createElement('div');
+                trEl.className = 'msg-translation';
+                trEl.textContent = String(msg.translation);
+                bubble.appendChild(trEl);
             }
 
             if (isError) {
@@ -1462,6 +1692,10 @@
         function renderAllMessages() {
             chatMessages.innerHTML = `<div class="message-time">Just now</div>`;
             const list = loadMessages();
+            // 老数据补齐稳定 id 与时间戳：只新增字段，不迁移、不改变原有结构
+            let midAdded = false;
+            list.forEach(function (m) { if (m && (!m.mid || !m.time)) { ensureMid(m); midAdded = true; } });
+            if (midAdded) saveMessages(list);
             // 清理历史残留：此前真实定位调用产生的超时/失败错误消息，一次性从记录中移除
             const cleaned = list.filter(m => {
                 const t = String((m && (m.text || m.content)) || '');
@@ -1753,6 +1987,106 @@
             return lines.length ? lines.join('\n') : '暂无记忆';
         }
 
+        // ================= 非流式单次 AI 调用（翻译等短任务复用，含 15 秒超时与埋点） =================
+        async function callAiNonStream(systemPrompt, userPrompt) {
+            const cfg = getAiConfig();
+            const apiKey = (cfg.apiKey || '').trim();
+            const baseUrl = (cfg.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+            const apiModel = (cfg.model || 'gpt-3.5-turbo').trim();
+            if (!apiKey) {
+                if (typeof showToast === 'function') showToast('请先到【设置页 → API 设置】配置 API Key');
+                return null;
+            }
+            const start = Date.now();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+            try {
+                const resp = await fetch(baseUrl + '/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        model: apiModel,
+                        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+                        temperature: 0.3,
+                        stream: false
+                    })
+                });
+                clearTimeout(timeoutId);
+                if (!resp.ok) {
+                    let raw = '';
+                    try { raw = await resp.text(); } catch (e) {}
+                    let detail = raw;
+                    try { detail = (JSON.parse(raw).error && JSON.parse(raw).error.message) || raw; } catch (e) {}
+                    logApiCall(apiModel, 'error', start, 'HTTP ' + resp.status + ' ' + detail);
+                    return null;
+                }
+                const data = await resp.json();
+                let out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+                out = String(out || '').trim();
+                if (!out) { logApiCall(apiModel, 'error', start, '空响应'); return null; }
+                logApiCall(apiModel, 'success', start, '');
+                return out;
+            } catch (e) {
+                clearTimeout(timeoutId);
+                const em = (e && e.name === 'AbortError') ? '请求超时（15秒）' : ('连接失败：' + ((e && e.message) || ''));
+                logApiCall(apiModel, 'error', start, em);
+                return null;
+            }
+        }
+
+        // ================= AI 翻译：结果写入 msg.translation 落库并就地追加小字 =================
+        const TRANSLATE_SYSTEM = '[任务]\n你是翻译引擎，只做翻译，不做其他任何事。\n' +
+            '[规则]\n' +
+            '1. 原文是中文就翻译成英文；原文不是中文就翻译成简体中文。\n' +
+            '2. 只输出译文本身，禁止输出解释、引号、“译文：”之类的前缀，禁止保留原文。\n' +
+            '3. 保留原文语气与口语感，句子短、自然。\n' +
+            '4. 人名、地名不翻译。\n' +
+            '5. 长度与原文相当，不要扩写。';
+
+        async function translateMessage(mid) {
+            const msg = findByMid(mid);
+            if (!msg) return;
+            const src = String((msg.text || msg.content) || '').trim();
+            if (!src) {
+                if (typeof showToast === 'function') showToast('这条消息没有可翻译的文字');
+                return;
+            }
+            var cfgNow = getAiConfig();
+            if (!(cfgNow.apiKey || '').trim()) {
+                if (typeof showToast === 'function') showToast('请先到【设置页 → API 设置】配置 API Key');
+                return;
+            }
+            if (typeof showToast === 'function') showToast('正在翻译...');
+            const out = await callAiNonStream(TRANSLATE_SYSTEM, '请翻译以下内容：\n' + src);
+            if (!out) {
+                if (typeof showToast === 'function') showToast('翻译失败，请检查网络或 API 设置');
+                return;
+            }
+            const list = loadMessages();
+            for (let i = 0; i < list.length; i++) {
+                if (ensureMid(list[i]) === mid) {
+                    list[i].translation = out;
+                    list[i].translationAt = Date.now();
+                    break;
+                }
+            }
+            saveMessages(list);
+            const row = chatMessages.querySelector('.msg-row[data-mid="' + mid + '"]');
+            const bubbleEl = row ? row.querySelector('.msg-bubble') : null;
+            if (bubbleEl) {
+                const old = bubbleEl.querySelector('.msg-translation');
+                if (old) old.remove();
+                const tr = document.createElement('div');
+                tr.className = 'msg-translation';
+                tr.textContent = out;
+                bubbleEl.appendChild(tr);
+            } else {
+                renderAllMessages();
+            }
+            if (typeof showToast === 'function') showToast('已翻译');
+        }
+
         // 3. 核心真实 AI 聊天发送逻辑 (含历史记录、人设构造与 15 秒超时控制)
         async function sendMsg(opts) {
             const input = document.getElementById('chat-input');
@@ -1762,6 +2096,10 @@
             const isRegen = !!(opts && opts.isRegenerate);
             const text = customText || input.value.trim();
             if (!text && !isRegen) return;
+            if (isBlocked(aliasRoleId)) {
+                if (typeof showToast === 'function') showToast('你已把 TA 拉黑，无法发送消息');
+                return;
+            }
 
             const config = getAiConfig();
             const apiKey = (config.apiKey || '').trim();
@@ -2324,19 +2662,29 @@
 
         // 暴露给 chat-extras.js：重玩/重新生成
         window.sendMsg = sendMsg;
-        window.regenerateReply = function(direction) {
-            var list = loadMessages();
-            // 从后往前找最后一条 AI 消息
-            var lastAiIdx = -1;
-            for (var i = list.length - 1; i >= 0; i--) {
-                var m = list[i];
-                if (m.role === 'received' || m.role === 'assistant') { lastAiIdx = i; break; }
-            }
-            if (lastAiIdx === -1) {
-                if (typeof showToast === 'function') showToast('还没有 AI 回复可以重玩');
+        window.regenerateReply = function(direction, mid) {
+            if (isBlocked(aliasRoleId)) {
+                if (typeof showToast === 'function') showToast('你已把 TA 拉黑，无法重玩或改写');
                 return;
             }
-            list.splice(lastAiIdx, 1);
+            var list = loadMessages();
+            var targetIdx = -1;
+            if (mid) {
+                for (var k = 0; k < list.length; k++) {
+                    if (ensureMid(list[k]) === mid) { targetIdx = k; break; }
+                }
+            } else {
+                // 从后往前找最后一条 AI 消息
+                for (var i = list.length - 1; i >= 0; i--) {
+                    var m = list[i];
+                    if (m.role === 'received' || m.role === 'assistant') { targetIdx = i; break; }
+                }
+            }
+            if (targetIdx === -1) {
+                if (typeof showToast === 'function') showToast(mid ? '这条消息已不存在' : '还没有 AI 回复可以重玩');
+                return;
+            }
+            list.splice(targetIdx, 1);
             saveMessages(list);
             // 清空聊天区重新渲染
             chatMessages.innerHTML = '';
@@ -2344,6 +2692,12 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
             // 触发重新生成
             sendMsg({ isRegenerate: true, regenDirection: direction || '' });
+        };
+
+        // 改写指定的某条 AI 消息（由消息操作面板调用）
+        window.openRegenForMid = function(mid) {
+            window.__regenMid = mid;
+            if (typeof window.openRegen === 'function') window.openRegen(mid);
         };
 
         // ================= 让TA回复（不发新消息，AI 主动说一句） =================
@@ -2412,15 +2766,372 @@
             updateSelectionUI();
         }
 
-        // 长按检测（pointer 事件兼容触摸/鼠标）
+        // ================= 消息操作面板（长按弹出；多选收进面板，原多选逻辑保持不变） =================
+        var MSG_ICON_SELECT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12.5l2.5 2.5 5-5.5"/></svg>';
+        var MSG_ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A2.5 2.5 0 0 1 7.5 3H15"/></svg>';
+        var MSG_ICON_FORWARD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19v-1.5A5.5 5.5 0 0 1 9.5 12H20"/><polyline points="15 7 20 12 15 17"/></svg>';
+        var MSG_ICON_TRANSLATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h9"/><path d="M7.5 5v1c0 4.5-2 8-4.5 9.5"/><path d="M5.5 12c1.8 3.2 4 4.6 6.5 5"/><path d="M12 20l3.5-9 3.5 9"/><path d="M13.4 17h4.2"/></svg>';
+        var MSG_ICON_REWRITE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><polyline points="20 4 20 9 15 9"/></svg>';
+        var MSG_ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+        var MSG_ICON_DELETE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+
+        var msgSheetOverlay = document.getElementById('msgSheetOverlay');
+        var msgSheetList = document.getElementById('msgSheetList');
+        var msgSheetBackdrop = document.getElementById('msgSheetBackdrop');
+        var msgSheetCancelBtn = document.getElementById('msgSheetCancel');
+        var msgSheetMid = '';
+        var msgSheetOpenedAt = 0;
+
+        function closeMsgSheet() {
+            if (msgSheetOverlay) msgSheetOverlay.classList.remove('active');
+            msgSheetMid = '';
+        }
+
+        function sheetItemHTML(act, label, icon, danger) {
+            return '<button class="msg-sheet-item' + (danger ? ' danger' : '') + '" type="button" data-act="' + act + '">' + icon + '<span>' + label + '</span></button>';
+        }
+
+        // 取消息的可读文本（非文本消息给等价占位文案）
+        function plainTextOf(msg) {
+            var t = String((msg && (msg.text || msg.content)) || '').trim();
+            if (t) return t;
+            if (!msg) return '';
+            if (msg.type === 'redpacket') return '[红包] ' + (msg.message || '恭喜发财，大吉大利');
+            if (msg.type === 'transfer') return '[转账] ' + (msg.amount != null ? '¥' + msg.amount : '');
+            if (msg.type === 'voice') return '[语音]' + (msg.text ? ' ' + msg.text : '');
+            if (msg.type === 'image') return '[图片]' + (msg.desc ? ' ' + msg.desc : '');
+            if (msg.type === 'location') return '[位置] ' + ((msg.location && msg.location.label) || '');
+            if (msg.type === 'card') return '[名片] ' + ((msg.card && msg.card.name) || '');
+            if (msg.type === 'sticker') return '[表情] ' + (msg.desc || '');
+            if (msg.type === 'call') return '[通话]';
+            return '[消息]';
+        }
+
+        function openMsgSheet(mid) {
+            var msg = findByMid(mid);
+            if (!msg || !msgSheetOverlay) return;
+            msgSheetMid = mid;
+            var isAi = msg.role === 'received' || msg.role === 'assistant';
+            var hasText = !!String((msg.text || msg.content) || '').trim();
+            var html = sheetItemHTML('select', '多选', MSG_ICON_SELECT, false);
+            if (hasText) html += sheetItemHTML('copy', '复制文本', MSG_ICON_COPY, false);
+            html += sheetItemHTML('forward', '转发给…', MSG_ICON_FORWARD, false);
+            if (hasText) html += sheetItemHTML('translate', 'AI 翻译', MSG_ICON_TRANSLATE, false);
+            if (isAi) html += sheetItemHTML('rewrite', '改写这条回复', MSG_ICON_REWRITE, false);
+            if (hasText) html += sheetItemHTML('edit', '编辑内容', MSG_ICON_EDIT, false);
+            html += sheetItemHTML('delete', '删除这条', MSG_ICON_DELETE, true);
+            msgSheetList.innerHTML = html;
+            msgSheetOpenedAt = Date.now();
+            msgSheetOverlay.classList.add('active');
+        }
+
+        if (msgSheetBackdrop) {
+            msgSheetBackdrop.addEventListener('click', function () {
+                if (Date.now() - msgSheetOpenedAt < 200) return;
+                closeMsgSheet();
+            });
+        }
+        if (msgSheetCancelBtn) {
+            msgSheetCancelBtn.addEventListener('click', function () {
+                if (Date.now() - msgSheetOpenedAt < 200) return;
+                closeMsgSheet();
+            });
+        }
+        if (msgSheetList) {
+            msgSheetList.addEventListener('click', function (e) {
+                var btn = e.target.closest('.msg-sheet-item');
+                if (!btn) return;
+                var act = btn.getAttribute('data-act');
+                var mid = msgSheetMid;
+                var msg = findByMid(mid);
+                closeMsgSheet();
+                if (!msg) return;
+                if (act === 'select') { enterSelection(String(msg.time || '')); return; }
+                if (act === 'copy') { copyMessageText(msg); return; }
+                if (act === 'forward') { openForwardSheet(mid); return; }
+                if (act === 'translate') {
+                    if (typeof translateMessage === 'function') translateMessage(mid);
+                    else if (typeof showToast === 'function') showToast('翻译功能稍后开放');
+                    return;
+                }
+                if (act === 'rewrite') {
+                    if (typeof openRegenForMid === 'function') openRegenForMid(mid);
+                    else if (typeof showToast === 'function') showToast('改写功能稍后开放');
+                    return;
+                }
+                if (act === 'edit') { openEditSheet(mid); return; }
+                if (act === 'delete') { deleteOneMessage(mid); return; }
+            });
+        }
+
+        // ---------- 复制消息文本 ----------
+        function copyMessageText(msg) {
+            var txt = plainTextOf(msg);
+            if (!txt) return;
+            function ok() { if (typeof showToast === 'function') showToast('已复制'); }
+            function fallback() {
+                try {
+                    var ta = document.createElement('textarea');
+                    ta.value = txt;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    ok();
+                } catch (e) {
+                    if (typeof showToast === 'function') showToast('复制失败');
+                }
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(txt).then(ok).catch(fallback);
+            } else {
+                fallback();
+            }
+        }
+
+        // ---------- 单条删除 ----------
+        function deleteOneMessage(mid) {
+            var list = loadMessages();
+            var keep = list.filter(function (m) { return ensureMid(m) !== mid; });
+            if (keep.length === list.length) {
+                if (typeof showToast === 'function') showToast('消息已不存在');
+                return;
+            }
+            saveMessages(keep);
+            chatMessages.innerHTML = '';
+            keep.forEach(function (m, i) { appendMessageToDOM(m, i); });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (typeof showToast === 'function') showToast('已删除 1 条消息');
+        }
+
+        // ---------- 编辑消息（P0 只放开纯文本气泡） ----------
+        var editOverlay = document.getElementById('editOverlay');
+        var editBackdrop = document.getElementById('editBackdrop');
+        var editInput = document.getElementById('editInput');
+        var editTitleEl = document.getElementById('editTitle');
+        var editCancelBtn = document.getElementById('editCancel');
+        var editConfirmBtn = document.getElementById('editConfirm');
+        var editMid = '';
+        var editOpenedAt = 0;
+
+        function closeEditSheet() {
+            if (editOverlay) editOverlay.classList.remove('active');
+            editMid = '';
+        }
+
+        function openEditSheet(mid) {
+            var msg = findByMid(mid);
+            if (!msg || !editOverlay) return;
+            var isAi = msg.role === 'received' || msg.role === 'assistant';
+            editMid = mid;
+            if (editTitleEl) editTitleEl.textContent = isAi ? '修改 TA 说的话' : '修改内容';
+            if (editInput) editInput.value = String(msg.text || msg.content || '');
+            editOpenedAt = Date.now();
+            editOverlay.classList.add('active');
+            setTimeout(function () { try { editInput.focus(); } catch (e) {} }, 60);
+        }
+
+        function saveEditedMessage() {
+            var mid = editMid;
+            var list = loadMessages();
+            var idx = -1;
+            for (var i = 0; i < list.length; i++) { if (ensureMid(list[i]) === mid) { idx = i; break; } }
+            if (idx === -1) {
+                if (typeof showToast === 'function') showToast('消息已不存在');
+                closeEditSheet();
+                return;
+            }
+            var msg = list[idx];
+            var newText = String(editInput.value || '').trim();
+            if (!newText) {
+                if (typeof showToast === 'function') showToast('内容不能为空');
+                return;
+            }
+            if (newText === String(msg.text || msg.content || '').trim()) { closeEditSheet(); return; }
+            if (msg.content != null && msg.text == null) msg.content = newText; else msg.text = newText;
+            msg.edited = true;
+            msg.editedAt = Date.now();
+            saveMessages(list);
+
+            var row = chatMessages.querySelector('.msg-row[data-mid="' + mid + '"]');
+            var bubbleEl = row ? row.querySelector('.msg-bubble') : null;
+            var textishOnly = !!bubbleEl;
+            if (bubbleEl) {
+                Array.prototype.forEach.call(bubbleEl.children, function (c) {
+                    if (!c.classList.contains('msg-translation') && !c.classList.contains('msg-edited')) textishOnly = false;
+                });
+            }
+            if (bubbleEl && textishOnly) {
+                var keepTr = bubbleEl.querySelector('.msg-translation');
+                bubbleEl.textContent = newText;
+                if (keepTr) bubbleEl.appendChild(keepTr);
+                var tag = document.createElement('div');
+                tag.className = 'msg-edited';
+                tag.textContent = '已编辑';
+                bubbleEl.appendChild(tag);
+            } else {
+                renderAllMessages();
+            }
+            closeEditSheet();
+            if (typeof showToast === 'function') showToast('已保存');
+        }
+
+        if (editBackdrop) {
+            editBackdrop.addEventListener('click', function () {
+                if (Date.now() - editOpenedAt < 200) return;
+                closeEditSheet();
+            });
+        }
+        if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditSheet);
+        if (editConfirmBtn) editConfirmBtn.addEventListener('click', saveEditedMessage);
+
+        // ---------- 转发面板：选择其他会话发送 ----------
+        var fwOverlay = document.getElementById('fwOverlay');
+        var fwBackdrop = document.getElementById('fwBackdrop');
+        var fwList = document.getElementById('fwList');
+        var fwOpenedAt = 0;
+
+        function closeForwardSheet() {
+            if (fwOverlay) fwOverlay.classList.remove('active');
+        }
+
+        // 可选会话：角色列表（排除当前会话与已隐藏会话）+ 群聊列表
+        function getForwardTargets() {
+            var out = [];
+            try {
+                var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
+                var hidden = JSON.parse(localStorage.getItem('hidden_chat_dialog_ids') || '[]').map(String);
+                if (Array.isArray(roles)) {
+                    roles.forEach(function (r) {
+                        if (!r || r.id == null) return;
+                        if (String(r.id) === String(aliasRoleId)) return;
+                        if (hidden.indexOf(String(r.id)) !== -1) return;
+                        out.push({ id: String(r.id), name: r.name || '角色', avatar: r.avatar || '' });
+                    });
+                }
+            } catch (e) {}
+            try {
+                var groups = JSON.parse(localStorage.getItem('phone_groups') || '[]');
+                if (Array.isArray(groups)) {
+                    groups.forEach(function (g) {
+                        if (!g || !g.id) return;
+                        if (String(g.id) === String(aliasRoleId)) return;
+                        out.push({ id: String(g.id), name: g.name || '群聊', avatar: '' });
+                    });
+                }
+            } catch (e) {}
+            return out;
+        }
+
+        function openForwardSheet(mid) {
+            var msg = findByMid(mid);
+            if (!msg || !fwOverlay) return;
+            if (msg.type === 'redpacket' || msg.type === 'transfer') {
+                if (typeof showToast === 'function') showToast('红包/转账不支持转发');
+                return;
+            }
+            var targets = getForwardTargets();
+            var html = '';
+            if (!targets.length) {
+                html = '<div class="fw-empty">暂无可转发的好友</div>';
+            } else {
+                html = targets.map(function (t) {
+                    var av = t.avatar && String(t.avatar).length > 20
+                        ? '<img src="' + t.avatar + '" alt="">'
+                        : String(t.name || '?').slice(0, 1);
+                    return '<button class="fw-item" type="button" data-id="' + String(t.id).replace(/"/g, '&quot;') + '" data-name="' + String(t.name).replace(/"/g, '&quot;') + '">' +
+                        '<span class="fw-avatar">' + av + '</span>' +
+                        '<span class="fw-name">' + String(t.name) + '</span>' +
+                        '</button>';
+                }).join('');
+            }
+            fwList.innerHTML = html;
+            fwList.dataset.mid = mid;
+            fwOpenedAt = Date.now();
+            fwOverlay.classList.add('active');
+        }
+
+        if (fwBackdrop) {
+            fwBackdrop.addEventListener('click', function () {
+                if (Date.now() - fwOpenedAt < 200) return;
+                closeForwardSheet();
+            });
+        }
+        if (fwList) {
+            fwList.addEventListener('click', function (e) {
+                var btn = e.target.closest('.fw-item');
+                if (!btn) return;
+                var mid = fwList.dataset.mid;
+                var targetId = btn.getAttribute('data-id');
+                var targetName = btn.getAttribute('data-name');
+                var msg = findByMid(mid);
+                closeForwardSheet();
+                if (!msg) return;
+                forwardMessage(msg, targetId, targetName);
+            });
+        }
+
+        // 只携带白名单字段，避免把本地状态（mid/status/translation/isError）带过去引发二次余额逻辑
+        function forwardMessage(msg, targetId, targetName) {
+            var key = 'chat_history_' + targetId;
+            var arr = [];
+            try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { arr = []; }
+            if (!Array.isArray(arr)) arr = [];
+            var fwd = {
+                role: 'user',
+                time: Date.now(),
+                forwarded: true,
+                forwardFrom: { id: String(aliasRoleId), name: roleDisplayName },
+                text: plainTextOf(msg)
+            };
+            if (msg.type === 'image' && msg.img) { fwd.type = 'image'; fwd.img = msg.img; fwd.desc = msg.desc || ''; }
+            else if (msg.type === 'voice') { fwd.type = 'voice'; fwd.duration = msg.duration || 3; }
+            else if (msg.type === 'location' && msg.location) { fwd.type = 'location'; fwd.location = msg.location; }
+            else if (msg.type === 'card' && msg.card) { fwd.type = 'card'; fwd.card = msg.card; }
+            else if (msg.type === 'sticker' && msg.img) { fwd.type = 'sticker'; fwd.img = msg.img; fwd.desc = msg.desc || ''; }
+            arr.push(fwd);
+            try {
+                localStorage.setItem(key, JSON.stringify(arr));
+            } catch (e) {
+                if (typeof showToast === 'function') showToast('转发失败：本地存储空间不足');
+                return;
+            }
+            if (typeof showToast === 'function') showToast('已转发给 ' + targetName);
+        }
+
+        // 语音气泡点击播放（模拟：无真实音频，用音效 + 声波进度动画）
+        chatMessages.addEventListener('click', function (e) {
+            var vbubble = e.target.closest('.msg-bubble');
+            if (!vbubble || !vbubble.classList.contains('bubble-voice')) return;
+            var wave = vbubble.querySelector('.voice-wave');
+            if (!wave || wave.dataset.playing === '1') return;
+            wave.dataset.playing = '1';
+            try { if (typeof SoundSystem !== 'undefined' && SoundSystem.playKey) SoundSystem.playKey('voice'); } catch (err) {}
+            var vbars = wave.querySelectorAll('i');
+            var vi = 0;
+            var vtimer = setInterval(function () {
+                if (vi > 0) vbars[vi - 1].classList.remove('on');
+                if (vi >= vbars.length) {
+                    clearInterval(vtimer);
+                    wave.dataset.playing = '0';
+                    return;
+                }
+                vbars[vi].classList.add('on');
+                vi++;
+            }, 140);
+        });
+
+        // 长按检测（pointer 事件兼容触摸/鼠标）：长按弹出消息操作面板
         chatMessages.addEventListener('pointerdown', function (e) {
             if (selectingMode) return;
             var row = e.target.closest('.msg-row');
-            if (!row || !row.dataset.time) return;
+            if (!row || !row.dataset.mid) return;
             pressTimer = setTimeout(function () {
                 pressTimer = null;
                 if (navigator.vibrate) { try { navigator.vibrate(10); } catch (err) {} }
-                enterSelection(row.dataset.time);
+                openMsgSheet(row.dataset.mid);
             }, 500);
         });
         ['pointerup', 'pointerleave', 'pointercancel', 'wheel', 'scroll'].forEach(function (ev) {

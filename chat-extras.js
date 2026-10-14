@@ -385,11 +385,17 @@
   const regenCancel = document.getElementById('regenCancel');
   const regenConfirm = document.getElementById('regenConfirm');
 
-  function openRegen() {
+  var regenTitleEl = regenOverlay ? regenOverlay.querySelector('.regen-title') : null;
+  var regenMid = '';
+
+  function openRegen(mid) {
     if (!regenOverlay) return;
+    regenMid = mid || '';
     regenInput.value = '';
+    if (regenTitleEl) regenTitleEl.textContent = regenMid ? '改写这条回复' : '重新生成回复';
     regenOverlay.style.display = 'flex';
   }
+  window.openRegen = openRegen;
   function closeRegen() {
     if (regenOverlay) regenOverlay.style.display = 'none';
   }
@@ -397,11 +403,129 @@
   if (regenCancel) regenCancel.addEventListener('click', closeRegen);
   if (regenConfirm) regenConfirm.addEventListener('click', function () {
     var dir = regenInput.value.trim();
+    var mid = regenMid;
     closeRegen();
     if (typeof window.regenerateReply === 'function') {
-      window.regenerateReply(dir);
+      window.regenerateReply(dir, mid);
     }
   });
+
+  // ============================================================
+  // 功能：分享名片（从已有角色里挑一个，发送名片卡片）
+  // ============================================================
+  var SEND_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+
+  function featCard() {
+    var roles = lsGet('ai_custom_characters', []);
+    if (!Array.isArray(roles) || !roles.length) { showToast('还没有角色可以做名片'); return; }
+    var html = '<div class="x-list">' + roles.map(function (r, i) {
+      return '<div class="x-list-item" data-idx="' + i + '">' +
+        '<div class="x-main"><div class="x-title">' + escapeHtml(r.name || '角色') + '</div>' +
+        '<div class="x-sub">发送 TA 的名片</div></div>' +
+        '<button class="x-icon-btn card-send" title="发送名片">' + SEND_SVG + '</button>' +
+        '</div>';
+    }).join('') + '</div>';
+    openModal('分享名片', html);
+    modalBody.querySelectorAll('.card-send').forEach(function (b) {
+      b.onclick = function () {
+        var idx = parseInt(b.closest('[data-idx]').getAttribute('data-idx'), 10);
+        var r = roles[idx];
+        if (!r) return;
+        closeModal();
+        insertChatMessage({ role: 'user', type: 'card', card: { id: String(r.id), name: r.name || '', avatar: r.avatar || '' } });
+        sendSilentInstruction('[系统动作：我发了一张「' + (r.name || '') + '」的名片给你]');
+      };
+    });
+  }
+
+  // ============================================================
+  // 功能：发送图片（真实图片：相册选择 + Canvas 压缩为 JPEG）
+  // ============================================================
+  function compressChatImage(file, cb) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      try {
+        const max = 400;
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, max / Math.max(w, h));
+        const cw = Math.max(1, Math.round(w * scale));
+        const ch = Math.max(1, Math.round(h * scale));
+        const c = document.createElement('canvas');
+        c.width = cw; c.height = ch;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+        URL.revokeObjectURL(url);
+        cb(c.toDataURL('image/jpeg', 0.7));
+      } catch (e) {
+        URL.revokeObjectURL(url);
+        cb('');
+      }
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); cb(''); };
+    img.src = url;
+  }
+
+  let chatImgInput = null;
+  function featImage() {
+    if (!chatImgInput) {
+      chatImgInput = document.createElement('input');
+      chatImgInput.type = 'file';
+      chatImgInput.accept = 'image/*';
+      chatImgInput.style.display = 'none';
+      document.body.appendChild(chatImgInput);
+      chatImgInput.addEventListener('change', function () {
+        const file = chatImgInput.files && chatImgInput.files[0];
+        chatImgInput.value = '';
+        if (!file) return;
+        compressChatImage(file, function (dataUrl) {
+          if (!dataUrl) { showToast('图片处理失败'); return; }
+          insertChatMessage({ role: 'user', type: 'image', img: dataUrl, desc: '图片', text: '[图片]' });
+          sendSilentInstruction('[系统动作：我发了一张图片给你]');
+        });
+      });
+    }
+    chatImgInput.click();
+  }
+
+  // ============================================================
+  // 功能：语音消息（纯模拟：手选时长 + 转写文案；不调用麦克风）
+  // ============================================================
+  function featVoiceMsg() {
+    openModal('发语音',
+      '<div class="x-chips" id="vmChips">' +
+        [3, 5, 10, 15].map(function (s) {
+          return '<button class="x-chip' + (s === 5 ? ' active' : '') + '" data-sec="' + s + '" type="button">' + s + ' 秒</button>';
+        }).join('') +
+      '</div>' +
+      '<textarea class="x-textarea" id="vmText" placeholder="说点什么（会转成文字一起发出去）"></textarea>' +
+      '<div class="x-row">' +
+        '<button class="x-btn x-btn-ghost" id="vmCancel">取消</button>' +
+        '<button class="x-btn x-btn-primary" id="vmSend">发送语音</button>' +
+      '</div>'
+    );
+    let picked = 5;
+    const chips = document.getElementById('vmChips');
+    if (chips) {
+      chips.querySelectorAll('.x-chip').forEach(function (b) {
+        b.onclick = function () {
+          picked = parseInt(b.getAttribute('data-sec'), 10) || 5;
+          chips.querySelectorAll('.x-chip').forEach(function (x) { x.classList.remove('active'); });
+          b.classList.add('active');
+        };
+      });
+    }
+    document.getElementById('vmCancel').onclick = closeModal;
+    document.getElementById('vmSend').onclick = function () {
+      const t = document.getElementById('vmText').value.trim();
+      if (!t) { showToast('请先写下要说的话'); return; }
+      closeModal();
+      insertChatMessage({ role: 'user', type: 'voice', duration: picked, text: t });
+      sendSilentInstruction('[语音消息] ' + t);
+    };
+  }
 
   // ---------- 分发 ----------
   function handleFeature(feat) {
@@ -415,6 +539,9 @@
       case 'moment': featMoment(); break;
       case 'redpacket': featRedpacket(); break;
       case 'transfer': featTransfer(); break;
+      case 'img': featImage(); break;
+      case 'voice-msg': featVoiceMsg(); break;
+      case 'card': featCard(); break;
     }
   }
 
