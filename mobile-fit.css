@@ -98,11 +98,14 @@
     min-height: 46px !important;
   }
 
-  /* 论坛 / 记账等「body 直接排版」的页面：原本跟随 390px 居中列的固定底栏与底部弹层，真机需同步全宽 */
+  /* 论坛 / 商城 / 记账等「body 直接排版」的页面：原本跟随 390px 居中列的固定底栏与底部弹层，真机需同步全宽 */
   .tabbar,
   .comment-bar,
   .dock,
   .composer,
+  .buy-bar,
+  .add-btn,
+  .add-backdrop,
   .modal-backdrop.show {
     left: 0 !important;
     transform: none !important;
