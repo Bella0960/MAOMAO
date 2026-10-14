@@ -48,8 +48,6 @@
     .simulator-stage {
       background: transparent !important;
       padding: 0 !important;
-      width: 390px !important;
-      height: 844px !important;
       display: block !important;
       flex-shrink: 0 !important;
     }
@@ -58,9 +56,6 @@
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      width: 390px !important;
-      max-width: 390px !important;
-      height: 844px !important;
       margin: 0 !important;
       padding: 0 !important;
       overflow: hidden !important;
@@ -68,11 +63,25 @@
     .phone-camera { display: none !important; }
     .phone-screen {
       border-radius: 0 !important;
-      height: 844px !important;
-      width: 390px !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
+    }
+    /* 固定 390×844 仅限桌面预览（宽>480px）；真手机由 mobile-fit.css 按 100dvw/dvh 全屏铺满 */
+    @media (min-width: 481px) {
+      .simulator-stage {
+        width: 390px !important;
+        height: 844px !important;
+      }
+      .phone {
+        width: 390px !important;
+        max-width: 390px !important;
+        height: 844px !important;
+      }
+      .phone-screen {
+        width: 390px !important;
+        height: 844px !important;
+      }
     }
     .stage-caption { display: none !important; }
 
@@ -355,14 +364,21 @@
     <script src="script.js"></script>
   <script src="statusbar-control.js"></script>
   <script>
-    // 开场加载动画：最短显示 600ms，然后淡出
-    window.addEventListener('load', function () {
+    // 开场加载动画：页面结构就绪（DOMContentLoaded）即淡出，不再等图片等全部资源下载完
+    var bootShownAt = Date.now();
+    function hideBootLoader() {
+      var wait = Math.max(0, 400 - (Date.now() - bootShownAt));
       setTimeout(function () {
         var el = document.getElementById('bootLoader');
         if (el) el.classList.add('hide');
         setTimeout(function () { if (el) el.remove(); }, 400);
-      }, 600);
-    });
+      }, wait);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hideBootLoader);
+    } else {
+      hideBootLoader();
+    }
     // 注册 Service Worker（PWA 装桌面）
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       navigator.serviceWorker.register('sw.js').catch(function () {});
