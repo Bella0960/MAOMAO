@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>消息通知</title>
+<script src="native-feel.js"></script>
+<link rel="stylesheet" href="mobile-fit.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+    background: #F7F7F9; color: #111;
+    min-height: 100vh; max-width: 390px; margin: 0 auto;
+    padding-bottom: 40px;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+    position: sticky; top: 0; background: #fff; z-index: 10;
+    border-bottom: 1px solid #F0F0F0;
+  }
+  .back-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .title { font-size: 1rem; font-weight: 700; }
+  .notif {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; background: #fff;
+    border-bottom: 1px solid #F0F0F0;
+    cursor: pointer;
+  }
+  .n-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.813rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .n-text { flex: 1; font-size: 0.875rem; line-height: 1.4; }
+  .n-time { font-size: 0.625rem; color: #999; margin-top: 2px; }
+  .empty { text-align: center; color: #999; padding: 60px 20px; font-size: 0.875rem; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="back-btn" onclick="location.href='forum.html'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="title">通知</div>
+  </div>
+
+  <div id="notifList"></div>
+
+<script>
+  function loadNotifs() {
+    return JSON.parse(localStorage.getItem('forum_notifications') || '[]');
+  }
+  function saveNotifs(arr) {
+    localStorage.setItem('forum_notifications', JSON.stringify(arr));
+  }
+  function timeAgo(ts) {
+    const m = Math.floor((Date.now() - ts) / 60000);
+    if (m < 1) return '刚刚';
+    if (m < 60) return m + '分钟前';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + '小时前';
+    return Math.floor(h / 24) + '天前';
+  }
+  function render() {
+    const arr = loadNotifs();
+    const list = document.getElementById('notifList');
+    if (!arr.length) {
+      list.innerHTML = '<div class="empty">还没有通知<br><small>有人回复你、赞你会在这里显示</small></div>';
+      return;
+    }
+    list.innerHTML = arr.map(n => `
+      <div class="notif">
+        <div class="n-avatar" style="background:${n.avatar || '#333'}">${n.name[0]}</div>
+        <div class="n-text">
+          <b>${n.name}</b> ${n.text}
+          <div class="n-time">${timeAgo(n.time)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  render();
+</script>
+</body>
+</html>

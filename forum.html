@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#F7F7F9" />
+<meta name="theme-color" content="#FFFFFF" />
 <title>论坛</title>
 <script src="native-feel.js"></script>
+<script src="custom-css.js"></script>
+<link rel="stylesheet" href="mobile-fit.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { display: none; width: 0; height: 0; }
-  html { background: #E8E8EC; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
     background: #F7F7F9; color: #111;
     min-height: 100vh; max-width: 390px; margin: 0 auto;
-    padding-bottom: 90px;
+    padding-bottom: 120px;
+    position: relative;
   }
 
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px 12px;
+  /* 顶部 */
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 16px 12px;
     padding-top: calc(16px + env(safe-area-inset-top));
     position: sticky; top: 0; background: #F7F7F9; z-index: 10;
   }
@@ -28,46 +31,121 @@
     width: 36px; height: 36px; border-radius: 50%;
     background: #fff; border: 1px solid #ECECEF;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
+    flex-shrink: 0;
   }
-  .brand { font-size: 1.375rem; font-weight: 800; letter-spacing: -0.02em; }
-  .brand small { display: block; font-size: 0.75rem; font-weight: 700; opacity: 0.4; letter-spacing: 0.08em; }
+  .search-box {
+    flex: 1; height: 36px; background: #fff;
+    border-radius: 999px; border: 1px solid #ECECEF;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px; color: #999; font-size: 0.813rem;
+  }
+  .search-box svg { width: 14px; height: 14px; flex-shrink: 0; }
   .post-btn {
     width: 36px; height: 36px; border-radius: 50%;
     background: #111; color: #fff;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
-    font-size: 1.25rem; font-weight: 400;
+    font-size: 1.25rem; flex-shrink: 0;
+  }
+  .brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; flex: 1; text-align: center; }
+  .brand small { display: block; font-size: 0.625rem; font-weight: 700; opacity: 0.4; letter-spacing: 0.1em; }
+
+  /* 热门话题横排3图 */
+  .hot-row {
+    display: flex; gap: 10px;
+    padding: 4px 16px 16px;
+  }
+  .hot-card {
+    flex: 1; aspect-ratio: 4/3;
+    background: #E8E8EC; border-radius: 12px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: flex-end;
+    padding: 8px;
+    cursor: pointer;
+  }
+  .hot-label {
+    font-size: 0.625rem; font-weight: 700; color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    line-height: 1.3;
   }
 
-  /* 帖子 */
-  .post-list { padding: 0 20px; }
-  .post {
-    background: #fff; border: 1px solid #ECECEF;
-    border-radius: 16px; padding: 16px;
-    margin-bottom: 12px;
+  /* 角色圆头像横排 */
+  .roles-row {
+    display: flex; gap: 16px;
+    padding: 0 16px 20px;
+    overflow-x: auto;
   }
-  .p-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .p-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
+  .role-dot {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .role-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #E8E8EC;
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.813rem; font-weight: 700;
-    flex-shrink: 0;
+    font-size: 1rem; font-weight: 700; color: #666;
   }
-  .p-name { font-size: 0.813rem; font-weight: 700; }
+  .role-name { font-size: 0.625rem; color: #666; }
+
+  /* 帖子流 - 小红书两列瀑布流 */
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; color: #999;
+    padding: 0 16px 10px; letter-spacing: 0.02em;
+  }
+  .post-grid {
+    columns: 2; column-gap: 10px;
+    padding: 0 16px;
+  }
+  .post {
+    background: #fff; border-radius: 14px;
+    margin-bottom: 10px; break-inside: avoid;
+    overflow: hidden;
+  }
+  .post-cover {
+    width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #E8E8EC 0%, #F0F0F4 100%);
+  }
+  .post-body { padding: 10px 12px 12px; }
+  .p-content { font-size: 0.813rem; line-height: 1.5; margin-bottom: 10px; }
+  .p-foot { display: flex; align-items: center; justify-content: space-between; }
+  .p-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.625rem; font-weight: 700;
+  }
+  .p-name { font-size: 0.625rem; color: #666; margin-left: 4px; }
+  .p-user { display: flex; align-items: center; }
+  .p-likes { display: flex; align-items: center; gap: 3px; color: #999; font-size: 0.625rem; cursor: pointer; }
+  .p-likes.liked { color: #111; }
   .p-tag {
-    display: inline-block; font-size: 0.563rem;
-    padding: 1px 6px; border-radius: 4px;
-    margin-left: 6px; vertical-align: 2px;
-    letter-spacing: 0.05em;
+    display: inline-block; font-size: 0.5rem;
+    padding: 1px 4px; border-radius: 3px;
+    margin-left: 4px; vertical-align: 1px;
   }
   .p-tag.ai { background: #111; color: #fff; }
   .p-tag.me { background: #ECECEF; color: #666; }
-  .p-time { font-size: 0.65rem; color: #999; margin-top: 1px; }
-  .p-content { font-size: 0.938rem; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
-  .p-actions { display: flex; gap: 16px; color: #999; font-size: 0.75rem; }
-  .p-act { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-  .p-act.liked { color: #111; }
 
-  /* 发帖弹层 */
+  /* 底部固定导航 - 小红书风 */
+  .tabbar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 390px;
+    background: #fff; border-top: 1px solid #ECECEF;
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 100;
+  }
+  .tab-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 8px 0 6px; cursor: pointer; color: #999;
+    text-decoration: none; font-size: 0.625rem; gap: 2px;
+  }
+  .tab-item.active { color: #111; font-weight: 700; }
+  .tab-item svg { width: 22px; height: 22px; }
+  .tab-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #E8E8EC;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.625rem; font-weight: 700; color: #666;
+  }
   .composer-backdrop {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.3);
@@ -76,7 +154,7 @@
   }
   .composer-backdrop.show { display: flex; }
   .composer {
-    background: #fff; width: 100%;
+    background: #fff; width: 100%; max-width: 390px; margin: 0 auto;
     border-radius: 24px 24px 0 0;
     padding: 20px;
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
@@ -95,24 +173,48 @@
   }
   .btn-cancel { background: #F4F4F6; color: #666; }
   .btn-post { background: #111; color: #fff; }
+  /* 下拉刷新提示 */
+  .pull-refresh {
+    text-align: center; font-size: 0.75rem; color: #999;
+    padding: 10px 0; height: 0; overflow: hidden;
+    transition: height 0.2s;
+  }
+  .pull-refresh.show { height: 40px; }
 </style>
 </head>
 <body>
 
-  <div class="header">
+  <div class="topbar">
     <button class="back-btn" onclick="window.location.href='index.html'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="brand">FORUM<small>讨论区</small></div>
+    <div class="brand">FORUM<small>讨论区</small>
+      <svg onclick="refreshPosts()" style="width:14px;height:14px;margin-left:6px;cursor:pointer;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </div>
     <div class="post-btn" onclick="openComposer()">+</div>
   </div>
 
-  <div class="post-list" id="postList"></div>
+  <div class="pull-refresh" id="pullRefresh">下拉刷新</div>
 
-  <div class="composer-backdrop" id="composer">
+  <!-- 热门话题横排3图 -->
+  <div class="hot-row" id="hotRow"></div>
+
+  <div class="section-label">最新讨论</div>
+  <div class="post-grid" id="postList"></div>
+
+  <div class="composer-backdrop" id="composer" onclick="if(event.target===this)closeComposer()">
     <div class="composer">
       <div class="sheet-handle"></div>
+      <input type="file" id="postImgInput" accept="image/*" style="display:none">
+      <div id="imgPreview" style="display:none;margin-bottom:10px;border-radius:12px;overflow:hidden">
+        <img id="previewImg" style="width:100%;display:block">
+      </div>
       <textarea id="composerInput" placeholder="说点什么..."></textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:#F4F4F6;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="document.getElementById('postImgInput').click()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+      </div>
       <div class="composer-actions">
         <button class="btn-cancel" onclick="closeComposer()">取消</button>
         <button class="btn-post" onclick="publish()">发布</button>
@@ -120,28 +222,59 @@
     </div>
   </div>
 
+  <!-- 底部固定导航 - 小红书风 -->
+  <nav class="tabbar">
+    <a class="tab-item active" href="javascript:void(0)" onclick="showHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      首页
+    </a>
+    <a class="tab-item" href="javascript:void(0)" onclick="showHot()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      热门
+    </a>
+    <a class="tab-item" href="forum-notifications.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      消息
+    </a>
+    <a class="tab-item" href="forum-profile.html">
+      <div class="tab-avatar" id="myTabAvatar"></div>
+      我的
+    </a>
+  </nav>
+
 <script>
-  // 路人名字池
   const RANDOM_NAMES = ['晚风', '橘子海', '七号公园', '北岛', '半糖', '青柠', '山顶洞人', '猫不语', '夏目', '木苏里', '阿柴', '远山', '七海', '星野', '落雨', '拾光', '北野', '南巷', '冬至', '白茶'];
   const AVATAR_COLORS = ['#111','#333','#555','#888','#222','#444','#666','#999'];
 
-  // 路人发的帖子内容
-  const RANDOM_POSTS = [
-    '今天天气真不错，适合出去走走。',
-    '刚喝完一杯冰美式，现在脑子转得比风扇还快。',
-    '有没有人推荐个好看的剧？剧荒了。',
-    '深夜食堂：泡了碗面，加了个蛋，满足。',
-    '今天跑了五公里，腿是自己的了。',
-    '最近在学做手冲，有没有大佬指点一下水温？',
-    '看到一只橘猫，胖得像个面包。',
-    '周末打算宅家，有人一起云聚会吗？',
-    '刚把房间收拾干净，强迫症狂喜。',
-    '听完一张老专辑，感觉时间都慢下来了。',
-    '有没有人跟我一样，凌晨三点才睡得着？',
-    '今天的云很好看，拍给你们看。',
-  ];
+  // 根据论坛主题生成热门话题
+  function getHotTopics() {
+    let cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem('forum_config') || '{}'); } catch(e){}
+    const t = cfg.theme || 'reality';
+    const map = {
+      xiuxian: [['#宗门日常', '今日修炼心得'], ['#渡劫专区', '渡劫失败记录'], ['#秘境探险', '捡到宝贝分享']],
+      reality: [['#今日话题', '你今天开心吗'], ['#深夜食堂', '你在吃什么'], ['#碎碎念', '随便说点啥']],
+      bagua: [['#瓜田前线', '今日大瓜汇总'], ['#明星动态', '最新爆料'], ['#吃瓜群众', '来聊聊你吃到的瓜']],
+      academy: [['#早八人', '今天又差点迟到'], ['#期末周', '复习进度0%'], ['#食堂测评', '哪个窗口最好吃']],
+      future: [['#夜之城日常', '今天又炸了哪'], ['#义体改造', '新手求推荐'], ['#黑市交易', '淘到好货了']]
+    };
+    return map[t] || map.reality;
+  }
 
-  // AI角色的帖子（根据人设）
+  function getTopicPosts() {
+    let cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem('forum_config') || '{}'); } catch(e){}
+    const t = cfg.theme || 'reality';
+    const map = {
+      xiuxian: ['今日灵气又涨了三分，突破在望！', '宗门大比被人暗算，求支招', '刚从秘境出来，捡到个宝贝有人要吗', '渡劫失败重修，心态崩了', '师兄又在偷练禁术，要不要举报', '仙门大会门票炒到五百灵石了'],
+      reality: ['今天天气真不错，适合出去走走。', '刚喝完一杯冰美式，现在脑子转得比风扇还快。', '有没有人推荐个好看的剧？剧荒了。', '深夜食堂：泡了碗面，加了个蛋，满足。', '今天跑了五公里，腿是自己的了。', '刚把房间收拾干净，强迫症狂喜。'],
+      bagua: ['某顶流恋情曝光！瓜太大了', '某小花被爆耍大牌，剧组全员吐槽', '刚吃到一个惊天大瓜，先码住', '某综艺剧本流出，嘉宾全是演的', '某小生偷税漏税被查？坐等官宣', '某夫妻表面恩爱实际各玩各的'],
+      academy: ['今天早八又差点迟到，谁懂', '期末考试范围划了整本书', '食堂新出的窗口好吃到哭', '隔壁班那个男生今天又偷看我', '论文写不出来了，求救', '周末图书馆占座大战又开始了'],
+      future: ['刚换了个义眼，夜视效果真爽', '夜之城又炸了个帮派，上班路上绕路', '黑客大会有人黑进了市政府，牛', '新出的神经接入设备谁买了', ' corpo 又在压榨员工，准备跳槽', '黑市淘到个老款手雷，要不要收藏']
+    };
+    return map[t] || map.reality;
+  }
+
   const AI_POSTS = {
     '宝宝': [
       '今天摇尾巴摇得太累了，需要抱抱充电。',
@@ -160,6 +293,20 @@
     ]
   };
 
+  // 渲染角色头像横排
+  function renderRoles() {
+    var box = document.getElementById('rolesRow');
+    var roles = [];
+    try { roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]'); } catch(e){}
+    if (!roles.length) { box.innerHTML = ''; return; }
+    box.innerHTML = roles.map(function(r){
+      return '<div class="role-dot" onclick="location.href=\'chat-detail.html?id='+r.id+'\'">'+
+        '<div class="role-circle" style="background:'+(r.avatarBg||'#E8E8EC')+'">'+r.name[0]+'</div>'+
+        '<div class="role-name">'+r.name+'</div>'+
+      '</div>';
+    }).join('');
+  }
+
   function loadPosts() {
     let arr;
     try { arr = JSON.parse(localStorage.getItem('forum_posts') || 'null'); }
@@ -171,48 +318,33 @@
     return arr;
   }
   function savePosts(arr) { localStorage.setItem('forum_posts', JSON.stringify(arr)); }
-
   function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
   function seedPosts() {
     const now = Date.now();
     const posts = [];
-    // 3个AI角色先发
     Object.keys(AI_POSTS).forEach((name, i) => {
       posts.push({
-        id: 'seed_ai_' + i,
-        name: name,
-        avatar: '#111',
-        tag: 'ai',
+        id: 'seed_ai_' + i, name: name, avatar: '#111', tag: 'ai',
         content: pick(AI_POSTS[name]),
         time: now - (i+1)*3600000*2,
-        likes: Math.floor(Math.random()*20)+3,
-        liked: false
+        likes: Math.floor(Math.random()*20)+3, liked: false
       });
     });
-    // 5个路人
     for (let i = 0; i < 5; i++) {
+      const topics = getTopicPosts();
       posts.push({
-        id: 'seed_user_' + i,
-        name: pick(RANDOM_NAMES),
-        avatar: pick(AVATAR_COLORS),
-        tag: '',
-        content: pick(RANDOM_POSTS),
+        id: 'seed_user_' + i, name: pick(RANDOM_NAMES),
+        avatar: pick(AVATAR_COLORS), tag: '',
+        content: pick(topics),
         time: now - (i+1)*3600000*5,
-        likes: Math.floor(Math.random()*15)+1,
-        liked: false
+        likes: Math.floor(Math.random()*15)+1, liked: false
       });
     }
-    // 我自己发一条
     posts.push({
-      id: 'seed_me',
-      name: '我',
-      avatar: '#111',
-      tag: 'me',
+      id: 'seed_me', name: '我', avatar: '#111', tag: 'me',
       content: '大家好，这是我的论坛。',
-      time: now - 3600000*30,
-      likes: 12,
-      liked: false
+      time: now - 3600000*30, likes: 12, liked: false
     });
     return posts;
   }
@@ -227,23 +359,19 @@
   function render() {
     const posts = loadPosts().sort((a,b) => b.time - a.time);
     document.getElementById('postList').innerHTML = posts.map(p => `
-      <div class="post">
-        <div class="p-head">
-          <div class="p-avatar" style="background:${p.avatar}">${p.name[0]}</div>
-          <div>
-            <div class="p-name">${p.name}${p.tag === 'ai' ? '<span class="p-tag ai">AI</span>' : p.tag === 'me' ? '<span class="p-tag me">我</span>' : ''}</div>
-            <div class="p-time">${timeAgo(p.time)}</div>
-          </div>
-        </div>
-        <div class="p-content">${p.content}</div>
-        <div class="p-actions">
-          <div class="p-act ${p.liked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="${p.liked ? '#111' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            ${p.likes}
-          </div>
-          <div class="p-act">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            ${Math.floor(Math.random()*5)}
+      <div class="post" style="cursor:pointer" onclick="location.href='forum-detail.html?id=${p.id}'">
+        ${p.img ? `<img src="${p.img}" style="width:100%;display:block;aspect-ratio:4/3;object-fit:cover">` : '<div class="post-cover"></div>'}
+        <div class="post-body">
+          <div class="p-content">${p.content}</div>
+          <div class="p-foot">
+            <div class="p-user">
+              <div class="p-avatar" style="background:${p.avatar}">${p.name[0]}</div>
+              <span class="p-name">${p.name}${p.tag === 'ai' ? '<span class="p-tag ai">AI</span>' : ''}</span>
+            </div>
+            <div class="p-likes ${p.liked ? 'liked' : ''}" onclick="event.stopPropagation();toggleLike('${p.id}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="${p.liked ? '#111' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              ${p.likes}
+            </div>
           </div>
         </div>
       </div>
@@ -260,18 +388,117 @@
     render();
   }
 
+  let pendingImg = null;
+  document.getElementById('postImgInput').onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      pendingImg = ev.target.result;
+      document.getElementById('previewImg').src = pendingImg;
+      document.getElementById('imgPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  };
+
   function openComposer() { document.getElementById('composer').classList.add('show'); }
-  function closeComposer() { document.getElementById('composer').classList.remove('show'); document.getElementById('composerInput').value=''; }
+  function closeComposer() {
+    document.getElementById('composer').classList.remove('show');
+    document.getElementById('composerInput').value='';
+    pendingImg = null;
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('postImgInput').value = '';
+  }
   function publish() {
     const text = document.getElementById('composerInput').value.trim();
-    if (!text) return;
+    if (!text && !pendingImg) return;
     const posts = loadPosts();
-    posts.push({ id: 'me_' + Date.now(), name: '我', avatar: '#111', tag: 'me', content: text, time: Date.now(), likes: 0, liked: false });
+    posts.push({ id: 'me_' + Date.now(), name: '我', avatar: '#111', tag: 'me', content: text, img: pendingImg, time: Date.now(), likes: 0, liked: false });
     savePosts(posts);
     closeComposer(); render();
   }
 
+  // 下拉刷新
+  let startY = 0, pulling = false;
+  document.addEventListener('touchstart', e => {
+    if (window.scrollY === 0) { startY = e.touches[0].clientY; pulling = true; }
+  });
+  document.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    const el = document.getElementById('pullRefresh');
+    if (dy > 50) { el.classList.add('show'); el.textContent = '松开刷新'; }
+    else if (dy > 0) { el.classList.add('show'); el.textContent = '下拉刷新'; }
+    else el.classList.remove('show');
+  });
+  document.addEventListener('touchend', () => {
+    const el = document.getElementById('pullRefresh');
+    if (el.classList.contains('show') && el.textContent === '松开刷新') {
+      localStorage.removeItem('forum_posts');
+      render();
+      el.textContent = '已更新';
+      setTimeout(() => el.classList.remove('show'), 800);
+    } else el.classList.remove('show');
+    pulling = false;
+  });
+
+  function showHome() {
+    document.getElementById('hotRow').style.display = 'flex';
+    document.querySelector('.section-label').textContent = '最新讨论';
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    render();
+  }
+
+  function showHot() {
+    document.getElementById('hotRow').style.display = 'none';
+    const posts = loadPosts().sort((a,b) => (b.likes||0) - (a.likes||0));
+    document.getElementById('postList').innerHTML = posts.map(p => `
+      <div class="post" style="cursor:pointer" onclick="location.href='forum-detail.html?id=${p.id}'">
+        ${p.img ? `<img src="${p.img}" style="width:100%;display:block;aspect-ratio:4/3;object-fit:cover">` : '<div class="post-cover"></div>'}
+        <div class="post-body">
+          <div class="p-content">${p.content}</div>
+          <div class="p-foot">
+            <div class="p-user">
+              <div class="p-avatar" style="background:${p.avatar}">${p.name[0]}</div>
+              <span class="p-name">${p.name}${p.tag === 'ai' ? '<span class="p-tag ai">AI</span>' : ''}</span>
+            </div>
+            <div class="p-likes ${p.liked ? 'liked' : ''}" onclick="event.stopPropagation();toggleLike('${p.id}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="${p.liked ? '#111' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              ${p.likes}
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    document.querySelector('.section-label').textContent = '热门讨论';
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  function refreshPosts() {
+    localStorage.removeItem('forum_posts');
+    render();
+  }
+
+  function renderHot() {
+    const topics = getHotTopics();
+    document.getElementById('hotRow').innerHTML = topics.map(t => `
+      <div class="hot-card" style="cursor:pointer" onclick="alert('${t[0]} 话题页开发中')">
+        <div class="hot-label">${t[0]}<br>${t[1]}</div>
+      </div>
+    `).join('');
+  }
+
+  renderHot();
   render();
+
+  // 我的tab头像
+  try {
+    const me = JSON.parse(localStorage.getItem('myProfile') || '{}');
+    const av = document.getElementById('myTabAvatar');
+    if (av) av.textContent = (me.nickname || '我')[0];
+  } catch(e){}
 </script>
 </body>
 </html>
