@@ -505,49 +505,55 @@
         .regen-cancel { background: #F2F2F7; color: #666666; }
         .regen-confirm { background: #111111; color: #FFFFFF; }
 
-        /* ========== 消息操作面板 / 转发面板 / 编辑抽屉（统一底部抽屉风格） ========== */
-        .msg-sheet-overlay, .fw-overlay, .edit-overlay {
-            position: absolute; inset: 0; z-index: 420;
-            display: none; align-items: flex-end;
+        /* ========== 消息操作：锚定气泡旁的深色浮动菜单（不再是底部抽屉） ========== */
+        .ctx-overlay { position: absolute; inset: 0; z-index: 420; display: none; }
+        .ctx-overlay.active { display: block; }
+        @keyframes ctxPop { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .msg-menu {
+            position: absolute; min-width: 172px; max-width: 232px;
+            max-height: 62vh; overflow-y: auto;
+            background: rgba(28,28,30,0.94);
+            border-radius: 12px; padding: 6px 0;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+            animation: ctxPop 0.15s ease-out;
         }
-        .msg-sheet-overlay.active, .fw-overlay.active, .edit-overlay.active { display: flex; }
-        .msg-sheet-backdrop, .fw-backdrop, .edit-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.32); }
-        .msg-sheet, .fw-sheet, .edit-sheet {
-            position: relative; width: 100%; box-sizing: border-box;
-            background: #FFFFFF;
-            border-radius: 22px 22px 0 0;
-            padding: 0 0 calc(12px + env(safe-area-inset-bottom));
-            animation: sheetUp 0.22s ease-out;
+        .msg-menu::after {
+            content: ''; position: absolute; left: var(--arrow-x, 22px);
+            width: 10px; height: 10px; background: rgba(28,28,30,0.94);
+            transform: rotate(45deg); border-radius: 2px;
         }
-        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .msg-sheet-handle, .fw-handle, .edit-handle {
-            width: 36px; height: 4px; border-radius: 999px; background: #111111;
-            margin: 8px auto 10px; opacity: 0.9;
-        }
-        .msg-sheet-list { max-height: 46vh; overflow-y: auto; }
+        .msg-menu.below::after { top: -5px; }
+        .msg-menu.above::after { bottom: -5px; }
         .msg-sheet-item {
-            display: flex; align-items: center; gap: 14px;
-            width: 100%; height: 52px; padding: 0 22px;
-            background: none; border: none; cursor: pointer;
-            font-size: 0.875rem; font-family: inherit; color: #333333; text-align: left;
+            display: flex; align-items: center; gap: 10px;
+            width: 100%; height: 38px; padding: 0 16px;
+            background: none; border: none; cursor: pointer; text-align: left;
+            font-size: 0.813rem; font-family: inherit; color: #FFFFFF; white-space: nowrap;
         }
-        .msg-sheet-item:active { background: #F7F7F9; }
-        .msg-sheet-item.danger { color: #FF453A; }
-        .msg-sheet-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-        .msg-sheet-cancel {
-            display: block; width: calc(100% - 40px); margin: 10px 20px 0; height: 48px;
-            background: #F2F2F7; border: none; border-radius: 14px;
-            font-size: 0.938rem; font-family: inherit; color: #666666; cursor: pointer;
+        .msg-sheet-item:active { background: rgba(255,255,255,0.10); }
+        .msg-sheet-item.danger { color: #FF6B60; }
+        .msg-sheet-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* ========== 转发：居中紧凑列表卡（与重玩弹窗同一范式） ========== */
+        .fw-overlay {
+            position: absolute; inset: 0; z-index: 420; display: none;
+            align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
         }
-        .fw-title, .edit-title {
-            font-size: 0.875rem; font-weight: 700; color: #111111;
-            padding: 0 22px 10px; margin: 0;
+        .fw-overlay.active { display: flex; }
+        .fw-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+        .fw-sheet {
+            position: relative; width: 100%; max-width: 320px; max-height: 70vh;
+            display: flex; flex-direction: column; box-sizing: border-box;
+            background: #FFFFFF; border-radius: 18px; padding: 20px 0 12px;
+            animation: ctxPop 0.18s ease-out;
         }
-        .fw-list { max-height: 50vh; overflow-y: auto; padding: 0 8px; }
+        .fw-title { font-size: 1.063rem; font-weight: 700; color: #111111; text-align: center; padding: 0 0 12px; margin: 0; }
+        .fw-list { flex: 1; overflow-y: auto; padding: 0 6px; }
         .fw-item {
             display: flex; align-items: center; gap: 12px;
-            width: 100%; height: 60px; padding: 0 14px;
-            background: none; border: none; cursor: pointer; text-align: left; font-family: inherit;
+            width: 100%; height: 56px; padding: 0 14px;
+            background: none; border: none; border-radius: 12px;
+            cursor: pointer; text-align: left; font-family: inherit;
         }
         .fw-item:active { background: #F7F7F9; }
         .fw-avatar {
@@ -558,14 +564,34 @@
         .fw-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .fw-name { flex: 1; font-size: 0.938rem; color: #111111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .fw-empty { text-align: center; color: #B0B0B5; font-size: 0.875rem; padding: 36px 0; }
-        .edit-input {
-            display: block; width: calc(100% - 40px); margin: 0 20px; box-sizing: border-box;
-            min-height: 88px; max-height: 40vh;
+        .fw-cancel {
+            display: block; width: calc(100% - 36px); margin: 10px 18px 0; height: 44px;
             background: #F2F2F7; border: none; border-radius: 12px;
+            font-size: 0.875rem; font-family: inherit; color: #666666; cursor: pointer;
+        }
+
+        /* ========== 编辑消息：居中卡片 ========== */
+        .edit-overlay {
+            position: absolute; inset: 0; z-index: 420; display: none;
+            align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+        }
+        .edit-overlay.active { display: flex; }
+        .edit-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+        .edit-sheet {
+            position: relative; width: 100%; max-width: 320px; box-sizing: border-box;
+            background: #FFFFFF; border-radius: 18px; padding: 22px 20px 20px;
+            animation: ctxPop 0.18s ease-out;
+        }
+        .edit-title { font-size: 1.063rem; font-weight: 700; color: #111111; text-align: center; margin: 0 0 14px; padding: 0; }
+        .edit-input {
+            display: block; width: 100%; margin: 0; box-sizing: border-box;
+            min-height: 88px; max-height: 40vh;
+            background: #F7F7F9; border: 0.5px solid #E5E5EA; border-radius: 12px;
             padding: 12px 14px; font-size: 0.875rem; font-family: inherit;
             color: #111111; outline: none; resize: none;
         }
-        .edit-actions { display: flex; gap: 10px; padding: 14px 20px 0; }
+        .edit-input:focus { border-color: #111111; }
+        .edit-actions { display: flex; gap: 10px; padding: 16px 0 0; }
         .edit-cancel, .edit-confirm {
             flex: 1; border: none; border-radius: 12px; padding: 13px;
             font-size: 0.938rem; font-family: inherit; font-weight: 600; cursor: pointer;
@@ -1201,31 +1227,25 @@
             </div>
         </div>
 
-        <!-- 消息操作面板（长按消息弹出） -->
-        <div class="msg-sheet-overlay" id="msgSheetOverlay">
-            <div class="msg-sheet-backdrop" id="msgSheetBackdrop"></div>
-            <div class="msg-sheet">
-                <div class="msg-sheet-handle"></div>
-                <div class="msg-sheet-list" id="msgSheetList"></div>
-                <button class="msg-sheet-cancel" id="msgSheetCancel" type="button">取消</button>
-            </div>
+        <!-- 消息操作菜单（长按消息时锚定在气泡旁弹出，深色浮动菜单，带指向气泡的小三角） -->
+        <div class="ctx-overlay" id="msgSheetOverlay">
+            <div class="msg-menu" id="msgSheetList"></div>
         </div>
 
-        <!-- 转发面板：选择其他会话 -->
+        <!-- 转发面板：居中选择会话卡片 -->
         <div class="fw-overlay" id="fwOverlay">
             <div class="fw-backdrop" id="fwBackdrop"></div>
             <div class="fw-sheet">
-                <div class="fw-handle"></div>
                 <div class="fw-title">转发给</div>
                 <div class="fw-list" id="fwList"></div>
+                <button class="fw-cancel" id="fwCancel" type="button">取消</button>
             </div>
         </div>
 
-        <!-- 编辑消息抽屉 -->
+        <!-- 编辑消息：居中卡片 -->
         <div class="edit-overlay" id="editOverlay">
             <div class="edit-backdrop" id="editBackdrop"></div>
             <div class="edit-sheet">
-                <div class="edit-handle"></div>
                 <div class="edit-title" id="editTitle">修改内容</div>
                 <textarea class="edit-input" id="editInput" rows="4"></textarea>
                 <div class="edit-actions">
@@ -2777,8 +2797,6 @@
 
         var msgSheetOverlay = document.getElementById('msgSheetOverlay');
         var msgSheetList = document.getElementById('msgSheetList');
-        var msgSheetBackdrop = document.getElementById('msgSheetBackdrop');
-        var msgSheetCancelBtn = document.getElementById('msgSheetCancel');
         var msgSheetMid = '';
         var msgSheetOpenedAt = 0;
 
@@ -2807,10 +2825,8 @@
             return '[消息]';
         }
 
-        function openMsgSheet(mid) {
-            var msg = findByMid(mid);
-            if (!msg || !msgSheetOverlay) return;
-            msgSheetMid = mid;
+        // 菜单项按消息类型动态生成，内容不变
+        function buildMsgMenuHTML(msg) {
             var isAi = msg.role === 'received' || msg.role === 'assistant';
             var hasText = !!String((msg.text || msg.content) || '').trim();
             var html = sheetItemHTML('select', '多选', MSG_ICON_SELECT, false);
@@ -2820,23 +2836,62 @@
             if (isAi) html += sheetItemHTML('rewrite', '改写这条回复', MSG_ICON_REWRITE, false);
             if (hasText) html += sheetItemHTML('edit', '编辑内容', MSG_ICON_EDIT, false);
             html += sheetItemHTML('delete', '删除这条', MSG_ICON_DELETE, true);
-            msgSheetList.innerHTML = html;
-            msgSheetOpenedAt = Date.now();
-            msgSheetOverlay.classList.add('active');
+            return html;
         }
 
-        if (msgSheetBackdrop) {
-            msgSheetBackdrop.addEventListener('click', function () {
+        // 锚定定位：气泡上方放得下就向上弹，否则向下；左右与上下都钳制在手机屏内
+        function positionMsgMenu(mid) {
+            var row = chatMessages.querySelector('.msg-row[data-mid="' + mid + '"]');
+            var host = document.querySelector('.phone-mockup') || document.body;
+            if (!row || !msgSheetList || !host) { msgSheetList.style.visibility = ''; return; }
+            var hostRect = host.getBoundingClientRect();
+            var rowRect = row.getBoundingClientRect();
+            var mw = msgSheetList.offsetWidth;
+            var mh = msgSheetList.offsetHeight;
+            var gap = 10;
+            var above = (rowRect.top - hostRect.top) > (mh + gap + 10);
+            var top = above
+                ? (rowRect.top - hostRect.top - mh - gap)
+                : (rowRect.bottom - hostRect.top + gap);
+            var isSent = row.classList.contains('sent');
+            var left = isSent ? (rowRect.right - hostRect.left - mw) : (rowRect.left - hostRect.left);
+            left = Math.max(8, Math.min(left, hostRect.width - mw - 8));
+            top = Math.max(8, Math.min(top, hostRect.height - mh - 8));
+            msgSheetList.style.top = Math.round(top) + 'px';
+            msgSheetList.style.left = Math.round(left) + 'px';
+            msgSheetList.classList.remove('above', 'below');
+            msgSheetList.classList.add(above ? 'above' : 'below');
+            // 小三角对准气泡中心
+            var bubbleEl2 = row.querySelector('.msg-bubble');
+            var bRect = bubbleEl2 ? bubbleEl2.getBoundingClientRect() : rowRect;
+            var ax = (bRect.left + bRect.width / 2) - (hostRect.left + left) - 5;
+            ax = Math.max(14, Math.min(ax, mw - 24));
+            msgSheetList.style.setProperty('--arrow-x', Math.round(ax) + 'px');
+            msgSheetList.style.visibility = '';
+        }
+
+        function openMsgSheet(mid) {
+            var msg = findByMid(mid);
+            if (!msg || !msgSheetOverlay) return;
+            msgSheetMid = mid;
+            msgSheetList.innerHTML = buildMsgMenuHTML(msg);
+            msgSheetList.style.visibility = 'hidden';
+            msgSheetOpenedAt = Date.now();
+            msgSheetOverlay.classList.add('active');
+            positionMsgMenu(mid);
+        }
+
+        // 点击菜单以外的任何位置关闭；聊天区滚动时也关闭（菜单锚定的是旧位置）
+        if (msgSheetOverlay) {
+            msgSheetOverlay.addEventListener('click', function (e) {
+                if (e.target.closest('.msg-menu')) return;
                 if (Date.now() - msgSheetOpenedAt < 200) return;
                 closeMsgSheet();
             });
         }
-        if (msgSheetCancelBtn) {
-            msgSheetCancelBtn.addEventListener('click', function () {
-                if (Date.now() - msgSheetOpenedAt < 200) return;
-                closeMsgSheet();
-            });
-        }
+        chatMessages.addEventListener('scroll', function () {
+            if (msgSheetOverlay && msgSheetOverlay.classList.contains('active')) closeMsgSheet();
+        }, { passive: true });
         if (msgSheetList) {
             msgSheetList.addEventListener('click', function (e) {
                 var btn = e.target.closest('.msg-sheet-item');
@@ -3059,6 +3114,8 @@
                 closeForwardSheet();
             });
         }
+        var fwCancelBtn = document.getElementById('fwCancel');
+        if (fwCancelBtn) fwCancelBtn.addEventListener('click', closeForwardSheet);
         if (fwList) {
             fwList.addEventListener('click', function (e) {
                 var btn = e.target.closest('.fw-item');
