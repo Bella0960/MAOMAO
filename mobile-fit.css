@@ -8,14 +8,21 @@
  * ============================================================ */
 @media (max-width: 480px) {
 
+  /* 画布底色保持白色；不再强制 body 背景，避免覆盖各页自身的业务配色（论坛/商城/记账的 #F7F7F9 等） */
+  html { background: #FFFFFF !important; }
+
+  /* 全屏铺满：解除各页写死的 max-width: 390px；高度用 dvh 保证不被浏览器工具栏截断 */
   html, body {
-    background: #FFFFFF !important;
     margin: 0 !important;
-    padding: 0 !important;
     width: 100% !important;
-    min-height: 100% !important;
+    max-width: none !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
     overscroll-behavior: none;
   }
+
+  /* 以 .phone / .phone-mockup 居中外壳承载内容的「桌面型」页面（如音乐页 body 的 20px padding）需清零，避免外壳溢出屏幕 */
+  body.shell-page { padding: 0 !important; }
 
   /* 去掉模拟器外壳，全屏 */
   .phone-mockup,
@@ -46,25 +53,27 @@
     flex: 1 !important;
   }
 
-  /* 状态栏：时间 / 图标整体避让刘海与灵动岛 */
+  /* 状态栏：时间 / 图标整体避让刘海与灵动岛（不加 !important，让页面自身已写好的间距优先生效） */
   .status-bar {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
   }
 
-  /* 模拟刘海条在真机上无意义，隐藏 */
+  /* 模拟刘海条在真机上无意义，隐藏（兼容各页不同的外壳类名） */
   .phone-camera,
-  .notch {
+  .notch,
+  .phone .camera,
+  .phone-mockup .camera {
     display: none !important;
   }
 
-  /* 各页面顶部标题区统一避让安全区（多数已带 env，这里兜底） */
+  /* 各页面顶部标题区兜底避让安全区；不加 !important，页面自己的间距优先 */
   .bt-topbar,
   .cs-topbar,
   .topbar,
   .header,
   .home-topbar,
   .chat-header {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 44px) !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 44px);
   }
 
   /* 底部控件避让 Home 指示条（真机全面屏手势条） */
@@ -72,8 +81,8 @@
   .bt-reset-card,
   .chat-input-wrap,
   .input-wrap,
+  .tabbar,
   .bottom-bar,
-  .dock,
   .tab-bar,
   .floating-nav {
     padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px) !important;
@@ -87,5 +96,17 @@
   .btn,
   .btn-action {
     min-height: 46px !important;
+  }
+
+  /* 论坛 / 记账等「body 直接排版」的页面：原本跟随 390px 居中列的固定底栏与底部弹层，真机需同步全宽 */
+  .tabbar,
+  .comment-bar,
+  .dock,
+  .composer,
+  .modal-backdrop.show {
+    left: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 }

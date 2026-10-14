@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>音乐 · Music</title>
+<link rel="stylesheet" href="mobile-fit.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -256,7 +257,7 @@
   .np-side { color: #000; cursor: pointer; background: none; border: none; display: flex; }
 </style>
 </head>
-<body>
+<body class="shell-page">
 
 <div class="phone">
 
@@ -609,6 +610,7 @@
 
   // ===== 波形 =====
   function renderBars(el, donePct) {
+    if (!el) return;
     el.innerHTML = '';
     for (let i = 0; i < 42; i++) {
       const s = document.createElement('span');
