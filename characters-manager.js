@@ -28,7 +28,10 @@ function selectRoleAndEnterPhone(roleId) {
     } catch (e) {
         console.error('保存当前角色失败:', e);
     }
-    window.location.href = 'index.html';
+    // 尊重来源：from=contacts 回通讯录，否则回主页
+    var params = new URLSearchParams(window.location.search);
+    var from = params.get('from');
+    window.location.href = from === 'contacts' ? 'contacts.html' : 'index.html';
 }
 
 const AVATAR_COLORS = [
@@ -316,6 +319,13 @@ function handleSaveRole() {
     }
 
     saveRoles(roles);
+
+    // 尊重来源：from=contacts 时，保存后直接回通讯录（省一次点击）
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('from') === 'contacts') {
+        window.location.href = 'contacts.html';
+        return;
+    }
     showView('list');
 }
 
@@ -354,3 +364,15 @@ document.getElementById('avatarFileInput').addEventListener('change', handleAvat
 
 // 页面初始化
 renderRoleList();
+
+// ====== 列表页返回按钮：根据来源决定去哪 ======
+// from=contacts → 回通讯录；其他情况（从桌面点进来）→ 回主页 index.html
+(function setupBackButton() {
+    var backBtn = document.querySelector('.back-circle');
+    if (!backBtn) return;
+    var params = new URLSearchParams(window.location.search);
+    var from = params.get('from');
+    if (from === 'contacts') {
+        backBtn.setAttribute('href', 'contacts.html');
+    }
+})();

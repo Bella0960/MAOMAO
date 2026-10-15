@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>消息通知</title>
+<script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
 <link rel="stylesheet" href="mobile-fit.css">
 <style>
@@ -27,21 +28,49 @@
     width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
   }
-  .title { font-size: 1rem; font-weight: 700; }
+  .title { font-size: 1rem; font-weight: 700; flex: 1; }
+  .clear-btn {
+    font-size: 0.75rem; color: #999; background: none; border: none; cursor: pointer;
+    font-family: inherit;
+  }
   .notif {
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: flex-start; gap: 12px;
     padding: 14px 16px; background: #fff;
     border-bottom: 1px solid #F0F0F0;
     cursor: pointer;
+  }
+  .n-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
   }
   .n-avatar {
     width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 0.813rem; font-weight: 700;
-    flex-shrink: 0;
+    overflow: hidden;
   }
-  .n-text { flex: 1; font-size: 0.875rem; line-height: 1.4; }
-  .n-time { font-size: 0.625rem; color: #999; margin-top: 2px; }
+  .n-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .n-icon-badge {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .n-icon-badge.like { background: #FF3B30; }
+  .n-icon-badge.comment { background: #007AFF; }
+  .n-icon-badge.mention { background: #FF9500; }
+  .n-icon-badge.post { background: #34C759; }
+  .n-icon-badge svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; }
+  .n-text { flex: 1; font-size: 0.875rem; line-height: 1.4; min-width: 0; }
+  .n-text b { font-weight: 600; color: #111; }
+  .n-content-snippet {
+    font-size: 0.75rem; color: #8E8E93; margin-top: 3px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .n-time { font-size: 0.625rem; color: #B0B0B5; margin-top: 4px; font-family: monospace; }
   .empty { text-align: center; color: #999; padding: 60px 20px; font-size: 0.875rem; }
 </style>
 </head>
@@ -52,43 +81,98 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
     </div>
     <div class="title">通知</div>
+    <button class="clear-btn" id="btnClearNotifs" type="button">全部清空</button>
   </div>
 
   <div id="notifList"></div>
 
 <script>
-  function loadNotifs() {
-    return JSON.parse(localStorage.getItem('forum_notifications') || '[]');
-  }
-  function saveNotifs(arr) {
-    localStorage.setItem('forum_notifications', JSON.stringify(arr));
-  }
   function timeAgo(ts) {
-    const m = Math.floor((Date.now() - ts) / 60000);
+    if (!ts) return '';
+    var m = Math.floor((Date.now() - ts) / 60000);
     if (m < 1) return '刚刚';
     if (m < 60) return m + '分钟前';
-    const h = Math.floor(m / 60);
+    var h = Math.floor(m / 60);
     if (h < 24) return h + '小时前';
     return Math.floor(h / 24) + '天前';
   }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // 合并两个通知源
+  function loadAllNotifs() {
+    var arr = [];
+    try { arr = arr.concat(JSON.parse(localStorage.getItem('forum_notifications') || '[]')); } catch (e) {}
+    try { arr = arr.concat(JSON.parse(localStorage.getItem('moments_notifications') || '[]')); } catch (e) {}
+    // 按时间倒序
+    arr.sort(function (a, b) { return (b.time || 0) - (a.time || 0); });
+    return arr;
+  }
+
+  function clearAllNotifs() {
+    localStorage.removeItem('forum_notifications');
+    localStorage.removeItem('moments_notifications');
+    render();
+  }
+
+  // 类型对应的图标和标签
+  var TYPE_META = {
+    like:     { cls: 'like',     icon: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>', badgeText: '赞了' },
+    comment:  { cls: 'comment',  icon: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>', badgeText: '评论了' },
+    mention_reply: { cls: 'mention', icon: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/>', badgeText: '回复了你' },
+    new_post: { cls: 'post',     icon: '<path d="M12 5v14M5 12h14"/>', badgeText: '发布了' }
+  };
+
+  function renderAvatarHtml(n) {
+    if (n.actorAvatar) {
+      return '<div class="n-avatar"><img src="' + escapeHtml(n.actorAvatar) + '" alt=""></div>';
+    }
+    // 旧 forum 通知可能只给了 n.avatar（颜色）和 n.name
+    if (n.avatar && typeof n.avatar === 'string' && n.avatar.indexOf('#') === 0) {
+      return '<div class="n-avatar" style="background:' + escapeHtml(n.avatar) + '">' + escapeHtml((n.name || 'U')[0]) + '</div>';
+    }
+    // 兜底：按名字首字 + 固定灰色
+    var firstChar = (n.actorName || n.name || 'U')[0];
+    return '<div class="n-avatar" style="background:#C7C7CC;">' + escapeHtml(firstChar) + '</div>';
+  }
+
   function render() {
-    const arr = loadNotifs();
-    const list = document.getElementById('notifList');
+    var arr = loadAllNotifs();
+    var list = document.getElementById('notifList');
     if (!arr.length) {
-      list.innerHTML = '<div class="empty">还没有通知<br><small>有人回复你、赞你会在这里显示</small></div>';
+      list.innerHTML = '<div class="empty">还没有通知<br><small>有人赞你、评论你、@你会在这里显示</small></div>';
       return;
     }
-    list.innerHTML = arr.map(n => `
-      <div class="notif">
-        <div class="n-avatar" style="background:${n.avatar || '#333'}">${n.name[0]}</div>
-        <div class="n-text">
-          <b>${n.name}</b> ${n.text}
-          <div class="n-time">${timeAgo(n.time)}</div>
-        </div>
-      </div>
-    `).join('');
+    list.innerHTML = arr.map(function (n) {
+      var typeMeta = TYPE_META[n.type] || null;
+      var badgeHtml = typeMeta ?
+        '<div class="n-icon-badge ' + typeMeta.cls + '"><svg viewBox="0 0 24 24">' + typeMeta.icon + '</svg></div>' : '';
+      var snippetHtml = n.postContent ?
+        '<div class="n-content-snippet">' + escapeHtml(n.postContent) + '</div>' : '';
+      var text = n.text || (typeMeta ? typeMeta.badgeText + '动态' : '');
+      return '<div class="notif">' +
+        '<div class="n-avatar-wrap">' +
+          renderAvatarHtml(n) +
+          badgeHtml +
+        '</div>' +
+        '<div class="n-text">' +
+          '<b>' + escapeHtml(n.actorName || n.name || '匿名') + '</b> ' + escapeHtml(text) +
+          snippetHtml +
+          '<div class="n-time">' + escapeHtml(timeAgo(n.time)) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
   }
+
+  document.getElementById('btnClearNotifs').addEventListener('click', function () {
+    if (confirm('确定清空全部通知？')) clearAllNotifs();
+  });
+
   render();
+  // 每次打开页面时刷新（可能 moments.html 刚刚写入了新通知）
+  window.addEventListener('pageshow', render);
 </script>
 </body>
 </html>

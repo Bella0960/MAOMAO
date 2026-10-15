@@ -1,11 +1,30 @@
 <!DOCTYPE html>
-<html lang="zh">
-<head>
+<html lang="zh"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>空间 · 小手机</title>
-    <script src="font-loader.js"></script>
-    <script src="native-feel.js"></script>
+    <script src="font-loader.js"></script><style>:root { --base-font-size: 14px; }html { font-size: calc(var(--base-font-size, 14px) / 14 * 16); }</style>
+    <script src="native-feel.js"></script><style>html {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    transition: opacity 0.15s ease;
+    opacity: 1;
+}
+* { -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior-y: none; }
+[class*="scroll"], .chat-stage { overscroll-behavior-y: none; }
+input, textarea, select, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+}
+html.nf-boot, html.nf-hide { opacity: 0 !important; }
+a, button, [role="button"] { touch-action: manipulation; }
+a:active, button:active, [role="button"]:active { transform: scale(0.97); }</style>
     <style>
         /* 全局重置 */
         * {
@@ -375,106 +394,40 @@
         .comment-send:disabled { background-color: #8E8E93; }
         .comment-send svg { width: 17px; height: 17px; stroke: #fff; }
 
-        /* ===== 发布抽屉（原样保留） ===== */
-        .post-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 600;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        .post-overlay.show { display: flex; }
-        .post-backdrop {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.3);
-        }
-        .post-sheet {
-            position: relative;
-            width: 100%;
-            background: #FFFFFF;
-            border-radius: 16px 16px 0 0;
-            padding: 18px 16px 24px;
-            animation: slideUp 0.25s ease;
+        /* ===== 评论抽屉 ===== */
+        .comment-input-row {
             display: flex;
-            flex-direction: column;
-            max-height: 85%;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        .post-title {
-            text-align: center;
-            font-size: 0.938rem;
-            font-weight: 600;
-            color: #222222;
-            margin-bottom: 14px;
-        }
-        .post-textarea {
-            width: 100%;
-            min-height: 120px;
-            background-color: #F2F2F7;
-            border: none;
-            outline: none;
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 0.875rem;
-            line-height: 1.6;
-            color: #333333;
-            font-family: inherit;
-            resize: none;
-        }
-        .post-textarea::placeholder { color: #B0B0B5; }
-
-        .post-image-box {
-            margin-top: 12px;
-            width: 100%;
-            height: 120px;
-            border-radius: 12px;
-            background-color: #F2F2F7;
-            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
             align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 6px;
+        }
+        .comment-extra-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: #F2F2F7;
+            border: none;
             cursor: pointer;
-            overflow: hidden;
-            color: #8E8E93;
-            font-size: 0.75rem;
-            transition: background-color 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        .post-image-box:hover { background-color: #E5E5EA; }
-        .post-image-box svg { width: 22px; height: 22px; }
-        .post-image-box img {
-            width: 100%;
-            height: 100%;
+        .comment-extra-btn svg { width: 18px; height: 18px; stroke: #666; }
+        .comment-image-thumb {
+            width: 40px; height: 40px;
+            border-radius: 10px;
             object-fit: cover;
+            flex-shrink: 0;
+        }
+        .cli-image {
+            margin-top: 4px;
+            max-width: 100%;
+            border-radius: 10px;
             display: block;
         }
-
-        .post-publish {
-            margin-top: 16px;
-            width: 100%;
-            height: 46px;
-            background-color: #1C1C1E;
-            color: #FFFFFF;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.938rem;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-        .post-publish:hover { background-color: #2C2C2E; }
-        .post-publish:active { transform: scale(0.99); }
-        .post-publish:disabled {
-            background-color: #8E8E93;
-            cursor: default;
+        .comment-row .cr-image {
+            margin-top: 4px;
+            max-width: 100%;
+            border-radius: 10px;
+            display: block;
         }
 
         /* Toast */
@@ -496,7 +449,82 @@
         .moments-toast.show { opacity: 1; }
     </style>
 <link rel="stylesheet" href="mobile-fit.css">
-</head>
+<style>.floating-nav {
+    position: absolute;
+    bottom: 20px;
+    left: 0 !important;
+    right: 0 !important;
+    width: fit-content !important;
+    max-width: calc(100% - 32px);
+    margin: 0 auto !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px 6px 12px !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    z-index: 500;
+}
+.nav-tab {
+    flex: 0 0 auto !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px !important;
+    padding: 4px 6px !important;
+    border-radius: 999px;
+    color: #777777;
+    text-decoration: none;
+    font-size: 8px !important;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s ease;
+    /* 手机端触摸优化：去掉点按灰光斑、禁止长按选中/呼出菜单、消除双击缩放延迟 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+/* 图标背后的小圆底（仅选中时显示极淡浅灰圆，不使用大黑块） */
+.nav-ico {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center bottom;
+    /* 松开手指：420ms 带过冲的回弹曲线，Q弹感来源 */
+    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+.nav-ico svg { width: 14px !important; height: 14px !important; display: block; stroke-width: 1.5 !important; }
+/* 选中态：图标轻微浮起放大 + 文字加粗变黑 */
+.nav-tab.active { color: #111111; font-weight: 700; }
+.nav-tab.active .nav-ico { background: rgba(0, 0, 0, 0.06); transform: translateY(-1px) scale(1.06); }
+/* 点按态：必须写在 .active 之后（两者优先级相同，靠书写顺序覆盖）。按下快速响应、不带过冲 */
+.nav-tab:active .nav-ico,
+.nav-tab.is-pressing .nav-ico {
+    transform: translateY(-5px) scale(1.12);
+    transition: transform 110ms ease-out, background 0.2s ease;
+}
+.nav-badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 12px);
+    width: 6px;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 50%;
+}</style></head>
 <body>
 
     <div class="phone-mockup">
@@ -512,50 +540,41 @@
             <!-- 封面板块 -->
             <div class="cover-block">
                 <div class="cover-nav-btn" aria-label="返回" onclick="location.href='index.html'">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
                 </div>
-                <div class="cover-add-btn" id="btnAdd" aria-label="发表动态">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <div class="cover-add-btn" id="btnAdd" aria-label="发表动态" onclick="location.href='post-create.html'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </div>
-                <div class="cover-avatar-left" id="coverAvatar"></div>
+                <div class="cover-avatar-left" id="coverAvatar"><svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
                 <!-- 隐形入口：让随机角色由 AI 生成一条动态 -->
                 <button class="cover-ai-btn" id="btnAiPost" type="button" aria-label="让 TA 发动态" title="让 TA 发动态">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 14l.7 1.8L21.5 16.5l-1.8.7L19 19l-.7-1.8-1.8-.7 1.8-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M19 14l.7 1.8L21.5 16.5l-1.8.7L19 19l-.7-1.8-1.8-.7 1.8-.7z"></path></svg>
                 </button>
             </div>
 
             <!-- 动态面板（原 #momentsList 节点保留，事件委托不受 innerHTML 重建影响） -->
-            <main class="moments-main-panel" id="momentsList"></main>
+            <main class="moments-main-panel" id="momentsList"><div class="empty-tip">还没有动态，快发一条吧</div></main>
 
         </div>
 
-        <!-- 发布抽屉 -->
-        <div class="post-overlay" id="postOverlay">
-            <div class="post-backdrop" id="postBackdrop"></div>
-            <div class="post-sheet">
-                <h3 class="post-title">发布新动态</h3>
-                <textarea class="post-textarea" id="postContent" maxlength="500" placeholder="记录此刻的想法…"></textarea>
-                <div class="post-image-box" id="postImageBox" title="点击添加图片">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                    <span id="postImageHint">添加图片</span>
-                </div>
-                <input type="file" id="postImageInput" accept="image/*" style="display:none;">
-                <input type="file" id="coverInput" accept="image/*" style="display:none;">
-                <input type="file" id="avatarInput" accept="image/*" style="display:none;">
-                <button class="post-publish" id="btnPublish" type="button">发布</button>
-            </div>
-        </div>
+        <!-- 封面/头像上传（保留给 cover-block 用） -->
+        <input type="file" id="coverInput" accept="image/*" style="display:none;">
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;">
 
         <!-- Toast -->
         <div class="moments-toast" id="momentsToast"></div>
 
         <!-- 评论抽屉 -->
-        <div class="post-overlay" id="commentOverlay">
-            <div class="post-backdrop" id="commentBackdrop"></div>
+        <div class="post-overlay" id="commentOverlay" style="position: absolute; inset: 0; z-index: 600; display: none; align-items: flex-end; justify-content: center;">
+            <div class="post-backdrop" id="commentBackdrop" style="position: absolute; inset: 0; background: rgba(0,0,0,0.3);"></div>
             <div class="comment-sheet">
                 <h3 class="post-title" id="commentTitle">评论</h3>
                 <div class="comment-list" id="commentList"></div>
                 <div class="comment-input-row">
+                    <button class="comment-extra-btn" id="commentImgBtn" type="button" aria-label="添加图片">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    </button>
+                    <input type="file" id="commentImgInput" accept="image/*" style="display:none;">
                     <input class="comment-input" id="commentInput" type="text" maxlength="200" placeholder="写下你的评论…">
                     <button class="comment-send" id="btnSendComment" type="button" aria-label="发送评论">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -726,7 +745,22 @@
         var listEl = document.getElementById('momentsList');
 
         function renderMoments() {
-            var list = loadMoments();
+            var allList = loadMoments();
+            var me = getMyInfo();
+            // 按可见权限过滤：自己的动态始终可见
+            var list = allList.filter(function (m) {
+                var isMine = m.authorId === me.id || m.authorId === 'me' || m.author === me.name || m.byAI === true;
+                if (isMine) return true; // 自己发的 / AI 角色发的（已在朋友圈里）都显示
+                var v = m.visibility || 'public';
+                if (v === 'public') return true;
+                if (v === 'friends') return true; // 简化：目前所有 AI 角色都是朋友
+                if (v === 'private') return false; // 别人的仅自己动态不显示
+                if (v === 'custom') {
+                    var visibleTo = m.visibleTo || [];
+                    return visibleTo.indexOf(me.id) !== -1 || visibleTo.indexOf('me') !== -1;
+                }
+                return true;
+            });
             if (!list.length) {
                 listEl.innerHTML = '<div class="empty-tip">还没有动态，快发一条吧</div>';
                 return;
@@ -745,18 +779,40 @@
                 var rawImage = m.image || m.imageData || '';
                 var imageSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(rawImage) ? rawImage : '';
                 var commentItems = Array.isArray(m.commentList) ? m.commentList : [];
-                var commentCount = commentItems.length || (m.comments || 0);
+                var rawComments = m.comments;
+                var commentCount = commentItems.length || (Array.isArray(rawComments) ? rawComments.length : (rawComments || 0));
                 var commentsHTML = commentItems.length ? (
                     '<div class="post-comments">' +
                         commentItems.map(function (c) {
+                            var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+                            var imgHTML = imgSrc ? '<img class="cr-image" src="' + imgSrc + '" alt="">' : '';
                             return '<div class="comment-row">' +
-                                '<span class="comment-name">' + escapeHtml(c.name || '匿名用户') + '：</span>' +
+                                '<span class="comment-name">' + escapeHtml(c.name || c.author || '匿名用户') + '：</span>' +
                                 escapeHtml(c.text || '') +
-                                (c.time ? '<span class="comment-time">' + formatTime(c.time) + '</span>' : '') +
+                                imgHTML +
+                                (c.time || c.timestamp ? '<span class="comment-time">' + formatTime(c.time || c.timestamp) + '</span>' : '') +
                             '</div>';
                         }).join('') +
                     '</div>'
                 ) : '';
+                // 可见权限 & @好友 标记（小字提示）
+                var metaBadges = '';
+                var permLabel = { public: '公开', friends: '好友可见', private: '仅自己', custom: '部分可见' }[m.visibility || 'public'];
+                if (permLabel && permLabel !== '公开') {
+                    metaBadges += '<span style="font-size:0.594rem;color:#999;margin-top:2px;">🔒 ' + permLabel + '</span>';
+                }
+                if (m.mentions && m.mentions.length) {
+                    var characters = getCharacterList();
+                    var mentionNames = [];
+                    m.mentions.forEach(function (mid) {
+                        for (var k = 0; k < characters.length; k++) {
+                            if (String(characters[k].id) === String(mid)) { mentionNames.push(characters[k].name); break; }
+                        }
+                    });
+                    if (mentionNames.length) {
+                        metaBadges += '<span style="font-size:0.594rem;color:#666;margin-top:2px;"> · @' + mentionNames.join(' @') + '</span>';
+                    }
+                }
                 return '' +
                     '<article class="moment-card post-item" data-id="' + escapeHtml(m.id) + '">' +
                         avatarHTML(posterAvatar) +
@@ -768,6 +824,7 @@
                             '<div class="post-text">' + escapeHtml(textContent) + '</div>' +
                             (imageSrc ? '<img class="post-image" src="' + imageSrc + '" alt="">' : '') +
                             commentsHTML +
+                            metaBadges +
                             '<div class="post-actions">' +
                                 '<button class="action-btn like-btn' + heartFill + '" type="button">' +
                                     '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
@@ -783,38 +840,15 @@
             }).join('');
         }
 
-        /* ================= 点赞 / 评论（事件委托） ================= */
-        listEl.addEventListener('click', function (e) {
-            var likeBtn = e.target.closest('.like-btn');
-            var commentBtn = e.target.closest('.comment-btn');
-            if (!likeBtn && !commentBtn) return;
-
-            var card = e.target.closest('.moment-card');
-            var id = card.getAttribute('data-id');
-            var list = loadMoments();
-            var post = null;
-            for (var i = 0; i < list.length; i++) {
-                if (String(list[i].id) === String(id)) { post = list[i]; break; }
-            }
-            if (!post) return;
-
-            if (likeBtn) {
-                post.liked = !post.liked;
-                post.likes = (post.likes || 0) + (post.liked ? 1 : -1);
-                if (post.likes < 0) post.likes = 0;
-                saveMoments(list);
-                renderMoments();
-            } else {
-                openCommentDrawer(id);
-            }
-        });
-
         /* ================= 评论抽屉 ================= */
         var commentOverlay = document.getElementById('commentOverlay');
         var commentListEl = document.getElementById('commentList');
         var commentTitleEl = document.getElementById('commentTitle');
         var commentInput = document.getElementById('commentInput');
         var commentPostId = null;
+        var pendingCommentImage = '';
+        var commentImgBtn = document.getElementById('commentImgBtn');
+        var commentImgInput = document.getElementById('commentImgInput');
 
         function findPost(list, id) {
             for (var i = 0; i < list.length; i++) {
@@ -845,49 +879,111 @@
                 return;
             }
             commentListEl.innerHTML = items.map(function (c) {
+                var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+                var imgHTML = imgSrc ? '<img class="cli-image" src="' + imgSrc + '" alt="">' : '';
                 return '<div class="comment-list-item">' +
                     '<div class="cli-dot"></div>' +
                     '<div class="cli-body">' +
-                        '<div class="cli-head">' + escapeHtml(c.name || '匿名用户') +
-                            (c.time ? '<span>' + formatTime(c.time) + '</span>' : '') +
+                        '<div class="cli-head">' + escapeHtml(c.name || c.author || '匿名用户') +
+                            (c.time || c.timestamp ? '<span>' + formatTime(c.time || c.timestamp) + '</span>' : '') +
                         '</div>' +
-                        '<div class="cli-text">' + escapeHtml(c.text || '') + '</div>' +
+                        (c.text ? '<div class="cli-text">' + escapeHtml(c.text || '') + '</div>' : '') +
+                        imgHTML +
                     '</div>' +
                 '</div>';
             }).join('');
             commentListEl.scrollTop = commentListEl.scrollHeight;
         }
 
-        function openCommentDrawer(id) {
-            commentPostId = id;
-            renderCommentDrawer();
-            commentOverlay.classList.add('show');
-            setTimeout(function () { commentInput.focus(); }, 260);
-        }
-        function closeCommentDrawer() {
-            commentOverlay.classList.remove('show');
-            commentPostId = null;
+        function resetCommentInput() {
             commentInput.value = '';
+            pendingCommentImage = '';
+            commentImgInput.value = '';
+            // 恢复按钮为默认图标
+            commentImgBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
         }
 
-        document.getElementById('commentBackdrop').addEventListener('click', closeCommentDrawer);
+        function openCommentDrawer(id) {
+            commentPostId = id;
+            resetCommentInput();
+            renderCommentDrawer();
+            commentOverlay.style.display = 'flex';
+            setTimeout(function () { commentInput && commentInput.focus(); }, 260);
+        }
+        function closeCommentDrawer() {
+            commentOverlay.style.display = 'none';
+            commentPostId = null;
+            resetCommentInput();
+        }
+
+        if (document.getElementById('commentBackdrop')) {
+            document.getElementById('commentBackdrop').addEventListener('click', closeCommentDrawer);
+        }
+
+        // 评论图片选择
+        if (commentImgBtn) {
+            commentImgBtn.addEventListener('click', function () { commentImgInput.click(); });
+        }
+        if (commentImgInput) {
+            commentImgInput.addEventListener('change', function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                compressImage(file, function (dataUrl) {
+                    if (!dataUrl) return;
+                    pendingCommentImage = dataUrl;
+                    commentImgBtn.innerHTML = '<img class="comment-image-thumb" src="' + dataUrl + '" alt="预览">';
+                });
+            });
+        }
 
         function submitComment() {
             var text = commentInput.value.trim();
-            if (!text || !commentPostId) return;
+            if (!text && !pendingCommentImage) return;
+            if (!commentPostId) return;
+
             var list = loadMoments();
             var post = findPost(list, commentPostId);
             if (!post) { closeCommentDrawer(); return; }
+
+            var me = getMyInfo();
+            var meName = me.name || '我';
+            var myAvatar = me.avatar || '';
+
+            var commentEntry = {
+                name: meName,
+                author: meName,
+                avatar: myAvatar,
+                text: text,
+                image: pendingCommentImage,
+                time: Date.now(),
+                timestamp: Date.now()
+            };
             if (!Array.isArray(post.commentList)) post.commentList = [];
-            post.commentList.push({ name: getMyName(), text: text, time: Date.now() });
-            post.comments = post.commentList.length;
+            if (!Array.isArray(post.comments)) post.comments = [];
+            post.commentList.push(commentEntry);
+            post.comments.push(commentEntry);
+            post.commentsCount = (post.commentList || []).length;
             saveMoments(list);
-            commentInput.value = '';
+            resetCommentInput();
             renderMoments();
             renderCommentDrawer();
+
+            // 写通知
+            var postContent = (post.content || '[图片动态]').slice(0, 40);
+            pushNotification({
+                type: 'comment',
+                actorId: me.id || 'me',
+                actorName: meName,
+                actorAvatar: myAvatar,
+                postId: post.id,
+                postContent: postContent,
+                text: (text ? '评论了' : '发图评论了') + '这条动态' + (text ? '：' + text.slice(0, 30) : ''),
+                time: Date.now()
+            });
         }
-        document.getElementById('btnSendComment').addEventListener('click', submitComment);
-        commentInput.addEventListener('keydown', function (e) {
+        var btnSend = document.getElementById('btnSendComment');
+        if (btnSend) btnSend.addEventListener('click', submitComment);
+        if (commentInput) commentInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') submitComment();
         });
 
@@ -933,7 +1029,7 @@
             } catch (e) { /* 日志失败不影响主流程 */ }
         }
 
-        aiBtn.addEventListener('click', function () {
+        if (aiBtn) aiBtn.addEventListener('click', function () {
             var characters = loadCharacters();
             if (!characters.length) {
                 showToast('还没有角色，先去联系人添加一个吧');
@@ -1029,32 +1125,7 @@
             });
         });
 
-        /* ================= 发布抽屉 ================= */
-        var overlay = document.getElementById('postOverlay');
-        var contentInput = document.getElementById('postContent');
-        var imageBox = document.getElementById('postImageBox');
-        var imageHint = document.getElementById('postImageHint');
-        var imageInput = document.getElementById('postImageInput');
-        var pendingImage = '';
-
-        function openDrawer() {
-            overlay.classList.add('show');
-            setTimeout(function () { contentInput.focus(); }, 260);
-        }
-        function closeDrawer() {
-            overlay.classList.remove('show');
-        }
-        function resetDrawer() {
-            contentInput.value = '';
-            pendingImage = '';
-            imageInput.value = '';
-            imageBox.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span id="postImageHint">添加图片</span>';
-        }
-
-        document.getElementById('btnAdd').addEventListener('click', openDrawer);
-        document.getElementById('postBackdrop').addEventListener('click', closeDrawer);
-
-        // Canvas 压缩：宽度上限 600，等比缩放，JPEG 0.7
+        /* ================= 图片压缩（评论/封面/头像共用） ================= */
         function compressImage(file, cb) {
             var reader = new FileReader();
             reader.onload = function (ev) {
@@ -1082,67 +1153,162 @@
             reader.readAsDataURL(file);
         }
 
-        imageBox.addEventListener('click', function () { imageInput.click(); });
-        imageInput.addEventListener('change', function (e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            compressImage(file, function (dataUrl) {
-                if (!dataUrl) return;
-                pendingImage = dataUrl;
-                imageBox.innerHTML = '<img src="' + dataUrl + '" alt="预览">';
-            });
-        });
-
-        document.getElementById('btnPublish').addEventListener('click', function () {
-            var text = contentInput.value.trim();
-            if (!text && !pendingImage) {
-                showToast('说点什么或选张图片吧');
-                return;
-            }
-
-            // 发布人信息优先取 myProfile
-            var author = '我';
-            var avatar = '';
+        /* ================= 通知系统 ================= */
+        var MOMENTS_NOTIF_KEY = 'moments_notifications';
+        function pushNotification(n) {
             try {
-                var raw = localStorage.getItem('myProfile');
-                if (raw) {
-                    var p = JSON.parse(raw) || {};
-                    if (p.nickname) author = p.nickname;
-                    if (p.avatar) avatar = p.avatar;
-                }
+                var arr = JSON.parse(localStorage.getItem(MOMENTS_NOTIF_KEY) || '[]');
+                arr.unshift(n);
+                while (arr.length > 100) arr.pop();
+                localStorage.setItem(MOMENTS_NOTIF_KEY, JSON.stringify(arr));
             } catch (e) {}
+        }
 
-            var post = {
-                id: 'm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-                authorId: 'me',
-                author: author,
-                avatar: avatar,
-                content: text,
-                image: pendingImage,
-                time: Date.now(),
-                likes: 0,
-                liked: false,
-                comments: 0,
-                commentList: []
-            };
+        /* ================= @好友触发 AI 回复 ================= */
+        function triggerMentionsReply(post) {
+            var characters = getCharacterList();
+            if (!characters.length) return;
+            var config = getApiConfig();
+            var apiKey = (config.apiKey || '').trim();
+            if (!apiKey) { showToast('未配置 API Key，@好友无法自动回复'); return; }
 
+            var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+            var model = (config.model || 'gpt-3.5-turbo').trim();
+            var content = post.content || '[图片动态]';
+            var mentionIds = post.mentions || [];
+
+            // 对每个被 @ 的角色分别发起 AI 回复
+            mentionIds.forEach(function (cid) {
+                var role = null;
+                for (var i = 0; i < characters.length; i++) {
+                    if (String(characters[i].id) === String(cid)) { role = characters[i]; break; }
+                }
+                if (!role) return;
+
+                var persona = (role.persona || role.prompt || '一个善解人意的AI角色').trim();
+                var tone = (role.tone || '').trim();
+                var systemPrompt = '你是' + (role.name || '一个角色') + '。角色设定：' + persona +
+                    (tone ? '。说话语气：' + tone : '') +
+                    '。现在有人在社交空间动态里 @ 了你，你需要以第一人称在那条动态下面评论回复。';
+                var userPrompt = '动态内容：' + content +
+                    '\n请写一条你对这条动态的评论回复，口语化、自然真实，20~50 字。' +
+                    '只输出评论正文本身，不要加引号或解释。';
+
+                var start = Date.now();
+                var controller = new AbortController();
+                var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+
+                fetch(baseUrl + '/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey
+                    },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        temperature: config.temperature != null ? config.temperature : 0.8,
+                        stream: false
+                    })
+                }).then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                }).then(function (data) {
+                    var text = (((data || {}).choices || [])[0] || {}).message
+                        ? data.choices[0].message.content : '';
+                    text = String(text || '').replace(/^["""]+|["""]+$/g, '').replace(/^评论[:：]\s*/, '').trim();
+                    if (!text) throw new Error('返回为空');
+                    if (text.length > 120) text = text.slice(0, 120);
+
+                    // 把 AI 角色评论加到这条动态下
+                    var list = loadMoments();
+                    var target = null;
+                    for (var j = 0; j < list.length; j++) {
+                        if (String(list[j].id) === String(post.id)) { target = list[j]; break; }
+                    }
+                    if (!target) return;
+                    if (!Array.isArray(target.commentList)) target.commentList = [];
+                    if (!Array.isArray(target.comments)) target.comments = [];
+                    var commentEntry = {
+                        name: role.name || '匿名',
+                        author: role.name || '匿名',
+                        avatar: role.avatar || '',
+                        text: text,
+                        time: Date.now(),
+                        timestamp: Date.now(),
+                        byAI: true
+                    };
+                    target.commentList.push(commentEntry);
+                    target.comments.push(commentEntry);
+                    target.commentsCount = (target.commentList || []).length;
+                    try { saveMoments(list); } catch (e) {}
+
+                    // 通知：TA 回复了你的动态
+                    pushNotification({
+                        type: 'mention_reply',
+                        actorId: String(role.id || ''),
+                        actorName: role.name || 'AI角色',
+                        actorAvatar: role.avatar || '',
+                        postId: post.id,
+                        postContent: content,
+                        text: '回复了你的动态：' + text.slice(0, 40),
+                        time: Date.now()
+                    });
+
+                    renderMoments();
+                    logApiCall(model, 'success', start);
+                }).catch(function (err) {
+                    logApiCall(model, 'error', start, (err && err.message) ? err.message : '');
+                }).finally(function () {
+                    clearTimeout(timeoutId);
+                });
+            });
+        }
+
+        /* ================= 点赞 / 评论 事件委托（扩展通知） ================= */
+        if (listEl) listEl.addEventListener('click', function (e) {
+            var likeBtn = e.target.closest('.like-btn');
+            var commentBtn = e.target.closest('.comment-btn');
+            if (!likeBtn && !commentBtn) return;
+
+            var card = e.target.closest('.moment-card');
+            var id = card.getAttribute('data-id');
             var list = loadMoments();
-            list.unshift(post);
-            try {
-                saveMoments(list);
-            } catch (err) {
-                alert('存储空间不足，请压缩图片或减少文字长度');
-                return;
+            var post = null;
+            for (var i = 0; i < list.length; i++) {
+                if (String(list[i].id) === String(id)) { post = list[i]; break; }
             }
-            resetDrawer();
-            closeDrawer();
-            renderMoments();
-            listEl.scrollTop = 0;
-        });
+            if (!post) return;
 
-        /* ================= Toast ================= */
-        var toastEl = document.getElementById('momentsToast');
-        var toastTimer = null;
+            if (likeBtn) {
+                var wasLiked = !!post.liked;
+                post.liked = !wasLiked;
+                post.likes = (post.likes || 0) + (post.liked ? 1 : -1);
+                if (post.likes < 0) post.likes = 0;
+                saveMoments(list);
+                renderMoments();
+                // 通知
+                if (post.liked) {
+                    var me = getMyInfo();
+                    pushNotification({
+                        type: 'like',
+                        actorId: me.id,
+                        actorName: me.name,
+                        actorAvatar: me.avatar,
+                        postId: post.id,
+                        postContent: (post.content || '[图片动态]').slice(0, 40),
+                        text: '赞了这条动态',
+                        time: Date.now()
+                    });
+                }
+            } else {
+                openCommentDrawer(id);
+            }
+        });
         function showToast(text) {
             toastEl.textContent = text;
             toastEl.classList.add('show');
@@ -1285,5 +1451,6 @@
         renderMoments();
     </script>
 <script src="statusbar-control.js"></script>
-</body>
-</html>
+
+
+</body></html>

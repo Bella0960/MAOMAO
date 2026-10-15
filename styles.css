@@ -10,6 +10,26 @@
 * { box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
+/* ===== 真实手机上：所有手机壳自动全屏铺满，去掉边框圆角 ===== */
+@media (max-width: 500px) {
+  body {
+    background: #fff !important;
+    display: block !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+  .phone-mockup,
+  .phone,
+  .simulator-stage {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;

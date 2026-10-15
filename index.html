@@ -10,8 +10,8 @@
     <title>手机模拟器 · 首页</title>
     <script src="font-loader.js"></script>
     <script src="native-feel.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20261013compact2" />
-  <link rel="stylesheet" href="mobile-fit.css?v=20261013">
+    <link rel="stylesheet" href="styles.css?v=20261015v8" />
+  <link rel="stylesheet" href="mobile-fit.css?v=20261015v3">
   <style>
     /* 开场加载动画：黑白灰极简 */
     #bootLoader {
@@ -34,10 +34,351 @@
       font-size: 0.813rem; color: #999999; letter-spacing: 1px;
     }
 
-    /* ===== 桌面升级：黑白极简参考图风格 ===== */
-    .home-screen { padding: 20px 16px 10px !important; }
+    /* ===== 桌面：居中大时间 + 自由摆放 ===== */
+    /* 横向滚动容器（保证能左右翻页） */
+    #homeScreen.home-screen,
+    .home-screen {
+      display: block !important;
+      flex: 1 !important;
+      min-height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow-x: scroll !important;
+      overflow-y: hidden !important;
+      scroll-snap-type: x mandatory !important;
+      scroll-behavior: smooth !important;
+      -webkit-overflow-scrolling: touch !important;
+      scrollbar-width: none !important;
+      white-space: nowrap !important;
+      cursor: grab !important;
+      background: #fff !important;
+    }
+    #homeScreen::-webkit-scrollbar { display: none !important; }
+    #homeScreen:active { cursor: grabbing !important; }
 
-    /* ===== 去掉手机外壳，真手机全屏 ===== */
+    /* 每个页面：inline-block + position:relative → 自由绝对定位 */
+    .home-page, .home-page.home-page {
+      display: inline-block !important;
+      width: 100% !important;
+      min-width: 100% !important;
+      height: 100% !important;
+      vertical-align: top !important;
+      white-space: normal !important;
+      scroll-snap-align: start !important;
+      scroll-snap-stop: always !important;
+      position: relative !important;
+      box-sizing: border-box !important;
+      background: #fff !important;
+    }
+
+    /* 页面指示器 */
+    .page-dots {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 4px 0 2px;
+    }
+    .page-dots .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #D1D1D6;
+      transition: background 0.3s;
+    }
+    .page-dots .dot.active { background: #111; }
+
+    /* ===== 第1页：居中大时间 ===== */
+    .center-time-block {
+      position: absolute;
+      top: 14%;
+      left: 0; right: 0;
+      text-align: center;
+    }
+    .time-top-row {
+      font-size: 0.75rem;
+      color: #888;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4vh;
+    }
+    .time-top-row .sep { margin: 0 4px; color: #CCC; }
+    .time-big {
+      font-size: 4.5rem;
+      font-weight: 200;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: #111;
+      margin: 0;
+    }
+    .time-progress-wrap {
+      margin-top: 2vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8vh;
+    }
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 60%;
+      max-width: 240px;
+    }
+    .progress-label {
+      font-size: 0.688rem;
+      color: #666;
+      width: 88px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: #EEE;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #111;
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+    .progress-pct {
+      font-size: 0.625rem;
+      color: #666;
+      width: 26px;
+      flex-shrink: 0;
+    }
+
+    /* ===== iMessage 风格小组件（左中） ===== */
+    .imsg-card {
+      position: absolute;
+      top: 42%;
+      left: 4%;
+      width: 42%;
+      max-width: 170px;
+      background: #fff;
+      border: 1px solid #E5E5EA;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      font-family: -apple-system, system-ui, sans-serif;
+    }
+    .imsg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.688rem;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .imsg-bubble {
+      padding: 6px 10px;
+      border-radius: 16px;
+      font-size: 0.688rem;
+      color: #333;
+      margin-bottom: 4px;
+      max-width: 85%;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+    .imsg-bubble.gray {
+      background: #F0F0F3;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+    }
+    .imsg-input {
+      margin-top: 8px;
+      border: 1px solid #E5E5EA;
+      border-radius: 14px;
+      padding: 5px 10px;
+      font-size: 0.625rem;
+      color: #AAA;
+    }
+
+    /* ===== 纪念日卡（右下） ===== */
+    .anniv-card {
+      position: absolute;
+      bottom: 22%;
+      right: 4%;
+      width: 38%;
+      max-width: 140px;
+      background: #fff;
+      border: 1px solid #E5E5EA;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      text-align: center;
+    }
+    .anniv-days {
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: #111;
+      line-height: 1;
+    }
+    .anniv-label {
+      font-size: 0.625rem;
+      color: #888;
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+    .anniv-avatars {
+      display: flex;
+      justify-content: center;
+    }
+    .anniv-avatars span {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #F0F0F3;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      border: 2px solid #fff;
+      margin-left: -6px;
+    }
+    .anniv-avatars span:first-child { margin-left: 0; }
+    .anniv-names {
+      font-size: 0.625rem;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    /* ===== 零散小应用图标：整齐 2×2 网格（iMessage 卡右边） ===== */
+    .float-apps-grid {
+      position: absolute;
+      top: 42%;
+      right: 4%;
+      width: 42%;
+      max-width: 170px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .float-app {
+      position: relative !important;  /* 覆盖 absolute */
+      width: auto !important;
+      height: auto !important;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.15s;
+      padding: 0;
+    }
+    .float-app:hover { transform: scale(1.05); }
+    .float-app svg {
+      width: 40px; height: 40px;
+      stroke: #111; stroke-width: 1.5; fill: none;
+      background: #F4F4F6;
+      border-radius: 14px;
+      padding: 9px;
+      box-sizing: border-box;
+    }
+    .float-app-label {
+      position: static;
+      font-size: 0.625rem;
+      color: #555;
+      text-align: center;
+      width: auto;
+      left: auto; top: auto;
+    }
+
+    /* ===== 第2页：小组件 + 应用网格 ===== */
+    .page2-widgets {
+      position: absolute;
+      top: 6%;
+      left: 5%; right: 5%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    /* 小组件通用 */
+    .w-card {
+      background: #fff;
+      border: 1px solid #E5E5EA;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    /* 迷你日历小组件 */
+    .w-cal .w-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.688rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    .w-cal .w-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7,1fr);
+      font-size: 0.5rem;
+      color: #BBB;
+      text-align: center;
+      margin-bottom: 3px;
+    }
+    .w-cal .w-days {
+      display: grid;
+      grid-template-columns: repeat(7,1fr);
+      font-size: 0.5625rem;
+      color: #333;
+      text-align: center;
+      gap: 1px 0;
+    }
+    .w-cal .w-days .today {
+      background: #111;
+      color: #fff;
+      border-radius: 50%;
+      width: 14px; height: 14px; line-height: 14px; margin: 0 auto;
+      font-size: 0.5rem;
+    }
+    .w-cal .w-days .empty { visibility: hidden; }
+
+    /* 心情/日记小组件 */
+    .w-mood { text-align: center; }
+    .w-mood .w-head {
+      font-size: 0.688rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    .w-mood .w-emoji {
+      font-size: 1.75rem;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+    .w-mood .w-text {
+      font-size: 0.5625rem;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    .page2-title { display: none; }  /* 不再需要单独标题 */
+
+    .page2-grid {
+      position: absolute;
+      top: 28%;
+      left: 5%; right: 5%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3.5vh 14px;
+    }
+
+    /* ===== 小组件可编辑：hover 提示 ===== */
+    .imsg-card, .anniv-card, .w-mood, .float-app {
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .imsg-card:hover, .anniv-card:hover, .w-mood:hover {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    /* 纪念日卡头像：支持图片替换 */
+    .anniv-avatars span.avatar-img {
+      background-size: cover;
+      background-position: center;
+      color: transparent;
+    }
     html, body { background: #E8E8EC !important; }
     body {
       display: flex !important;
@@ -93,7 +434,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
       padding: 18px 20px;
       border-radius: 24px !important;
-      margin-bottom: 10px;
+      margin-bottom: 0 !important;
     }
     .clock-display {
       font-size: 3.1rem !important;
@@ -111,7 +452,7 @@
     .time-weekday { font-size: 0.688rem; color: #999; margin-top: 3px; }
 
     /* 双图卡：浅灰底 + 细虚线 + 居中 + 号 */
-    .image-duo { margin-bottom: 10px; }
+    .image-duo { margin-bottom: 0 !important; }
     .img-card {
       background: #F4F4F6 !important;
       border: 1.5px dashed #D8D8DE !important;
@@ -169,163 +510,135 @@
             </div>
           </header>
 
-          <section class="home-screen">
-            <!-- 玻璃时间卡 -->
-            <div class="glass time-card">
-              <div class="time-left">
-                <div class="clock-display" id="large-clock">09:41</div>
-                <div class="clock-meta" id="clock-meta">5月11日 MON 晴 24°C</div>
+          <!-- 页面指示器（放在滚动容器外面，固定显示） -->
+          <div class="page-dots" aria-hidden="true">
+            <span class="dot active" id="dot-0"></span>
+            <span class="dot" id="dot-1"></span>
+          </div>
+
+          <section class="home-screen" id="homeScreen">
+            <!-- ============ 第一页：居中大时间 + 进度条 + 自由摆放 ============ -->
+            <div class="home-page">
+
+              <!-- 居中大时间块 -->
+              <div class="center-time-block">
+                <div class="time-top-row" id="date-top">10-1 · about me · 周四</div>
+                <h1 class="time-big" id="big-clock">09:41</h1>
+                <div class="time-progress-wrap">
+                  <div class="progress-row">
+                    <span class="progress-label">My lovely phone</span>
+                    <div class="progress-bar"><div class="progress-fill" id="fill1"></div></div>
+                    <span class="progress-pct" id="pct1">66%</span>
+                  </div>
+                  <div class="progress-row">
+                    <span class="progress-label">本周剩余</span>
+                    <div class="progress-bar"><div class="progress-fill" id="fill2"></div></div>
+                    <span class="progress-pct" id="pct2">66%</span>
+                  </div>
+                </div>
               </div>
-              <div class="time-right">
-                <div class="time-greeting" id="time-greeting">上午好</div>
-                <div class="time-weekday" id="time-weekday">星期一</div>
+
+              <!-- 左上：消息风格小组件（可编辑） -->
+              <div class="imsg-card" data-edit="imsg" title="点击编辑消息">
+                <div class="imsg-head">
+                  <span>◁</span>
+                  <span data-imsg="date">2026-10-01 Thu</span>
+                  <span>▷</span>
+                </div>
+                <div class="imsg-bubble gray" data-imsg="bubble1">嗨，一直在等你呢～</div>
+                <div class="imsg-bubble gray" data-imsg="bubble2">你好，我常想来找你</div>
+                <div class="imsg-input" data-imsg="input">Send message or hold to speak......</div>
               </div>
+
+              <!-- 右侧：整齐 2×2 图标网格（和 iMessage 卡 top 对齐） -->
+              <div class="float-apps-grid">
+                <button class="float-app" type="button" data-app="音乐" title="音乐">
+                  <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  <span class="float-app-label">音乐</span>
+                </button>
+                <button class="float-app" type="button" data-app="设置" title="设置">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  <span class="float-app-label">设置</span>
+                </button>
+                <button class="float-app" type="button" data-app="消息">
+                  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span class="float-app-label">消息</span>
+                </button>
+                <button class="float-app" type="button" data-app="角色管理">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span class="float-app-label">角色</span>
+                </button>
+              </div>
+
+              <!-- 右下：纪念日卡（可编辑） -->
+              <div class="anniv-card" data-edit="anniv" title="点击编辑纪念日">
+                <div class="anniv-days" data-anniv="days">1562</div>
+                <div class="anniv-label">天</div>
+                <div class="anniv-avatars">
+                  <span data-anniv="avatar1" title="点击换头像">头像1</span>
+                  <span data-anniv="avatar2" title="点击换头像">头像2</span>
+                </div>
+                <div class="anniv-names" data-anniv="names">小雨 - 小梦</div>
+              </div>
+              <!-- 隐藏头像选图 -->
+              <input type="file" id="avatar-file-1" accept="image/*" hidden />
+              <input type="file" id="avatar-file-2" accept="image/*" hidden />
             </div>
 
-            <!-- 玻璃双图卡 -->
-            <div class="image-duo">
-              <div class="glass img-card" id="home-img-left" role="button" tabindex="0">
-                <svg class="img-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                <span class="img-placeholder">点击上传</span>
+            <!-- ============ 第二页：小组件 + 应用网格 ============ -->
+            <div class="home-page">
+              <!-- 顶部：两个小组件左右并排 -->
+              <div class="page2-widgets">
+                <!-- 迷你日历 -->
+                <div class="w-card w-cal">
+                  <div class="w-head">
+                    <span id="p2-cal-month">10 月</span>
+                    <span id="p2-cal-year">2026</span>
+                  </div>
+                  <div class="w-weekdays">
+                    <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                  </div>
+                  <div class="w-days" id="p2-cal-days"></div>
+                </div>
+                <!-- 今日心情（可编辑） -->
+                <div class="w-card w-mood" data-edit="mood" title="点击编辑心情">
+                  <div class="w-head">今日心情</div>
+                  <div class="w-emoji" data-mood="emoji">心情不错</div>
+                  <div class="w-text" data-mood="text">保持微笑<br>每一刻都值得被记录</div>
+                </div>
               </div>
-              <div class="glass img-card" id="home-img-right" role="button" tabindex="0">
-                <svg class="img-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                <span class="img-placeholder">点击上传</span>
-              </div>
-              <input type="file" id="home-img-input" accept="image/*" hidden>
-            </div>
 
-            <!-- 玻璃音乐卡 -->
-            <div class="glass music-card">
-              <div class="music-cover" id="music-cover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <!-- 应用网格 -->
+              <div class="page2-grid" aria-label="应用列表">
+                <button class="app-card" type="button" data-app="记忆">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/></svg></span>
+                  <span class="app-name">记忆</span>
+                </button>
+                <button class="app-card" type="button" data-app="钱包">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span>
+                  <span class="app-name">钱包</span>
+                </button>
+                <button class="app-card" type="button" data-app="世界书" onclick="event.stopImmediatePropagation();window.location.href='worldbook.html'">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                  <span class="app-name">世界书</span>
+                </button>
+                <button class="app-card" type="button" data-app="足迹" onclick="event.stopImmediatePropagation();window.location.href='footprint.html'">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16c2-2 4-2 6 0s4 2 6 0"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="11" r="1.5"/></svg></span>
+                  <span class="app-name">足迹</span>
+                </button>
+                <button class="app-card" type="button" data-app="记账" onclick="event.stopImmediatePropagation();window.location.href='finance.html'">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v4"/></svg></span>
+                  <span class="app-name">记账</span>
+                </button>
+                <button class="app-card" type="button" data-app="商店" onclick="event.stopImmediatePropagation();window.location.href='shop.html'">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg></span>
+                  <span class="app-name">商店</span>
+                </button>
+                <button class="app-card" type="button" data-app="论坛" onclick="event.stopImmediatePropagation();window.location.href='forum.html'">
+                  <span class="app-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span>
+                  <span class="app-name">论坛</span>
+                </button>
               </div>
-              <div class="music-info">
-                <div class="music-title" id="music-title">暂无播放</div>
-                <div class="music-artist">点击播放按钮试试</div>
-              </div>
-              <button class="music-play" id="music-play-btn" type="button" aria-label="播放/暂停">
-                <svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="#111"><polygon points="6 3 20 12 6 21"/></svg>
-              </button>
-            </div>
-
-            <!-- 挂件区（保留可编辑文字，折叠为一行小挂件） -->
-            <!-- 已折叠：HELLO/MONOCHROME 挂件暂隐藏，如需恢复可在代码中取消注释
-            <div class="korean-widgets" aria-label="桌面小挂件">
-              <div class="glass widget-card widget-left" id="widget-left-btn" role="button" tabindex="0" title="点击编辑挂件">
-                <span class="widget-kaomoji" id="widget-kaomoji-text">HELLO</span>
-              </div>
-              <div class="glass widget-card widget-right" id="widget-right-btn" role="button" tabindex="0" title="点击编辑挂件">
-                <span class="widget-motto" id="widget-motto-text">MONOCHROME</span>
-              </div>
-            </div>
-            -->
-
-            <div class="app-grid" aria-label="应用列表">
-              <button class="app-card" type="button" data-app="消息">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                </span>
-                <span class="app-name">消息</span>
-              </button>
-              <button class="app-card" type="button" data-app="联系人">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </span>
-                <span class="app-name">联系人</span>
-              </button>
-              <button class="app-card" type="button" data-app="音乐">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M9 18V5l12-2v13"/>
-                    <circle cx="6" cy="18" r="3"/>
-                    <circle cx="18" cy="16" r="3"/>
-                  </svg>
-                </span>
-                <span class="app-name">音乐</span>
-              </button>
-              <button class="app-card" type="button" data-app="设置">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                  </svg>
-                </span>
-                <span class="app-name">设置</span>
-              </button>
-              <button class="app-card" type="button" data-app="记忆">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
-                    <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
-                    <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
-                  </svg>
-                </span>
-                <span class="app-name">记忆</span>
-              </button>
-              <button class="app-card" type="button" data-app="钱包">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-                    <path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
-                  </svg>
-                </span>
-                <span class="app-name">钱包</span>
-              </button>
-              <button class="app-card" type="button" data-app="世界书"
-                onclick="event.stopImmediatePropagation();window.location.href='worldbook.html'">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                  </svg>
-                </span>
-                <span class="app-name">世界书</span>
-              </button>
-              <button class="app-card" type="button" data-app="足迹"
-                onclick="event.stopImmediatePropagation();window.location.href='footprint.html'">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 16c2-2 4-2 6 0s4 2 6 0"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="11" r="1.5"/>
-                  </svg>
-                </span>
-                <span class="app-name">足迹</span>
-              </button>
-              <button class="app-card" type="button" data-app="记账"
-                onclick="event.stopImmediatePropagation();window.location.href='finance.html'">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v4"/>
-                  </svg>
-                </span>
-                <span class="app-name">记账</span>
-              </button>
-              <button class="app-card" type="button" data-app="商店"
-                onclick="event.stopImmediatePropagation();window.location.href='shop.html'">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>
-                  </svg>
-                </span>
-                <span class="app-name">商店</span>
-              </button>
-              <button class="app-card" type="button" data-app="论坛"
-                onclick="event.stopImmediatePropagation();window.location.href='forum.html'">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
-                  </svg>
-                </span>
-                <span class="app-name">论坛</span>
-              </button>
             </div>
           </section>
 
@@ -393,6 +706,279 @@
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       navigator.serviceWorker.register('sw.js').catch(function () {});
     }
+
+    // ======= 居中大时间 + 进度条 =======
+    (function () {
+      var clockEl = document.getElementById('big-clock');
+      var dateEl = document.getElementById('date-top');
+      var fill1 = document.getElementById('fill1');
+      var fill2 = document.getElementById('fill2');
+      var pct1 = document.getElementById('pct1');
+      var pct2 = document.getElementById('pct2');
+
+      function update() {
+        var now = new Date();
+        // 大时间
+        if (clockEl) {
+          clockEl.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        // 日期行
+        if (dateEl) {
+          var weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+          dateEl.textContent = (now.getMonth()+1) + '-' + now.getDate() + ' · about me · ' + weekdays[now.getDay()];
+        }
+        // 进度1：本月已过百分比
+        if (fill1 && pct1) {
+          var totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+          var p1 = Math.round((now.getDate() / totalDays) * 100);
+          fill1.style.width = p1 + '%';
+          pct1.textContent = p1 + '%';
+        }
+        // 进度2：本周剩余百分比
+        if (fill2 && pct2) {
+          var remaining = 7 - now.getDay(); // 剩余天数（今天算完）
+          var p2 = Math.round((remaining / 7) * 100);
+          fill2.style.width = p2 + '%';
+          pct2.textContent = p2 + '%';
+        }
+      }
+      update();
+      setInterval(update, 1000);
+    })();
+
+    // ======= 第二页：迷你日历填充 =======
+    (function () {
+      var calDays = document.getElementById('p2-cal-days');
+      var calMonth = document.getElementById('p2-cal-month');
+      var calYear = document.getElementById('p2-cal-year');
+      if (!calDays) return;
+      var now = new Date();
+      var y = now.getFullYear();
+      var m = now.getMonth();
+      var today = now.getDate();
+      if (calMonth) calMonth.textContent = (m + 1) + ' 月';
+      if (calYear) calYear.textContent = y;
+      var firstDay = new Date(y, m, 1).getDay();
+      var daysInMonth = new Date(y, m + 1, 0).getDate();
+      var html = '';
+      for (var i = 0; i < firstDay; i++) html += '<span class="empty">·</span>';
+      for (var d = 1; d <= daysInMonth; d++) {
+        if (d === today) html += '<span class="today">' + d + '</span>';
+        else html += '<span>' + d + '</span>';
+      }
+      calDays.innerHTML = html;
+    })();
+
+    // ======= 小组件编辑系统 =======
+    (function () {
+      var LS_KEY = 'home_widgets_custom';
+      var modal = document.getElementById('widgetModal');
+      var title = document.getElementById('widgetModalTitle');
+      var input = document.getElementById('widgetModalInput');
+      var saveBtn = document.getElementById('widgetModalSave');
+
+      // 默认值
+      var DEFAULTS = {
+        imsg:   { date: '2026-10-01 Thu', bubble1: '嗨，一直在等你呢～', bubble2: '你好，我常想来找你', input: 'Send message or hold to speak......' },
+        anniv:  { days: '1562', names: '小雨 - 小梦' },
+        mood:   { emoji: '心情不错', text: '保持微笑\n每一刻都值得被记录' }
+      };
+      // 清理 localStorage 里残留的旧 emoji 值
+      (function cleanOldEmoji() {
+        var raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        try {
+          var data = JSON.parse(raw);
+          var changed = false;
+          if (data.mood && data.mood.emoji && /\p{Emoji}/u.test(data.mood.emoji)) { data.mood.emoji = '心情不错'; changed = true; }
+          if (data.anniv && data.anniv.names && data.anniv.names.includes('❤')) { data.anniv.names = '小雨 - 小梦'; changed = true; }
+          if (changed) localStorage.setItem(LS_KEY, JSON.stringify(data));
+        } catch(e) {}
+      })();
+
+      function load() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; } }
+      function merge(key) { return Object.assign({}, DEFAULTS[key], load()[key] || {}); }
+      function save(key, val) {
+        var s = load(); s[key] = val; localStorage.setItem(LS_KEY, JSON.stringify(s));
+      }
+
+      // 恢复 DOM（含头像）
+      function restoreAll() {
+        // iMessage
+        var imsg = merge('imsg');
+        var el;
+        if ((el = document.querySelector('[data-imsg="bubble1"]'))) el.textContent = imsg.bubble1;
+        if ((el = document.querySelector('[data-imsg="bubble2"]'))) el.textContent = imsg.bubble2;
+        if ((el = document.querySelector('[data-imsg="input"]'))) el.textContent = imsg.input;
+        if ((el = document.querySelector('[data-imsg="date"]'))) el.textContent = imsg.date;
+
+        // 纪念日
+        var anniv = merge('anniv');
+        if ((el = document.querySelector('[data-anniv="days"]'))) el.textContent = anniv.days;
+        if ((el = document.querySelector('[data-anniv="names"]'))) el.textContent = anniv.names;
+        ['avatar1','avatar2'].forEach(function(a) {
+          var s = document.querySelector('[data-anniv="'+a+'"]');
+          if (s && anniv[a]) { s.classList.add('avatar-img'); s.style.backgroundImage = 'url('+anniv[a]+')'; }
+        });
+
+        // 心情
+        var mood = merge('mood');
+        if ((el = document.querySelector('[data-mood="emoji"]'))) el.textContent = mood.emoji;
+        if ((el = document.querySelector('[data-mood="text"]'))) el.innerHTML = mood.text.replace(/\n/g, '<br>');
+      }
+      restoreAll();
+
+      // 当前编辑状态
+      var state = null; // { type, fields[], index }
+
+      function openEditor(type) {
+        var data = merge(type);
+        var fields = [];
+        if (type === 'imsg') fields = [
+          { label: '日期',     field: 'date',   val: data.date },
+          { label: '消息 1',   field: 'bubble1', val: data.bubble1 },
+          { label: '消息 2',   field: 'bubble2', val: data.bubble2 },
+          { label: '输入框提示', field: 'input',   val: data.input }
+        ];
+        else if (type === 'anniv') fields = [
+          { label: '天数', field: 'days',  val: data.days },
+          { label: '名字', field: 'names', val: data.names }
+        ];
+        else if (type === 'mood') fields = [
+          { label: '表情', field: 'emoji', val: data.emoji },
+          { label: '文案', field: 'text',  val: data.text }
+        ];
+        state = { type: type, fields: fields, index: 0 };
+        showField();
+      }
+
+      function showField() {
+        var f = state.fields[state.index];
+        title.textContent = f.label + ' (' + (state.index+1) + '/' + state.fields.length + ')';
+        input.value = f.val;
+        modal.style.display = 'flex';
+        setTimeout(function(){ input.focus(); input.select(); }, 50);
+      }
+
+      // 点击小组件或头像
+      document.addEventListener('click', function(e) {
+        // 头像选图
+        var av = e.target.closest('[data-anniv^="avatar"]');
+        if (av) {
+          var fileId = av.dataset.anniv === 'avatar1' ? 'avatar-file-1' : 'avatar-file-2';
+          document.getElementById(fileId).click();
+          return;
+        }
+        // 小组件编辑入口
+        var card = e.target.closest('[data-edit]');
+        if (card) { openEditor(card.dataset.edit); e.stopPropagation(); }
+      });
+
+      // 头像文件处理
+      ['avatar-file-1','avatar-file-2'].forEach(function(fid, i) {
+        document.getElementById(fid).addEventListener('change', function(e) {
+          var file = e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function() {
+            var data = merge('anniv');
+            var key = i === 0 ? 'avatar1' : 'avatar2';
+            data[key] = reader.result;
+            save('anniv', data);
+            restoreAll();
+            var toast = document.getElementById('toast');
+            if (toast) { toast.textContent = '头像已更新'; toast.style.display = 'block'; setTimeout(function(){ toast.style.display='none'; }, 1500); }
+          };
+          reader.readAsDataURL(file);
+          e.target.value = '';
+        });
+      });
+
+      // 取消按钮
+      var cancelBtn = document.getElementById('widgetModalCancel');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+          modal.style.display = 'none';
+          state = null;
+        });
+      }
+
+      // 保存按钮
+      saveBtn.addEventListener('click', function() {
+        if (!state) return;
+        var val = input.value.trim();
+        var f = state.fields[state.index];
+        var data = merge(state.type);
+        data[f.field] = val;
+        save(state.type, data);
+        restoreAll();
+        // 下一个字段，或者结束
+        state.index++;
+        if (state.index < state.fields.length) {
+          input.value = val; // 保留刚输入的值作下一字段参考
+          setTimeout(showField, 50);
+        } else {
+          modal.style.display = 'none';
+          state = null;
+        }
+      });
+    })();
+
+    // ======= 横向滚动：指示器高亮 + 鼠标拖拽 + 滚轮翻页 =======
+    (function () {
+      var screen = document.getElementById('homeScreen');
+      if (!screen) return;
+      var dots = [document.getElementById('dot-0'), document.getElementById('dot-1')];
+
+      // 指示器高亮
+      function updateDots() {
+        var idx = Math.round(screen.scrollLeft / screen.clientWidth);
+        dots.forEach(function (d, i) { if (d) d.classList.toggle('active', i === idx); });
+      }
+      screen.addEventListener('scroll', updateDots, { passive: true });
+
+      // 鼠标拖拽翻页（加距离阈值不拦点击）
+      var isDown = false, hasMoved = false, startX = 0, startScroll = 0;
+      screen.addEventListener('mousedown', function (e) {
+        isDown = true; hasMoved = false;
+        startX = e.pageX;
+        startScroll = screen.scrollLeft;
+      });
+      document.addEventListener('mousemove', function (e) {
+        if (!isDown) return;
+        var dx = e.pageX - startX;
+        if (Math.abs(dx) < 5) return;
+        hasMoved = true;
+        e.preventDefault();
+        screen.scrollLeft = startScroll - dx;
+      });
+      document.addEventListener('mouseup', function () {
+        if (!isDown) return;
+        isDown = false;
+        if (hasMoved) { e.preventDefault(); snapToNearest(); }
+      });
+      screen.addEventListener('mouseleave', function () {
+        if (isDown) { isDown = false; if (hasMoved) snapToNearest(); }
+      });
+
+      // 滚轮转横向
+      var wheelTimer = null;
+      screen.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          screen.scrollLeft += e.deltaY;
+          e.preventDefault();
+        }
+        clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(snapToNearest, 150);
+      }, { passive: false });
+
+      function snapToNearest() {
+        var w = screen.clientWidth;
+        var target = Math.round(screen.scrollLeft / w) * w;
+        screen.scrollTo({ left: target, behavior: 'smooth' });
+      }
+      screen.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    })();
   </script>
 </body>
 </html>

@@ -375,6 +375,30 @@
   }
   .cm-send:active { transform: scale(0.94); }
   .cm-send svg { width: 17px; height: 17px; stroke: #FFFFFF; }
+
+  /* 评论图片支持 */
+  .cm-extra-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #F2F2F7;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .cm-extra-btn svg { width: 18px; height: 18px; stroke: #666; }
+  .cm-image-thumb {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .cm-text-img {
+    margin-top: 4px;
+    max-width: 100%;
+    border-radius: 10px;
+    display: block;
+  }
 </style>
 <link rel="stylesheet" href="mobile-fit.css">
 </head>
@@ -426,6 +450,10 @@
         <div class="cm-handle"></div>
         <div class="cm-list" id="cmList"></div>
         <div class="cm-input-row">
+          <button class="cm-extra-btn" id="cmImgBtn" type="button" aria-label="添加图片">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </button>
+          <input type="file" id="cmImgInput" accept="image/*" style="display:none;">
           <input class="cm-input" id="cmInput" type="text" maxlength="200" placeholder="写下你的评论…">
           <button class="cm-send" id="cmSend" type="button" aria-label="发送评论">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -626,12 +654,32 @@
       if (!post) return;
 
       if (likeBtn) {
-        var nextLiked = !getLiked(post);
+        var wasLiked = getLiked(post);
+        var nextLiked = !wasLiked;
         post.isLiked = nextLiked;   // 新字段
         post.liked = nextLiked;     // 同步朋友圈页旧字段
         post.likes = (post.likes || 0) + (nextLiked ? 1 : -1);
         if (post.likes < 0) post.likes = 0;
         if (!saveMomentsSafe(list)) return;
+        // 写通知（仅点赞时）
+        if (nextLiked) {
+          var profile = readProfile();
+          try {
+            var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+            arr.unshift({
+              type: 'like',
+              actorId: 'me',
+              actorName: profile.nickname || '我',
+              actorAvatar: profile.avatar || '',
+              postId: post.id,
+              postContent: (post.content || '[图片动态]').slice(0, 40),
+              text: '赞了这条动态',
+              time: Date.now()
+            });
+            while (arr.length > 100) arr.pop();
+            localStorage.setItem('moments_notifications', JSON.stringify(arr));
+          } catch (e) {}
+        }
         // 微缩动画结束后重渲染
         likeBtn.classList.add('pop');
         setTimeout(function () { renderMyMoments(currentMe); }, 120);
@@ -645,6 +693,9 @@
     var cmListEl = document.getElementById('cmList');
     var cmInput = document.getElementById('cmInput');
     var cmActiveId = null;
+    var cmPendingImage = '';
+    var cmImgBtn = document.getElementById('cmImgBtn');
+    var cmImgInput = document.getElementById('cmImgInput');
 
     function avatarBlock(avatar) {
       if (avatar) {
@@ -652,6 +703,27 @@
       }
       return '<div class="cm-avatar">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+    }
+
+    function compressImage(file, cb) {
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var maxW = 600;
+            var scale = Math.min(1, maxW / img.width);
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            cb(canvas.toDataURL('image/jpeg', 0.7));
+          } catch (err) { alert('图片处理失败'); cb(''); }
+        };
+        img.onerror = function () { alert('图片读取失败'); cb(''); };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     function renderCommentDrawer() {
@@ -663,21 +735,32 @@
         return;
       }
       cmListEl.innerHTML = comments.map(function (c) {
+        var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+        var imgHTML = imgSrc ? '<img class="cm-text-img" src="' + imgSrc + '" alt="">' : '';
         return '<div class="cm-item">' +
           avatarBlock(c.avatar) +
           '<div class="cm-body">' +
             '<div class="cm-head">' + escapeHtml(c.author) +
               (c.timestamp ? '<span>' + formatTime(c.timestamp) + '</span>' : '') +
             '</div>' +
-            '<div class="cm-text">' + escapeHtml(c.text) + '</div>' +
+            (c.text ? '<div class="cm-text">' + escapeHtml(c.text) + '</div>' : '') +
+            imgHTML +
           '</div>' +
         '</div>';
       }).join('');
       cmListEl.scrollTop = cmListEl.scrollHeight;
     }
 
+    function resetCmInput() {
+      cmInput.value = '';
+      cmPendingImage = '';
+      if (cmImgInput) cmImgInput.value = '';
+      if (cmImgBtn) cmImgBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+    }
+
     function openCommentDrawer(post) {
       cmActiveId = post.id;
+      resetCmInput();
       renderCommentDrawer();
       cmOverlay.classList.add('show');
       setTimeout(function () { cmInput.focus(); }, 260);
@@ -685,14 +768,41 @@
     function closeCommentDrawer() {
       cmOverlay.classList.remove('show');
       cmActiveId = null;
-      cmInput.value = '';
+      resetCmInput();
     }
 
     document.getElementById('cmBackdrop').addEventListener('click', closeCommentDrawer);
 
+    // 评论图片选择
+    if (cmImgBtn) {
+      cmImgBtn.addEventListener('click', function () { cmImgInput.click(); });
+    }
+    if (cmImgInput) {
+      cmImgInput.addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        compressImage(file, function (dataUrl) {
+          if (!dataUrl) return;
+          cmPendingImage = dataUrl;
+          cmImgBtn.innerHTML = '<img class="cm-image-thumb" src="' + dataUrl + '" alt="预览">';
+        });
+      });
+    }
+
+    // 通知写入（与 moments.html 共用同一个 key）
+    function pushNotif(n) {
+      try {
+        var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+        arr.unshift(n);
+        while (arr.length > 100) arr.pop();
+        localStorage.setItem('moments_notifications', JSON.stringify(arr));
+      } catch (e) {}
+    }
+
     function submitComment() {
       var text = cmInput.value.trim();
-      if (!text || !cmActiveId) return;
+      if (!text && !cmPendingImage) return;
+      if (!cmActiveId) return;
       var profile = readProfile();
       var authorName = profile.nickname || '我';
 
@@ -700,18 +810,34 @@
       var post = findInList(list, cmActiveId);
       if (!post) { closeCommentDrawer(); return; }
 
+      var ts = Date.now();
+      var entry = { author: authorName, avatar: profile.avatar || '', text: text, image: cmPendingImage, timestamp: ts, time: ts };
+
       // 新结构 comments
       if (!Array.isArray(post.comments)) post.comments = [];
-      post.comments.push({ author: authorName, avatar: profile.avatar || '', text: text, timestamp: Date.now() });
+      post.comments.push(entry);
 
       // 同步朋友圈页旧结构 commentList，保证两页数据一致
       if (!Array.isArray(post.commentList)) post.commentList = [];
-      post.commentList.push({ name: authorName, text: text, time: Date.now() });
+      post.commentList.push({ name: authorName, author: authorName, avatar: profile.avatar || '', text: text, image: cmPendingImage, time: ts, timestamp: ts });
 
       if (!saveMomentsSafe(list)) return;
-      cmInput.value = '';
+      resetCmInput();
       closeCommentDrawer();
       renderMyMoments(currentMe);
+
+      // 写通知
+      var postContent = (post.content || '[图片动态]').slice(0, 40);
+      pushNotif({
+        type: 'comment',
+        actorId: 'me',
+        actorName: authorName,
+        actorAvatar: profile.avatar || '',
+        postId: post.id,
+        postContent: postContent,
+        text: (text ? '评论了' : '发图评论了') + '这条动态' + (text ? '：' + text.slice(0, 30) : ''),
+        time: ts
+      });
     }
     document.getElementById('cmSend').addEventListener('click', submitComment);
     cmInput.addEventListener('keydown', function (e) {

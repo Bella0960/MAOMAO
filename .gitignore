@@ -7,6 +7,8 @@ ehthumbs.db
 # ===== 编辑器 / IDE =====
 .vscode/
 .idea/
+.trae/
+.trae-html-share-packages/
 *.swp
 *.swo
 *~

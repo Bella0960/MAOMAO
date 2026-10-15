@@ -1,7 +1,7 @@
 /* 悬浮胶囊底部导航 - 自动注入 + 自动高亮 */
 (function () {
-    // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间）
-    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html'];
+    // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间、角色管理）
+    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html'];
     var path = location.pathname.toLowerCase();
     for (var i = 0; i < SKIP_PAGES.length; i++) {
         if (path.indexOf(SKIP_PAGES[i]) !== -1) return;
@@ -17,9 +17,9 @@
             badge: true
         },
         {
-            key: 'characters',
+            key: 'contacts',
             label: '联系人',
-            href: 'characters.html',
+            href: 'contacts.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
             badge: false
         },

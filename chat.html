@@ -20,17 +20,19 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
     color: #111111;
     user-select: none;
   }
 
-  /* ===== 项目统一手机外壳（390×844 / 45px 圆角） ===== */
+  /* ===== 手机壳容器（与 chat-detail.html / chat-settings.html 等页面保持一致） ===== */
   .phone-mockup {
     position: relative;
     width: min(390px, calc(100vw - 24px));
     height: min(844px, calc(100vh - 24px));
-    background: #EBEBEB;
+    min-height: 0;
+    background-color: #F4F4F6;
     border-radius: 45px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
     overflow: hidden;
@@ -73,11 +75,11 @@
   .cover-gradient-banner {
     position: absolute;
     top: 0;
-    left: 12px;
-    right: 12px;
+    left: 0;
+    right: 0;
     bottom: 0;
     background: linear-gradient(180deg, #343434 0%, #777777 38%, #B8B8B8 65%, #E8E8E8 88%, #F5F5F5 100%);
-    border-radius: 20px;
+    border-radius: 0;
     background-size: cover;
     background-position: center;
     z-index: 0;
@@ -116,8 +118,8 @@
 
   /* 白色卡片上方保持白，向下渐隐透出封面 */
   .white-profile-stage {
-    width: auto;
-    margin: 0 12px;
+    width: 100%;
+    margin: 0;
     background: linear-gradient(180deg,
       #FFFFFF 0%,
       rgba(255, 255, 255, 1) 15%,
@@ -126,7 +128,7 @@
       rgba(255, 255, 255, 0.6) 68%,
       rgba(255, 255, 255, 0.3) 85%,
       rgba(255, 255, 255, 0.1) 100%);
-    border-radius: 22px;
+    border-radius: 0;
     margin-top: -26px;
     position: relative;
     z-index: 10;
@@ -135,7 +137,7 @@
     flex-direction: column;
     align-items: center;
     flex: 1;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.02);
+    box-shadow: none;
   }
 
   /* 嵌在拱形凸起处的圆头像 */
@@ -546,6 +548,20 @@
     flex-wrap: wrap;
     padding: 1px;
     gap: 1px;
+  }
+  /* 自定义群头像：单张图，覆盖四宫格规则，正常裁圆 */
+  .chat-avatar.group-avatar.group-avatar-custom {
+    flex-wrap: nowrap;
+    padding: 0;
+    gap: 0;
+  }
+  .chat-avatar.group-avatar.group-avatar-custom img {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    object-fit: cover;
   }
   .chat-avatar.group-avatar img,
   .chat-avatar.group-avatar svg {
@@ -1118,6 +1134,10 @@
       }
 
       function groupAvatarHTML(g) {
+        // 自定义群头像优先（与 chat-settings.html 的 renderGroupAvatar 保持一致）
+        if (g && g.avatar) {
+          return '<img src="' + g.avatar + '" alt="">';
+        }
         var members = g.members || [];
         if (members.length === 0) {
           return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
@@ -1136,9 +1156,10 @@
           var alias = localStorage.getItem('chat_group_alias_' + gid);
           if (alias) displayName = alias;
         } catch (e) {}
+        var isCustomAv = !!(g && g.avatar);
         return '' +
           '<div class="chat-slim-card chat-group-card" data-gid="' + escapeHtml(gid) + '">' +
-            '<div class="chat-avatar group-avatar">' + groupAvatarHTML(g) + '</div>' +
+            '<div class="chat-avatar group-avatar' + (isCustomAv ? ' group-avatar-custom' : '') + '">' + groupAvatarHTML(g) + '</div>' +
             '<div class="chat-meta">' +
               '<div class="chat-title-row">' +
                 '<span class="chat-name">' + escapeHtml(displayName) + '</span>' +
