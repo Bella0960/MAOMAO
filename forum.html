@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#FFFFFF" />
 <title>论坛</title>
 <script src="font-loader.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <script src="native-feel.js"></script>
 <script src="custom-css.js"></script>
 <link rel="stylesheet" href="mobile-fit.css">
@@ -320,10 +321,10 @@
   };
 
   // 渲染角色头像横排
+  var _storage = window.PhoneStorage;
   function renderRoles() {
     var box = document.getElementById('rolesRow');
-    var roles = [];
-    try { roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]'); } catch(e){}
+    var roles = _storage ? _storage.getCharacters() : (function(){ try { return JSON.parse(localStorage.getItem('ai_custom_characters') || '[]'); } catch(e){ return []; } })();
     if (!roles.length) { box.innerHTML = ''; return; }
     box.innerHTML = roles.map(function(r){
       return '<div class="role-dot" onclick="location.href=\'chat-detail.html?id='+r.id+'\'">'+
@@ -564,7 +565,7 @@
 
   // 我的tab头像
   try {
-    const me = JSON.parse(localStorage.getItem('myProfile') || '{}');
+    const me = (_storage ? _storage.getMyProfile() : null) || JSON.parse(localStorage.getItem('myProfile') || '{}');
     const av = document.getElementById('myTabAvatar');
     if (av) av.textContent = (me.nickname || '我')[0];
   } catch(e){}

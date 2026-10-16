@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#F7F7F9" />
 <title>记账</title>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <link rel="stylesheet" href="mobile-fit.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -347,11 +348,14 @@
   let currentType = 'expense';
   let currentCat = '餐饮';
 
+  var _storage = window.PhoneStorage;
   function loadRecords() {
-    try { return JSON.parse(localStorage.getItem('finance_records') || '[]'); }
-    catch(e) { return []; }
+    return _storage ? _storage.getFinanceRecords() : (function(){ try { return JSON.parse(localStorage.getItem('finance_records') || '[]'); } catch(e){ return []; } })();
   }
-  function saveRecords(list) { localStorage.setItem('finance_records', JSON.stringify(list)); }
+  function saveRecords(list) {
+    if (_storage) { _storage.saveFinanceRecords(list); return; }
+    localStorage.setItem('finance_records', JSON.stringify(list));
+  }
 
   function render() {
     const list = loadRecords();

@@ -6,6 +6,7 @@
 <title>通讯录</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -45,7 +46,7 @@
     pointer-events: none;
   }
 
-  /* 顶部导航栏 · 韩系极简 */
+  /* mobile fullscreen: no rounded shell */
   .top-nav {
     flex: 0 0 auto;
     padding: 52px 14px 6px 14px;
@@ -62,7 +63,7 @@
     letter-spacing: -0.3px;
   }
 
-  /* 搜索框 */
+  /* mobile fullscreen: no rounded shell */
   .search-wrap {
     padding: 6px 14px 8px 14px;
     background: #FFFFFF;
@@ -87,7 +88,7 @@
   }
   .search-box input::placeholder { color: #AAA; }
 
-  /* 联系人列表区 */
+  /* mobile fullscreen: no rounded shell */
   .contact-stage {
     flex: 1;
     overflow-y: auto;
@@ -97,7 +98,7 @@
   }
   .contact-stage::-webkit-scrollbar { display: none; }
 
-  /* 列表项 · 紧凑 */
+  /* mobile fullscreen: no rounded shell */
   .contact-section-title {
     padding: 8px 14px 3px 14px;
     font-size: 12px;
@@ -150,7 +151,7 @@
     text-overflow: ellipsis;
   }
 
-  /* 空状态 */
+  /* mobile fullscreen: no rounded shell */
   .empty-state {
     text-align: center;
     padding: 60px 40px;
@@ -159,7 +160,7 @@
   .empty-state svg { width: 40px; height: 40px; stroke: #DDD; margin-bottom: 14px; }
   .empty-state .empty-text { font-size: 13px; line-height: 1.6; }
 
-  /* 快捷入口 · 紧凑 */
+  /* mobile fullscreen: no rounded shell */
   .quick-entry-list {
     background: #FFFFFF;
     margin-bottom: 6px;
@@ -185,7 +186,31 @@
   .quick-entry-arrow { margin-left: auto; color: #CCC; }
   .quick-entry-arrow svg { width: 11px; height: 11px; stroke: #CCC; }
 
-  /* 侧边字母索引（可选，先不做太复杂） */
+  /* mobile fullscreen: no rounded shell */
+
+
+  /* mobile fullscreen: no rounded shell */
+  @media (max-width: 480px) {
+    html, body {
+      background: #FFFFFF !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      align-items: stretch !important;
+      overflow: hidden !important;
+    }
+    .phone-mockup {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -242,10 +267,12 @@
 
   <script src="nav.js"></script>
   <script>
-    /* ===== 数据源：与 chat.html 共用 localStorage ===== */
+  /* mobile fullscreen: no rounded shell */
     var CHARACTERS_KEY = 'ai_custom_characters';
+    var _storage = window.PhoneStorage;
 
     function loadCharacters() {
+      if (_storage) return _storage.getCharacters();
       try {
         var raw = localStorage.getItem(CHARACTERS_KEY);
         if (!raw) return [];
@@ -321,17 +348,17 @@
       });
     }
 
-    /* ===== 搜索 ===== */
+  /* mobile fullscreen: no rounded shell */
     document.getElementById('searchInput').addEventListener('input', function (e) {
       renderList(e.target.value);
     });
 
-    /* ===== 跳转到角色管理（添加/编辑） ===== */
+  /* mobile fullscreen: no rounded shell */
     document.getElementById('goManageRole').addEventListener('click', function () {
       window.location.href = 'characters.html?from=contacts';
     });
 
-    /* ===== 初始渲染 ===== */
+  /* mobile fullscreen: no rounded shell */
     renderList();
   </script>
   <script src="statusbar-control.js"></script>

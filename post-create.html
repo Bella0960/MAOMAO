@@ -6,6 +6,7 @@
     <title>发表动态</title>
     <script src="font-loader.js"></script>
     <script src="native-feel.js"></script>
+    <script src="js/phone/phone_storage.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -411,50 +412,30 @@
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
+        var _storage = window.PhoneStorage;
+
         function getCharacterList() {
-            try {
-                var raw = localStorage.getItem('ai_custom_characters');
-                if (raw) {
-                    var arr = JSON.parse(raw);
-                    if (Array.isArray(arr)) return arr;
-                }
-            } catch (e) {}
-            return [];
+            return _storage ? _storage.getCharacters() : (function(){ try { var raw = localStorage.getItem('ai_custom_characters'); if (raw) { var arr = JSON.parse(raw); if (Array.isArray(arr)) return arr; } } catch(e) {} return []; })();
         }
 
         function getMyInfo() {
+            if (_storage) { var p = _storage.getMyProfile(); if (p) return { id: p.id || 'me', name: p.nickname || '我', avatar: p.avatar || '' }; }
             try {
                 var raw = localStorage.getItem('myProfile');
-                if (raw) {
-                    var p = JSON.parse(raw) || {};
-                    return { id: p.id || 'me', name: p.nickname || '我', avatar: p.avatar || '' };
-                }
+                if (raw) { var p = JSON.parse(raw) || {}; return { id: p.id || 'me', name: p.nickname || '我', avatar: p.avatar || '' }; }
             } catch (e) {}
             return { id: 'me', name: '我', avatar: '' };
         }
 
         function getApiConfig() {
-            try {
-                var raw = localStorage.getItem('api_settings');
-                if (raw) {
-                    var parsed = JSON.parse(raw);
-                    if (parsed) return parsed;
-                }
-            } catch (e) {}
-            return {};
+            return _storage ? _storage.getApiConfig() : (function(){ try { var raw = localStorage.getItem('api_settings'); if (raw) { var parsed = JSON.parse(raw); if (parsed) return parsed; } } catch(e) {} return {}; })();
         }
 
         function logApiCall(model, status, startTime, errorMsg) {
+            if (_storage) { _storage.pushApiLog({ model: model || 'unknown', status: status, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' }); return; }
             try {
                 var logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
-                var entry = {
-                    id: Date.now().toString(36),
-                    time: Date.now(),
-                    model: model || 'unknown',
-                    status: status,
-                    duration: Date.now() - startTime,
-                    errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
-                };
+                var entry = { id: Date.now().toString(36), time: Date.now(), model: model || 'unknown', status: status, duration: Date.now() - startTime, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' };
                 logs.unshift(entry);
                 while (logs.length > 50) logs.pop();
                 localStorage.setItem('api_call_logs', JSON.stringify(logs));
@@ -469,12 +450,8 @@
         }
 
         function pushNotification(n) {
-            try {
-                var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
-                arr.unshift(n);
-                while (arr.length > 100) arr.pop();
-                localStorage.setItem('moments_notifications', JSON.stringify(arr));
-            } catch (e) {}
+            if (_storage) { _storage.pushMomentsNotification(n); return; }
+            try { var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]'); arr.unshift(n); while (arr.length > 100) arr.pop(); localStorage.setItem('moments_notifications', JSON.stringify(arr)); } catch (e) {}
         }
 
         /* ========== Canvas 压缩 ========== */
@@ -695,11 +672,11 @@
             }
 
             // 存
-            var list = [];
-            try { list = JSON.parse(localStorage.getItem('moments') || '[]'); } catch (e) {}
+            var list = _storage ? _storage.getMoments() : (function(){ try { return JSON.parse(localStorage.getItem('moments') || '[]'); } catch (e) { return []; } })();
             list.unshift(post);
             try {
-                localStorage.setItem('moments', JSON.stringify(list));
+                if (_storage) { _storage.saveMoments(list); }
+                else { localStorage.setItem('moments', JSON.stringify(list)); }
             } catch (err) {
                 alert('存储空间不足，请压缩图片');
                 return;
@@ -785,8 +762,7 @@
                     if (!text) throw new Error('返回为空');
                     if (text.length > 120) text = text.slice(0, 120);
 
-                    var list;
-                    try { list = JSON.parse(localStorage.getItem('moments') || '[]'); } catch (e) { return; }
+                    var list = _storage ? _storage.getMoments() : (function(){ try { return JSON.parse(localStorage.getItem('moments') || '[]'); } catch (e) { return []; } })();
                     var target = null;
                     for (var j = 0; j < list.length; j++) {
                         if (String(list[j].id) === String(post.id)) { target = list[j]; break; }
@@ -805,7 +781,7 @@
                     };
                     target.commentList.push(entry);
                     target.comments.push(entry);
-                    try { localStorage.setItem('moments', JSON.stringify(list)); } catch (e) {}
+                    try { if (_storage) { _storage.saveMoments(list); } else { localStorage.setItem('moments', JSON.stringify(list)); } } catch (e) {}
 
                     pushNotification({
                         type: 'mention_reply',

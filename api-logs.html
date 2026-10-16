@@ -6,6 +6,7 @@
 <title>API 调用记录 · 小手机</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
@@ -238,10 +239,8 @@
     // 渲染日志列表：读取 api_call_logs，倒序已由写入方保证（unshift），直接顺序渲染
     function renderLogs() {
       var listEl = document.getElementById('logList');
-      var logs = [];
-      try {
-        logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
-      } catch (e) { logs = []; }
+      var _storage = window.PhoneStorage;
+      var logs = _storage ? _storage.getApiLogs() : (function(){ try { return JSON.parse(localStorage.getItem('api_call_logs') || '[]'); } catch (e) { return []; } })();
       if (!Array.isArray(logs) || !logs.length) {
         listEl.innerHTML = '<div class="al-empty">暂无调用记录</div>';
         return;

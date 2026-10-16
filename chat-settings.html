@@ -6,6 +6,7 @@
 <title>对话设置 · 小手机</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
@@ -2151,18 +2152,13 @@
 
   refreshBlockUI();
 
-  // ================= API 调用记录（unshift 到 api_call_logs 最前，最多 50 条；异常静默不影响主流程） =================
+  // ================= API 调用记录 — 委托 PhoneStorage =================
+  var _storage = window.PhoneStorage;
   function logApiCall(model, status, startTime, errorMsg) {
+    if (_storage) { _storage.pushApiLog({ model: model || 'unknown', status: status, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' }); return; }
     try {
       var logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
-      var entry = {
-        id: Date.now().toString(36),
-        time: Date.now(),
-        model: model || 'unknown',
-        status: status,
-        duration: Date.now() - startTime,
-        errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
-      };
+      var entry = { id: Date.now().toString(36), time: Date.now(), model: model || 'unknown', status: status, duration: Date.now() - startTime, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' };
       logs.unshift(entry);
       while (logs.length > 50) logs.pop();
       localStorage.setItem('api_call_logs', JSON.stringify(logs));

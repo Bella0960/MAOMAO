@@ -542,6 +542,7 @@
       case 'img': featImage(); break;
       case 'voice-msg': featVoiceMsg(); break;
       case 'card': featCard(); break;
+      case 'narration': featureAside(); break;
     }
   }
 
@@ -640,4 +641,90 @@
 
   function featRedpacket() { openPayDrawer('redpacket'); }
   function featTransfer() { openPayDrawer('transfer'); }
+
+  // ---------- 本轮补齐：文本版图片、表情、旁白、复制/删除/清空、转发面板 ----------
+  function addFeatureStyle() {
+    if (document.getElementById('chatCoreFeatureStyle')) return;
+    var st = document.createElement('style'); st.id = 'chatCoreFeatureStyle';
+    st.textContent = `
+      .x-core-card{background:#fff;border:1px solid #f0f0f3;border-radius:18px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.04);color:#111}
+      .x-core-muted{color:#999;font-size:12px}.x-core-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+      .x-core-actions .x-btn{border-radius:12px}.x-core-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+      .x-core-grid button{border:1px solid #eee;background:#f7f7f9;border-radius:12px;padding:12px 4px;color:#333;font-size:13px}
+      .x-core-list{display:flex;flex-direction:column;gap:8px}.x-core-list button{text-align:left;border:1px solid #eee;background:#fff;border-radius:12px;padding:12px;color:#222}
+      .x-core-input{width:100%;box-sizing:border-box;border:1px solid #d0d0d5;border-radius:12px;padding:12px;background:#fff;color:#111;font:inherit;margin:6px 0}
+    `;
+    document.head.appendChild(st);
+  }
+  addFeatureStyle();
+
+  function coreField(id, label, placeholder, value) {
+    return '<label class="x-core-muted" for="'+id+'">'+label+'</label><input class="x-core-input" id="'+id+'" placeholder="'+escapeHtml(placeholder||'')+'" value="'+escapeHtml(value||'')+'">';
+  }
+  function featureVirtualImage() {
+    openModal('发送虚拟图片', '<div class="x-core-card"><div class="x-core-muted">文字版图片卡片</div>'+
+      coreField('vimg-title','图片标题','例如：今天的天空','')+
+      coreField('vimg-desc','图片描述','描述画面内容','一张安静的日落照片')+
+      '<div class="x-core-actions"><button class="x-btn x-btn-ghost" id="vimg-cancel">取消</button><button class="x-btn x-btn-primary" id="vimg-send">发送</button></div></div>');
+    document.getElementById('vimg-cancel').onclick=closeModal;
+    document.getElementById('vimg-send').onclick=function(){
+      var title=document.getElementById('vimg-title').value.trim()||'图片';
+      var desc=document.getElementById('vimg-desc').value.trim();
+      closeModal(); insertChatMessage({role:'user',type:'virtual-image',title:title,description:desc,text:'[图片] '+title+(desc?'：'+desc:'')});
+      sendSilentInstruction('我给你发了一张图片，图片标题是「'+title+'」'+(desc?'，画面描述：'+desc:'')+'。请自然地回应。');
+    };
+  }
+  function featureEmoji() {
+    var chars=['微笑','开心','赞','爱心','抱抱','疑问','叹气','晚安','收到','谢谢','加油','无语'];
+    openModal('表情', '<div class="x-core-grid">'+chars.map(function(x){return '<button data-word="'+x+'">'+x+'</button>';}).join('')+'</div>');
+    modalBody.querySelectorAll('[data-word]').forEach(function(b){b.onclick=function(){closeModal();insertChatMessage({role:'user',type:'text',text:'['+b.dataset.word+']'});if(typeof sendMsg==='function')sendMsg('['+b.dataset.word+']');};});
+  }
+  function featureAside() {
+    openModal('旁白与动作', '<div class="x-core-card"><div class="x-core-muted">写下动作、神态或场景旁白</div><textarea class="x-core-input" id="asideText" rows="4" placeholder="例如：我轻轻推开门，探头看向你。"></textarea><div class="x-core-actions"><button class="x-btn x-btn-ghost" id="asideCancel">取消</button><button class="x-btn x-btn-primary" id="asideSend">发送并让角色回应</button></div></div>');
+    document.getElementById('asideCancel').onclick=closeModal;
+    document.getElementById('asideSend').onclick=function(){var t=document.getElementById('asideText').value.trim();if(!t)return;closeModal();insertChatMessage({role:'user',type:'aside',text:t});sendSilentInstruction('[旁白/动作描写] '+t);};
+  }
+  function coreClearChat() {
+    openModal('清空聊天记录','<div class="x-core-card">此操作会清除此角色当前会话的聊天记录，无法撤销。<div class="x-core-actions"><button class="x-btn x-btn-ghost" id="clearNo">取消</button><button class="x-btn x-btn-primary" id="clearYes">确认清空</button></div></div>');
+    document.getElementById('clearNo').onclick=closeModal;
+    document.getElementById('clearYes').onclick=function(){closeModal();if(typeof saveMessages==='function'){saveMessages([]);if(typeof renderAllMessages==='function')renderAllMessages();else if(chatMessages)chatMessages.innerHTML='';if(typeof showToast==='function')showToast('当前聊天记录已清空');}};
+  }
+  function coreCopyLast() {
+    var list=loadMessages()||[], last=list[list.length-1]; if(!last){if(typeof showToast==='function')showToast('没有可复制的消息');return;}
+    var text=String(last.text||last.message||last.content||last.description||'');
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast&&showToast('已复制消息文本');}).catch(function(){window.prompt('复制消息文本',text);});}
+    else window.prompt('复制消息文本',text);
+  }
+  function coreForward() {
+    var list=loadMessages()||[], last=list[list.length-1]; if(!last){showToast&&showToast('没有可转发的消息');return;}
+    var text=String(last.text||last.message||last.content||last.description||'[特殊消息]');
+    var chars=[];try{chars=JSON.parse(localStorage.getItem('characters')||'[]');}catch(e){}
+    var html='<div class="x-core-list">';
+    if(!Array.isArray(chars)||!chars.length) html+='<div class="x-core-muted">未找到可选角色列表。你可以先复制消息文本。</div>';
+    else chars.forEach(function(c,i){var name=c.name||c.nickname||('会话 '+(i+1));html+='<button data-forward="'+i+'">'+escapeHtml(name)+'</button>';});
+    html+='</div><div class="x-core-actions"><button class="x-btn x-btn-ghost" id="forwardCopy">复制文本</button></div>';
+    openModal('转发到其他会话',html);
+    modalBody.querySelectorAll('[data-forward]').forEach(function(b){b.onclick=function(){var idx=Number(b.dataset.forward), c=chars[idx];var key=c.id||c.characterId||c.name||c.nickname;var targetKey='chatMessages_'+key;try{var target=JSON.parse(localStorage.getItem(targetKey)||'[]');target.push({role:'user',type:'forwarded',text:text,forwarded:true,time:Date.now()});localStorage.setItem(targetKey,JSON.stringify(target));showToast&&showToast('已尝试转发到 '+(c.name||c.nickname||'目标会话'));}catch(e){showToast&&showToast('转发失败，请检查会话存储规则');}closeModal();};});
+    var cp=document.getElementById('forwardCopy');if(cp)cp.onclick=function(){closeModal();if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){showToast&&showToast('已复制，可粘贴发送');});else window.prompt('复制消息文本',text);};
+  }
+  // 给现有加号面板补充入口；不重复创建已有按钮
+  function addPlusEntry(feat,label) {
+    if(!panelOverlay||panelOverlay.querySelector('[data-feat="'+feat+'"]'))return;
+    var b=document.createElement('button');b.type='button';b.className='plus-item';b.dataset.feat=feat;b.innerHTML='<span class="plus-item-label">'+label+'</span>';
+    panelOverlay.querySelector('.plus-grid, .plus-items, .plus-panel-content')?.appendChild(b);
+    b.addEventListener('click',function(){closePlusPanel();handleFeature(feat);});
+  }
+  // 动态添加的重复按钮已移除（表情/旁白动作/清空记录/转发/复制最近）
+
+  var oldHandleFeature = handleFeature;
+  handleFeature = function(feat) {
+    if(feat==='img'){featureVirtualImage();return;}
+    if(feat==='emoji'){featureEmoji();return;}
+    if(feat==='aside'||feat==='narration'){featureAside();return;}
+    if(feat==='clear-chat'){coreClearChat();return;}
+    if(feat==='forward'){coreForward();return;}
+    if(feat==='copy-last'){coreCopyLast();return;}
+    oldHandleFeature(feat);
+  };
+
 })();

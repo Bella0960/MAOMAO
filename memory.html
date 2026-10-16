@@ -6,6 +6,7 @@
     <title>记忆空间 · 小手机</title>
     <script src="font-loader.js"></script>
     <script src="native-feel.js"></script>
+    <script src="js/phone/phone_storage.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -875,7 +876,10 @@
     const CAT_LABEL = { key: '关键事件', plot: '剧情', detail: '生活细节', anniversary: '纪念日', preference: '互动偏好' };
     const STATUS_LABEL = { pending: '待确认', confirmed: '已确认', fixed: '已固定' };
 
+    var _storage = window.PhoneStorage;
+
     function loadCharacters() {
+        if (_storage) return _storage.getCharacters();
         try {
             const raw = localStorage.getItem(CHAR_STORAGE);
             const arr = raw ? JSON.parse(raw) : [];
@@ -883,6 +887,7 @@
         } catch (e) { return []; }
     }
     function loadGroups() {
+        if (_storage) return _storage.getGroups();
         try {
             const raw = localStorage.getItem(GROUP_STORAGE);
             const arr = raw ? JSON.parse(raw) : [];
@@ -890,6 +895,7 @@
         } catch (e) { return []; }
     }
     function loadMemories(id) {
+        if (_storage) return _storage.getMemories(id);
         try {
             const raw = localStorage.getItem('chat_memories_' + id);
             const arr = raw ? JSON.parse(raw) : [];
@@ -897,9 +903,11 @@
         } catch (e) { return []; }
     }
     function saveMemories(id, arr) {
+        if (_storage) { _storage.saveMemories(id, arr); return; }
         try { localStorage.setItem('chat_memories_' + id, JSON.stringify(arr)); } catch (e) {}
     }
     function readHistory(id) {
+        if (_storage) return _storage.getChatHistory(id);
         try {
             const raw = localStorage.getItem('chat_history_' + id);
             const arr = raw ? JSON.parse(raw) : [];

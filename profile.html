@@ -6,6 +6,7 @@
     <title>我的 · 小手机</title>
     <script src="font-loader.js"></script>
     <script src="native-feel.js"></script>
+    <script src="js/phone/phone_storage.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -248,7 +249,30 @@
             transition: opacity 0.25s ease;
         }
         .profile-toast.show { opacity: 1; }
-    </style>
+    
+        /* mobile fullscreen: no rounded shell */
+        @media (max-width: 480px) {
+            html, body {
+                background: #F7F7F9 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                min-height: 100vh !important;
+                align-items: stretch !important;
+                overflow: hidden !important;
+            }
+            .phone-mockup {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: none !important;
+                max-height: none !important;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+        }
+</style>
 <link rel="stylesheet" href="mobile-fit.css">
 </head>
 <body>
@@ -340,13 +364,14 @@
     <script>
         /* ===== 从 myProfile 读取并渲染（页面重新显示时刷新，保证编辑返回后最新） ===== */
         var DEFAULT_SIGN = '这个人很懒，什么都没有留下';
+        var _storage = window.PhoneStorage;
 
         function renderProfile() {
-            var profile = {};
-            try {
-                var raw = localStorage.getItem('myProfile');
-                if (raw) profile = JSON.parse(raw) || {};
-            } catch (e) {}
+            var profile = _storage ? (_storage.getMyProfile() || {}) : {};
+            if (_storage) { /* 有公共模块已读，跳过本地 localStorage */ }
+            else {
+              try { var raw = localStorage.getItem('myProfile'); if (raw) profile = JSON.parse(raw) || {}; } catch (e) {}
+            }
 
             // 昵称
             document.getElementById('profileName').textContent = profile.nickname || '未设置昵称';
@@ -372,11 +397,10 @@
             }
 
             // 好友数实时读取角色数组（统计行已移除，好友数仅保留变量兼容）
-            var friendCount = 0;
-            try {
-                var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
-                if (Array.isArray(roles)) friendCount = roles.length;
-            } catch (e) {}
+            var friendCount = _storage ? _storage.getCharacters().length : 0;
+            if (!_storage) {
+              try { var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]'); if (Array.isArray(roles)) friendCount = roles.length; } catch (e) {}
+            }
         }
 
         // 钱包 / 收藏占位提示（不接业务逻辑）
@@ -424,14 +448,14 @@
             compressCover(file, function (dataUrl) {
                 if (!dataUrl) return;
                 // 读-改-写 myProfile，保留其他字段
-                var profile = {};
-                try {
-                    var raw = localStorage.getItem('myProfile');
-                    if (raw) profile = JSON.parse(raw) || {};
-                } catch (err) {}
+                var profile = _storage ? (_storage.getMyProfile() || {}) : {};
+                if (!_storage) {
+                  try { var raw = localStorage.getItem('myProfile'); if (raw) profile = JSON.parse(raw) || {}; } catch (err) {}
+                }
                 profile.cover = dataUrl;
                 try {
-                    localStorage.setItem('myProfile', JSON.stringify(profile));
+                    if (_storage) { _storage.saveMyProfile(profile); }
+                    else { localStorage.setItem('myProfile', JSON.stringify(profile)); }
                     renderProfile();
                 } catch (err) {
                     alert('存储空间不足，请压缩图片');

@@ -6,6 +6,7 @@
 <title>我的主页 · 小手机</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
@@ -472,7 +473,13 @@
       '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
+    var _storage = window.PhoneStorage;
+
     function readProfile() {
+      if (_storage) {
+        var p = _storage.getMyProfile();
+        return p && typeof p === 'object' ? p : {};
+      }
       try {
         var raw = localStorage.getItem(PROFILE_KEY);
         if (raw) {
@@ -484,6 +491,7 @@
     }
 
     function loadMoments() {
+      if (_storage) return _storage.getMoments();
       try {
         var raw = localStorage.getItem(MOMENTS_KEY);
         if (raw) {
@@ -630,6 +638,7 @@
       return null;
     }
     function saveMomentsSafe(list) {
+      if (_storage) { _storage.saveMoments(list); return true; }
       try {
         localStorage.setItem(MOMENTS_KEY, JSON.stringify(list));
         return true;
@@ -664,21 +673,25 @@
         // 写通知（仅点赞时）
         if (nextLiked) {
           var profile = readProfile();
-          try {
-            var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
-            arr.unshift({
-              type: 'like',
-              actorId: 'me',
-              actorName: profile.nickname || '我',
-              actorAvatar: profile.avatar || '',
-              postId: post.id,
-              postContent: (post.content || '[图片动态]').slice(0, 40),
-              text: '赞了这条动态',
-              time: Date.now()
-            });
-            while (arr.length > 100) arr.pop();
-            localStorage.setItem('moments_notifications', JSON.stringify(arr));
-          } catch (e) {}
+          var notif = {
+            type: 'like',
+            actorId: 'me',
+            actorName: profile.nickname || '我',
+            actorAvatar: profile.avatar || '',
+            postId: post.id,
+            postContent: (post.content || '[图片动态]').slice(0, 40),
+            text: '赞了这条动态',
+            time: Date.now()
+          };
+          if (_storage) { _storage.pushMomentsNotification(notif); }
+          else {
+            try {
+              var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+              arr.unshift(notif);
+              while (arr.length > 100) arr.pop();
+              localStorage.setItem('moments_notifications', JSON.stringify(arr));
+            } catch (e) {}
+          }
         }
         // 微缩动画结束后重渲染
         likeBtn.classList.add('pop');

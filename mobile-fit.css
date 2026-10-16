@@ -2,37 +2,34 @@
  * mobile-fit.css —— 真机浏览器全屏适配
  * 在手机（窄屏 + 触摸设备）上打开时：
  *   去掉模拟器外壳（圆角/边框/阴影），内容 100% 全屏铺满
- *   状态栏与顶部标题避让刘海 / 灵动岛安全区
- *   底部控件避让 Home 指示条
+ *   高度链统一 100vh，不依赖 dvh（PWA 无地址栏，dvh 无效）
+ *   safe-area 由 iOS 系统自行处理，不堆 env() 全局注入
  * 电脑 / 平板预览不受影响，仍显示手机模拟器外壳。
  * ============================================================ */
 @media (max-width: 480px) {
 
-  /* 画布底色保持白色；不再强制 body 背景，避免覆盖各页自身的业务配色（论坛/商城/记账的 #F7F7F9 等） */
+  /* 画布底色保持白色；各页面业务配色由自身 body 决定 */
   html { background: #FFFFFF !important; }
 
-  /* 全屏铺满：解除各页写死的 max-width: 390px；高度用 dvh 保证不被浏览器工具栏截断 */
+  /* === 高度链根节点：html / body 统一 100vh + overflow hidden === */
   html, body {
     margin: 0 !important;
     width: 100% !important;
+    height: 100vh !important;
     max-width: none !important;
-    min-height: 100vh !important;
-    min-height: 100dvh !important;
+    overflow: hidden !important;
     overscroll-behavior: none;
   }
 
-  /* 以 .phone / .phone-mockup 居中外壳承载内容的「桌面型」页面（如音乐页 body 的 20px padding）需清零，避免外壳溢出屏幕 */
   body.shell-page { padding: 0 !important; }
 
-  /* 去掉模拟器外壳，全屏 */
+  /* === 去掉模拟器外壳，全屏铺满 === */
   .phone-mockup,
   .home-screen,
   .phone,
   .app-frame {
     width: 100vw !important;
-    width: 100dvw !important;
     height: 100vh !important;
-    height: 100dvh !important;
     max-width: none !important;
     max-height: none !important;
     border-radius: 0 !important;
@@ -40,22 +37,24 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* 首页舞台去留白 */
+  /* === simulator-stage / phone-screen 补齐 100vh + overflow hidden === */
   .simulator-stage {
     display: block !important;
-    min-height: 100dvh !important;
+    width: 100vw !important;
+    height: 100vh !important;
     padding: 0 !important;
     background: #FFFFFF !important;
-  }
-  .phone-screen {
-    flex: 1 !important;
+    overflow: hidden !important;
   }
 
-  /* 状态栏：时间 / 图标整体避让刘海与灵动岛（不加 !important，让页面自身已写好的间距优先生效） */
-  .status-bar {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  .phone-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    flex: none !important;
+    overflow: hidden !important;
   }
 
   /* 模拟刘海条在真机上无意义，隐藏（兼容各页不同的外壳类名） */
@@ -64,28 +63,6 @@
   .phone .camera,
   .phone-mockup .camera {
     display: none !important;
-  }
-
-  /* 各页面顶部标题区兜底避让安全区；不加 !important，页面自己的间距优先 */
-  .bt-topbar,
-  .cs-topbar,
-  .topbar,
-  .header,
-  .home-topbar,
-  .chat-header {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 44px);
-  }
-
-  /* 底部控件避让 Home 指示条（真机全面屏手势条） */
-  .bt-actions,
-  .bt-reset-card,
-  .chat-input-wrap,
-  .input-wrap,
-  .tabbar,
-  .bottom-bar,
-  .tab-bar,
-  .floating-nav {
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px) !important;
   }
 
   /* 触控目标加大，点按更跟手 */
@@ -98,7 +75,8 @@
     min-height: 46px !important;
   }
 
-  /* 论坛 / 商城 / 记账等「body 直接排版」的页面：原本跟随 390px 居中列的固定底栏与底部弹层，真机需同步全宽 */
+  /* 论坛 / 商城 / 记账等「body 直接排版」的页面：
+     原本跟随 390px 居中列的固定底栏与底部弹层，真机需同步全宽 */
   .tabbar,
   .comment-bar,
   .dock,
@@ -111,5 +89,25 @@
     transform: none !important;
     width: 100% !important;
     max-width: none !important;
+  }
+
+  /* === Home Indicator 避让：只给贴底的固定元素加 padding-bottom ===
+     （避免全局堆 env()，只作用于确实贴底的控件） */
+  .dock-wrapper,
+  .dock-bar,
+  .gesture-bar,
+  .tabbar,
+  .bottom-bar,
+  .tab-bar,
+  .floating-nav,
+  .chat-input-wrap,
+  .chat-actions,
+  .bt-actions,
+  .composer,
+  .buy-bar,
+  .comment-bar,
+  .modal-backdrop,
+  .bt-reset-card {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4px) !important;
   }
 }

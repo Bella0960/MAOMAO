@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>空间 · 小手机</title>
     <script src="font-loader.js"></script><style>:root { --base-font-size: 14px; }html { font-size: calc(var(--base-font-size, 14px) / 14 * 16); }</style>
-    <script src="native-feel.js"></script><style>html {
+    <script src="native-feel.js"></script><script src="js/phone/phone_storage.js"></script><script src="js/phone/phone_api.js"></script><script src="js/phone/phone_context.js"></script><script src="js/phone/phone_apps.js"></script><script src="js/phone/phone_engine.js"></script><script src="js/phone/phone_ui.js"></script><style>html {
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -128,6 +128,56 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
             z-index: 10;
         }
         .cover-add-btn svg { width: 20px; height: 20px; stroke: #111; stroke-width: 1.5; }
+
+        /* 整机刷新按钮 */
+        .cover-refresh-btn {
+            position: absolute;
+            top: 14px;
+            right: 48px;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.7;
+            transition: opacity 0.15s;
+        }
+        .cover-refresh-btn:hover { opacity: 1; }
+        .cover-refresh-btn svg { width: 18px; height: 18px; stroke: #111; stroke-width: 1.5; }
+        .cover-refresh-btn.spinning svg { animation: cover-spin 0.9s linear infinite; }
+        @keyframes cover-spin { to { transform: rotate(360deg); } }
+
+        /* 角色选择条（封面底部） */
+        .cover-role-bar {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #666;
+            z-index: 10;
+        }
+        .cover-role-bar select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: rgba(255,255,255,0.7);
+            padding: 3px 18px 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #333;
+            cursor: pointer;
+            font-family: inherit;
+            /* 下拉箭头 */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+        }
 
         /* 封面头像：有图显图，无图浅灰圆角方块 + 细线条 SVG 占位 */
         .cover-avatar-left {
@@ -545,6 +595,13 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
                 <div class="cover-add-btn" id="btnAdd" aria-label="发表动态" onclick="location.href='post-create.html'">
                     <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </div>
+                <div class="cover-refresh-btn" id="btnRefreshAll" aria-label="整机刷新" title="整机刷新：AI 一次性生成朋友圈 + 钱包">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+                </div>
+                <div class="cover-role-bar">
+                    <span>角色：</span>
+                    <select id="roleSelect"></select>
+                </div>
                 <div class="cover-avatar-left" id="coverAvatar"><svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
                 <!-- 隐形入口：让随机角色由 AI 生成一条动态 -->
                 <button class="cover-ai-btn" id="btnAiPost" type="button" aria-label="让 TA 发动态" title="让 TA 发动态">
@@ -591,41 +648,30 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
     <script>
         /* ================= 数据层 ================= */
         var MOMENTS_KEY = 'moments';
+        var _storage = window.PhoneStorage;
 
         function loadMoments() {
-            try {
-                var raw = localStorage.getItem(MOMENTS_KEY);
-                if (raw) {
-                    var list = JSON.parse(raw);
-                    if (Array.isArray(list)) {
-                        // 一次性清理脏数据：演示种子 / 测试注入 / 测试前缀 / 假图（SVG 占位）
-                        var cleaned = [];
-                        var changed = false;
-                        for (var i = 0; i < list.length; i++) {
-                            var item = list[i];
-                            if (!item || typeof item !== 'object' || Array.isArray(item)) { changed = true; continue; }
-                            var id = String(item.id || '');
-                            // 1) 丢弃演示种子与测试注入数据（真实动态 id 为 m_<时间戳>_<随机数>）
-                            if (id.indexOf('m_seed_') === 0 || id.indexOf('m_test_') === 0) { changed = true; continue; }
-                            // 2) 丢弃带测试前缀的脏动态
-                            if (typeof item.content === 'string' && item.content.indexOf('用户动态：') !== -1) { changed = true; continue; }
-                            // 3) 假图（SVG data URI）清空图片字段，保留动态本身
-                            if (typeof item.imageData === 'string' && item.imageData.indexOf('data:image/svg') === 0) { item.imageData = ''; changed = true; }
-                            if (typeof item.image === 'string' && item.image.indexOf('data:image/svg') === 0) { item.image = ''; changed = true; }
-                            cleaned.push(item);
-                        }
-                        if (changed) {
-                            try { localStorage.setItem(MOMENTS_KEY, JSON.stringify(cleaned)); } catch (e) {}
-                        }
-                        return cleaned;
-                    }
-                }
-            } catch (e) {}
-            // 无数据时初始为空，不再写入任何演示内容
-            return [];
+            var list = _storage ? _storage.getMoments() : [];
+            if (!list.length) return [];
+            // 清理脏数据
+            var cleaned = [];
+            var changed = false;
+            for (var i = 0; i < list.length; i++) {
+                var item = list[i];
+                if (!item || typeof item !== 'object' || Array.isArray(item)) { changed = true; continue; }
+                var id = String(item.id || '');
+                if (id.indexOf('m_seed_') === 0 || id.indexOf('m_test_') === 0) { changed = true; continue; }
+                if (typeof item.content === 'string' && item.content.indexOf('用户动态：') !== -1) { changed = true; continue; }
+                if (typeof item.imageData === 'string' && item.imageData.indexOf('data:image/svg') === 0) { item.imageData = ''; changed = true; }
+                if (typeof item.image === 'string' && item.image.indexOf('data:image/svg') === 0) { item.image = ''; changed = true; }
+                cleaned.push(item);
+            }
+            if (changed) saveMoments(cleaned);
+            return cleaned;
         }
 
         function saveMoments(list) {
+            if (_storage) { _storage.saveMoments(list); return; }
             localStorage.setItem(MOMENTS_KEY, JSON.stringify(list));
         }
 
@@ -657,28 +703,18 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
             } catch (e) {}
         };
 
-        // 当前用户信息（实时读 myProfile，保证与顶部头像一致）
+        // 当前用户信息（委托 PhoneStorage）
         function getMyInfo() {
-            try {
-                var raw = localStorage.getItem('myProfile');
-                if (raw) {
-                    var p = JSON.parse(raw) || {};
-                    return { id: 'me', name: p.nickname || '我', avatar: p.avatar || '' };
-                }
-            } catch (e) {}
+            if (_storage) {
+                var p = _storage.getMyProfile();
+                if (p) return { id: p.id || 'me', name: p.nickname || '我', avatar: p.avatar || '' };
+            }
             return { id: 'me', name: '我', avatar: '' };
         }
 
-        // AI 角色列表（真实键名 ai_custom_characters）
+        // AI 角色列表 — 委托 PhoneStorage
         function getCharacterList() {
-            try {
-                var raw = localStorage.getItem('ai_custom_characters');
-                if (raw) {
-                    var arr = JSON.parse(raw);
-                    if (Array.isArray(arr)) return arr;
-                }
-            } catch (e) {}
-            return [];
+            return _storage ? _storage.getCharacters() : [];
         }
 
         // 解析一条动态的真实发布者（用户本人 / AI 角色 / 兜底）
@@ -1001,32 +1037,20 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
             return [];
         }
         function getApiConfig() {
-            try {
-                var raw = localStorage.getItem('api_settings');
-                if (raw) {
-                    var parsed = JSON.parse(raw);
-                    if (parsed) return parsed;
-                }
-            } catch (e) {}
-            return {};
+            return _storage ? _storage.getApiConfig() : {};
         }
 
-        // API 调用记录：unshift 到 api_call_logs 最前，最多保留 50 条；异常静默，不影响主流程
+        // API 调用记录 — 委托 PhoneStorage
         function logApiCall(model, status, startTime, errorMsg) {
-            try {
-                var logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
-                var entry = {
-                    id: Date.now().toString(36),
-                    time: Date.now(),
-                    model: model || 'unknown',
-                    status: status,
-                    duration: Date.now() - startTime,
-                    errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
-                };
-                logs.unshift(entry);
-                while (logs.length > 50) logs.pop();
-                localStorage.setItem('api_call_logs', JSON.stringify(logs));
-            } catch (e) { /* 日志失败不影响主流程 */ }
+            if (!_storage) return;
+            _storage.pushApiLog({
+                id: Date.now().toString(36) + Math.floor(Math.random() * 1000),
+                time: Date.now(),
+                model: model || 'unknown',
+                status: status,
+                duration: Date.now() - startTime,
+                errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
+            });
         }
 
         if (aiBtn) aiBtn.addEventListener('click', function () {
@@ -1154,13 +1178,13 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
         }
 
         /* ================= 通知系统 ================= */
-        var MOMENTS_NOTIF_KEY = 'moments_notifications';
         function pushNotification(n) {
+            if (_storage) { _storage.pushMomentsNotification(n); return; }
             try {
-                var arr = JSON.parse(localStorage.getItem(MOMENTS_NOTIF_KEY) || '[]');
+                var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
                 arr.unshift(n);
                 while (arr.length > 100) arr.pop();
-                localStorage.setItem(MOMENTS_NOTIF_KEY, JSON.stringify(arr));
+                localStorage.setItem('moments_notifications', JSON.stringify(arr));
             } catch (e) {}
         }
 
@@ -1449,6 +1473,87 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
         })();
 
         renderMoments();
+
+        /* ================= 整机刷新（PhoneEngine） ================= */
+        (function initRefreshAll() {
+            var S = window.PhoneStorage;
+            var E = window.PhoneEngine;
+            var UI = window.PhoneUI;
+
+            if (!S || !E || !UI) return; // 公共模块没加载就跳过
+
+            var roleSelect = document.getElementById('roleSelect');
+            var refreshBtn = document.getElementById('btnRefreshAll');
+
+            // 1. 填充角色下拉
+            var chars = S.getCharacters();
+            if (roleSelect && chars.length) {
+                var html = '';
+                for (var i = 0; i < chars.length; i++) {
+                    var c = chars[i];
+                    html += '<option value="' + c.id + '">' + (c.name || '角色' + (i + 1)) + '</option>';
+                }
+                roleSelect.innerHTML = html;
+                // 默认选中 currentContact 或第一个
+                var saved = E.getCurrentContactId();
+                if (saved) roleSelect.value = saved;
+                E.setCurrentContact(roleSelect.value);
+            }
+
+            // 2. 角色切换 → 保存
+            if (roleSelect) {
+                roleSelect.addEventListener('change', function () {
+                    E.setCurrentContact(roleSelect.value);
+                });
+            }
+
+            // 3. 整机刷新按钮
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    if (!roleSelect) { UI.showToast('请先添加 AI 角色'); return; }
+                    var contactId = roleSelect.value;
+                    if (!contactId) { UI.showToast('请先选择角色'); return; }
+
+                    // 检查 API key
+                    var cfg = S.getApiConfig();
+                    if (!cfg.apiKey) {
+                        UI.confirm({
+                            title: '还没配置 API Key',
+                            message: '请到 设置 → API 设置 里填入 API Key 后再试。',
+                            okText: '知道了',
+                            cancelText: null
+                        });
+                        return;
+                    }
+
+                    // 开始刷新
+                    refreshBtn.classList.add('spinning');
+                    UI.showLoading('AI 正在生成整机数据...');
+
+                    E.refreshAll({ contactId: contactId }).then(function (result) {
+                        if (!result || !result.ok) {
+                            throw new Error((result && result.error) || 'AI 返回空结果');
+                        }
+                        // 存入各 App
+                        var applied = E.applyBundle(result.data);
+                        var okCount = 0;
+                        for (var k in applied) { if (applied[k]) okCount++; }
+
+                        UI.hideLoading();
+                        refreshBtn.classList.remove('spinning');
+
+                        // 刷新页面数据
+                        renderMoments();
+
+                        UI.showToast('整机刷新完成 ✅ 成功 ' + okCount + ' 个 App');
+                    }).catch(function (err) {
+                        UI.hideLoading();
+                        refreshBtn.classList.remove('spinning');
+                        UI.showToast('刷新失败：' + (err && err.message ? err.message.slice(0, 60) : String(err)));
+                    });
+                });
+            }
+        })();
     </script>
 <script src="statusbar-control.js"></script>
 

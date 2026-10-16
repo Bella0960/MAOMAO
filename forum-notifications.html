@@ -6,6 +6,7 @@
 <title>消息通知</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <link rel="stylesheet" href="mobile-fit.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -101,17 +102,29 @@
     return String(str == null ? '' : str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  var _storage = window.PhoneStorage;
+
   // 合并两个通知源
   function loadAllNotifs() {
     var arr = [];
-    try { arr = arr.concat(JSON.parse(localStorage.getItem('forum_notifications') || '[]')); } catch (e) {}
-    try { arr = arr.concat(JSON.parse(localStorage.getItem('moments_notifications') || '[]')); } catch (e) {}
+    if (_storage) {
+      arr = arr.concat(_storage.getForumNotifications());
+      arr = arr.concat(_storage.getMomentsNotifications());
+    } else {
+      try { arr = arr.concat(JSON.parse(localStorage.getItem('forum_notifications') || '[]')); } catch (e) {}
+      try { arr = arr.concat(JSON.parse(localStorage.getItem('moments_notifications') || '[]')); } catch (e) {}
+    }
     // 按时间倒序
     arr.sort(function (a, b) { return (b.time || 0) - (a.time || 0); });
     return arr;
   }
 
   function clearAllNotifs() {
+    if (_storage) {
+      _storage.saveForumNotifications([]);
+      _storage.saveMomentsNotifications([]);
+      return;
+    }
     localStorage.removeItem('forum_notifications');
     localStorage.removeItem('moments_notifications');
     render();

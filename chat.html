@@ -6,6 +6,7 @@
 <title>聊天 · 小手机</title>
 <script src="font-loader.js"></script>
 <script src="native-feel.js"></script>
+<script src="js/phone/phone_storage.js"></script>
 <style>
   * {
     box-sizing: border-box;
@@ -694,6 +695,29 @@
     cursor: pointer;
   }
   .save-btn:active { opacity: 0.85; }
+
+  /* ===== 手机全屏强制直角去外壳（不依赖外部 mobile-fit.css，避免缓存不生效） ===== */
+  @media (max-width: 480px) {
+    html, body {
+      background: #FFFFFF !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      align-items: stretch !important;
+      overflow: hidden !important;
+    }
+    .phone-mockup {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+  }
 </style>
 <link rel="stylesheet" href="mobile-fit.css">
 </head>
@@ -801,13 +825,13 @@
     var USER_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
     var USER_SVG_SMALL = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
 
+    var _storage = window.PhoneStorage;
+
     function loadProfile() {
+      if (_storage) { var p = _storage.getMyProfile(); return p && typeof p === 'object' ? p : {}; }
       try {
         var raw = localStorage.getItem(PROFILE_KEY);
-        if (raw) {
-          var obj = JSON.parse(raw);
-          if (obj && typeof obj === 'object') return obj;
-        }
+        if (raw) { var obj = JSON.parse(raw); if (obj && typeof obj === 'object') return obj; }
       } catch (e) {}
       return {};
     }
@@ -822,6 +846,7 @@
       var data = loadProfile();
       Object.keys(patch).forEach(function (k) { data[k] = patch[k]; });
       try {
+        if (_storage) { _storage.saveMyProfile(data); return true; }
         localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
       } catch (err) {
         alert('存储空间不足，请压缩图片');
@@ -853,7 +878,7 @@
               canvas.height = Math.max(1, Math.round(h * scale));
               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             }
-            cb(canvas.toDataURL('image/jpeg', 0.7));
+            cb(canvas.toDataURL('image/jpeg', 0.88));
           } catch (err) {
             alert('图片处理失败，请更换图片重试');
             cb('');
@@ -904,7 +929,7 @@
     document.getElementById('coverInput').addEventListener('change', function (e) {
       var file = e.target.files[0];
       if (!file) return;
-      compressImage(file, 400, 'contain', function (dataUrl) {
+      compressImage(file, 1080, 'contain', function (dataUrl) {
         if (dataUrl && mergeProfile({ cover: dataUrl })) renderProfile();
       });
       e.target.value = '';
