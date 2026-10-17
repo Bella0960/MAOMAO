@@ -46,6 +46,80 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 .field-label{display:block;font-size:10px;color:#999;letter-spacing:.06em;margin:13px 0 7px}.field-input,.field-select{width:100%;border:1px solid #e8e8e8;background:#fafafa;border-radius:10px;padding:11px 12px;font-size:11px;outline:none;color:#333}.field-textarea{width:100%;min-height:118px;border:1px solid #e8e8e8;background:#fafafa;border-radius:10px;padding:12px;font-size:12px;line-height:1.8;resize:vertical;outline:none;color:#333}.sheet-actions{display:flex;gap:8px;margin-top:17px;padding-top:13px;border-top:1px solid #eee}.sheet-actions .dark-button{flex:1}.detail-overlay{position:absolute;inset:0;z-index:15;display:none;flex-direction:column;background:#fff;animation:fadeIn .18s ease}.detail-overlay.show{display:flex}.detail-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.detail-scroll::-webkit-scrollbar{display:none}.detail-head{position:absolute;top:42px;left:18px;right:18px;z-index:4;display:flex;justify-content:space-between;align-items:center}.detail-head .icon-button{background:rgba(255,255,255,.82);backdrop-filter:blur(12px)}.detail-scene .art-scene{height:300px;border-radius:0}.detail-content{padding:20px 22px 28px}.detail-kicker{font-size:8px;letter-spacing:.18em;color:#999}.detail-title{font-size:33px;letter-spacing:-.07em;margin:9px 0 7px;font-weight:740}.detail-subtitle{font-size:11px;color:#888;line-height:1.8}.detail-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:19px 0 22px}.metric{background:#f6f6f6;border-radius:10px;padding:11px 9px}.metric span{display:block;color:#aaa;font-size:8px;margin-bottom:5px}.metric strong{display:block;color:#333;font-size:11px;font-weight:650}.story-title{font-size:13px;font-weight:700;letter-spacing:-.03em;margin:0 0 9px}.story-text{font-size:11px;line-height:2;color:#666;margin:0;white-space:pre-line}.route-box{margin-top:19px;padding:14px;border:1px solid #ececec;border-radius:13px}.route-box .route-label{font-size:8px;letter-spacing:.14em;color:#aaa}.route-box p{font-size:10px;line-height:1.8;color:#555;margin:7px 0 0}.detail-actions{position:relative;display:flex;gap:8px;padding:13px 20px calc(13px + env(safe-area-inset-bottom,0px));border-top:1px solid #eee;background:rgba(255,255,255,.91);backdrop-filter:blur(20px)}.detail-actions button{height:44px}.detail-actions .light-button{width:47px;padding:0}.detail-actions .dark-button{flex:1}
 .toast{position:absolute;z-index:60;left:50%;bottom:90px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:rgba(25,25,25,.93);color:#fff;padding:10px 14px;border-radius:99px;font-size:10px;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:opacity .2s,transform .2s}.toast.show{opacity:1;transform:translate(-50%,0)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes sheetUp{from{transform:translateY(22px);opacity:.6}to{transform:translateY(0);opacity:1}}
+
+/* Editorial direction · restrained monochrome, fine-grain print and deliberate rhythm */
+.editorial-travel-hero{padding:23px 0 16px;margin-bottom:17px;border-bottom:1px solid #e3e3e3;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.013) 0px,rgba(0,0,0,.013) 1px,transparent 1px,transparent 4px),linear-gradient(105deg,#fafafa,rgba(255,255,255,.25) 78%);isolation:isolate}
+.editorial-travel-hero:before{content:"";position:absolute;z-index:-1;left:-21px;right:-21px;top:0;bottom:0;background:radial-gradient(ellipse at 91% 20%,rgba(0,0,0,.04),transparent 38%),repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0,transparent 1px,transparent 7px);pointer-events:none}
+.editorial-travel-hero .eyebrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:8px;letter-spacing:.17em;color:#767676}
+.hero-issue{font-size:7px;letter-spacing:.12em;color:#aaa;white-space:nowrap}
+.editorial-travel-hero h1{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:19px 0 11px;font-weight:400;line-height:1}
+.travel-english{display:block;font-family:Georgia,"Times New Roman",serif;font-size:48px;letter-spacing:-.08em;font-weight:400;line-height:.91;color:#171717}
+.hero-period{color:#aaa}
+.travel-cn{display:block;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;font-size:10px;font-weight:550;letter-spacing:.12em;color:#555}
+.editorial-travel-hero p{font-size:11px;line-height:1.9;letter-spacing:.015em;color:#777;margin:12px 0 0}
+.editorial-travel-hero .hero-aside{position:static;display:flex;align-items:baseline;gap:8px;text-align:left;margin-top:18px;padding-top:11px;border-top:1px solid #ececec;color:#999}
+.editorial-travel-hero .hero-aside strong{display:inline-flex;align-items:baseline;gap:4px;font-family:Georgia,"Times New Roman",serif;font-size:17px;font-weight:400;letter-spacing:-.035em;color:#333}
+.editorial-travel-hero .hero-aside strong i{font-style:normal;font-size:10px;color:#aaa}
+.editorial-travel-hero .hero-aside span{font-size:7px;letter-spacing:.13em;color:#aaa}
+.hero-rule{display:flex;align-items:center;gap:10px;margin-top:16px;font-family:Georgia,"Times New Roman",serif;font-size:7px;letter-spacing:.18em;color:#aaa}
+.hero-rule i{height:1px;flex:1;background:linear-gradient(90deg,#d5d5d5,transparent)}
+.search-line{height:39px;background:transparent;border:0;border-top:1px solid #e9e9e9;border-bottom:1px solid #e9e9e9;border-radius:0;padding:0 4px;margin-bottom:18px}
+.search-line:focus-within{border-color:#bdbdbd;background:rgba(250,250,250,.6)}
+.feature-card{border-radius:2px;margin-bottom:25px;box-shadow:0 10px 28px rgba(0,0,0,.075);outline:1px solid rgba(0,0,0,.035);outline-offset:4px}
+.feature-card .art-scene{height:228px}
+.feature-top{left:16px;right:16px;top:14px;align-items:flex-start}
+.outline-chip{border-radius:2px;padding:6px 8px;letter-spacing:.08em}
+.feature-overlay{padding:20px;background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,0) 30%,rgba(0,0,0,.12) 48%,rgba(0,0,0,.78) 100%)}
+.feature-kicker{font-size:7px;letter-spacing:.2em}
+.feature-title{font-family:Georgia,"Songti SC",serif;font-size:30px;letter-spacing:-.045em;font-weight:500}
+.feature-desc{font-size:10px;line-height:1.8;letter-spacing:.015em}
+.feature-action{right:16px;bottom:18px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08)}
+.progress-strip{position:relative;border-radius:2px;margin:18px 0 25px;padding:15px 14px;background:linear-gradient(105deg,#f5f5f5,#fafafa);border-top:1px solid #e9e9e9;border-bottom:1px solid #e7e7e7}
+.progress-strip:after{content:"";position:absolute;inset:0;opacity:.3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 4px)}
+.progress-copy,.progress-number{position:relative;z-index:1}
+.prompt-strip{border-radius:2px;border:0;border-left:2px solid #222;padding:14px 12px 14px 14px;background:linear-gradient(112deg,#f6f6f6,#fff 76%);box-shadow:none;margin-bottom:28px;position:relative;overflow:hidden}
+.prompt-strip:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0px,transparent 1px,transparent 3px)}
+.prompt-strip>*{position:relative;z-index:1}
+.prompt-mark{font-family:Georgia,"Times New Roman",serif;font-size:26px;color:#aaa}
+.prompt-body p{line-height:1.9;color:#4c4c4c}
+.section-head h2{font-size:17px;font-weight:650;letter-spacing:-.055em}
+.section-meta{font-family:Georgia,"Times New Roman",serif;font-size:9px;letter-spacing:.15em}
+.destination-grid{align-items:start;column-gap:14px;row-gap:20px}
+.destination-card:nth-child(4n+2){margin-top:22px}
+.destination-card:nth-child(4n+3){margin-top:-8px}
+.destination-card:nth-child(4n+1) .card-art .art-scene{height:166px}
+.destination-card:nth-child(4n+2) .card-art .art-scene{height:128px}
+.destination-card:nth-child(4n+3) .card-art .art-scene{height:135px}
+.destination-card:nth-child(4n+4) .card-art .art-scene{height:174px}
+.card-art{border-radius:2px;margin-bottom:11px}
+.card-fav{border-radius:50%;width:28px;height:28px}
+.place-category{font-size:7px;letter-spacing:.15em}
+.place-name{font-family:Georgia,"Songti SC",serif;font-size:16px;font-weight:600;letter-spacing:-.04em}
+.place-desc{line-height:1.85;color:#777;min-height:34px}
+.place-foot{padding-top:8px;margin-top:10px;border-top:1px solid #e6e6e6}
+.progress-copy .label{letter-spacing:.17em}
+.progress-copy strong{font-size:12px;letter-spacing:.01em}
+.art-scene{isolation:isolate}
+.art-scene:before,.art-scene:after{z-index:0}
+.art-scene .star,.art-scene .terrain,.art-scene .train-line,.art-scene .hotel-windows{z-index:1}
+.art-grain{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.20;mix-blend-mode:screen;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.83' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.23'/%3E%3C/svg%3E")}
+.art-frame{position:absolute;inset:9px;z-index:4;border:1px solid rgba(255,255,255,.16);pointer-events:none}
+.art-code,.scene-caption{z-index:5!important}
+.card-art .art-frame{inset:7px;border-color:rgba(255,255,255,.22)}
+.empty-state{border-radius:2px;border-style:solid;border-color:#e4e4e4;background:linear-gradient(140deg,#fff,#f8f8f8)}
+.ticket{border-radius:2px}
+.ticket-top{padding:14px}
+.ticket-bottom{background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0,transparent 1px,transparent 4px)}
+.note-card{border-radius:2px;background-image:linear-gradient(110deg,rgba(247,247,247,.5),rgba(255,255,255,.6))}
+@media(max-width:500px){
+ .editorial-travel-hero{padding-top:17px}
+ .travel-english{font-size:45px}
+ .feature-card .art-scene{height:215px}
+ .destination-grid{column-gap:12px;row-gap:18px}
+ .destination-card:nth-child(4n+2){margin-top:18px}
+ .destination-card:nth-child(4n+3){margin-top:-5px}
+}
+
 @media(max-width:500px){html,body{background:#fff}.phone-shell{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none}.topbar{padding-top:6px}.hero h1{font-size:38px}.overlay{position:fixed}.sheet{max-height:94dvh;padding-bottom:calc(15px + env(safe-area-inset-bottom,0px))}.detail-overlay{position:fixed}.detail-head{top:49px}.detail-scene .art-scene{height:33vh;min-height:220px;max-height:300px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
@@ -129,7 +203,7 @@ function findPlace(id){return destinations.find(function(p){return p.id===id})||
 function has(list,id){return list.indexOf(id)!==-1}
 function toast(msg){var el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.classList.remove('show')},2300)}
 function iconSvg(name){var map={search:'<circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.5 4.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/>',pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'};return '<svg viewBox="0 0 24 24">'+(map[name]||'')+'</svg>'}
-function artHTML(p,feature){return '<div class="art-scene '+p.art+'"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>'+(p.id==='cloud-train'?'<span class="train-line"></span>':'')+(p.id==='time-inn'?'<span class="hotel-windows"></span>':'')+(p.id==='moon-sea'?'<span class="terrain"></span>':'')+'<span class="art-code">DREAM / '+p.code+'</span><span class="scene-caption">'+esc(p.distance.toUpperCase())+'</span></div>'}
+function artHTML(p,feature){return '<div class="art-scene '+p.art+'"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>'+(p.id==='cloud-train'?'<span class="train-line"></span>':'')+(p.id==='time-inn'?'<span class="hotel-windows"></span>':'')+(p.id==='moon-sea'?'<span class="terrain"></span>':'')+'<span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / '+p.code+'</span><span class="scene-caption">'+esc(p.distance.toUpperCase())+'</span></div>'}
 function renderPlaceCard(p){
 var saved=has(data.favorites,p.id);
 return '<article class="destination-card"><button class="open-destination" data-detail="'+p.id+'"><div class="card-art">'+artHTML(p,false)+'<span class="place-label">'+p.code+' / '+esc(p.category.toUpperCase())+'</span></div><div class="place-category">'+esc(p.category)+'</div><div class="place-name">'+esc(p.name)+'</div><div class="place-desc">'+esc(p.desc)+'</div><div class="place-foot"><span>'+esc(p.duration)+' · '+esc(p.mood)+'</span><strong>探索 '+iconSvg('arrow')+'</strong></div></button><button class="card-fav '+(saved?'saved':'')+'" data-favorite="'+p.id+'" aria-label="'+(saved?'取消收藏':'收藏目的地')+'">'+(saved?'★':'☆')+'</button></article>'
@@ -138,7 +212,7 @@ function progressPercent(){return Math.round((data.visited.length/destinations.l
 function renderExplore(){
 var filtered=destinations.filter(function(p){return [p.name,p.category,p.tagline,p.desc,p.distance,p.story].join(' ').toLowerCase().indexOf(searchQuery.toLowerCase())!==-1});
 var featured=destinations[0];
-return '<section class="hero"><div class="eyebrow">A JOURNEY BEYOND REALITY</div><h1>触梦旅行<span style="font-weight:320;color:#aaa">。</span></h1><p>不是地图上的远方。<br>而是另一个世界，正在等你抵达。</p><div class="hero-aside"><strong>'+String(data.visited.length).padStart(2,'0')+' / '+destinations.length+'</strong><span>已抵达目的地</span></div></section>'+
+return '<section class="hero editorial-travel-hero"><div class="eyebrow">TOUCH DREAM / TRAVEL <span class="hero-issue">FIELD NOTES — 001</span></div><h1><span class="travel-english">Somewhere,<br>Else<span class="hero-period">.</span></span><span class="travel-cn">触梦旅行 / 未知之地的档案</span></h1><p>远方不一定在地图尽头。<br>有些地方，只在你准备好时出现。</p><div class="hero-aside"><strong>'+String(data.visited.length).padStart(2,'0')+' <i>/</i> '+destinations.length+'</strong><span>WORLDS ARRIVED · DREAM PASSPORT</span></div><div class="hero-rule"><span>PLACES THAT EXIST IN DREAMS</span><i></i></div></section>'+
 '<div class="search-line">'+iconSvg('search')+'<input id="placeSearch" type="search" value="'+esc(searchQuery)+'" placeholder="寻找海岛、时间缝隙或一座城市" aria-label="搜索目的地">'+(searchQuery?'<button class="plain-close" id="clearPlaceSearch">清除</button>':'')+'</div>'+
 '<button class="feature-card" data-detail="'+featured.id+'" style="display:block;width:100%;padding:0;text-align:left;border:0;cursor:pointer"><div>'+artHTML(featured,true)+'</div><div class="feature-top"><span>FEATURED DESTINATION / '+featured.code+'</span><span class="outline-chip">本日推荐 ↗</span></div><div class="feature-overlay"><div class="feature-kicker">A PLACE OUTSIDE OF TIME</div><div class="feature-title">'+esc(featured.name)+'</div><div class="feature-desc">'+esc(featured.tagline)+'</div></div><span class="feature-action">'+iconSvg('arrow')+'</span></button>'+
 '<div class="progress-strip"><div class="progress-copy"><div class="label">YOUR DREAM PASSPORT</div><strong>每次出发，都会留下印记</strong><div class="progress-bar"><div class="progress-fill" style="width:'+progressPercent()+'%"></div></div></div><div class="progress-number">'+progressPercent()+'%</div></div>'+
