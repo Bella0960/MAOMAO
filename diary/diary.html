@@ -37,6 +37,60 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .menu-sheet{width:calc(100% - 28px);max-width:360px;margin:0 14px 18px;background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);animation:sheetUp .2s ease}.menu-head{display:flex;justify-content:space-between;align-items:center;padding:12px 11px;border-bottom:1px solid #eee;font-size:13px;font-weight:650}.menu-item{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;border:0;background:transparent;padding:14px 11px;font-size:12px;color:#444;border-radius:10px}.menu-item:active{background:#f3f3f3}.menu-item small{display:block;font-size:9px;color:#aaa;margin-top:4px}.menu-item svg{width:17px;height:17px;stroke:#777;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .toast{position:absolute;z-index:50;left:50%;bottom:86px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:rgba(25,25,25,.92);color:#fff;padding:10px 14px;border-radius:99px;font-size:11px;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:opacity .2s,transform .2s}.toast.show{opacity:1;transform:translate(-50%,0)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes sheetUp{from{transform:translateY(22px);opacity:.6}to{transform:translateY(0);opacity:1}}
+
+/* Editorial polish · paper, hierarchy and intentional whitespace */
+.editorial-hero{padding:22px 0 17px;margin-bottom:17px;border-bottom:1px solid #e4e4e4;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.013) 0px,rgba(0,0,0,.013) 1px,transparent 1px,transparent 4px),linear-gradient(110deg,rgba(250,250,250,.84),rgba(255,255,255,.22) 65%);isolation:isolate}
+.editorial-hero:before{content:"";position:absolute;z-index:-1;left:-22px;right:-22px;top:0;bottom:0;background:radial-gradient(ellipse at 86% 5%,rgba(0,0,0,.035),transparent 34%),repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0px,transparent 1px,transparent 7px);pointer-events:none}
+.editorial-hero .eyebrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:8px;letter-spacing:.18em;color:#737373}
+.hero-issue{font-size:7px;letter-spacing:.12em;color:#b0b0b0;white-space:nowrap}
+.editorial-hero h1{margin:18px 0 10px;line-height:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.hero-english{font-family:Georgia,"Times New Roman",serif;font-size:51px;font-weight:400;letter-spacing:-.075em;color:#151515}
+.hero-period{color:#a2a2a2}
+.hero-cn{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;font-size:11px;letter-spacing:.08em;font-weight:550;color:#555}
+.editorial-hero p{font-size:11px;line-height:1.9;letter-spacing:.015em;color:#777;margin-top:12px}
+.editorial-hero .hero-date{top:84px;right:1px}
+.editorial-hero .hero-date strong{font-family:Georgia,"Times New Roman",serif;font-size:35px;font-weight:400}
+.editorial-hero .hero-date span{display:block;max-width:82px;font-size:7px;line-height:1.7;letter-spacing:.11em;color:#999}
+.hero-rule{display:flex;align-items:center;gap:10px;margin-top:20px;font-size:7px;letter-spacing:.17em;color:#aaa}
+.hero-rule i{height:1px;flex:1;background:linear-gradient(90deg,#d5d5d5,transparent)}
+.stats-row{gap:0;margin:0 0 24px;padding:14px 0;border-top:1px solid #ededed;border-bottom:1px solid #ededed;background:linear-gradient(95deg,rgba(247,247,247,.64),rgba(255,255,255,.28))}
+.stat{background:transparent;border-radius:0;min-height:64px;padding:5px 15px 5px 2px}
+.stat+.stat{border-left:1px solid #e7e7e7;padding-left:17px}
+.stat-label{font-size:9px;letter-spacing:.1em;color:#9b9b9b}
+.stat-main{margin-top:9px}
+.stat-main strong{font-family:Georgia,"Times New Roman",serif;font-size:28px;font-weight:400;letter-spacing:-.06em}
+.prompt{position:relative;overflow:hidden;border-radius:2px;border:0;border-left:2px solid #202020;padding:15px 12px 15px 14px;margin-bottom:28px;background:linear-gradient(112deg,#f6f6f6,#fff 75%);box-shadow:none}
+.prompt:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.38;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0px,transparent 1px,transparent 3px)}
+.prompt>*{position:relative;z-index:1}
+.prompt-mark{font-family:Georgia,serif;font-size:27px;color:#aaa}
+.prompt-copy .label{font-size:8px;letter-spacing:.18em}
+.prompt-copy p{font-size:11px;line-height:1.9;color:#4d4d4d}
+.section-head{margin-bottom:14px}
+.section-head h2{font-size:17px;font-weight:650;letter-spacing:-.055em}
+.section-meta{font-family:Georgia,"Times New Roman",serif;letter-spacing:.13em;font-size:9px;color:#999}
+.search-wrap{height:39px;background:transparent;border:0;border-top:1px solid #e9e9e9;border-bottom:1px solid #e9e9e9;border-radius:0;padding:0 4px;margin:0 0 13px}
+.search-wrap:focus-within{border-color:#bdbdbd;background:rgba(250,250,250,.6)}
+.filter-row{gap:12px;margin-bottom:19px}
+.filter-chip{border:0;border-bottom:1px solid transparent;border-radius:0;padding:6px 1px;color:#999;background:transparent;font-size:10px}
+.filter-chip.active{background:transparent;border-color:#171717;color:#171717;font-weight:700}
+.entries{gap:0}
+.entry-card{border:0;border-top:1px solid #e7e7e7;border-radius:0;padding:17px 2px 16px;background:transparent;box-shadow:none}
+.entry-card:first-child{padding:20px 13px 17px;margin:0 0 2px;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0px,transparent 1px,transparent 4px),linear-gradient(120deg,#f8f8f8,#fff 78%);border-top:1.5px solid #282828;border-bottom:1px solid #e5e5e5}
+.entry-card:first-child .entry-date strong{font-family:Georgia,"Times New Roman",serif;font-size:30px;font-weight:400}
+.entry-card:first-child .entry-title{font-family:Georgia,"Times New Roman",serif;font-size:19px;font-weight:600;letter-spacing:-.045em;margin-top:5px}
+.entry-card:first-child .entry-text{-webkit-line-clamp:5;font-size:12px;line-height:1.9}
+.entry-card:not(:first-child) .entry-title{font-size:14px;font-weight:650}
+.entry-card:not(:first-child) .entry-bottom{margin-top:10px}
+.entry-bottom{border-top:1px solid #ececec}
+.tiny-tag{background:transparent;border:1px solid #ececec;border-radius:2px;padding:4px 6px}
+.empty-state{border-radius:2px;border-style:solid;border-color:#e6e6e6;background:linear-gradient(140deg,#fff,#f8f8f8)}
+@media(max-width:500px){
+ .editorial-hero{padding-top:17px}
+ .hero-english{font-size:48px}
+ .editorial-hero .hero-date{top:77px}
+ .stats-row{margin-bottom:21px}
+}
+
 @media(max-width:500px){html,body{background:#fff}.phone-mockup{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none}.app-head{padding-top:7px}.hero h1{font-size:41px}.editor-backdrop,.menu-backdrop{position:fixed}.editor-sheet{max-height:94dvh;padding-bottom:calc(15px + env(safe-area-inset-bottom,0px))}.app-scroll{padding-bottom:18px}}
 @media(min-width:501px){.phone-mockup{height:min(890px,calc(100vh - 28px))}.app-scroll{padding-bottom:26px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
@@ -179,7 +233,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     var savedDays={};entries.forEach(function(e){savedDays[e.date]=1});
     var days=Object.keys(savedDays).length;
     var filters=['全部','平静','开心','疲惫','低落','期待'];
-    return '<section class="hero"><div class="eyebrow">A PLACE TO PAUSE</div><h1>日记<span style="font-weight:350;color:#aaa">。</span></h1><p>把生活收进字里行间。<br>不必完美，只要真实。</p><div class="hero-date"><strong>'+String(d.getDate()).padStart(2,'0')+'</strong><span>'+d.getFullYear()+' / '+String(d.getMonth()+1).padStart(2,'0')+'</span></div></section>'+
+    return '<section class="hero editorial-hero"><div class="eyebrow">THE PERSONAL JOURNAL <span class="hero-issue">VOL.01 — DAILY NOTES</span></div><h1><span class="hero-english">Today<span class="hero-period">.</span></span><span class="hero-cn">日记 / 留给自己的空白</span></h1><p>不必把每一天都写得完整。<br>把真正发生过的细小瞬间留下来。</p><div class="hero-date"><strong>'+String(d.getDate()).padStart(2,'0')+'</strong><span>'+d.getFullYear()+' / '+String(d.getMonth()+1).padStart(2,'0')+' · DAYBOOK</span></div><div class="hero-rule"><span>NOTES ON ORDINARY DAYS</span><i></i></div></section>'+
       '<div class="stats-row"><div class="stat"><div class="stat-label">已写下的片段</div><div class="stat-main"><strong>'+entries.length+'</strong><span>篇记录</span></div></div><div class="stat"><div class="stat-label">留下印记的日子</div><div class="stat-main"><strong>'+days+'</strong><span>天 · 今天 '+todayCount+' 篇</span></div></div></div>'+
       '<aside class="prompt"><div class="prompt-mark">“</div><div class="prompt-copy"><div class="label">A SMALL PROMPT FOR TODAY</div><p>'+esc(prompts[promptIndex])+'</p></div><button class="prompt-refresh" id="refreshPrompt">换一句</button></aside>'+
       '<div class="section-head"><h2>最近记录</h2><span class="section-meta">'+(query?'搜索结果 '+list.length+' 篇':list.length+' ENTRIES')+'</span></div>'+
