@@ -25,11 +25,11 @@
 
   /* === 去掉模拟器外壳，全屏铺满 === */
   .phone-mockup,
-  .pages-container,
   .phone,
   .app-frame {
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
     max-width: none !important;
     max-height: none !important;
     border-radius: 0 !important;
@@ -37,24 +37,99 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
     overflow: hidden !important;
   }
 
-  /* === simulator-stage / phone-screen 补齐 100vh + overflow hidden === */
+  /* === simulator-stage 填满视口 === */
   .simulator-stage {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
     padding: 0 !important;
+    margin: 0 !important;
     background: #FFFFFF !important;
     overflow: hidden !important;
   }
 
+  .stage-caption {
+    display: none !important;
+  }
+
   .phone-screen {
     width: 100vw !important;
-    height: 100vh !important;
-    flex: none !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
     overflow: hidden !important;
+  }
+
+  /* 状态栏：贴合真机安全区顶部 */
+  .status-bar {
+    padding-top: max(8px, env(safe-area-inset-top, 0px)) !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-bottom: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 首页多页水平滑动容器：必须允许横向滚动，flex: 1 占据剩余空间 */
+  .pages-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    width: 100vw !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 6px 0 10px !important;
+    margin: 0 !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+  }
+
+  /* 单页桌面 */
+  .home-page {
+    flex: 0 0 100vw !important;
+    width: 100vw !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
+    padding: 2px 14px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+  }
+
+  /* 桌面 4 列网格 */
+  .desktop-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    align-content: start !important;
+    padding: 2px 2px 16px !important;
+  }
+
+  /* 底部固定 Dock 栏：贴合真机安全区底部 */
+  .dock-wrapper {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    padding: 0 14px max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
   }
 
   /* 模拟刘海条在真机上无意义，隐藏（兼容各页不同的外壳类名） */

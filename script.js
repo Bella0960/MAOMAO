@@ -23,6 +23,11 @@ function showToast(msg) {
 
 // ===== 统一事件委托：所有 data-href 点击跳转 =====
 document.addEventListener('click', function (e) {
+  if (document.body.classList.contains('home-editing')) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
   var target = e.target.closest('[data-href]');
   if (!target) return;
   var href = target.dataset.href;

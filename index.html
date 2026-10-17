@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
@@ -7,18 +7,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="manifest" href="manifest.json" />
-    <title>手机模拟器 · 首页</title>
+    <title>手机模拟器</title>
+    <meta name="description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
+    <meta property="og:title" content="手机模拟器" />
+    <meta property="og:description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
     <script src="font-loader.js"></script>
     <script src="native-feel.js"></script>
     <link rel="stylesheet" href="styles.css?v=20261017v1">
   <link rel="stylesheet" href="mobile-fit.css?v=20261015v3">
-
 </head>
   <body>
-    <div id="bootLoader">
-      <div class="boot-ring"></div>
-      <div class="boot-text">正在准备</div>
-    </div>
     <main class="simulator-stage">
       <section class="phone" aria-label="手机模拟器">
         <div class="phone-camera" aria-hidden="true"></div>
@@ -26,6 +24,9 @@
         <div class="phone-screen">
           <header class="status-bar">
             <time id="status-time">09:41</time>
+            <div class="edit-mode-indicator" id="editModeIndicator" style="display: none;">
+              <button class="edit-done-btn" id="editDoneBtn" type="button">✓ 完成</button>
+            </div>
             <div class="status-icons" aria-label="设备状态">
               <span class="signal-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
               <span class="wifi-icon" aria-hidden="true"></span>
@@ -34,9 +35,208 @@
           </header>
 
           <section class="pages-container" id="homeScreen">
-            <!-- 第一页：教程规范默认布局 -->
+            <!-- 第一页：主屏幕全部应用，进页面即展示完整手机应用网格（4×4共16个应用） -->
             <div class="home-page" data-page="0">
               <div class="desktop-grid" id="gridPage0">
+
+                <button class="app-card app-tile" type="button" data-href="worldbook.html" data-drag="app_worldbook" data-name="世界书" title="世界书">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  </span>
+                  <span class="app-name">世界书</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="memory.html" data-drag="app_memory" data-name="记忆" title="记忆">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/></svg>
+                  </span>
+                  <span class="app-name">记忆</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="profile.html" data-drag="app_profile" data-name="档案" title="档案">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+                  </span>
+                  <span class="app-name">档案</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="moments.html" data-drag="app_moments" data-name="时刻" title="时刻">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </span>
+                  <span class="app-name">时刻</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="forum.html" data-drag="app_forum" data-name="论坛" title="论坛">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </span>
+                  <span class="app-name">论坛</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="wallet.html" data-drag="app_wallet" data-name="钱包" title="钱包">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><circle cx="18" cy="14" r="1"/></svg>
+                  </span>
+                  <span class="app-name">钱包</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="music.html" data-drag="app_music" data-name="音乐" title="音乐">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  </span>
+                  <span class="app-name">音乐</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="beauty.html" data-drag="app_beauty" data-name="头像馆" title="头像馆">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                  </span>
+                  <span class="app-name">头像馆</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="characters.html" data-drag="app_characters" data-name="角色库" title="角色库">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </span>
+                  <span class="app-name">角色库</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="settings.html" data-drag="app_settings" data-name="设置" title="设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </span>
+                  <span class="app-name">设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="finance.html" data-drag="app_finance" data-name="记账" title="记账">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </span>
+                  <span class="app-name">记账</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="footprint.html" data-drag="app_footprint" data-name="足迹" title="足迹">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </span>
+                  <span class="app-name">足迹</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="mask.html" data-drag="app_mask" data-name="面具" title="面具">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v2a8 8 0 0 1-8 8H10a8 8 0 0 1-8-8v-2z"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="16" y2="11"/><path d="M9 15c1 1 3 1 4 0"/></svg>
+                  </span>
+                  <span class="app-name">面具</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="sticker-manager.html" data-drag="app_stickers" data-name="贴纸" title="贴纸">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 15h8"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                  </span>
+                  <span class="app-name">贴纸</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="bubble-theme.html" data-drag="app_bubble" data-name="气泡" title="气泡">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
+                  </span>
+                  <span class="app-name">气泡</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="font-settings.html" data-drag="app_font" data-name="字体" title="字体">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                  </span>
+                  <span class="app-name">字体</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- 第二页：更多应用与趣味互动小组件 -->
+            <div class="home-page" data-page="1">
+              <div class="desktop-grid" id="gridPage1">
+
+                <button class="app-card app-tile" type="button" data-href="sound-settings.html" data-drag="app_sound" data-name="声音" title="声音">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  </span>
+                  <span class="app-name">声音</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="call-settings.html" data-drag="app_callsettings" data-name="通话设置" title="通话设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><circle cx="18" cy="6" r="3"/></svg>
+                  </span>
+                  <span class="app-name">通话设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat-settings.html" data-drag="app_chatsettings" data-name="聊天设置" title="聊天设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
+                  </span>
+                  <span class="app-name">聊天设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="forum-settings.html" data-drag="app_forumsettings" data-name="论坛设置" title="论坛设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                  </span>
+                  <span class="app-name">论坛设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="api-logs.html" data-drag="app_apilogs" data-name="系统日志" title="系统日志">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                  </span>
+                  <span class="app-name">系统日志</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="regex-settings.html" data-drag="app_regex" data-name="正则设置" title="正则设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  </span>
+                  <span class="app-name">正则设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="rp-protocol.html" data-drag="app_rp" data-name="伴侣协议" title="伴侣协议">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="app-name">伴侣协议</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="shop-admin.html" data-drag="app_shopadmin" data-name="店铺管理" title="店铺管理">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  </span>
+                  <span class="app-name">店铺管理</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
 
                 <!-- ========== 明信片组件（4×2）：3层设计 ========== -->
                 <div class="ds-postcard ds-widget" data-drag="postcard">
@@ -47,14 +247,14 @@
                     <div class="pc-name" id="pcName">关于我</div>
                     <div class="pc-sign" id="pcSign">保持微笑 每一刻都值得被记录</div>
                   </div>
-                  <span class="ds-del">×</span>
+                  <span class="ds-del" title="移除组件">×</span>
                 </div>
 
                 <!-- ========== 拍立得相框（2×2）：倾斜双层 ========== -->
-                <div class="po-wrapper" data-drag="polaroid">
+                <div class="po-wrapper ds-widget" data-drag="polaroid">
                   <div class="po-card po-back2"></div>
                   <div class="po-card po-back1"></div>
-                  <div class="po-card po-front ds-widget">
+                  <div class="po-card po-front">
                     <div class="po-img" id="poImg">
                       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#C0C0C5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -64,37 +264,8 @@
                     </div>
                     <span class="po-text">CLICK · UPLOAD</span>
                   </div>
-                  <span class="ds-del">×</span>
+                  <span class="ds-del" title="移除组件">×</span>
                 </div>
-
-                <!-- ========== 默认应用（4个） ========== -->
-                <button class="app-card app-tile" type="button" data-href="chat.html" data-drag="app_chat">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  </span>
-                  <span class="app-name">聊天</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="worldbook.html" data-drag="app_worldbook">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                  </span>
-                  <span class="app-name">世界书</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="memory.html" data-drag="app_memory">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/></svg>
-                  </span>
-                  <span class="app-name">记忆</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="profile.html" data-drag="app_profile">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
-                  </span>
-                  <span class="app-name">档案</span>
-                </button>
 
                 <!-- ========== 小对话组件（2×2） ========== -->
                 <div class="ds-dialog ds-widget" data-drag="dialog">
@@ -106,7 +277,7 @@
                     <div class="dl-bubble" id="dlBubbleMe">刚到，找我？</div>
                     <div class="dl-avatar" id="dlAvatarMe"></div>
                   </div>
-                  <span class="ds-del">×</span>
+                  <span class="ds-del" title="移除组件">×</span>
                 </div>
 
                 <!-- ========== 音乐箱组件（2×2） ========== -->
@@ -126,78 +297,8 @@
                       </div>
                     </div>
                   </div>
-                  <span class="ds-del">×</span>
+                  <span class="ds-del" title="移除组件">×</span>
                 </div>
-
-              </div>
-            </div>
-
-            <!-- 第二页：更多应用 -->
-            <div class="home-page" data-page="1">
-              <div class="desktop-grid" id="gridPage1">
-
-                <button class="app-card app-tile" type="button" data-href="settings.html" data-drag="app_settings">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                  </span>
-                  <span class="app-name">设置</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="music.html" data-drag="app_music">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                  </span>
-                  <span class="app-name">音乐</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="forum.html" data-drag="app_forum">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                  </span>
-                  <span class="app-name">论坛</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="contacts.html" data-drag="app_contacts">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </span>
-                  <span class="app-name">通讯录</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="wallet.html" data-drag="app_wallet">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><circle cx="18" cy="14" r="1"/></svg>
-                  </span>
-                  <span class="app-name">钱包</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="call.html" data-drag="app_call">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  </span>
-                  <span class="app-name">通话</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="moments.html" data-drag="app_moments">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  </span>
-                  <span class="app-name">时刻</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="beauty.html" data-drag="app_beauty">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-                  </span>
-                  <span class="app-name">头像馆</span>
-                </button>
-
-                <button class="app-card app-tile" type="button" data-href="characters.html" data-drag="app_characters">
-                  <span class="app-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-4-4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </span>
-                  <span class="app-name">角色库</span>
-                </button>
 
               </div>
             </div>
@@ -209,15 +310,42 @@
             </div>
           </section>
 
-          <!-- 底部 Dock 栏：默认商店 -->
+          <!-- 底部 Dock 栏：可自由拖入拖出自定义应用 -->
           <footer class="dock-wrapper">
             <div class="dock-bar" id="dockBar" aria-label="快捷应用栏">
-              <button class="dock-item" type="button" data-href="shop.html" data-drag="dock_shop" title="商店">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                  <path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>
-                </svg>
+
+              <button class="dock-item app-tile" type="button" data-href="call.html" data-drag="app_call" data-name="通话" title="通话">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <span class="app-name">通话</span>
+                <span class="ds-del" title="移除">×</span>
               </button>
+
+              <button class="dock-item app-tile" type="button" data-href="chat.html" data-drag="app_chat" data-name="聊天" title="聊天">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span class="app-name">聊天</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+              <button class="dock-item app-tile" type="button" data-href="contacts.html" data-drag="app_contacts" data-name="通讯录" title="通讯录">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="app-name">通讯录</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+              <button class="dock-item app-tile" type="button" data-href="shop.html" data-drag="app_shop" data-name="商店" title="商店">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+                </span>
+                <span class="app-name">商店</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
             </div>
             <div class="gesture-bar" aria-hidden="true"></div>
           </footer>
@@ -243,299 +371,699 @@
     <script src="script.js"></script>
   <script src="statusbar-control.js"></script>
   <script>
-    // ===== 开场加载动画 =====
+    // ===== 手机桌面拖拽引擎：实时自动让位 + 跨页流转 + Dock 自由布局 =====
     (function () {
-      var bootShownAt = Date.now();
-      function hideBootLoader() {
-        var wait = Math.max(0, 400 - (Date.now() - bootShownAt));
-        setTimeout(function () {
-          var el = document.getElementById('bootLoader');
-          if (el) el.classList.add('hide');
-          setTimeout(function () { if (el) el.remove(); }, 400);
-        }, wait);
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', hideBootLoader);
-      } else {
-        hideBootLoader();
-      }
-    })();
+      var LS_KEY = 'ds_layout_v4';
 
-    // ===== 长按编辑 + 拖拽（支持跨页） =====
-    (function () {
-      var LS = 'ds_layout_v2';
-      var LS_OLD = 'ds_layout_v1';
       var editing = false;
+      var isDragging = false;
       var dragEl = null;
-      var clone = null;
-      var edgeScrollTimer = null;
+      var dragClone = null;
+      var placeholder = null;
 
-      function load() {
+      var activePageIndex = 0;
+      var edgeTimer = null;
+      var edgeCooldown = false;
+      var lastEdgeSide = null;
+
+      var pressTimer = null;
+      var startX = 0, startY = 0;
+      var hasMoved = false;
+
+      var homeScreen = document.getElementById('homeScreen');
+      var dockBar = document.getElementById('dockBar');
+      var editModeIndicator = document.getElementById('editModeIndicator');
+      var editDoneBtn = document.getElementById('editDoneBtn');
+
+      // 震动反馈兼容
+      function vibrate(ms) {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(ms); } catch (e) {}
+        }
+      }
+
+      // ===== 布局数据加载与默认全应用首页 =====
+      var LS_KEY = 'ds_layout_v5';
+
+      function getDefaultLayout() {
+        return {
+          pages: [
+            [
+              'app_worldbook', 'app_memory', 'app_profile', 'app_moments',
+              'app_forum', 'app_wallet', 'app_music', 'app_beauty',
+              'app_characters', 'app_settings', 'app_finance', 'app_footprint',
+              'app_mask', 'app_stickers', 'app_bubble', 'app_font'
+            ],
+            [
+              'app_sound', 'app_callsettings', 'app_chatsettings', 'app_forumsettings',
+              'app_apilogs', 'app_regex', 'app_rp', 'app_shopadmin',
+              'postcard', 'polaroid', 'dialog', 'music'
+            ]
+          ],
+          dock: ['app_call', 'app_chat', 'app_contacts', 'app_shop']
+        };
+      }
+
+      function loadLayout() {
         try {
-          var d = JSON.parse(localStorage.getItem(LS));
-          if (d) return d;
-          // 迁移 v1 → v2
-          var old = JSON.parse(localStorage.getItem(LS_OLD)) || {};
-          var migrated = { pages: [], dock: old['order_dockBar'] || null };
-          if (old['order_desktopGrid']) migrated.pages[0] = old['order_desktopGrid'];
-          save(migrated);
-          return migrated;
-        } catch(e) { return {}; }
+          var v = JSON.parse(localStorage.getItem(LS_KEY));
+          if (v && Array.isArray(v.pages) && v.pages.length > 0 && Array.isArray(v.pages[0]) && v.pages[0].length >= 4 && Array.isArray(v.dock)) {
+            return v;
+          }
+        } catch (e) {}
+        return getDefaultLayout();
       }
-      function save(d) { try { localStorage.setItem(LS, JSON.stringify(d)); } catch(e) {} }
-      var layout = load();
 
-      // 工具：获取当前可见的 desktop-grid
-      function getVisibleGrid() {
-        var container = document.getElementById('homeScreen');
-        if (!container) return document.querySelector('.desktop-grid');
-        var pages = container.querySelectorAll('.home-page');
-        var best = null, bestDist = Infinity;
-        pages.forEach(function (p) {
-          var r = p.getBoundingClientRect();
-          var center = r.left + r.width / 2;
-          var dist = Math.abs(center - window.innerWidth / 2);
-          if (dist < bestDist) { bestDist = dist; best = p; }
+      function saveLayout(data) {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(data));
+        } catch (e) {}
+      }
+
+      var currentLayout = loadLayout();
+
+      // ===== 恢复布局到 DOM =====
+      function restoreLayout() {
+        if (!homeScreen || !dockBar) return;
+
+        // 确保桌面页数与配置匹配
+        var pages = Array.from(homeScreen.querySelectorAll('.home-page'));
+        var requiredPages = Math.max(2, currentLayout.pages.length);
+
+        while (pages.length < requiredPages) {
+          var newPageIndex = pages.length;
+          var newPage = document.createElement('div');
+          newPage.className = 'home-page';
+          newPage.dataset.page = String(newPageIndex);
+          newPage.innerHTML = '<div class="desktop-grid" id="gridPage' + newPageIndex + '"></div>';
+          homeScreen.appendChild(newPage);
+          pages.push(newPage);
+        }
+
+        // 把现有所有 data-drag 元素建立索引
+        var itemMap = {};
+        document.querySelectorAll('[data-drag]').forEach(function (el) {
+          var id = el.dataset.drag;
+          if (id) itemMap[id] = el;
         });
-        return best ? best.querySelector('.desktop-grid') : document.querySelector('.desktop-grid');
+
+        // 1. 恢复 Dock
+        if (Array.isArray(currentLayout.dock)) {
+          currentLayout.dock.forEach(function (id) {
+            var el = itemMap[id];
+            if (el) {
+              setElementAsDock(el);
+              dockBar.appendChild(el);
+              delete itemMap[id];
+            }
+          });
+        }
+
+        // 2. 恢复桌面各页
+        pages = Array.from(homeScreen.querySelectorAll('.home-page'));
+        if (Array.isArray(currentLayout.pages)) {
+          currentLayout.pages.forEach(function (pageIds, pi) {
+            var page = pages[pi];
+            if (!page) return;
+            var grid = page.querySelector('.desktop-grid');
+            if (!grid) return;
+            if (Array.isArray(pageIds)) {
+              pageIds.forEach(function (id) {
+                var el = itemMap[id];
+                if (el) {
+                  setElementAsDesktop(el);
+                  grid.appendChild(el);
+                  delete itemMap[id];
+                }
+              });
+            }
+          });
+        }
+
+        // 3. 如果还有未放置的应用，自动补到第二页或第一页末尾
+        var remainingIds = Object.keys(itemMap);
+        if (remainingIds.length > 0) {
+          var fallbackPage = pages[1] || pages[0];
+          var fallbackGrid = fallbackPage ? fallbackPage.querySelector('.desktop-grid') : null;
+          if (fallbackGrid) {
+            remainingIds.forEach(function (id) {
+              var el = itemMap[id];
+              setElementAsDesktop(el);
+              fallbackGrid.appendChild(el);
+            });
+          }
+        }
+
+        updateDotsUI();
       }
 
+      // 样式归一化转换
+      function setElementAsDock(el) {
+        if (!el) return;
+        el.classList.remove('app-card');
+        el.classList.add('dock-item', 'app-tile');
+      }
+
+      function setElementAsDesktop(el) {
+        if (!el) return;
+        el.classList.remove('dock-item');
+        if (!el.classList.contains('ds-widget')) {
+          el.classList.add('app-card', 'app-tile');
+        }
+      }
+
+      // ===== 当前可见页与指示点 =====
+      function getPages() {
+        return Array.from(homeScreen.querySelectorAll('.home-page'));
+      }
+
+      function getCurrentPageFromScroll() {
+        if (!homeScreen) return 0;
+        var pw = homeScreen.clientWidth || 360;
+        return Math.max(0, Math.round(homeScreen.scrollLeft / pw));
+      }
+
+      function updateDotsUI() {
+        var dotsContainer = document.querySelector('.page-dots');
+        if (!dotsContainer) return;
+        var pages = getPages();
+        dotsContainer.innerHTML = '';
+        pages.forEach(function (_, i) {
+          var dot = document.createElement('span');
+          dot.className = 'dot' + (i === activePageIndex ? ' active' : '');
+          dot.dataset.page = String(i);
+          dot.addEventListener('click', function () {
+            goToPage(i);
+          });
+          dotsContainer.appendChild(dot);
+        });
+      }
+
+      function goToPage(index) {
+        var pages = getPages();
+        if (index < 0 || index >= pages.length) return;
+        activePageIndex = index;
+        var pw = homeScreen.clientWidth || 360;
+        homeScreen.scrollTo({ left: index * pw, behavior: 'smooth' });
+        var dots = document.querySelectorAll('.page-dots .dot');
+        dots.forEach(function (d, i) {
+          d.classList.toggle('active', i === index);
+        });
+      }
+
+      // 动态新建页面（最多 4 页）
+      function createPageIfNeeded() {
+        var pages = getPages();
+        if (pages.length >= 4) return null;
+        var newIdx = pages.length;
+        var newPage = document.createElement('div');
+        newPage.className = 'home-page';
+        newPage.dataset.page = String(newIdx);
+        newPage.innerHTML = '<div class="desktop-grid" id="gridPage' + newIdx + '"></div>';
+        homeScreen.appendChild(newPage);
+        updateDotsUI();
+        return newPage;
+      }
+
+      // 清理末尾空页
+      function cleanupEmptyTrailingPages() {
+        var pages = getPages();
+        if (pages.length <= 2) return;
+        for (var i = pages.length - 1; i >= 2; i--) {
+          var p = pages[i];
+          var items = p.querySelectorAll('[data-drag]');
+          if (items.length === 0) {
+            p.remove();
+          } else {
+            break;
+          }
+        }
+        updateDotsUI();
+      }
+
+      // ===== 进入与退出编辑模式 =====
       function enterEdit() {
+        if (editing) return;
         editing = true;
         document.body.classList.add('home-editing');
+        if (editModeIndicator) editModeIndicator.style.display = 'flex';
+        vibrate(25);
       }
+
       function exitEdit() {
+        if (!editing) return;
         editing = false;
         document.body.classList.remove('home-editing');
-        if (clone) { clone.remove(); clone = null; }
-        if (dragEl) { dragEl.classList.remove('dragging'); dragEl.style.opacity = ''; dragEl = null; }
-        if (edgeScrollTimer) { clearInterval(edgeScrollTimer); edgeScrollTimer = null; }
+        if (editModeIndicator) editModeIndicator.style.display = 'none';
+
+        if (isDragging) endDrag();
+        cleanupEmptyTrailingPages();
+        persistCurrentDOM();
       }
 
-      // 边缘自动滚动
-      function startEdgeScroll(cx) {
-        if (edgeScrollTimer) return;
-        var container = document.getElementById('homeScreen');
-        if (!container) return;
-        edgeScrollTimer = setInterval(function () {
-          var rect = container.getBoundingClientRect();
-          if (cx < rect.left + 30) {
-            container.scrollLeft -= 60;
-          } else if (cx > rect.right - 30) {
-            container.scrollLeft += 60;
-          }
-        }, 80);
-      }
-      function stopEdgeScroll() {
-        if (edgeScrollTimer) { clearInterval(edgeScrollTimer); edgeScrollTimer = null; }
-      }
-
-      // 查找最近的兄弟元素（在整个可见区域内）
-      function findClosest(targetX, targetY) {
-        // 在所有 desktop-grid 的 [data-drag] 里找最近的（排除 dragEl 自身 + dock 栏）
-        var all = document.querySelectorAll('.desktop-grid [data-drag]');
-        var closest = null, minDist = 99999;
-        all.forEach(function (s) {
-          if (s === dragEl) return;
-          var r = s.getBoundingClientRect();
-          var cx = r.left + r.width/2, cy = r.top + r.height/2;
-          var d = Math.sqrt((targetX-cx)*(targetX-cx) + (targetY-cy)*(targetY-cy));
-          if (d < minDist) { minDist = d; closest = s; }
+      if (editDoneBtn) {
+        editDoneBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          exitEdit();
         });
-        return closest;
       }
 
-      function doSwap(targetX, targetY) {
-        if (!dragEl) return;
-        // dock 栏：只在 dockBar 内交换
-        var isDock = dragEl.closest('.dock-bar');
-        if (isDock) {
-          var dockSiblings = document.querySelectorAll('#dockBar [data-drag]');
-          var closest = null, minDist = 99999;
-          dockSiblings.forEach(function (s) {
-            if (s === dragEl) return;
-            var r = s.getBoundingClientRect();
-            var cx = r.left + r.width/2, cy = r.top + r.height/2;
-            var d = Math.sqrt((targetX-cx)*(targetX-cx) + (targetY-cy)*(targetY-cy));
-            if (d < minDist) { minDist = d; closest = s; }
+      // ===== 保存当前 DOM 顺序 =====
+      function persistCurrentDOM() {
+        var pages = getPages();
+        var pagesOrder = [];
+        pages.forEach(function (p) {
+          var ids = [];
+          p.querySelectorAll('.desktop-grid > [data-drag]').forEach(function (el) {
+            if (el.dataset.drag) ids.push(el.dataset.drag);
           });
-          if (closest && minDist < 80) {
-            document.getElementById('dockBar').insertBefore(dragEl, closest.nextSibling);
-            var order = [];
-            document.querySelectorAll('#dockBar [data-drag]').forEach(function (el) { order.push(el.dataset.drag); });
-            layout.dock = order; save(layout);
+          pagesOrder.push(ids);
+        });
+
+        var dockOrder = [];
+        dockBar.querySelectorAll('#dockBar > [data-drag]').forEach(function (el) {
+          if (el.dataset.drag) dockOrder.push(el.dataset.drag);
+        });
+
+        currentLayout = { pages: pagesOrder, dock: dockOrder };
+        saveLayout(currentLayout);
+      }
+
+      // ===== 拖拽系统核心实现 =====
+      function startDrag(targetItem, cx, cy) {
+        if (!targetItem) return;
+        if (!editing) enterEdit();
+
+        isDragging = true;
+        dragEl = targetItem;
+
+        var isWidget = dragEl.classList.contains('ds-widget');
+        var dragId = dragEl.dataset.drag;
+
+        // 创建占位符（保持尺寸，确保 CSS 网格其他元素自然推移让位）
+        placeholder = document.createElement('div');
+        placeholder.className = 'drag-placeholder';
+
+        if (isWidget) {
+          if (dragId === 'postcard') {
+            placeholder.classList.add('span-4');
+          } else {
+            placeholder.classList.add('span-2');
+          }
+        }
+
+        // 把占位符插入源位置
+        if (dragEl.parentNode) {
+          dragEl.parentNode.insertBefore(placeholder, dragEl);
+        }
+
+        // 隐藏原元素
+        dragEl.classList.add('is-dragging-source');
+
+        // 创建浮动镜像并跟随手势
+        dragClone = dragEl.cloneNode(true);
+        dragClone.classList.add('drag-avatar');
+        dragClone.classList.remove('is-dragging-source');
+        var delIcon = dragClone.querySelector('.ds-del');
+        if (delIcon) delIcon.remove();
+
+        dragClone.style.left = cx + 'px';
+        dragClone.style.top = cy + 'px';
+        document.body.appendChild(dragClone);
+
+        vibrate(18);
+      }
+
+      function moveDrag(cx, cy) {
+        if (!isDragging || !dragClone || !placeholder) return;
+
+        // 1. 跟随手指
+        dragClone.style.left = cx + 'px';
+        dragClone.style.top = cy + 'px';
+
+        // 2. 跨页边缘触发检测（拖拽至左右边缘停留时滑向上一页/下一页）
+        var cRect = homeScreen.getBoundingClientRect();
+        var edgeThreshold = 42;
+        var pages = getPages();
+
+        if (cx < cRect.left + edgeThreshold) {
+          // 左边缘
+          if (activePageIndex > 0 && !edgeCooldown) {
+            if (lastEdgeSide !== 'left') {
+              lastEdgeSide = 'left';
+              clearTimeout(edgeTimer);
+              edgeTimer = setTimeout(function () {
+                if (!isDragging) return;
+                var targetIdx = activePageIndex - 1;
+                goToPage(targetIdx);
+                // 把占位符带到新页
+                var newGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                if (newGrid && placeholder.parentNode !== newGrid) {
+                  newGrid.appendChild(placeholder);
+                }
+                vibrate(15);
+                edgeCooldown = true;
+                setTimeout(function () { edgeCooldown = false; }, 480);
+              }, 320);
+            }
+          }
+        } else if (cx > cRect.right - edgeThreshold) {
+          // 右边缘
+          if (!edgeCooldown) {
+            if (lastEdgeSide !== 'right') {
+              lastEdgeSide = 'right';
+              clearTimeout(edgeTimer);
+              edgeTimer = setTimeout(function () {
+                if (!isDragging) return;
+                var targetIdx = activePageIndex + 1;
+                if (targetIdx < pages.length) {
+                  goToPage(targetIdx);
+                  var newGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                  if (newGrid && placeholder.parentNode !== newGrid) {
+                    newGrid.appendChild(placeholder);
+                  }
+                  vibrate(15);
+                } else if (pages.length < 4) {
+                  // 在末尾拉出新页
+                  createPageIfNeeded();
+                  pages = getPages();
+                  targetIdx = pages.length - 1;
+                  goToPage(targetIdx);
+                  var freshGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                  if (freshGrid && placeholder.parentNode !== freshGrid) {
+                    freshGrid.appendChild(placeholder);
+                  }
+                  vibrate(15);
+                }
+                edgeCooldown = true;
+                setTimeout(function () { edgeCooldown = false; }, 480);
+              }, 320);
+            }
+          }
+        } else {
+          // 离开了边缘区
+          lastEdgeSide = null;
+          if (edgeTimer) {
+            clearTimeout(edgeTimer);
+            edgeTimer = null;
+          }
+        }
+
+        // 3. 实时碰撞检测与自动让位
+        var dockRect = dockBar.getBoundingClientRect();
+        var isOverDock = (
+          cy >= dockRect.top - 16 &&
+          cy <= dockRect.bottom + 20 &&
+          cx >= dockRect.left - 10 &&
+          cx <= dockRect.right + 10
+        );
+
+        var isWidget = dragEl.classList.contains('ds-widget');
+
+        if (isOverDock) {
+          // 悬停在底部 Dock 栏上方
+          if (isWidget) {
+            // 组件不可放置到底部 Dock 栏，提示或保持在当前桌面
+            return;
+          }
+
+          var dockItems = Array.from(dockBar.children).filter(function (child) {
+            return child !== placeholder && child !== dragEl;
+          });
+
+          // 限制 Dock 最多容纳 5 个应用
+          if (dockItems.length >= 5 && placeholder.parentNode !== dockBar) {
+            return;
+          }
+
+          // 寻找插入位置（水平排列让位）
+          var targetDockSibling = null;
+          for (var i = 0; i < dockItems.length; i++) {
+            var itemRect = dockItems[i].getBoundingClientRect();
+            var midX = itemRect.left + itemRect.width / 2;
+            if (cx < midX) {
+              targetDockSibling = dockItems[i];
+              break;
+            }
+          }
+
+          if (placeholder.parentNode !== dockBar || placeholder.nextSibling !== targetDockSibling) {
+            dockBar.insertBefore(placeholder, targetDockSibling);
+          }
+
+        } else {
+          // 悬停在桌面网格区
+          pages = getPages();
+          var curPage = pages[activePageIndex] || pages[0];
+          if (!curPage) return;
+          var curGrid = curPage.querySelector('.desktop-grid');
+          if (!curGrid) return;
+
+          var gridItems = Array.from(curGrid.children).filter(function (child) {
+            return child !== placeholder && child !== dragEl;
+          });
+
+          if (gridItems.length === 0) {
+            if (placeholder.parentNode !== curGrid) {
+              curGrid.appendChild(placeholder);
+            }
+            return;
+          }
+
+          // 寻找最佳插入网格槽位并进行动态插队让位
+          var hitSibling = null;
+          var closestSibling = null;
+          var minDistance = Infinity;
+
+          for (var j = 0; j < gridItems.length; j++) {
+            var el = gridItems[j];
+            var r = el.getBoundingClientRect();
+            var itemCenterX = r.left + r.width / 2;
+            var itemCenterY = r.top + r.height / 2;
+
+            // 1. 直接命中当前元素边界：即刻确定在其前或在其后
+            if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
+              hitSibling = (cx < itemCenterX) ? el : el.nextSibling;
+              break;
+            }
+
+            // 2. 距离中心最近的元素容差判定
+            var dist = Math.hypot(cx - itemCenterX, cy - itemCenterY);
+            if (dist < minDistance) {
+              minDistance = dist;
+              if (cy < itemCenterY - 14 || (Math.abs(cy - itemCenterY) <= 32 && cx < itemCenterX)) {
+                closestSibling = el;
+              } else {
+                closestSibling = el.nextSibling;
+              }
+            }
+          }
+
+          var targetSibling = hitSibling || closestSibling;
+          if (placeholder.parentNode !== curGrid || placeholder.nextSibling !== targetSibling) {
+            curGrid.insertBefore(placeholder, targetSibling);
+          }
+        }
+      }
+
+      function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (edgeTimer) {
+          clearTimeout(edgeTimer);
+          edgeTimer = null;
+        }
+
+        if (dragEl && placeholder && placeholder.parentNode) {
+          var targetParent = placeholder.parentNode;
+
+          // 替换占位符
+          targetParent.insertBefore(dragEl, placeholder);
+          placeholder.remove();
+          placeholder = null;
+
+          // 恢复显示
+          dragEl.classList.remove('is-dragging-source');
+          dragEl.style.display = '';
+
+          // 根据归属地应用对应样式
+          if (targetParent.id === 'dockBar') {
+            setElementAsDock(dragEl);
+          } else {
+            setElementAsDesktop(dragEl);
+          }
+
+          vibrate(22);
+        }
+
+        if (dragClone) {
+          dragClone.remove();
+          dragClone = null;
+        }
+
+        dragEl = null;
+
+        // 清理空页与持久化
+        cleanupEmptyTrailingPages();
+        persistCurrentDOM();
+      }
+
+      // ===== 事件监听：触摸手势与鼠标 =====
+      // 1. Touch Events
+      document.addEventListener('touchstart', function (e) {
+        var t = e.target.closest('[data-drag]');
+        if (!t) return;
+        if (e.target.classList.contains('ds-del')) return;
+
+        var touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        hasMoved = false;
+
+        if (editing) {
+          // 编辑模式下点按直接准备拖拽
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 40);
+        } else {
+          // 常态下长按 280ms 触发编辑模式与拖拽
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 280);
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!e.touches || !e.touches[0]) return;
+        var touch = e.touches[0];
+        var cx = touch.clientX, cy = touch.clientY;
+
+        if (pressTimer) {
+          if (Math.hypot(cx - startX, cy - startY) > 9) {
+            // 手指滑动位移大于阈值，判定为普通页面滑动，取消长按
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        }
+
+        if (isDragging) {
+          if (e.cancelable) e.preventDefault();
+          moveDrag(cx, cy);
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      document.addEventListener('touchcancel', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      // 2. Mouse Events
+      document.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        var t = e.target.closest('[data-drag]');
+        if (!t) return;
+        if (e.target.classList.contains('ds-del')) return;
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        if (editing) {
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 30);
+        } else {
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 260);
+        }
+      });
+
+      document.addEventListener('mousemove', function (e) {
+        if (pressTimer) {
+          if (Math.hypot(e.clientX - startX, e.clientY - startY) > 8) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        }
+        if (isDragging) {
+          e.preventDefault();
+          moveDrag(e.clientX, e.clientY);
+        }
+      });
+
+      document.addEventListener('mouseup', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      // 3. 点击事件处理：删除组件/退出编辑
+      document.addEventListener('click', function (e) {
+        if (!editing) return;
+
+        // 点击红叉删除组件或应用
+        if (e.target.classList.contains('ds-del')) {
+          e.stopPropagation();
+          e.preventDefault();
+          var item = e.target.closest('[data-drag]');
+          if (item) {
+            item.remove();
+            cleanupEmptyTrailingPages();
+            persistCurrentDOM();
           }
           return;
         }
 
-        // 桌面：找到最近的桌面元素 + 目标页
-        var closestEl = findClosest(targetX, targetY);
-        var targetGrid = getVisibleGrid();
-        if (!targetGrid) return;
-
-        if (closestEl) {
-          var closestGrid = closestEl.closest('.desktop-grid');
-          // 如果最近元素和当前可见页不同，用最近元素的页
-          if (closestGrid) targetGrid = closestGrid;
-          var r = closestEl.getBoundingClientRect();
-          var cx = r.left + r.width/2, cy = r.top + r.height/2;
-          var d = Math.sqrt((targetX-cx)*(targetX-cx) + (targetY-cy)*(targetY-cy));
-          if (d < 80) {
-            targetGrid.insertBefore(dragEl, closestEl.nextSibling);
-          } else {
-            targetGrid.appendChild(dragEl);
-          }
-        } else {
-          targetGrid.appendChild(dragEl);
-        }
-
-        // 保存所有页顺序
-        var pages = document.querySelectorAll('.home-page');
-        layout.pages = [];
-        pages.forEach(function (page) {
-          var order = [];
-          page.querySelectorAll('[data-drag]').forEach(function (el) { order.push(el.dataset.drag); });
-          layout.pages.push(order);
-        });
-        save(layout);
-      }
-
-      function startDrag(e) {
-        var t = e.target.closest('[data-drag]');
-        if (!t) return;
-        if (!editing) enterEdit();
-        dragEl = t;
-        dragEl.classList.add('dragging');
-        dragEl.style.opacity = '0.3';
-        clone = t.cloneNode(true);
-        clone.style.cssText = 'position:fixed;z-index:99999;pointer-events:none;opacity:0.85;transform:translate(-50%,-50%);margin:0;box-shadow:0 4px 16px rgba(0,0,0,0.2);';
-        document.body.appendChild(clone);
-        var cx, cy;
-        if (e.touches && e.touches[0]) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
-        else { cx = e.clientX; cy = e.clientY; }
-        clone.style.left = cx + 'px'; clone.style.top = cy + 'px';
-        startEdgeScroll(cx);
-      }
-
-      function moveDrag(e) {
-        if (!clone) return;
-        var cx, cy;
-        if (e.touches && e.touches[0]) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
-        else { cx = e.clientX; cy = e.clientY; }
-        clone.style.left = cx + 'px'; clone.style.top = cy + 'px';
-        // 更新边缘滚动检测位置
-        if (dragEl && !dragEl.closest('.dock-bar')) startEdgeScroll(cx);
-      }
-
-      function endDrag(e) {
-        if (!dragEl) return;
-        stopEdgeScroll();
-        var cx, cy;
-        if (e.changedTouches && e.changedTouches[0]) { cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
-        else if (e.clientX !== undefined) { cx = e.clientX; cy = e.clientY; }
-        doSwap(cx, cy);
-        dragEl.classList.remove('dragging');
-        dragEl.style.opacity = '';
-        if (clone) { clone.remove(); clone = null; }
-        dragEl = null;
-      }
-
-      // 长按检测（触摸 + 鼠标）
-      var pressTimer = null;
-      document.addEventListener('touchstart', function (e) {
-        if (editing) return;
-        if (!e.target.closest('[data-drag]')) return;
-        pressTimer = setTimeout(function () { pressTimer = null; startDrag(e); }, 300);
-      }, { passive: true });
-      document.addEventListener('touchmove', function () { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }, { passive: true });
-      document.addEventListener('touchend', function () { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } endDrag(e); });
-      document.addEventListener('touchcancel', function () { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
-
-      var mouseTimer = null;
-      document.addEventListener('mousedown', function (e) {
-        if (editing) return;
-        if (e.button !== 0) return;
-        if (!e.target.closest('[data-drag]')) return;
-        mouseTimer = setTimeout(function () { mouseTimer = null; startDrag(e); }, 250);
-      });
-      document.addEventListener('mousemove', function (e) {
-        if (mouseTimer) { clearTimeout(mouseTimer); mouseTimer = null; }
-        moveDrag(e);
-      });
-      document.addEventListener('mouseup', function (e) {
-        if (mouseTimer) { clearTimeout(mouseTimer); mouseTimer = null; }
-        endDrag(e);
-      });
-
-      // 编辑模式下：点空白退出；点 × 删除
-      document.addEventListener('click', function (e) {
-        if (editing) {
-          if (e.target.classList.contains('ds-del')) {
-            e.stopPropagation();
-            var item = e.target.closest('[data-drag]');
-            if (item) item.style.display = 'none';
-            return;
-          }
-          if (!e.target.closest('[data-drag]') && !e.target.classList.contains('dot')) {
-            exitEdit();
-          }
+        // 点击空白区域退出编辑模式
+        if (
+          !e.target.closest('[data-drag]') &&
+          !e.target.closest('.dot') &&
+          !e.target.closest('#editModeIndicator')
+        ) {
+          exitEdit();
         }
       }, true);
 
-      // 恢复顺序（多页 + dock）
-      function restoreLayout() {
-        // 桌面：按页恢复
-        var pages = document.querySelectorAll('.home-page');
-        if (layout.pages && Array.isArray(layout.pages)) {
-          layout.pages.forEach(function (order, pi) {
-            var page = pages[pi];
-            if (!page || !order) return;
-            var grid = page.querySelector('.desktop-grid');
-            if (!grid) return;
-            order.forEach(function (id) {
-              var el = document.querySelector('[data-drag="' + id + '"]');
-              if (el && !el.closest('.dock-bar')) grid.appendChild(el);
-            });
-          });
-        }
-        // Dock 恢复
-        if (layout.dock && Array.isArray(layout.dock)) {
-          var dock = document.getElementById('dockBar');
-          if (dock) {
-            layout.dock.forEach(function (id) {
-              var el = document.querySelector('#dockBar [data-drag="' + id + '"]');
-              if (el) dock.appendChild(el);
+      // 4. 监听桌面横向滑动同步 dot
+      if (homeScreen) {
+        homeScreen.addEventListener('scroll', function () {
+          var cur = getCurrentPageFromScroll();
+          if (cur !== activePageIndex) {
+            activePageIndex = cur;
+            var dots = document.querySelectorAll('.page-dots .dot');
+            dots.forEach(function (d, i) {
+              d.classList.toggle('active', i === cur);
             });
           }
-        }
+        }, { passive: true });
       }
+
+      // 初始化桌面恢复
       restoreLayout();
-
-      // ===== page-dots 联动 =====
-      var container = document.getElementById('homeScreen');
-      var dots = document.querySelectorAll('.page-dots .dot');
-      var activeIndex = 0;
-
-      function updateDots() {
-        if (!container) return;
-        var pageWidth = container.clientWidth;
-        var idx = Math.round(container.scrollLeft / pageWidth);
-        if (idx !== activeIndex && idx >= 0 && idx < dots.length) {
-          activeIndex = idx;
-          dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
-        }
-      }
-      if (container) {
-        container.addEventListener('scroll', updateDots, { passive: true });
-      }
-      // 点 dot 跳页
-      dots.forEach(function (dot) {
-        dot.addEventListener('click', function () {
-          if (!container) return;
-          var idx = parseInt(dot.dataset.page, 10) || 0;
-          container.scrollTo({ left: idx * container.clientWidth, behavior: 'smooth' });
-        });
-      });
     })();
 
     // ===== 四个桌面组件交互 =====

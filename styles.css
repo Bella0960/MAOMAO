@@ -32,8 +32,8 @@ button { color: inherit; font: inherit; }
   display: grid;
   min-height: 100vh;
   place-items: center;
-  padding: 36px 20px 30px;
-  background: #ffffff !important;
+  padding: 30px 20px 24px;
+  background: #f0f2f5 !important;
 }
 
 /* 一、 桌面背景与外框 */
@@ -42,11 +42,11 @@ button { color: inherit; font: inherit; }
   display: flex;
   flex-direction: column;
   width: min(390px, calc(100vw - 24px));
-  height: min(844px, calc(100vh - 96px));
-  border: 8px solid #ffffff !important;
-  border-radius: 45px !important;
+  height: min(844px, calc(100vh - 70px));
+  border: 10px solid #1c1c1e !important;
+  border-radius: 48px !important;
   background: #ffffff !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 2px 10px rgba(0,0,0,0.08) !important;
   overflow: hidden;
 }
 
@@ -167,13 +167,15 @@ button { color: inherit; font: inherit; }
   background: #333333 !important;
 }
 
-/* 多页桌面容器：横向 scroll-snap */
+/* 多页桌面容器：横向 scroll-snap flex 布局 */
 .pages-container {
-  display: block !important;
-  flex: 1;
-  padding: 32px 14px 24px;
+  display: flex !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  padding: 10px 0 14px;
   background: transparent !important;
-  overflow-x: scroll !important;
+  overflow-x: auto !important;
   overflow-y: hidden !important;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
@@ -184,15 +186,21 @@ button { color: inherit; font: inherit; }
 }
 .pages-container::-webkit-scrollbar { display: none; }
 
-/* 单页：占满容器宽度，inline-block 在 nowrap 容器里横排 */
+/* 单页：占满容器宽度，flex 项横向自适应 */
 .home-page {
-  display: inline-block;
+  flex: 0 0 100%;
   width: 100%;
+  height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  white-space: normal; /* 恢复子元素正常换行 */
+  white-space: normal;
   vertical-align: top;
   box-sizing: border-box;
+  padding: 4px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 页面指示器 */
@@ -462,46 +470,68 @@ button { color: inherit; font: inherit; }
   letter-spacing: 0.02em;
 }
 
-/* 五、 底部 Dock 栏（悬浮圆角长方形磨砂玻璃栏） */
+/* 五、 底部 Dock 栏（悬浮圆角磨砂玻璃栏） */
 .dock-wrapper {
   padding: 0 16px 8px;
   background: transparent !important;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
 }
 
 .dock-bar {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
-  height: 60px;
-  border-radius: 22px !important;
-  background: var(--icon-bg, #F8F8FA) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin-bottom: 12px;
-  transition: background-color .2s ease;
+  height: 66px;
+  min-height: 66px;
+  border-radius: 26px !important;
+  background: rgba(246, 246, 249, 0.85) !important;
+  backdrop-filter: blur(25px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(1.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06) !important;
+  margin-bottom: 8px;
+  padding: 0 8px;
+  gap: 8px;
+  transition: all .2s ease;
 }
 
-.dock-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: none;
+.dock-bar .dock-item,
+.dock-bar .app-card,
+.dock-bar .app-tile {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 50px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  border: none !important;
   background: transparent !important;
   cursor: pointer;
-  border-radius: 14px;
-  transition: transform .2s ease;
-}
-.dock-item:hover, .dock-item:focus-visible {
-  transform: scale(1.08);
-  outline: none;
+  border-radius: 17px;
+  transition: transform .2s ease, opacity .2s ease;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.dock-item svg {
+.dock-bar .dock-item:active,
+.dock-bar .app-tile:active {
+  transform: scale(0.92);
+}
+
+.dock-bar .app-name {
+  display: none !important;
+}
+
+.dock-bar .app-icon {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 17px !important;
+}
+
+.dock-bar .app-icon svg {
   width: 22px !important;
   height: 22px !important;
   stroke: #111111 !important;
@@ -674,44 +704,181 @@ button { color: inherit; font: inherit; }
   font-size: 0.813rem; color: #999999; letter-spacing: 1px;
 }
 
-/* ===== 桌面网格：4列固定网格 ===== */
+/* ===== 桌面网格：4列标准手机桌面网格 ===== */
 .desktop-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 0;
+  gap: 16px 10px;
+  padding: 2px 2px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  align-content: start;
 }
-.desktop-grid [class*="-widget"] { grid-column: span 2; }
-.desktop-grid .app-tile { grid-column: span 1; }
+.desktop-grid [class*="-widget"],
+.desktop-grid .ds-widget {
+  grid-column: span 2;
+}
+.desktop-grid .app-tile,
+.desktop-grid .app-card,
+.desktop-grid .dock-item {
+  grid-column: span 1;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer;
+  position: relative;
+  transition: transform .2s ease;
+}
+.desktop-grid .app-name {
+  display: block !important;
+  color: #333333 !important;
+  font-size: 0.688rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.02em;
+  text-align: center;
+  max-width: 64px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.desktop-grid .app-icon {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+}
 
-/* ===== 长按编辑模式 ===== */
+/* 状态栏编辑模式指示器与完成按钮 */
+.edit-mode-indicator {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+}
+.edit-done-btn {
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.edit-done-btn:active {
+  transform: scale(0.95);
+  background: #333333;
+}
+
+/* ===== 长按编辑模式（抖动与徽章） ===== */
 .home-editing .app-tile,
+.home-editing .dock-item,
 .home-editing .ds-widget {
-  animation: wiggle 0.28s ease-in-out infinite;
+  animation: wiggle 0.28s ease-in-out infinite alternate !important;
   position: relative;
 }
-.home-editing .dock-item { animation: none; }
-@keyframes wiggle {
-  0%, 100% { transform: rotate(-1deg); }
-  50% { transform: rotate(1deg); }
+.home-editing .app-tile:nth-child(2n),
+.home-editing .dock-item:nth-child(2n) {
+  animation-duration: 0.31s !important;
+  animation-delay: -0.06s !important;
 }
+.home-editing .app-tile:nth-child(3n),
+.home-editing .dock-item:nth-child(3n) {
+  animation-duration: 0.26s !important;
+  animation-delay: -0.12s !important;
+}
+@keyframes wiggle {
+  0% { transform: rotate(-1.2deg) translateY(-0.5px); }
+  100% { transform: rotate(1.2deg) translateY(0.5px); }
+}
+
 .ds-del {
   position: absolute;
-  top: -8px; right: -8px;
-  width: 20px; height: 20px;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #FF3B30;
   color: #fff;
   font-size: 13px;
+  font-weight: 600;
   line-height: 20px;
   text-align: center;
   cursor: pointer;
   z-index: 300;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   display: none;
+  border: 1.5px solid #ffffff;
 }
 .home-editing .ds-del { display: block; }
-.dragging { opacity: 0.3 !important; }
+
+/* 拖拽占位符与自动让位效果 */
+.drag-placeholder {
+  box-sizing: border-box !important;
+  border: 2px dashed rgba(0, 122, 255, 0.45) !important;
+  background: rgba(0, 122, 255, 0.08) !important;
+  border-radius: 20px !important;
+  pointer-events: none !important;
+  animation: placeholderPulse 1.2s ease-in-out infinite alternate !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease !important;
+}
+@keyframes placeholderPulse {
+  0% { opacity: 0.55; }
+  100% { opacity: 0.95; }
+}
+
+.desktop-grid .drag-placeholder {
+  grid-column: span 1;
+  min-height: 78px;
+  height: 80px;
+}
+.desktop-grid .drag-placeholder.span-4 {
+  grid-column: span 4 !important;
+  grid-row: span 2 !important;
+  aspect-ratio: 16/9;
+  min-height: 130px;
+}
+.desktop-grid .drag-placeholder.span-2 {
+  grid-column: span 2 !important;
+  grid-row: span 2 !important;
+  aspect-ratio: 1 !important;
+}
+
+.dock-bar .drag-placeholder {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 17px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 拖拽时的浮空镜像 */
+.drag-avatar {
+  position: fixed !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+  transform: translate(-50%, -50%) scale(1.1) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28) !important;
+  opacity: 0.92 !important;
+  margin: 0 !important;
+  transition: transform 0.06s ease !important;
+}
+.drag-avatar .ds-del {
+  display: none !important;
+}
+
+.is-dragging-source {
+  display: none !important;
+}
 
 /* ===== 明信片组件（4×2） ===== */
 .ds-postcard {

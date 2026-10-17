@@ -28,8 +28,6 @@
         '    user-select: text;',
         '    -webkit-touch-callout: default;',
         '}',
-        /* 启动淡入态（首屏绘制前）与跳转淡出态（点击链接后） */
-        'html.nf-boot, html.nf-hide { opacity: 0 !important; }',
         /* 消除双击缩放延迟 */
         'a, button, [role="button"] { touch-action: manipulation; }',
         /* 按压反馈：瞬间缩放，最接近原生手感（不加过渡，避免覆盖各按钮已有 transition） */
@@ -39,18 +37,13 @@
     style.textContent = css;
     document.head.appendChild(style);
 
-    /* ---------- 二、启动淡入：首屏绘制前先整页透明，加载完成后 150ms 淡入 ---------- */
+    /* ---------- 二、确保首屏可见 ---------- */
     function showPage() {
         var de = document.documentElement;
         de.classList.remove('nf-boot');
         de.classList.remove('nf-hide');
     }
-    document.documentElement.classList.add('nf-boot');
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', showPage);
-    } else {
-        showPage();
-    }
+    showPage();
     /* 安卓返回键/前进从缓存(bfcache)恢复页面时：强制立即显示，防止整页停在透明状态 */
     window.addEventListener('pageshow', function (e) {
         if (e.persisted) showPage();

@@ -1,0 +1,8 @@
+{
+  "name": "手机模拟器",
+  "description": "沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
