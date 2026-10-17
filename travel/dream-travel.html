@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>触梦旅行 · 小手机</title>
+<script src="../js/native-feel.js"></script>
+<style>
+:root{color-scheme:light;--ink:#171717;--text:#4c4c4c;--muted:#929292;--line:#e8e8e8;--paper:#fff;--soft:#f5f5f5;--shadow:0 14px 42px rgba(0,0,0,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#ededed;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #777;outline-offset:3px}
+.phone-shell{position:relative;width:min(420px,calc(100vw - 24px));height:min(900px,calc(100dvh - 24px));min-height:630px;margin:12px auto;background:#fff;border:7px solid #fff;border-radius:43px;box-shadow:0 24px 80px rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column}
+.statusbar{height:34px;flex:0 0 34px;padding:7px 20px 0;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:650;letter-spacing:.02em;background:rgba(255,255,255,.94);z-index:3}
+.status-right{display:flex;align-items:center;gap:6px;color:#222}.signal{display:flex;align-items:flex-end;gap:2px;height:11px}.signal i{display:block;width:3px;background:#222;border-radius:3px}.signal i:nth-child(1){height:4px}.signal i:nth-child(2){height:6px}.signal i:nth-child(3){height:8px}.signal i:nth-child(4){height:10px}.wifi{width:13px;height:9px;border:1.5px solid transparent;border-top-color:#222;border-radius:50%;position:relative;transform:translateY(2px)}.wifi:after{content:"";position:absolute;width:4px;height:4px;border:1.5px solid transparent;border-top-color:#222;border-radius:50%;left:3px;top:2px}.battery{width:19px;height:10px;border:1.4px solid #222;border-radius:3px;padding:1.5px;position:relative}.battery:before{content:"";position:absolute;right:-3px;top:2px;width:2px;height:4px;background:#222;border-radius:0 2px 2px 0}.battery b{display:block;background:#222;width:70%;height:100%;border-radius:1px}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;padding:10px 20px 9px}.top-left{display:flex;align-items:center;gap:11px}.icon-button{width:35px;height:35px;border:1px solid #ededed;background:rgba(255,255,255,.84);border-radius:50%;display:grid;place-items:center;flex-shrink:0;transition:background .18s,transform .18s}.icon-button:active{background:#eee;transform:scale(.94)}.icon-button svg,.btn-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.wordmark{font-size:10px;letter-spacing:.21em;color:#777;font-weight:650}.submark{font-size:9px;color:#b1b1b1;margin-top:4px;letter-spacing:.08em}.top-actions{display:flex;gap:7px}
+.scroller{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 21px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}
+.hero{padding:14px 0 20px;position:relative}.eyebrow{font-size:9px;color:#9b9b9b;letter-spacing:.2em;text-transform:uppercase;font-weight:700}.hero h1{font-size:39px;line-height:1.05;letter-spacing:-.075em;margin:10px 0 8px;font-weight:760}.hero p{font-size:11px;line-height:1.8;color:#888;margin:0;max-width:255px}.hero-aside{position:absolute;right:0;top:31px;text-align:right;color:#aaa}.hero-aside strong{display:block;font-size:27px;line-height:1;font-weight:350;letter-spacing:-.06em;color:#444}.hero-aside span{font-size:8px;letter-spacing:.13em}
+.search-line{display:flex;align-items:center;gap:9px;background:#f6f6f6;border:1px solid transparent;border-radius:12px;padding:0 12px;height:41px;margin:0 0 15px;transition:border-color .2s,background .2s}.search-line:focus-within{border-color:#dedede;background:#fff}.search-line svg{width:15px;height:15px;stroke:#888;fill:none;stroke-width:1.6;flex-shrink:0}.search-line input{border:0;background:transparent;outline:0;min-width:0;flex:1;font-size:11px;color:#222}.search-line input::placeholder{color:#aaa}
+.feature-card{position:relative;border-radius:19px;overflow:hidden;margin:0 0 23px;background:#242424;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.09)}.feature-card .art-scene{height:207px;border-radius:0}.feature-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:19px;background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.08) 43%,rgba(0,0,0,.72) 100%);pointer-events:none}.feature-top{position:absolute;top:15px;left:16px;right:15px;display:flex;align-items:center;justify-content:space-between;color:rgba(255,255,255,.83);font-size:8px;letter-spacing:.17em}.outline-chip{border:1px solid rgba(255,255,255,.55);border-radius:99px;padding:6px 9px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}.feature-kicker{font-size:8px;letter-spacing:.19em;color:rgba(255,255,255,.7);margin-bottom:7px}.feature-title{font-size:26px;letter-spacing:-.06em;font-weight:680;line-height:1.05}.feature-desc{font-size:10px;color:rgba(255,255,255,.75);margin-top:7px;max-width:230px;line-height:1.65}.feature-action{position:absolute;right:15px;bottom:17px;width:37px;height:37px;border:1px solid rgba(255,255,255,.56);border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.12);backdrop-filter:blur(8px)}.feature-action svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.section-head h2{margin:0;font-size:15px;font-weight:680;letter-spacing:-.04em}.section-meta{font-size:8px;color:#aaa;letter-spacing:.13em;text-transform:uppercase}.link-button{border:0;background:transparent;color:#888;font-size:10px;padding:3px}
+.prompt-strip{display:flex;align-items:flex-start;gap:11px;padding:13px 13px 12px;border:1px solid #ececec;border-radius:14px;margin-bottom:24px;background:linear-gradient(135deg,#fff,#f7f7f7);box-shadow:0 5px 18px rgba(0,0,0,.025)}.prompt-mark{font-family:Georgia,serif;font-size:22px;color:#bdbdbd;line-height:1}.prompt-body{flex:1;min-width:0}.prompt-label{font-size:8px;color:#aaa;letter-spacing:.16em;margin-bottom:5px}.prompt-body p{font-size:10px;line-height:1.7;color:#555;margin:0}
+.destination-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 11px}.destination-card{position:relative;min-width:0}.open-destination{display:block;width:100%;padding:0;text-align:left;border:0;background:transparent}.open-destination:active .art-scene{transform:scale(.985)}.card-art{position:relative;overflow:hidden;border-radius:13px;background:#ddd;margin-bottom:10px}.card-art .art-scene{height:145px;transition:transform .22s}.place-label{position:absolute;left:9px;top:9px;color:rgba(255,255,255,.91);font-size:7px;letter-spacing:.16em;text-shadow:0 1px 6px rgba(0,0,0,.28)}.card-fav{position:absolute;right:8px;top:8px;width:27px;height:27px;border-radius:50%;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.66);backdrop-filter:blur(10px);display:grid;place-items:center;font-size:15px;color:#2c2c2c;z-index:2}.card-fav.saved{background:#171717;color:#fff;border-color:#171717}.place-category{font-size:8px;color:#aaa;letter-spacing:.11em;margin-bottom:5px}.place-name{font-size:14px;letter-spacing:-.04em;font-weight:700;margin-bottom:5px}.place-desc{font-size:9px;line-height:1.7;color:#888;min-height:31px}.place-foot{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid #ededed;color:#999;font-size:8px}.place-foot strong{color:#555;font-size:9px;font-weight:600}
+.progress-strip{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 15px;border-radius:14px;background:#f6f6f6;margin:18px 0 24px}.progress-copy .label{font-size:8px;letter-spacing:.14em;color:#999}.progress-copy strong{display:block;font-size:13px;margin-top:5px;font-weight:650}.progress-bar{height:3px;background:#e2e2e2;border-radius:4px;margin-top:9px;overflow:hidden}.progress-fill{height:100%;background:#272727;transition:width .3s}.progress-number{font-size:23px;font-weight:350;letter-spacing:-.06em;color:#555}
+.empty-state{padding:34px 18px 29px;text-align:center;border:1px dashed #ddd;border-radius:16px;background:linear-gradient(145deg,#fff,#fafafa)}.empty-mark{font-size:28px;font-weight:250;color:#c4c4c4;letter-spacing:-.1em}.empty-state h3{margin:12px 0 6px;font-size:14px;font-weight:650}.empty-state p{margin:0 auto 14px;max-width:220px;font-size:10px;line-height:1.8;color:#999}.dark-button,.light-button{height:38px;border-radius:11px;font-size:10px;font-weight:650;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;gap:7px}.dark-button{background:#171717;color:#fff;border:1px solid #171717}.light-button{background:#fff;color:#222;border:1px solid #e5e5e5}.dark-button svg,.light-button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.page-hero{padding:19px 0 24px}.page-hero h1{font-size:35px;line-height:1.1;letter-spacing:-.07em;margin:9px 0 8px}.page-hero p{font-size:10px;line-height:1.8;color:#888;margin:0;max-width:255px}
+.ticket-list{display:flex;flex-direction:column;gap:12px}.ticket{border:1px solid #e9e9e9;border-radius:16px;overflow:hidden;background:#fff}.ticket-top{display:grid;grid-template-columns:90px 1fr;gap:13px;padding:12px}.ticket-art .art-scene{height:91px;border-radius:10px}.ticket-label{font-size:8px;color:#999;letter-spacing:.14em}.ticket-title{font-size:15px;font-weight:700;letter-spacing:-.04em;margin:6px 0}.ticket-meta{font-size:9px;color:#888;line-height:1.8}.ticket-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;letter-spacing:.12em;color:#777;margin-top:7px}.ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-top:1px dashed #e6e6e6;background:#fafafa}.status-pill{font-size:8px;border:1px solid #ddd;border-radius:99px;padding:5px 8px;color:#777}.status-pill.done{background:#171717;color:#fff;border-color:#171717}.ticket-actions{display:flex;gap:6px}.ticket-actions button{border:0;background:transparent;color:#777;font-size:9px;padding:4px}
+.collection-section{margin:0 0 25px}.collection-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}.collection-head h2{font-size:14px;margin:0;letter-spacing:-.04em}.collection-head span{font-size:9px;color:#aaa}.souvenir-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.souvenir{border:1px solid #e8e8e8;border-radius:12px;padding:10px 7px;text-align:center;background:linear-gradient(150deg,#fff,#f8f8f8)}.souvenir-stamp{width:47px;height:47px;border:1px solid #d7d7d7;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:19px;color:#555;outline:1px dashed #cfcfcf;outline-offset:-4px}.souvenir-name{font-size:9px;font-weight:650;line-height:1.5}.souvenir-caption{font-size:7px;color:#aaa;margin-top:4px}
+.note-list{display:flex;flex-direction:column;gap:10px}.note-card{padding:14px;border:1px solid #e9e9e9;border-radius:15px;background:#fff}.note-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.note-date{font-size:8px;color:#999;letter-spacing:.1em}.note-title{font-size:14px;margin:6px 0;font-weight:680;letter-spacing:-.04em}.note-text{font-size:10px;line-height:1.85;color:#666;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}.note-place{font-size:8px;color:#777;background:#f4f4f4;border-radius:5px;padding:5px 7px;white-space:nowrap}.note-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:12px}.note-actions button{background:transparent;border:1px solid #eee;border-radius:8px;font-size:9px;padding:6px 9px;color:#777}
+.bottom-nav{flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.87);backdrop-filter:blur(23px);-webkit-backdrop-filter:blur(23px);border-top:1px solid rgba(0,0,0,.045);z-index:5}.tab{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:#999;padding:4px 5px;min-width:53px;font-size:8px;transition:color .2s}.tab svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.tab.active{color:#171717}.tab.active span{font-weight:750}.tab-create{width:40px;height:40px;border:0;border-radius:50%;background:#171717;color:#fff;display:grid;place-items:center;box-shadow:0 7px 17px rgba(0,0,0,.15);margin-top:-10px;transition:transform .2s}.tab-create:active{transform:scale(.93)}.tab-create svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
+.art-scene{height:180px;position:relative;overflow:hidden;isolation:isolate;background:#c7c7c7;--light:#d9d9d9;--mid:#9c9c9c;--dark:#515151}
+.art-scene:before,.art-scene:after{content:"";position:absolute;pointer-events:none}
+.scene-moon{background:linear-gradient(180deg,#202124 0%,#55585a 43%,#a4a5a4 72%,#e2e1dc 100%)}.scene-moon:before{width:55px;height:55px;left:60%;top:19%;border-radius:50%;background:linear-gradient(140deg,#f5f4ef,#c7c8c6);box-shadow:0 0 26px rgba(255,255,255,.2)}.scene-moon:after{left:-12%;right:-12%;height:43%;bottom:-4%;background:repeating-linear-gradient(178deg,rgba(255,255,255,.23) 0 1px,transparent 1px 12px),linear-gradient(180deg,#777c7d,#30383d);clip-path:polygon(0 9%,16% 0,30% 12%,45% 1%,58% 13%,73% 0,89% 8%,100% 2%,100% 100%,0 100%)}
+.scene-moon .terrain{position:absolute;bottom:35%;left:-5%;width:110%;height:25%;background:linear-gradient(170deg,rgba(235,235,230,.5),rgba(90,92,95,.08));clip-path:polygon(0 62%,18% 19%,32% 49%,46% 8%,62% 58%,78% 20%,100% 54%,100% 100%,0 100%)}
+.scene-cloud{background:linear-gradient(180deg,#28292d,#a5a6a6 75%,#e4e4e0)}.scene-cloud:before{width:145px;height:43px;left:-10px;top:27%;background:rgba(237,237,235,.62);border-radius:100px;box-shadow:48px 15px 0 rgba(220,221,220,.58),160px -13px 0 rgba(244,244,241,.3),202px 17px 0 rgba(224,224,222,.6)}.scene-cloud:after{left:0;right:0;bottom:18%;height:2px;background:rgba(250,250,250,.9);box-shadow:0 5px 0 rgba(0,0,0,.12),0 9px 0 rgba(255,255,255,.28)}.train-line{position:absolute;left:22%;top:42%;width:57%;height:26px;border-radius:12px 12px 5px 5px;background:linear-gradient(180deg,#f7f7f4,#9fa0a0);border:1px solid rgba(255,255,255,.65);box-shadow:0 9px 15px rgba(0,0,0,.2);transform:skewY(-5deg)}.train-line:before{content:"";position:absolute;left:13px;right:13px;top:5px;height:7px;background:repeating-linear-gradient(90deg,#515357 0 13px,#d3d3d0 13px 18px);border-radius:3px}
+.scene-garden{background:linear-gradient(180deg,#101315 0%,#444849 52%,#929493 100%)}.scene-garden:before{width:67px;height:67px;border:1px solid rgba(245,245,240,.72);border-radius:50%;left:calc(50% - 33px);top:13%;box-shadow:0 0 0 10px rgba(255,255,255,.035),0 0 0 23px rgba(255,255,255,.025)}.scene-garden:after{left:-5%;right:-5%;bottom:-4%;height:65%;background:linear-gradient(180deg,rgba(160,164,160,.3),#15191b 88%);clip-path:polygon(0 100%,0 65%,8% 42%,13% 68%,19% 19%,25% 70%,34% 37%,40% 67%,48% 14%,55% 65%,63% 30%,71% 76%,80% 25%,88% 64%,95% 39%,100% 55%,100% 100%)}
+.scene-hotel{background:linear-gradient(180deg,#222326 0%,#67686a 64%,#c1c1be 100%)}.scene-hotel:before{left:31%;bottom:0;width:39%;height:79%;background:linear-gradient(90deg,#36383a,#a4a4a1 50%,#414244);clip-path:polygon(50% 0,100% 16%,90% 100%,10% 100%,0 16%);box-shadow:0 0 20px rgba(255,255,255,.12)}.scene-hotel:after{left:0;right:0;bottom:0;height:15%;background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(0,0,0,.3))}
+.hotel-windows{position:absolute;z-index:1;left:38%;top:34%;width:24%;height:45%;background:repeating-linear-gradient(180deg,transparent 0 10px,rgba(235,235,227,.72) 10px 13px,transparent 13px 20px),repeating-linear-gradient(90deg,transparent 0 10px,rgba(25,25,25,.55) 10px 13px,transparent 13px 22px)}
+.scene-desert{background:linear-gradient(180deg,#353638 0%,#b3b3af 62%,#e4e2da 100%)}.scene-desert:before{width:75px;height:75px;border-radius:50%;top:12%;left:14%;background:linear-gradient(145deg,#e6e5df,#a1a2a0);box-shadow:0 0 36px rgba(255,255,255,.16)}.scene-desert:after{left:-10%;right:-10%;bottom:-4%;height:56%;background:linear-gradient(164deg,#e4e1d7,#9f9e99 42%,#3d4145 100%);clip-path:polygon(0 25%,16% 7%,33% 45%,49% 14%,67% 54%,83% 24%,100% 42%,100% 100%,0 100%)}
+.scene-city{background:linear-gradient(180deg,#161719 0%,#737577 70%,#d0d0cb 100%)}.scene-city:before{inset:25% 0 0;background:repeating-linear-gradient(90deg,transparent 0 12px,rgba(245,245,242,.12) 12px 13px,transparent 13px 24px);clip-path:polygon(0 45%,8% 45%,8% 28%,16% 28%,16% 9%,26% 9%,26% 35%,34% 35%,34% 3%,46% 3%,46% 40%,53% 40%,53% 20%,64% 20%,64% 1%,73% 1%,73% 33%,82% 33%,82% 11%,91% 11%,91% 44%,100% 44%,100% 100%,0 100%);background-color:rgba(35,36,38,.72)}.scene-city:after{left:0;right:0;bottom:0;height:30%;background:repeating-linear-gradient(180deg,rgba(255,255,255,.28) 0 1px,transparent 1px 10px),linear-gradient(180deg,transparent,rgba(255,255,255,.2))}
+.art-scene .star{position:absolute;z-index:1;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 5px rgba(255,255,255,.8)}.art-scene .star.s1{left:20%;top:20%}.art-scene .star.s2{left:78%;top:16%}.art-scene .star.s3{left:40%;top:11%}.art-scene .art-code{position:absolute;z-index:2;left:10px;bottom:8px;font-size:7px;letter-spacing:.16em;color:rgba(255,255,255,.62)}.art-scene .scene-caption{position:absolute;right:9px;bottom:8px;z-index:2;color:rgba(255,255,255,.6);font-size:7px;letter-spacing:.12em}.scene-cloud .art-code,.scene-cloud .scene-caption,.scene-desert .scene-caption{color:rgba(255,255,255,.78)}
+.overlay{position:absolute;inset:0;background:rgba(15,15,15,.27);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:20;display:none;align-items:flex-end;justify-content:center}.overlay.show{display:flex;animation:fadeIn .18s ease}.sheet{width:100%;max-height:92%;background:rgba(255,255,255,.98);border-radius:25px 25px 0 0;box-shadow:0 -12px 45px rgba(0,0,0,.13);padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;overflow:auto;animation:sheetUp .24s cubic-bezier(.2,.75,.25,1)}.grabber{width:34px;height:4px;border-radius:9px;background:#dedede;margin:0 auto 16px;flex-shrink:0}.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.sheet-title{font-size:18px;font-weight:700;letter-spacing:-.05em}.sheet-sub{font-size:8px;color:#aaa;letter-spacing:.13em;margin-top:4px}.plain-close{border:0;background:transparent;color:#888;font-size:11px;padding:7px}
+.field-label{display:block;font-size:10px;color:#999;letter-spacing:.06em;margin:13px 0 7px}.field-input,.field-select{width:100%;border:1px solid #e8e8e8;background:#fafafa;border-radius:10px;padding:11px 12px;font-size:11px;outline:none;color:#333}.field-textarea{width:100%;min-height:118px;border:1px solid #e8e8e8;background:#fafafa;border-radius:10px;padding:12px;font-size:12px;line-height:1.8;resize:vertical;outline:none;color:#333}.sheet-actions{display:flex;gap:8px;margin-top:17px;padding-top:13px;border-top:1px solid #eee}.sheet-actions .dark-button{flex:1}.detail-overlay{position:absolute;inset:0;z-index:15;display:none;flex-direction:column;background:#fff;animation:fadeIn .18s ease}.detail-overlay.show{display:flex}.detail-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.detail-scroll::-webkit-scrollbar{display:none}.detail-head{position:absolute;top:42px;left:18px;right:18px;z-index:4;display:flex;justify-content:space-between;align-items:center}.detail-head .icon-button{background:rgba(255,255,255,.82);backdrop-filter:blur(12px)}.detail-scene .art-scene{height:300px;border-radius:0}.detail-content{padding:20px 22px 28px}.detail-kicker{font-size:8px;letter-spacing:.18em;color:#999}.detail-title{font-size:33px;letter-spacing:-.07em;margin:9px 0 7px;font-weight:740}.detail-subtitle{font-size:11px;color:#888;line-height:1.8}.detail-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:19px 0 22px}.metric{background:#f6f6f6;border-radius:10px;padding:11px 9px}.metric span{display:block;color:#aaa;font-size:8px;margin-bottom:5px}.metric strong{display:block;color:#333;font-size:11px;font-weight:650}.story-title{font-size:13px;font-weight:700;letter-spacing:-.03em;margin:0 0 9px}.story-text{font-size:11px;line-height:2;color:#666;margin:0;white-space:pre-line}.route-box{margin-top:19px;padding:14px;border:1px solid #ececec;border-radius:13px}.route-box .route-label{font-size:8px;letter-spacing:.14em;color:#aaa}.route-box p{font-size:10px;line-height:1.8;color:#555;margin:7px 0 0}.detail-actions{position:relative;display:flex;gap:8px;padding:13px 20px calc(13px + env(safe-area-inset-bottom,0px));border-top:1px solid #eee;background:rgba(255,255,255,.91);backdrop-filter:blur(20px)}.detail-actions button{height:44px}.detail-actions .light-button{width:47px;padding:0}.detail-actions .dark-button{flex:1}
+.toast{position:absolute;z-index:60;left:50%;bottom:90px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:rgba(25,25,25,.93);color:#fff;padding:10px 14px;border-radius:99px;font-size:10px;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:opacity .2s,transform .2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes sheetUp{from{transform:translateY(22px);opacity:.6}to{transform:translateY(0);opacity:1}}
+@media(max-width:500px){html,body{background:#fff}.phone-shell{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none}.topbar{padding-top:6px}.hero h1{font-size:38px}.overlay{position:fixed}.sheet{max-height:94dvh;padding-bottom:calc(15px + env(safe-area-inset-bottom,0px))}.detail-overlay{position:fixed}.detail-head{top:49px}.detail-scene .art-scene{height:33vh;min-height:220px;max-height:300px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="phone-shell">
+  <div class="statusbar"><span id="statusTime">09:41</span><div class="status-right" aria-label="设备状态"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"><b></b></span></div></div>
+  <header class="topbar">
+    <div class="top-left"><button class="icon-button" id="backHome" aria-label="返回桌面"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg></button><div><div class="wordmark">TOUCH DREAM / TRAVEL</div><div class="submark">远方，也可以是一场梦</div></div></div>
+    <div class="top-actions"><button class="icon-button" id="randomBtn" aria-label="随机探索" title="随机探索"><svg viewBox="0 0 24 24"><path d="M3 7h3c5 0 7 10 12 10h3M17 13l4 4-4 4M3 17h3c2 0 3.5-2 5-4M17 3l4 4-4 4M14 7h4"/></svg></button><button class="icon-button" id="moreBtn" aria-label="更多选项" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button></div>
+  </header>
+  <main class="scroller" id="scroller"><div id="mainView"></div></main>
+  <nav class="bottom-nav" aria-label="触梦旅行导航">
+    <button class="tab active" data-view="explore"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.2 5.4-5.4 2.2 2.2-5.4z"/></svg><span>探索</span></button>
+    <button class="tab" data-view="trips"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2"/><path d="M8 6V4h8v2M3 11h18M8 11v3M16 11v3"/></svg><span>行程</span></button>
+    <button class="tab-create" id="newNoteBtn" aria-label="写旅行手札" title="写旅行手札"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab" data-view="collection"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg><span>收藏</span></button>
+    <button class="tab" data-view="notes"><svg viewBox="0 0 24 24"><path d="M5 3.5h14a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V5A1.5 1.5 0 0 1 5 3.5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>手札</span></button>
+  </nav>
+
+  <section class="detail-overlay" id="detailOverlay" aria-label="目的地详情">
+    <div class="detail-scroll" id="detailScroll"></div>
+    <div class="detail-actions"><button class="light-button" id="detailFavorite" aria-label="收藏目的地">☆</button><button class="dark-button" id="detailPlan">预订一段幻想旅程 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+  </section>
+
+  <div class="overlay" id="bookingOverlay" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
+    <section class="sheet"><div class="grabber"></div><div class="sheet-head"><div><div class="sheet-title" id="bookingTitle">预订一段幻想旅程</div><div class="sheet-sub">A FICTIONAL JOURNEY · NO REAL BOOKING</div></div><button class="plain-close" id="closeBooking">关闭</button></div>
+      <div id="bookingPlaceName" style="font-size:12px;font-weight:650;margin-bottom:3px"></div><div style="font-size:9px;color:#999;line-height:1.7">这是一张虚构世界的旅行票根，不涉及现实交通、酒店或付款。</div>
+      <label class="field-label" for="bookingDate">想从哪一天出发？</label><input class="field-input" type="date" id="bookingDate">
+      <label class="field-label" for="bookingMemo">这次想带走什么心情？（选填）</label><input class="field-input" id="bookingMemo" maxlength="90" placeholder="例如：去一个没有闹钟的地方">
+      <div class="sheet-actions"><button class="light-button" id="cancelBooking">再想一想</button><button class="dark-button" id="confirmBooking">生成我的旅行票根 ↗</button></div>
+    </section>
+  </div>
+
+  <div class="overlay" id="noteOverlay" role="dialog" aria-modal="true" aria-labelledby="noteHeading">
+    <section class="sheet"><div class="grabber"></div><div class="sheet-head"><div><div class="sheet-title" id="noteHeading">写一张旅行手札</div><div class="sheet-sub">POSTCARDS FROM SOMEWHERE ELSE</div></div><button class="plain-close" id="closeNote">关闭</button></div>
+      <label class="field-label" for="noteDate">日期</label><input class="field-input" type="date" id="noteDate">
+      <label class="field-label" for="notePlace">来自哪里</label><select class="field-select" id="notePlace"></select>
+      <label class="field-label" for="noteTitle">给这一页起个名字</label><input class="field-input" id="noteTitle" maxlength="70" placeholder="写给雾里的自己">
+      <label class="field-label" for="noteContent">留下这次旅行</label><textarea class="field-textarea" id="noteContent" maxlength="8000" placeholder="你看见了什么？又把什么留在了那里？"></textarea>
+      <div class="sheet-actions"><button class="light-button" id="deleteNote" hidden>删除手札</button><button class="light-button" id="cancelNote">取消</button><button class="dark-button" id="saveNote">收藏这段记忆</button></div>
+    </section>
+  </div>
+
+  <div class="overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="旅行资料管理">
+    <section class="sheet"><div class="grabber"></div><div class="sheet-head"><div><div class="sheet-title">我的旅行资料</div><div class="sheet-sub">YOUR LITTLE ARCHIVE</div></div><button class="plain-close" id="closeMenu">关闭</button></div>
+      <button class="menu-row" id="exportData"><span><strong>导出旅行备份</strong><small>收藏、票根、探索记录与旅行手札</small></span><span>↓</span></button>
+      <button class="menu-row" id="importData"><span><strong>导入旅行备份</strong><small>与当前本地资料合并</small></span><span>↑</span></button><input type="file" accept="application/json,.json" id="importFile" hidden>
+      <button class="menu-row" id="clearTravelSearch"><span><strong>清除搜索内容</strong><small>回到全部目的地</small></span><span>↺</span></button>
+      <p style="font-size:9px;line-height:1.8;color:#999;padding:7px 11px 0">触梦旅行中的地点、预约与票根均为虚构互动内容。资料保存在当前浏览器本地，不会主动上传。</p>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+<style>
+.menu-row{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 11px;text-align:left;background:transparent;border:0;border-radius:10px;color:#333;font-size:11px}.menu-row:active{background:#f4f4f4}.menu-row strong{font-size:11px;font-weight:650}.menu-row small{display:block;font-size:9px;color:#aaa;margin-top:5px}.menu-row>span:last-child{font-size:17px;color:#888}
+</style>
+<script>
+(function(){
+'use strict';
+var STORE_KEY='maomao_dream_travel_v1';
+var destinations=[
+{id:'moon-sea',code:'001',name:'月光海',category:'静谧海域',tagline:'潮汐会替你保管秘密。',desc:'一片只在午夜涨潮的银色海湾。',duration:'一晚',season:'月圆之夜',distance:'梦境东岸',mood:'安静',art:'scene-moon',icon:'◯',story:'这里没有白昼。海面收集了许多无人认领的月光，偶尔也会把远方寄来的梦推上岸。\\n\\n当地人说，只要在潮水退去时把一个秘密写在纸上，第二天醒来，你就会记得它真正的名字。',route:'沿着没有路牌的海岸向北走，在第三盏熄灭的灯之后下坡。若听见远处有钟声，不必寻找钟楼，那是海正在换气。',gift:'月汐玻璃片'},
+{id:'cloud-train',code:'002',name:'云端列车',category:'漂浮交通',tagline:'下一站，尚未发生的事。',desc:'列车穿过云层，也经过尚未抵达的明天。',duration:'三站',season:'风很轻的日子',distance:'高空环线',mood:'好奇',art:'scene-cloud',icon:'↗',story:'这趟列车没有固定终点。车窗外会经过一些你曾经想象过、却没能去到的地方。每当列车减速，窗外就会出现一座只属于某个乘客的车站。\\n\\n请留意车票背面的空白。它会在你愿意出发时，慢慢浮现下一站的名字。',route:'从云层边缘的白色站台登车。选一张没有标注到站时间的车票，把它交给戴灰手套的检票员。',gift:'漂浮车票'},
+{id:'night-garden',code:'003',name:'永夜花园',category:'夜行植物园',tagline:'这里的花不需要天亮。',desc:'银色枝叶在黑夜里缓慢生长。',duration:'半日',season:'每一个深夜',distance:'沉默森林内侧',mood:'疗愈',art:'scene-garden',icon:'✳',story:'永夜花园里没有太阳，也没有凋谢这件事。植物会把来访者没说出口的话，收进叶脉最深的地方，再用细小的光回应。\\n\\n花园的守门人不问你从哪里来，只会递给你一只空花盆。你可以把不想继续携带的烦恼，埋在里面。',route:'找到长着两片银叶的黑色小门。沿石径一直向前，经过第七棵树后，记得回头看一次。',gift:'夜光种子'},
+{id:'time-inn',code:'004',name:'时间旅馆',category:'时间缝隙',tagline:'每个房间都住着另一种可能。',desc:'入住一晚，可以和某个平行时刻擦肩。',duration:'一晚',season:'雨落下之前',distance:'时针背面',mood:'神秘',art:'scene-hotel',icon:'⌁',story:'旅馆一共十三层，但电梯按钮只显示十二个数字。前台从不登记姓名，只会问你：今晚想暂住在哪一种时间里？\\n\\n有人在这里找回了忘记的夏天，也有人只想坐在窗边，安静地看一场从未发生的雨。退房时请把房卡放在桌上，不需要带走任何东西。',route:'在旧钟表店后门敲三下。接待员会递给你一把没有钥匙齿的钥匙，那就是你的房间。',gift:'无刻度房卡'},
+{id:'glass-desert',code:'005',name:'玻璃沙漠',category:'折光旷野',tagline:'所有迷路，都会折射成方向。',desc:'沙丘像被磨砂过的玻璃，藏着微弱回声。',duration:'两日',season:'雾散的清晨',distance:'地图留白处',mood:'辽阔',art:'scene-desert',icon:'◇',story:'这里的沙粒透明而轻，风吹过时会发出极低的和声。沙漠中央有一座不提供水的驿站，只提供可以反复翻阅的旧地图。\\n\\n旅人常在地图上发现一条此前没有的路。那条路不会通往某个固定地点，只会通向你当下最需要抵达的地方。',route:'找到地面上最暗的一道折光，沿它向西。不要追逐远处的绿洲，真正的入口藏在脚边的浅浅凹痕里。',gift:'折光石'},
+{id:'mist-city',code:'006',name:'雾中书城',category:'迷雾街区',tagline:'每一本书，都在等它的读者。',desc:'街道由未完成的故事连成，转角总有新章节。',duration:'三章',season:'雾气漫上窗时',distance:'旧梦北部',mood:'奇遇',art:'scene-city',icon:'▤',story:'雾中书城的楼宇没有门牌，只有书名。街上没有店员，书页会在你停下时自行翻动，选中一段适合现在的文字。\\n\\n如果你在某本书的末页看见自己的名字，不必惊讶。那只是这个世界温柔地提醒你：接下来几页，还可以由你来写。',route:'先走进一条看起来没有尽头的窄巷。听见翻页声时停下，靠左手边第二扇窗，轻轻说出你正在寻找的故事。',gift:'雾纹书签'}
+];
+var data=loadData(),view='explore',searchQuery='',activePlaceId=null,bookingPlaceId=null,editingNoteId=null;
+var $=function(id){return document.getElementById(id)};
+var main=$('mainView'),scroller=$('scroller');
+function freshData(){return {favorites:[],visited:[],bookings:[],notes:[],souvenirs:[]}}
+function loadData(){try{var d=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');if(!d||typeof d!=='object')return freshData();return {favorites:Array.isArray(d.favorites)?d.favorites:[],visited:Array.isArray(d.visited)?d.visited:[],bookings:Array.isArray(d.bookings)?d.bookings:[],notes:Array.isArray(d.notes)?d.notes:[],souvenirs:Array.isArray(d.souvenirs)?d.souvenirs:[]}}catch(e){return freshData()}}
+function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify(data));return true}catch(e){toast('本机存储空间不足，暂时无法保存');return false}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function dateKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function plusDays(num){var d=new Date();d.setDate(d.getDate()+num);return dateKey(d)}
+function prettyDate(key){if(!key)return '';var p=String(key).split('-');return p[0]+' / '+p[1]+' / '+p[2]}
+function findPlace(id){return destinations.find(function(p){return p.id===id})||destinations[0]}
+function has(list,id){return list.indexOf(id)!==-1}
+function toast(msg){var el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.classList.remove('show')},2300)}
+function iconSvg(name){var map={search:'<circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.5 4.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/>',pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'};return '<svg viewBox="0 0 24 24">'+(map[name]||'')+'</svg>'}
+function artHTML(p,feature){return '<div class="art-scene '+p.art+'"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>'+(p.id==='cloud-train'?'<span class="train-line"></span>':'')+(p.id==='time-inn'?'<span class="hotel-windows"></span>':'')+(p.id==='moon-sea'?'<span class="terrain"></span>':'')+'<span class="art-code">DREAM / '+p.code+'</span><span class="scene-caption">'+esc(p.distance.toUpperCase())+'</span></div>'}
+function renderPlaceCard(p){
+var saved=has(data.favorites,p.id);
+return '<article class="destination-card"><button class="open-destination" data-detail="'+p.id+'"><div class="card-art">'+artHTML(p,false)+'<span class="place-label">'+p.code+' / '+esc(p.category.toUpperCase())+'</span></div><div class="place-category">'+esc(p.category)+'</div><div class="place-name">'+esc(p.name)+'</div><div class="place-desc">'+esc(p.desc)+'</div><div class="place-foot"><span>'+esc(p.duration)+' · '+esc(p.mood)+'</span><strong>探索 '+iconSvg('arrow')+'</strong></div></button><button class="card-fav '+(saved?'saved':'')+'" data-favorite="'+p.id+'" aria-label="'+(saved?'取消收藏':'收藏目的地')+'">'+(saved?'★':'☆')+'</button></article>'
+}
+function progressPercent(){return Math.round((data.visited.length/destinations.length)*100)}
+function renderExplore(){
+var filtered=destinations.filter(function(p){return [p.name,p.category,p.tagline,p.desc,p.distance,p.story].join(' ').toLowerCase().indexOf(searchQuery.toLowerCase())!==-1});
+var featured=destinations[0];
+return '<section class="hero"><div class="eyebrow">A JOURNEY BEYOND REALITY</div><h1>触梦旅行<span style="font-weight:320;color:#aaa">。</span></h1><p>不是地图上的远方。<br>而是另一个世界，正在等你抵达。</p><div class="hero-aside"><strong>'+String(data.visited.length).padStart(2,'0')+' / '+destinations.length+'</strong><span>已抵达目的地</span></div></section>'+
+'<div class="search-line">'+iconSvg('search')+'<input id="placeSearch" type="search" value="'+esc(searchQuery)+'" placeholder="寻找海岛、时间缝隙或一座城市" aria-label="搜索目的地">'+(searchQuery?'<button class="plain-close" id="clearPlaceSearch">清除</button>':'')+'</div>'+
+'<button class="feature-card" data-detail="'+featured.id+'" style="display:block;width:100%;padding:0;text-align:left;border:0;cursor:pointer"><div>'+artHTML(featured,true)+'</div><div class="feature-top"><span>FEATURED DESTINATION / '+featured.code+'</span><span class="outline-chip">本日推荐 ↗</span></div><div class="feature-overlay"><div class="feature-kicker">A PLACE OUTSIDE OF TIME</div><div class="feature-title">'+esc(featured.name)+'</div><div class="feature-desc">'+esc(featured.tagline)+'</div></div><span class="feature-action">'+iconSvg('arrow')+'</span></button>'+
+'<div class="progress-strip"><div class="progress-copy"><div class="label">YOUR DREAM PASSPORT</div><strong>每次出发，都会留下印记</strong><div class="progress-bar"><div class="progress-fill" style="width:'+progressPercent()+'%"></div></div></div><div class="progress-number">'+progressPercent()+'%</div></div>'+
+'<div class="prompt-strip"><div class="prompt-mark">“</div><div class="prompt-body"><div class="prompt-label">A NOTE FROM THE OTHER SIDE</div><p>'+esc(['你不一定要去很远的地方，才能遇见新的自己。','未知不是空白，它只是还没有被写下名字。','有些目的地，只有在你准备好时才会出现。','把现实暂时放在口袋里，去别处呼吸一下。'][new Date().getDate()%4])+'</p></div></div>'+
+'<div class="section-head"><h2>'+(searchQuery?'搜索结果':'目的地档案')+'</h2><span class="section-meta">'+filtered.length+' WORLDS FOUND</span></div>'+
+(filtered.length?'<div class="destination-grid">'+filtered.map(renderPlaceCard).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">404 / DREAM</div><h3>还没有找到这个地方</h3><p>换个关键词，或许下一次转弯就会遇见。</p><button class="light-button" id="clearPlaceSearchEmpty">清除搜索</button></div>');
+}
+function renderTrips(){
+var list=data.bookings.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'')});
+var upcoming=list.filter(function(x){return x.status!=='arrived'});
+var done=list.filter(function(x){return x.status==='arrived'});
+return '<section class="page-hero"><div class="eyebrow">YOUR FICTIONAL ITINERARY</div><h1>旅程档案<span style="font-weight:320;color:#aaa">。</span></h1><p>每一张票根，都是你与另一个世界约定好的见面。</p></section>'+
+'<div class="progress-strip"><div class="progress-copy"><div class="label">DREAM PASSPORT</div><strong>已收集 '+data.souvenirs.length+' 枚旅行纪念</strong><div class="progress-bar"><div class="progress-fill" style="width:'+progressPercent()+'%"></div></div></div><div class="progress-number">'+String(data.visited.length).padStart(2,'0')+'<span style="font-size:10px;color:#aaa"> / '+destinations.length+'</span></div></div>'+
+'<div class="section-head"><h2>即将出发</h2><span class="section-meta">'+upcoming.length+' TICKETS</span></div>'+
+(upcoming.length?'<div class="ticket-list">'+upcoming.map(renderTicket).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">NEXT / 001</div><h3>还没有安排的旅程</h3><p>挑选一个想去的幻想目的地，给未来留一张票。</p><button class="dark-button" data-goto="explore">去看看目的地 ↗</button></div>')+
+(done.length?'<div class="section-head" style="margin-top:25px"><h2>已经抵达</h2><span class="section-meta">'+done.length+' ARRIVED</span></div><div class="ticket-list">'+done.map(renderTicket).join('')+'</div>':'');
+}
+function renderTicket(t){
+var p=findPlace(t.placeId),done=t.status==='arrived';
+return '<article class="ticket"><div class="ticket-top"><div class="ticket-art">'+artHTML(p,false)+'</div><div><div class="ticket-label">DREAM TICKET / '+esc(p.code)+'</div><div class="ticket-title">'+esc(p.name)+'</div><div class="ticket-meta">'+esc(prettyDate(t.date))+'<br>'+esc(t.memo||p.tagline)+'</div><div class="ticket-code">'+esc(t.code||'TD-'+String(t.id).slice(-6).toUpperCase())+'</div></div></div><div class="ticket-bottom"><span class="status-pill '+(done?'done':'')+'">'+(done?'已抵达 · 纪念已收录':'待出发 · 虚构行程')+'</span><div class="ticket-actions">'+(done?'<button data-detail="'+p.id+'">重访地点 ↗</button>':'<button data-cancel-ticket="'+t.id+'">取消</button><button data-arrive="'+t.id+'">确认抵达 ↗</button>')+'</div></div></article>'
+}
+function renderCollection(){
+var favorites=destinations.filter(function(p){return has(data.favorites,p.id)});
+var visited=destinations.filter(function(p){return has(data.visited,p.id)});
+var souvenirs=data.souvenirs.slice().reverse();
+return '<section class="page-hero"><div class="eyebrow">COLLECT LITTLE IMPOSSIBILITIES</div><h1>梦境收藏<span style="font-weight:320;color:#aaa">。</span></h1><p>世界走过你，也在你身上留下一点回声。</p></section>'+
+'<section class="collection-section"><div class="collection-head"><h2>收藏的目的地</h2><span>'+favorites.length+' SAVED</span></div>'+(favorites.length?'<div class="destination-grid">'+favorites.map(renderPlaceCard).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">☆</div><h3>把想去的地方先收起来</h3><p>在目的地卡片上点星星，它们就会住进这里。</p><button class="light-button" data-goto="explore">发现一个地方</button></div>')+'</section>'+
+'<section class="collection-section"><div class="collection-head"><h2>护照印记</h2><span>'+visited.length+' / '+destinations.length+' WORLDS</span></div>'+(visited.length?'<div class="destination-grid">'+visited.map(function(p){return renderPlaceCard(p)}).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">01 / 06</div><h3>你的护照还很新</h3><p>完成一次幻想旅程，就会得到一枚属于这个世界的印记。</p></div>')+'</section>'+
+'<section class="collection-section"><div class="collection-head"><h2>旅行纪念品</h2><span>'+souvenirs.length+' COLLECTED</span></div>'+(souvenirs.length?'<div class="souvenir-grid">'+souvenirs.map(function(s){var p=findPlace(s.placeId);return '<div class="souvenir"><div class="souvenir-stamp">'+esc(p.icon)+'</div><div class="souvenir-name">'+esc(s.name||p.gift)+'</div><div class="souvenir-caption">'+esc(p.name)+' · '+esc((s.date||'').replace(/-/g,'.'))+'</div></div>'}).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">◇</div><h3>还没捡到纪念品</h3><p>每次确认抵达，都会收下这个世界的一份小礼物。</p></div>')+'</section>';
+}
+function renderNotes(){
+var list=data.notes.slice().sort(function(a,b){return (b.updatedAt||b.date||'').localeCompare(a.updatedAt||a.date||'')});
+return '<section class="page-hero"><div class="eyebrow">POSTCARDS FROM SOMEWHERE ELSE</div><h1>旅行手札<span style="font-weight:320;color:#aaa">。</span></h1><p>写给另一个世界，也写给后来会想起它的自己。</p></section>'+
+'<div class="section-head"><h2>留在路上的文字</h2><span class="section-meta">'+list.length+' NOTES</span></div>'+
+(list.length?'<div class="note-list">'+list.map(renderNote).join('')+'</div>':'<div class="empty-state"><div class="empty-mark">Dear, somewhere.</div><h3>还没有寄出的明信片</h3><p>记录一段旅程、一种心情，或者一件只发生在梦里的小事。</p><button class="dark-button" id="emptyNewNote">写第一张手札 ↗</button></div>');
+}
+function renderNote(n){var p=n.placeId&&findPlace(n.placeId);return '<article class="note-card"><div class="note-head"><div><div class="note-date">'+esc(prettyDate(n.date))+' · TRAVEL NOTE</div><div class="note-title">'+esc(n.title||'无题手札')+'</div></div>'+(p?'<span class="note-place">'+esc(p.name)+'</span>':'<span class="note-place">自由记录</span>')+'</div><div class="note-text">'+esc(n.content||'')+'</div><div class="note-actions"><button data-edit-note="'+n.id+'">编辑</button><button data-delete-note="'+n.id+'">删除</button></div></article>'}
+function render(){
+document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.view===view)});
+main.innerHTML=view==='trips'?renderTrips():view==='collection'?renderCollection():view==='notes'?renderNotes():renderExplore();
+if(view==='explore'){
+var input=$('placeSearch');
+if(input)input.addEventListener('input',function(){var pos=input.selectionStart;searchQuery=input.value;var y=scroller.scrollTop;main.innerHTML=renderExplore();scroller.scrollTop=y;var next=$('placeSearch');if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch(e){}}});
+var clear=$('clearPlaceSearch');if(clear)clear.addEventListener('click',function(){searchQuery='';render()});
+var clearEmpty=$('clearPlaceSearchEmpty');if(clearEmpty)clearEmpty.addEventListener('click',function(){searchQuery='';render()});
+}
+var newNote=$('emptyNewNote');if(newNote)newNote.addEventListener('click',function(){openNote()});
+scroller.scrollTop=0;
+}
+function setView(v){view=v;render()}
+function openDetail(id){
+var p=findPlace(id);activePlaceId=p.id;
+$('detailScroll').innerHTML='<div class="detail-scene">'+artHTML(p,true)+'</div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><button class="icon-button" id="detailTopFavorite" aria-label="收藏目的地">'+(has(data.favorites,p.id)?'★':'☆')+'</button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / '+p.code+' · '+esc(p.category.toUpperCase())+'</div><h1 class="detail-title">'+esc(p.name)+'</h1><div class="detail-subtitle">'+esc(p.tagline)+'<br>'+esc(p.desc)+'</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>'+esc(p.duration)+'</strong></div><div class="metric"><span>適合時刻</span><strong>'+esc(p.season)+'</strong></div><div class="metric"><span>夢境方向</span><strong>'+esc(p.distance)+'</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">'+esc(p.story)+'</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>'+esc(p.route)+'</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>'+esc(p.gift)+'。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div></div>';
+$('detailOverlay').classList.add('show');document.body.style.overflow='hidden';
+$('closeDetail').addEventListener('click',closeDetail);
+$('detailTopFavorite').addEventListener('click',function(){toggleFavorite(p.id);$('detailTopFavorite').textContent=has(data.favorites,p.id)?'★':'☆';$('detailFavorite').textContent=has(data.favorites,p.id)?'★':'☆'});
+$('detailFavorite').textContent=has(data.favorites,p.id)?'★':'☆';
+$('detailPlan').onclick=function(){openBooking(p.id)};
+}
+function closeDetail(){$('detailOverlay').classList.remove('show');document.body.style.overflow=''}
+function toggleFavorite(id){
+var i=data.favorites.indexOf(id);if(i<0){data.favorites.push(id);toast('已收进梦境收藏')}else{data.favorites.splice(i,1);toast('已从收藏中移除')}
+persist();render();
+if(activePlaceId){$('detailFavorite').textContent=has(data.favorites,activePlaceId)?'★':'☆';var topFav=$('detailTopFavorite');if(topFav)topFav.textContent=has(data.favorites,activePlaceId)?'★':'☆'}
+}
+function openBooking(id){
+bookingPlaceId=id||activePlaceId;var p=findPlace(bookingPlaceId);
+$('bookingPlaceName').textContent=p.name+' · '+p.tagline;$('bookingDate').value=plusDays(1);$('bookingMemo').value='';
+$('bookingOverlay').classList.add('show');
+}
+function closeBooking(){$('bookingOverlay').classList.remove('show')}
+function confirmBooking(){
+var date=$('bookingDate').value||plusDays(1),memo=$('bookingMemo').value.trim();
+var ticket={id:'t_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),placeId:bookingPlaceId,date:date,memo:memo,status:'planned',createdAt:new Date().toISOString(),code:'TD-'+Math.random().toString(36).slice(2,8).toUpperCase()};
+data.bookings.push(ticket);
+if(!persist()){data.bookings.pop();return}
+closeBooking();closeDetail();view='trips';render();toast('旅行票根已生成 · 这是一次幻想旅程');
+}
+function arriveTicket(id){
+var t=data.bookings.find(function(x){return x.id===id});if(!t)return;
+if(t.status==='arrived'){toast('这段旅程已经收录');return}
+t.status='arrived';t.arrivedAt=new Date().toISOString();
+if(!has(data.visited,t.placeId))data.visited.push(t.placeId);
+var p=findPlace(t.placeId);
+if(!data.souvenirs.some(function(s){return s.placeId===p.id}))data.souvenirs.push({id:'s_'+Date.now().toString(36),placeId:p.id,name:p.gift,date:t.date});
+if(persist()){render();toast('抵达成功 · '+p.gift+' 已加入收藏')}
+}
+function cancelTicket(id){
+if(!confirm('确定取消这张虚构旅行票根吗？'))return;
+data.bookings=data.bookings.filter(function(t){return t.id!==id});persist();render();toast('票根已取消');
+}
+function openNote(id){
+editingNoteId=id||null;var n=id?data.notes.find(function(x){return x.id===id}):null;
+$('noteHeading').textContent=n?'编辑旅行手札':'写一张旅行手札';
+$('noteDate').value=n?n.date:dateKey();
+$('notePlace').innerHTML='<option value="">自由记录</option>'+destinations.map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+'</option>'}).join('');
+$('notePlace').value=n?(n.placeId||''):'';
+$('noteTitle').value=n?(n.title||''):'';
+$('noteContent').value=n?(n.content||''):'';
+$('deleteNote').hidden=!n;
+$('noteOverlay').classList.add('show');
+}
+function closeNote(){$('noteOverlay').classList.remove('show')}
+function saveNote(){
+var title=$('noteTitle').value.trim(),content=$('noteContent').value.trim();
+if(!title&&!content){toast('先写下一点内容吧');$('noteContent').focus();return}
+var old=editingNoteId?data.notes.find(function(x){return x.id===editingNoteId}):null;
+var n=old||{id:'n_'+Date.now().toString(36),createdAt:new Date().toISOString()};
+n.date=$('noteDate').value||dateKey();n.placeId=$('notePlace').value;n.title=title;n.content=content;n.updatedAt=new Date().toISOString();
+if(!old)data.notes.push(n);
+if(persist()){closeNote();view='notes';render();toast(old?'手札已更新':'旅行手札已保存')}
+}
+function deleteNote(id){
+if(!confirm('确定删除这张旅行手札吗？'))return;
+data.notes=data.notes.filter(function(n){return n.id!==id});persist();render();toast('手札已删除');
+}
+function exportBackup(){
+var payload={app:'MAOMAO Touch Dream Travel',version:1,exportedAt:new Date().toISOString(),data:data};
+var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob);
+var a=document.createElement('a');a.href=url;a.download='touch-dream-travel-'+dateKey()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1400);$('menuOverlay').classList.remove('show');toast('旅行资料备份已生成');
+}
+function importBackup(file){
+if(!file)return;
+var r=new FileReader();
+r.onload=function(){try{var v=JSON.parse(r.result),incoming=v.data||v;if(!incoming||!Array.isArray(incoming.favorites)||!Array.isArray(incoming.bookings)||!Array.isArray(incoming.notes))throw new Error('bad');
+if(!confirm('导入资料会与当前资料合并，重复票根和手札将自动跳过。继续吗？'))return;
+incoming.favorites.forEach(function(id){if(destinations.some(function(p){return p.id===id})&&!has(data.favorites,id))data.favorites.push(id)});
+incoming.visited=(incoming.visited||[]).filter(function(id){return destinations.some(function(p){return p.id===id})}).forEach(function(id){if(!has(data.visited,id))data.visited.push(id)});
+incoming.bookings.forEach(function(t){if(t&&t.id&&!data.bookings.some(function(x){return x.id===t.id}))data.bookings.push(t)});
+incoming.notes.forEach(function(n){if(n&&n.id&&!data.notes.some(function(x){return x.id===n.id}))data.notes.push(n)});
+(incoming.souvenirs||[]).forEach(function(s){if(s&&s.id&&!data.souvenirs.some(function(x){return x.id===s.id}))data.souvenirs.push(s)});
+if(persist()){setView('explore');$('menuOverlay').classList.remove('show');toast('旅行资料已合并导入')}
+}catch(e){toast('文件格式不正确，请选择触梦旅行备份文件')}}
+;r.onerror=function(){toast('读取备份失败')};r.readAsText(file);
+}
+main.addEventListener('click',function(e){
+var fav=e.target.closest('[data-favorite]');if(fav){e.stopPropagation();toggleFavorite(fav.dataset.favorite);return}
+var detail=e.target.closest('[data-detail]');if(detail){openDetail(detail.dataset.detail);return}
+var nav=e.target.closest('[data-goto]');if(nav){setView(nav.dataset.goto);return}
+var arrive=e.target.closest('[data-arrive]');if(arrive){arriveTicket(arrive.dataset.arrive);return}
+var cancel=e.target.closest('[data-cancel-ticket]');if(cancel){cancelTicket(cancel.dataset.cancelTicket);return}
+var edit=e.target.closest('[data-edit-note]');if(edit){openNote(edit.dataset.editNote);return}
+var del=e.target.closest('[data-delete-note]');if(del){deleteNote(del.dataset.deleteNote);return}
+});
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.view)})});
+$('backHome').addEventListener('click',function(){location.href='index.html'});
+$('randomBtn').addEventListener('click',function(){var options=destinations.filter(function(p){return p.id!==activePlaceId});var p=options[Math.floor(Math.random()*options.length)];openDetail(p.id)});
+$('moreBtn').addEventListener('click',function(){$('menuOverlay').classList.add('show')});
+$('closeMenu').addEventListener('click',function(){$('menuOverlay').classList.remove('show')});
+$('menuOverlay').addEventListener('click',function(e){if(e.target===$('menuOverlay'))$('menuOverlay').classList.remove('show')});
+$('exportData').addEventListener('click',exportBackup);
+$('importData').addEventListener('click',function(){$('importFile').click()});
+$('importFile').addEventListener('change',function(){importBackup(this.files&&this.files[0]);this.value=''});
+$('clearTravelSearch').addEventListener('click',function(){searchQuery='';$('menuOverlay').classList.remove('show');setView('explore');toast('已清除搜索')});
+$('closeBooking').addEventListener('click',closeBooking);$('cancelBooking').addEventListener('click',closeBooking);
+$('bookingOverlay').addEventListener('click',function(e){if(e.target===$('bookingOverlay'))closeBooking()});
+$('confirmBooking').addEventListener('click',confirmBooking);
+$('newNoteBtn').addEventListener('click',function(){openNote()});
+$('closeNote').addEventListener('click',closeNote);$('cancelNote').addEventListener('click',closeNote);
+$('noteOverlay').addEventListener('click',function(e){if(e.target===$('noteOverlay'))closeNote()});
+$('saveNote').addEventListener('click',saveNote);
+$('deleteNote').addEventListener('click',function(){if(editingNoteId)deleteNote(editingNoteId);closeNote()});
+function updateTime(){var d=new Date();$('statusTime').textContent=d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false})}
+updateTime();setInterval(updateTime,30000);render();
+})();
+</script>
+</body>
+</html>
