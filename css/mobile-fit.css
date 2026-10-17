@@ -6,6 +6,20 @@
  *   safe-area 由 iOS 系统自行处理，不堆 env() 全局注入
  * 电脑 / 平板预览不受影响，仍显示手机模拟器外壳。
  * ============================================================ */
+
+/* ============================================================
+ * 全局死命令（不限屏幕宽度）：所有滚动条必须隐形，滚动功能保留
+ * ============================================================ */
+* {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* 旧 Edge/IE */
+}
+*::-webkit-scrollbar {            /* Chrome / Safari / WebView */
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
 @media (max-width: 480px) {
 
   /* 画布底色保持白色；各页面业务配色由自身 body 决定 */

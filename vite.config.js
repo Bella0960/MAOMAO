@@ -5,14 +5,19 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-// Auto-detect all HTML entry points in the root directory for multi-page setup
-const htmlFiles = fs.readdirSync(__dirname)
-  .filter(file => file.endsWith('.html'))
-  .reduce((acc, file) => {
-    const name = file.replace(/\.html$/, '');
-    acc[name] = resolve(__dirname, file);
-    return acc;
-  }, {});
+// Auto-detect all HTML entry points (root + feature subfolders) for multi-page setup
+const htmlFiles = {};
+(function collectHtml(dir, prefix) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) continue;
+    const abs = resolve(dir, entry.name);
+    if (entry.isDirectory()) {
+      collectHtml(abs, prefix + entry.name + '/');
+    } else if (entry.name.endsWith('.html')) {
+      htmlFiles[prefix + entry.name.replace(/\.html$/, '')] = abs;
+    }
+  }
+})(__dirname, '');
 
 export default defineConfig({
   server: {

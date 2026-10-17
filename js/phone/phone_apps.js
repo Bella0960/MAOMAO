@@ -40,7 +40,7 @@
             name: '朋友圈',
             description: '动态与评论',
             icon: '💬',
-            page: 'moments.html',
+            page: '/chat/moments.html',
             prompt: `根据提供的人物设定、记忆、聊天记录和其他 App 数据，
 生成该角色的朋友圈动态。
 
@@ -75,7 +75,7 @@
             name: '论坛',
             description: '帖子与讨论',
             icon: '📱',
-            page: 'forum.html',
+            page: '/forum/forum.html',
             prompt: `根据提供的人物设定、记忆、聊天记录和其他 App 数据，
 生成该角色在论坛上发过的帖子。
 
@@ -111,7 +111,7 @@
             name: '钱包',
             description: '消费与收支',
             icon: '💰',
-            page: 'finance.html',
+            page: '/wallet/finance.html',
             prompt: `根据提供的人物设定、记忆、聊天记录和其他 App 数据，
 生成该角色的钱包收支记录。
 

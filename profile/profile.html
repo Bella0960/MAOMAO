@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的 · 小手机</title>
-    <script src="js/font-loader.js"></script>
-    <script src="js/native-feel.js"></script>
-    <script src="js/phone/phone_storage.js"></script>
+    <script src="../js/font-loader.js"></script>
+    <script src="../js/native-feel.js"></script>
+    <script src="../js/phone/phone_storage.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -273,7 +273,7 @@
             }
         }
 </style>
-<link rel="stylesheet" href="css/mobile-fit.css">
+<link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
 <body>
 
@@ -310,7 +310,7 @@
 
             <!-- 菜单卡片 -->
             <section class="menu-card">
-                <a class="menu-row" href="my-moments.html">
+                <a class="menu-row" href="../chat/my-moments.html">
                     <span class="menu-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/></svg>
                     </span>
@@ -334,7 +334,7 @@
                     <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
                 <div class="menu-divider"></div>
-                <a class="menu-row" href="sticker-manager.html">
+                <a class="menu-row" href="../chat/sticker-manager.html">
                     <span class="menu-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                     </span>
@@ -342,7 +342,7 @@
                     <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
                 <div class="menu-divider"></div>
-                <a class="menu-row" href="settings.html">
+                <a class="menu-row" href="../settings/settings.html">
                     <span class="menu-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </span>
@@ -360,7 +360,7 @@
 
     </div>
 
-    <script src="js/nav.js"></script>
+    <script src="../js/nav.js"></script>
     <script>
         /* ===== 从 myProfile 读取并渲染（页面重新显示时刷新，保证编辑返回后最新） ===== */
         var DEFAULT_SIGN = '这个人很懒，什么都没有留下';
@@ -412,7 +412,7 @@
             if (toastTimer) clearTimeout(toastTimer);
             toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1500);
         }
-        document.getElementById('menuWallet').addEventListener('click', function () { window.location.href = 'wallet.html'; });
+        document.getElementById('menuWallet').addEventListener('click', function () { window.location.href = '../wallet/wallet.html'; });
         document.getElementById('menuFavorites').addEventListener('click', function () { showToast('功能开发中'); });
 
         /* ===== 封面图点击上传（Canvas 压缩，与编辑页同规格：最大 600x400 / JPEG 0.7） ===== */
@@ -468,6 +468,6 @@
         // 从编辑页 history.back() 返回时刷新数据
         window.addEventListener('pageshow', renderProfile);
     </script>
-<script src="js/statusbar-control.js"></script>
+<script src="../js/statusbar-control.js"></script>
 </body>
 </html>

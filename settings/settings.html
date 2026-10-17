@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings · 设置</title>
-    <script src="js/font-loader.js"></script>
-    <script src="js/native-feel.js"></script>
-    <script src="js/phone/phone_storage.js"></script>
-    <script src="js/statusbar-control.js"></script>
-    <link rel="stylesheet" href="css/settings.css">
+    <script src="../js/font-loader.js"></script>
+    <script src="../js/native-feel.js"></script>
+    <script src="../js/phone/phone_storage.js"></script>
+    <script src="../js/statusbar-control.js"></script>
+    <link rel="stylesheet" href="../css/settings.css">
     <script>
     (function () {
         try {
@@ -18,7 +18,7 @@
         } catch (e) {}
     })();
     </script>
-<link rel="stylesheet" href="css/mobile-fit.css">
+<link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
@@ -33,7 +33,7 @@
         <!-- 主页面：设置菜单 -->
         <header class="header">
             <div class="header-left">
-                <button type="button" class="icon-btn back-btn" onclick="location.href='index.html'" aria-label="返回主屏幕">
+                <button type="button" class="icon-btn back-btn" onclick="location.href='../index.html'" aria-label="返回主屏幕">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
                 <h1 class="header-title">Settings</h1>
@@ -52,7 +52,7 @@
             <!-- ACCOUNT 分组 -->
             <div class="group-title">ACCOUNT</div>
             <section class="card">
-                <div class="menu-row user-row" onclick="location.href='profile.html'" role="button" tabindex="0">
+                <div class="menu-row user-row" onclick="location.href='../profile/profile.html'" role="button" tabindex="0">
                     <div class="avatar" id="settingsAvatar">简</div>
                     <div class="menu-info">
                         <div class="menu-title" id="settingsName">未设置昵称</div>
@@ -70,7 +70,7 @@
                     <div class="menu-title"><span class="t-cn">API 设置</span><span class="t-en">API</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='api-logs.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../tools/api-logs.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
                     <div class="menu-title"><span class="t-cn">API 调用记录</span><span class="t-en">Logs</span></div>
                     <div class="menu-arrow">›</div>
@@ -85,12 +85,12 @@
                     <div class="menu-title"><span class="t-cn">外观</span><span class="t-en">Appearance</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='beauty.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../beauty/beauty.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
                     <div class="menu-title"><span class="t-cn">外观美化</span><span class="t-en">Beauty CSS</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='bubble-theme.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../chat/bubble-theme.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
                     <div class="menu-title"><span class="t-cn">气泡设置</span><span class="t-en">Bubble</span></div>
                     <div class="menu-arrow">›</div>
@@ -105,7 +105,7 @@
                     <div class="menu-title"><span class="t-cn">音效设置</span><span class="t-en">Sound</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='regex-settings.html?v=20261013new'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../worldbook/regex-settings.html?v=20261013new'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></div>
                     <div class="menu-title"><span class="t-cn">正则过滤</span><span class="t-en">Regex</span></div>
                     <div class="menu-arrow">›</div>
@@ -144,12 +144,12 @@
             <!-- 协议分组 -->
             <div class="group-title">PROTOCOL</div>
             <section class="card">
-                <div class="menu-row" onclick="window.location.href='rp-protocol.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../worldbook/rp-protocol.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></div>
                     <div class="menu-title"><span class="t-cn">角色扮演协议</span><span class="t-en">Protocol</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='beautify.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../beauty/beauty.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg></div>
                     <div class="menu-title"><span class="t-cn">美化导入</span><span class="t-en">Themes</span></div>
                     <div class="menu-arrow">›</div>
@@ -263,7 +263,7 @@
 
         <div class="toast-msg" id="toastMsg">已保存设置</div>
     </div>
-    <script src="js/settings.js"></script>
+    <script src="../js/settings.js"></script>
     <script>
     // 设置页用户卡片 + 深色模式开关
     (function () {

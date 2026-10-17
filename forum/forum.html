@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#FFFFFF" />
 <title>论坛</title>
-<script src="js/font-loader.js"></script>
-<script src="js/phone/phone_storage.js"></script>
-<script src="js/native-feel.js"></script>
-<script src="js/custom-css.js"></script>
-<link rel="stylesheet" href="css/mobile-fit.css">
+<script src="../js/font-loader.js"></script>
+<script src="../js/phone/phone_storage.js"></script>
+<script src="../js/native-feel.js"></script>
+<script src="../js/custom-css.js"></script>
+<link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   * { scrollbar-width: none; -ms-overflow-style: none; }
@@ -206,7 +206,7 @@
 <body>
 
   <div class="topbar">
-    <button class="back-btn" onclick="window.location.href='index.html'">
+    <button class="back-btn" onclick="window.location.href='../index.html'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="brand">
@@ -327,7 +327,7 @@
     var roles = _storage ? _storage.getCharacters() : (function(){ try { return JSON.parse(localStorage.getItem('ai_custom_characters') || '[]'); } catch(e){ return []; } })();
     if (!roles.length) { box.innerHTML = ''; return; }
     box.innerHTML = roles.map(function(r){
-      return '<div class="role-dot" onclick="location.href=\'chat-detail.html?id='+r.id+'\'">'+
+      return '<div class="role-dot" onclick="location.href=\'../chat/chat-detail.html?id='+r.id+'\'">'+
         '<div class="role-circle" style="background:'+(r.avatarBg||'#E8E8EC')+'">'+r.name[0]+'</div>'+
         '<div class="role-name">'+r.name+'</div>'+
       '</div>';
