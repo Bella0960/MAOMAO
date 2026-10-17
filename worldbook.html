@@ -855,9 +855,28 @@
   function genId() {
     return 'wb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
+  function genEntryId() {
+    return 'e_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+
+  function normalizeEntry(raw) {
+    var e = raw && typeof raw === 'object' ? raw : {};
+    return {
+      id: e.id || genEntryId(),
+      name: String(e.name || '未命名条目'),
+      type: e.type === 'regex' ? 'regex' : 'text',
+      content: String(e.content == null ? '' : e.content),
+      position: (e.position === 'front' || e.position === 'back') ? e.position : 'middle',
+      enabled: e.enabled !== false,   // 默认启用
+      injectMode: (e.injectMode === 'keyword' || e.injectMode === 'probability') ? e.injectMode : 'always',
+      keywords: Array.isArray(e.keywords) ? e.keywords.map(function (k) { return String(k).trim(); }).filter(Boolean) : [],
+      probability: (typeof e.probability === 'number' && e.probability >= 0 && e.probability <= 100) ? e.probability : 50
+    };
+  }
+
   function normalizeBook(raw, fallbackType) {
     var b = raw && typeof raw === 'object' ? raw : {};
-    return {
+    var book = {
       id: b.id || genId(),
       title: String(b.title || b.name || '未命名世界书'),
       content: String(b.content == null ? (b.desc || b.text || '') : b.content),
@@ -869,6 +888,26 @@
         : [],
       createdAt: b.createdAt || Date.now()
     };
+
+    // ===== entries：嵌套条目数组（v2 新字段） =====
+    if (Array.isArray(b.entries) && b.entries.length) {
+      book.entries = b.entries.map(normalizeEntry);
+    } else if (typeof b.content === 'string' && b.content.trim()) {
+      // v1 → v2 迁移：旧 content 变成一个默认条目
+      book.entries = [normalizeEntry({
+        id: 'migrated_' + book.id,
+        name: '默认条目',
+        type: 'text',
+        content: b.content,
+        position: 'middle',
+        enabled: true,
+        injectMode: 'always'
+      })];
+    } else {
+      book.entries = [];
+    }
+
+    return book;
   }
 
   function escapeHtml(str) {
@@ -1169,12 +1208,13 @@
 
   document.getElementById('btnEditSave').addEventListener('click', function () {
     var title = editTitleInput.value.trim();
-    var content = editContentInput.value;
+    var content = editContentInput.value;   // 保留旧 content 字段，兼容 v1 迁移；新建时会被 normalizeBook 忽略
     var keywords = parseKeywords(editKeywordsInput.value);
     if (!title) { showToast('请填写名称'); editTitleInput.focus(); return; }
 
     var list = loadBooks();
     if (state.editingId) {
+      // 编辑书本基本信息 → 必须保留原有 entries 数组！
       for (var i = 0; i < list.length; i++) {
         if (String(list[i].id) === String(state.editingId)) {
           list[i].title = title;
@@ -1182,10 +1222,22 @@
           list[i].scope = editScope;
           list[i].categoryId = editCategory;
           list[i].keywords = keywords;
+          // entries 为空时，把 content 迁成默认条目（数据层，不影响列表显示）
+          if ((!list[i].entries || !list[i].entries.length) && content && content.trim()) {
+            list[i].entries = [normalizeEntry({
+              id: 'migrated_' + list[i].id,
+              name: '默认条目',
+              content: content,
+              position: 'middle',
+              enabled: true,
+              injectMode: 'always'
+            })];
+          }
           break;
         }
       }
     } else {
+      // 新建：entries 交给用户在详情页添加，这里建空数组
       list.unshift({
         id: genId(),
         title: title,
@@ -1194,7 +1246,8 @@
         type: state.tab,
         categoryId: editCategory,
         keywords: keywords,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        entries: []
       });
     }
     try {
@@ -1212,16 +1265,13 @@
     showToast(state.editingId ? '已保存' : '新建成功');
   });
 
-  /* 点击卡片进入编辑 */
+  /* 点击卡片进入条目详情页 */
   listEl.addEventListener('click', function (e) {
     var card = e.target.closest('.book-card');
     if (!card) return;
-    var book = null;
-    var list = loadBooks();
-    for (var i = 0; i < list.length; i++) {
-      if (String(list[i].id) === String(card.getAttribute('data-id'))) { book = list[i]; break; }
-    }
-    if (book) openEditDrawer(book);
+    var id = card.getAttribute('data-id');
+    if (!id) return;
+    window.location.href = 'worldbook-detail.html?id=' + encodeURIComponent(id);
   });
 
   /* ---- 导入 ---- */

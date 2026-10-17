@@ -1171,6 +1171,82 @@
             opacity: 0.9;
         }
 
+        /* ========== 思维链（<think>）：可折叠，默认收起，黑白灰极简 ========== */
+        .think-chain {
+            align-self: flex-start;
+            max-width: 86%;
+            margin: 2px 0;
+            font-size: 0.688rem;
+            color: #999999;
+            line-height: 1.5;
+        }
+        .think-chain-head {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #F2F2F7;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
+            font-weight: 500;
+        }
+        .think-chain-head:active {
+            background: #E5E5EA;
+        }
+        .think-chain-head svg {
+            width: 10px;
+            height: 10px;
+            stroke: #8E8E93;
+            transition: transform 0.2s ease;
+        }
+        .think-chain.open .think-chain-head svg {
+            transform: rotate(90deg);
+        }
+        .think-chain-body {
+            display: none;
+            margin-top: 4px;
+            padding: 8px 10px;
+            background: #FAFAFA;
+            border-radius: 10px;
+            border: 1px solid #ECECF0;
+            font-size: 0.656rem;
+            color: #8E8E93;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-style: italic;
+        }
+        .think-chain.open .think-chain-body {
+            display: block;
+        }
+
+        /* ========== 旁白（<narratage>）：居中淡化，无气泡包裹 ========== */
+        .narratage-block {
+            align-self: center;
+            max-width: 75%;
+            margin: 4px auto;
+            text-align: center;
+            font-size: 0.688rem;
+            color: #B0B0B5;
+            line-height: 1.5;
+            letter-spacing: 0.02em;
+            font-style: italic;
+            padding: 2px 0;
+        }
+        .narratage-block::before,
+        .narratage-block::after {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 1px;
+            background: #D1D1D6;
+            vertical-align: middle;
+            margin: 0 8px;
+            opacity: 0.6;
+        }
+
     </style>
 <link rel="stylesheet" href="mobile-fit.css">
 </head>
@@ -1614,6 +1690,101 @@
             return null;
         }
 
+        // AI 回复清洗（保护 think/narratage 标签不被 cleanup 破坏）
+        function cleanupAiReply(raw) {
+            // 1) 提取 think 和 narratage 块，替换成占位符
+            var THINK_PH = '\u0000THINK_BLOCK\u0000';
+            var NARR_PH = '\u0000NARR_BLOCK\u0000';
+            var thinks = [];
+            var narrations = [];
+            var text = String(raw || '');
+            var m;
+            var thinkRegex = /<think>[\s\S]*?<\/think>/gi;
+            while ((m = thinkRegex.exec(text)) !== null) {
+                thinks.push(m[0]);
+            }
+            text = text.replace(thinkRegex, THINK_PH);
+            var narrRegex = /<narratage>[\s\S]*?<\/narratage>/gi;
+            while ((m = narrRegex.exec(text)) !== null) {
+                narrations.push(m[0]);
+            }
+            text = text.replace(narrRegex, NARR_PH);
+            // 2) 对不含标签的安全文本做 cleanup
+            text = applyAICleanup(text);
+            // 3) 还原占位符
+            var idx = 0;
+            text = text.replace(new RegExp(THINK_PH.replace(/\u0000/g, '\\u0000'), 'g'), function () {
+                return thinks[idx++] || '';
+            });
+            idx = 0;
+            text = text.replace(new RegExp(NARR_PH.replace(/\u0000/g, '\\u0000'), 'g'), function () {
+                return narrations[idx++] || '';
+            });
+            return text;
+        }
+
+        // ===== 解析 AI 回复：拆分 <think>思维链</think>、<narratage>旁白</narratage>、双回车多气泡 =====
+        function parseReplyContent(raw) {
+            var text = String(raw || '');
+            // 1) 提取思维链块
+            var thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+            var thinks = [];
+            var m;
+            thinkRegex.lastIndex = 0;
+            while ((m = thinkRegex.exec(text)) !== null) {
+                var tc = String(m[1] || '').trim();
+                if (tc) thinks.push(tc);
+            }
+            // 从正文中移除 <think>...</think>
+            text = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+
+            // 2) 提取旁白块
+            var narrRegex = /<narratage>([\s\S]*?)<\/narratage>/g;
+            var narrations = [];
+            narrRegex.lastIndex = 0;
+            while ((m = narrRegex.exec(text)) !== null) {
+                var nc = String(m[1] || '').trim();
+                if (nc) narrations.push(nc);
+            }
+            // 从正文中移除 <narratage>...</narratage>
+            text = text.replace(/<narratage>[\s\S]*?<\/narratage>/g, '');
+
+            // 3) 双回车拆分成多段正文，每段一个气泡
+            // 先清理多余空行，再按 \n\n 分段
+            var segments = text.replace(/\n{3,}/g, '\n\n').split(/\n\n+/);
+            var bubbles = [];
+            segments.forEach(function (seg) {
+                var s = seg.trim();
+                if (s) bubbles.push(s);
+            });
+
+            return { thinks: thinks, narrations: narrations, bubbles: bubbles };
+        }
+
+        // 渲染思维链块（可折叠）
+        function renderThinkChainBlock(content) {
+            var wrap = document.createElement('div');
+            wrap.className = 'think-chain';
+            wrap.innerHTML = '' +
+                '<div class="think-chain-head">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+                    '<span>思维链</span>' +
+                '</div>' +
+                '<div class="think-chain-body">' + escHtml(content) + '</div>';
+            wrap.querySelector('.think-chain-head').addEventListener('click', function () {
+                wrap.classList.toggle('open');
+            });
+            return wrap;
+        }
+
+        // 渲染旁白块（居中淡化，无气泡）
+        function renderNarratageBlock(content) {
+            var el = document.createElement('div');
+            el.className = 'narratage-block';
+            el.textContent = content;
+            return el;
+        }
+
         function appendMessageToDOM(msg, idx) {
             const row = document.createElement('div');
             const isSent = msg.role === 'sent' || msg.role === 'user';
@@ -1780,7 +1951,52 @@
                     '<div class="card-label">个人名片</div></div>' +
                     '</div>';
             } else {
-                bubble.textContent = msg.text || msg.content || '';
+                var rawText = msg.text || msg.content || '';
+                // AI 消息：解析思维链、旁白、双回车多气泡
+                var isAiMsg = !isSent && !isError &&
+                    (msg.role === 'assistant' || msg.role === 'received');
+                var _pendingExtras = []; // 收集 think/narration/extra rows，主 row 之后再 append
+                if (isAiMsg && rawText) {
+                    var parsed = parseReplyContent(rawText);
+                    // 思维链块（折叠）
+                    parsed.thinks.forEach(function (tc) {
+                        _pendingExtras.push(renderThinkChainBlock(tc));
+                    });
+                    // 旁白块（居中淡化）
+                    parsed.narrations.forEach(function (nc) {
+                        _pendingExtras.push(renderNarratageBlock(nc));
+                    });
+                    if (parsed.bubbles.length > 0) {
+                        // 第一个气泡走正常 row 流程（含 avatar / group name / mid / 译文）
+                        bubble.textContent = parsed.bubbles[0];
+                        // 后续气泡：只保留 bubble + avatar，不带 extra 装饰
+                        for (var bi = 1; bi < parsed.bubbles.length; bi++) {
+                            var extraRow = document.createElement('div');
+                            extraRow.className = 'msg-row received';
+                            extraRow.dataset.mid = ensureMid(msg);
+                            extraRow.dataset.time = String(msg.time || '');
+                            var extraBubble = document.createElement('div');
+                            extraBubble.className = 'msg-bubble';
+                            extraBubble.textContent = parsed.bubbles[bi];
+                            var extraAv = document.createElement('div');
+                            extraAv.className = 'msg-avatar';
+                            if (currentCharacter.avatar) {
+                                extraAv.innerHTML = '<img src="' + currentCharacter.avatar + '" alt="">';
+                            } else {
+                                extraAv.innerHTML = USER_SVG;
+                            }
+                            extraRow.appendChild(extraAv);
+                            extraRow.appendChild(extraBubble);
+                            _pendingExtras.push(extraRow);
+                        }
+                    } else {
+                        // 只有思维链/旁白没正文：直接挂 extras 并 return，主 row 丢弃
+                        _pendingExtras.forEach(function (el) { chatMessages.appendChild(el); });
+                        return;
+                    }
+                } else {
+                    bubble.textContent = rawText;
+                }
             }
 
             // 译文小字（AI 翻译结果落库后随消息一起渲染）
@@ -1835,6 +2051,10 @@
             }
 
             chatMessages.appendChild(row);
+            // AI 消息的思维链块/旁白块/额外气泡：主 row 之后追加，保证正确渲染顺序
+            if (typeof _pendingExtras !== 'undefined') {
+                _pendingExtras.forEach(function (el) { chatMessages.appendChild(el); });
+            }
         }
 
         function renderAllMessages() {
@@ -2495,10 +2715,12 @@
             }
             // 说话方式强制约束（每次请求必注入）
             const SPEAK_STYLE = '[说话方式强制约束]\n' +
-                '1. 你是在发微信，不是写小说！禁止写动作描写（如 *微笑*）、禁止写心理描写（如 （想了一下））、禁止写旁白。\n' +
-                '2. 句子必须极短，口语化。例如："今天好累啊，想你了。"（正确），"我坐在这里，看着窗外的雨，心中泛起一丝涟漪……"（错误，绝对不准写！）。\n' +
-                '3. 不要每句话都带括号、不要每句话都带颜文字，自然一点。\n' +
-                '4. 绝对禁止使用"作为AI"、"我是语言模型"、"我没有情感"等任何助手语气。你现在就是一个活生生的人。';
+                '1. 你是在发微信，不是写小说！禁止写 *动作*（星号动作描写）、禁止写（心理描写）括号。\n' +
+                '2. 如果需要动作/神态/环境旁白，请使用固定格式 <narratage>旁白内容</narratage>，每次旁白不超过50字，总旁白占比不超过50%。\n' +
+                '3. 每次回复【必须】先输出思维链：<think>你的思考过程</think>，然后再输出对话正文。思维链是你的思考草稿，可以随意写，会被系统折叠隐藏。\n' +
+                '4. 句子必须极短，口语化，1-6句话。多段回复用双回车 \\n\\n 分隔，系统会自动拆成多个气泡。\n' +
+                '5. 不要每句话都带括号、不要每句话都带颜文字，自然一点。\n' +
+                '6. 绝对禁止使用"作为AI"、"我是语言模型"、"我没有情感"等任何助手语气。你现在就是一个活生生的人。';
             if (!systemPrompt.includes('[说话方式强制约束]')) {
                 systemPrompt += '\n\n' + SPEAK_STYLE;
             }
@@ -2568,10 +2790,14 @@
               '世界书是舞台，不是你这个人。',
               '',
               '【输出格式】',
-              '直接输出 ' + charName + ' 说的话。禁止：',
+              '每次回复必须按以下顺序输出：',
+              '1. <think>你的思考过程（随意写，会被折叠）</think>',
+              '2. 1-6句对话正文（多段用双回车 \\n\\n 分隔，系统会自动拆成多气泡）',
+              '3. 可选：<narratage>动作/神态/环境旁白</narratage>（每次不超50字，总占比不超50%）',
+              '禁止：',
               '- 禁止写 *动作*（星号动作描写）',
-              '- 禁止写（心理活动）',
-              '- 禁止写旁白"她笑了笑"',
+              '- 禁止写（心理活动）括号',
+              '- 禁止写自由格式旁白（必须用 <narratage> 标签）',
               '- 禁止加"' + charName + '："前缀',
               '- 禁止解释、道歉、"好的我明白了"',
               '你就是她/他，你直接说话。',
@@ -2644,8 +2870,14 @@
 
             recentHistory.forEach(m => {
                 if (m.isError || m.role === 'system_error') return;
-                const content = String(m.text || m.content || '').trim();
+                var content = String(m.text || m.content || '').trim();
                 if (!content) return; // 纯展示卡片消息（位置/通话等）无文本时不发给 AI
+                // 剥离 <think>...</think>（思维链是草稿，不进上下文）
+                content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
+                // 剥离 <narratage>...</narratage>（旁白是 UI 层，不占上下文序号）
+                content = content.replace(/<narratage>[\s\S]*?<\/narratage>/gi, '');
+                content = content.replace(/\n{3,}/g, '\n\n').trim();
+                if (!content) return;
                 if (m.role === 'sent' || m.role === 'user') {
                     apiMessages.push({ role: 'user', content: content });
                 } else if (m.role === 'received' || m.role === 'assistant') {
@@ -2659,7 +2891,10 @@
                 apiMessages.push({ role: 'user', content: '(继续)' });
             }
 
-            // 界面反馈：显示“对方正在输入...”状态
+            // 界面反馈：显示"对方正在输入..."状态（底部 loading + 顶部 header 切换）
+            var chatTitleEl = document.getElementById('chat-title');
+            var originalTitleText = chatTitleEl ? chatTitleEl.textContent : '';
+            if (chatTitleEl) chatTitleEl.textContent = '对方正在输入...';
             const statusId = 'loading-' + Date.now();
             const box = document.getElementById('chat-messages');
             const statusDiv = document.createElement('div');
@@ -2717,6 +2952,8 @@
                     appendMessageToDOM(errorMsg);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                     logApiCall(apiModel, 'error', apiCallStart, errText);
+                    // 恢复 header 名字
+                    if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                     return;
                 }
 
@@ -2777,8 +3014,14 @@
                             }
 
                             if (streamBubble) {
-                                // 实时展示时即隐藏通话标记（完整标记到达的瞬间起不再可见）
-                                streamBubble.textContent = extractVoiceCallMarker(fullText).text;
+                                // 流式实时显示：临时隐藏 think/narratage 标签块（含未闭合的），只展示正文
+                                var tmpText = extractVoiceCallMarker(fullText).text;
+                                tmpText = tmpText.replace(/<think>[\s\S]*?<\/think>/gi, '')
+                                    .replace(/<narratage>[\s\S]*?<\/narratage>/gi, '')
+                                    .replace(/<think>[\s\S]*$/gi, '')   // 未闭合的 <think> 开标签
+                                    .replace(/<narratage>[\s\S]*$/gi, '')
+                                    .replace(/\n{3,}/g, '\n\n').trim();
+                                streamBubble.textContent = tmpText;
                             }
                             chatMessages.scrollTop = chatMessages.scrollHeight;
                         }
@@ -2797,6 +3040,8 @@
                     historyList.push(errorMsg);
                     saveMessages(historyList);
                     appendMessageToDOM(errorMsg);
+                    // 恢复 header 名字
+                    if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                 } else {
                     // 落盘前剥离主动通话标记：气泡展示与聊天记录均不保留标记，避免污染后续上下文
                     const parsedCall = extractVoiceCallMarker(fullText);
@@ -2813,14 +3058,22 @@
                     fullText = parsedHeart.text;
                     const parsedImg = extractVImageMarkers(fullText);
                     fullText = parsedImg.text;
-                    // AI 回复清洗：硬编码八股规则 + 用户自定义正则 + 残余标点收口（只对 AI 文本生效）
-                    fullText = applyAICleanup(fullText);
+                    // AI 回复清洗：保护 think/narratage 标签
+                    fullText = cleanupAiReply(fullText);
                     if (fullText) {
-                        if (streamBubble) streamBubble.textContent = fullText;
-                        // 气泡已在流式过程中挂载，这里只做持久化
+                        // 落库（保留 think/narratage 标签供 parseReplyContent 解析）
                         const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
                         historyList.push(aiMsg);
                         saveMessages(historyList);
+                        // 删掉流式期间的临时气泡（它只显示了剥离标签后的原始文本）
+                        if (streamBubble) {
+                            var tempRow = streamBubble.closest('.msg-row');
+                            if (tempRow) tempRow.remove();
+                        }
+                        // 整体重新渲染：让新消息走 parseReplyContent → 思维链块 + 旁白块 + 多气泡
+                        renderAllMessages();
+                        // 恢复 header 名字
+                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                     } else if ((parsedCall.wantCall || parsedPay.items.length || parsedHeart.hearts.length || parsedImg.images.length) && streamBubble) {
                         // 模型只输出了标记：移除空白气泡、不落文本（来电卡/红包卡仍会插入）
                         const onlyRow = streamBubble.closest('.msg-row');
@@ -2867,13 +3120,20 @@
                     fullText = parsedHeart.text;
                     const parsedImg = extractVImageMarkers(fullText);
                     fullText = parsedImg.text;
-                    // AI 回复清洗（与正常分支同一套规则）
-                    fullText = applyAICleanup(fullText);
-                    if (streamBubble) streamBubble.textContent = fullText;
+                    // AI 回复清洗（与正常分支同一套规则，保护标签）
+                    fullText = cleanupAiReply(fullText);
                     if (fullText) {
                         const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
                         historyList.push(aiMsg);
                         saveMessages(historyList);
+                        // 删掉流式临时气泡，整体 re-render 让 think/narratage 生效
+                        if (streamBubble) {
+                            var tRow = streamBubble.closest('.msg-row');
+                            if (tRow) tRow.remove();
+                        }
+                        renderAllMessages();
+                        // 恢复 header 名字
+                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                     }
                     const tipText = error.name === 'AbortError'
                         ? '连接中断，以上为已收到的回复（15秒超时）'
@@ -2913,6 +3173,8 @@
                 appendMessageToDOM(errorMsg);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 logApiCall(apiModel, 'error', apiCallStart, errorText);
+                // 恢复 header 名字
+                if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
             }
         }
 

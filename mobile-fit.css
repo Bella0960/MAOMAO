@@ -25,7 +25,7 @@
 
   /* === 去掉模拟器外壳，全屏铺满 === */
   .phone-mockup,
-  .home-screen,
+  .pages-container,
   .phone,
   .app-frame {
     width: 100vw !important;

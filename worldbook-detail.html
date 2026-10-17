@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>世界书 · 条目管理</title>
+<script src="font-loader.js"></script>
+<script src="native-feel.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    min-height: 0;
+    background-color: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0; width: 100%;
+    padding: 14px 28px;
+    font-size: 0.875rem; font-weight: 600;
+    color: #000; z-index: 50;
+    pointer-events: none !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ============ 顶部栏 ============ */
+  .d-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 10px 16px;
+    position: relative;
+    z-index: 30;
+  }
+  .d-back-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #F2F2F7;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+  .d-back-btn::after { content:''; position:absolute; inset:-6px; }
+  .d-back-btn:active { transform: scale(0.94); }
+  .d-back-btn svg { width: 16px; height: 16px; stroke: #333; }
+  .d-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.688rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #8E8E93;
+    text-transform: uppercase;
+  }
+  .d-title-cn {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: 0;
+    margin-top: 2px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+  }
+  .d-placeholder { width: 32px; }
+
+  /* ============ 位置 Tab ============ */
+  .d-pos-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 8px 16px;
+  }
+  .d-pos-tab {
+    flex: 1;
+    height: 30px;
+    border: none;
+    border-radius: 15px;
+    background: #F2F2F7;
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #8E8E93;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .d-pos-tab .d-pos-count { font-size: 0.625rem; color: #AEAEB2; font-weight: 500; }
+  .d-pos-tab.active { background: #1C1C1E; color: #FFFFFF; }
+  .d-pos-tab.active .d-pos-count { color: rgba(255,255,255,0.6); }
+
+  /* ============ 条目列表 ============ */
+  .d-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 90px;
+    scrollbar-width: none;
+    background: #FFFFFF;
+  }
+  .d-stage::-webkit-scrollbar { display: none; }
+
+  .d-section-label {
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #8E8E93;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 10px 0 8px;
+  }
+  .d-empty {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 0.813rem;
+    color: #8E8E93;
+  }
+
+  /* 条目卡片 */
+  .entry-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    border: 1px solid #F2F2F7;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.1s;
+  }
+  .entry-card:active { transform: scale(0.99); }
+  .entry-card.is-disabled { opacity: 0.55; }
+  .entry-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .entry-type-badge {
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 10px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    display: flex; align-items: center;
+    letter-spacing: 0.03em;
+  }
+  .entry-type-badge.is-text { background: #F2F2F7; color: #333; }
+  .entry-type-badge.is-regex { background: #FFF2CC; color: #996600; }
+  .entry-name {
+    flex: 1;
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .entry-pos-tag {
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    display: flex; align-items: center;
+  }
+  .entry-pos-tag.is-front { background: #E8F5E9; color: #2E7D32; }
+  .entry-pos-tag.is-middle { background: #E3F2FD; color: #1565C0; }
+  .entry-pos-tag.is-back { background: #FCE4EC; color: #C2185B; }
+
+  .entry-body {
+    font-size: 0.75rem;
+    color: #555;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-all;
+  }
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .entry-inject-tag {
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .entry-inject-tag .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .entry-inject-tag.is-always .dot { background: #34C759; }
+  .entry-inject-tag.is-keyword .dot { background: #FF9500; }
+  .entry-inject-tag.is-probability .dot { background: #AF52DE; }
+
+  /* 开关 toggle */
+  .entry-toggle {
+    width: 40px; height: 22px;
+    border-radius: 11px;
+    border: none;
+    padding: 0;
+    background: #E5E5EA;
+    position: relative;
+    transition: background 0.25s ease;
+    cursor: pointer;
+  }
+  .entry-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.25s ease;
+  }
+  .entry-toggle.on { background: #34C759; }
+  .entry-toggle.on::after { transform: translateX(18px); }
+
+  /* ============ 底部新建按钮 ============ */
+  .d-footer {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 10px 16px 24px;
+    display: flex;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 30%);
+    z-index: 20;
+  }
+  .d-footer-btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .d-footer-btn:active { opacity: 0.85; }
+  .d-footer-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .d-footer-btn.is-dark svg { stroke: #FFFFFF; width: 17px; height: 17px; }
+  .d-footer-btn.is-light { background: #F2F2F7; color: #111; }
+  .d-footer-btn.is-light svg { stroke: #111; width: 17px; height: 17px; }
+
+  /* ============ 编辑抽屉 ============ */
+  .d-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 600;
+    display: none;
+    align-items: flex-end;
+  }
+  .d-overlay.show { display: flex; }
+  .d-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+  .d-sheet {
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px 20px 0 0;
+    padding: 10px 16px 26px;
+    max-height: 88%;
+    overflow-y: auto;
+    animation: dSlideUp 0.25s ease;
+  }
+  @keyframes dSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .d-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #E5E5EA;
+    margin: 0 auto 14px;
+    flex-shrink: 0;
+  }
+  .d-sheet-title {
+    text-align: center;
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 14px;
+  }
+  .d-field { margin-bottom: 14px; }
+  .d-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #8E8E93;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .d-field input, .d-field textarea, .d-field select {
+    width: 100%;
+    background: #F2F2F7;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333;
+  }
+  .d-field input { height: 42px; padding: 0 14px; }
+  .d-field textarea {
+    min-height: 110px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+  .d-field input::placeholder, .d-field textarea::placeholder { color: #B0B0B5; }
+
+  /* 三选一胶囊 */
+  .d-seg {
+    display: flex;
+    background: #F2F2F7;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .d-seg-btn {
+    flex: 1;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #8E8E93;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+  .d-seg-btn svg { width: 14px; height: 14px; stroke: currentColor; }
+  .d-seg-btn.active { background: #FFFFFF; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+  /* 开关行（抽屉内） */
+  .d-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .d-toggle-label { font-size: 0.875rem; font-weight: 500; color: #333; }
+
+  /* 概率滑块 */
+  .d-prob-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .d-prob-row input[type=range] {
+    flex: 1;
+    height: 4px;
+    accent-color: #1C1C1E;
+  }
+  .d-prob-val {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #111;
+    min-width: 38px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .d-sheet-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .d-btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .d-btn.is-light { background: #F2F2F7; color: #333; }
+  .d-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .d-btn:active { opacity: 0.9; }
+  .d-btn.is-danger { background: rgba(255, 69, 58, 0.08); color: #FF453A; }
+  .d-btn.is-danger:active { background: rgba(255, 69, 58, 0.16); }
+
+  /* 位置和注入模式提示框（条件显示） */
+  .d-hint {
+    font-size: 0.688rem;
+    color: #8E8E93;
+    margin-top: 6px;
+    line-height: 1.4;
+    padding-left: 2px;
+  }
+
+  /* Toast */
+  .d-toast {
+    position: absolute;
+    left: 50%;
+    bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,0,0,0.8);
+    color: #FFF;
+    font-size: 0.813rem;
+    padding: 10px 18px;
+    border-radius: 20px;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .d-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <main class="phone-mockup" id="phoneMockup">
+    <div class="status-bar">
+      <span id="statusTime">09:41</span>
+      <span>●●●●●</span>
+    </div>
+
+    <!-- 顶部栏 -->
+    <div class="d-topbar">
+      <button class="d-back-btn" id="btnBack" type="button" aria-label="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="flex:1; text-align:center; min-width:0;">
+        <div class="d-title">WORLDBOOK</div>
+        <div class="d-title-cn" id="bookTitleCn">加载中…</div>
+      </div>
+      <div class="d-placeholder"></div>
+    </div>
+
+    <!-- 位置 Tab：前 / 中 / 后 + 全部 -->
+    <div class="d-pos-tabs">
+      <button class="d-pos-tab active" data-pos="all" type="button">
+        <span>全部</span><span class="d-pos-count" id="countAll">0</span>
+      </button>
+      <button class="d-pos-tab" data-pos="front" type="button">
+        <span>前位</span><span class="d-pos-count" id="countFront">0</span>
+      </button>
+      <button class="d-pos-tab" data-pos="middle" type="button">
+        <span>中位</span><span class="d-pos-count" id="countMiddle">0</span>
+      </button>
+      <button class="d-pos-tab" data-pos="back" type="button">
+        <span>后位</span><span class="d-pos-count" id="countBack">0</span>
+      </button>
+    </div>
+
+    <!-- 条目列表 -->
+    <div class="d-stage" id="listStage">
+      <!-- JS 渲染 -->
+    </div>
+
+    <!-- 底部新建按钮 -->
+    <div class="d-footer">
+      <button class="d-footer-btn is-dark" id="btnNewText" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建文本条目
+      </button>
+      <button class="d-footer-btn is-light" id="btnNewRegex" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+        正则条目
+      </button>
+    </div>
+
+    <!-- 编辑抽屉 -->
+    <div class="d-overlay" id="editOverlay">
+      <div class="d-backdrop" data-close="editOverlay"></div>
+      <div class="d-sheet">
+        <div class="d-handle"></div>
+        <div class="d-sheet-title" id="sheetTitle">编辑条目</div>
+
+        <!-- 名称 -->
+        <div class="d-field">
+          <label for="edName">条目名称</label>
+          <input id="edName" type="text" maxlength="40" placeholder="例如：世界观设定" />
+        </div>
+
+        <!-- 类型（text / regex） -->
+        <div class="d-field">
+          <label>条目类型</label>
+          <div class="d-seg" id="edTypeSeg">
+            <button class="d-seg-btn active" data-type="text" type="button">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h7"/></svg>
+              文本
+            </button>
+            <button class="d-seg-btn" data-type="regex" type="button">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M6 4l2 16M12 4l2 16M4 8h18M4 16h18"/></svg>
+              正则
+            </button>
+          </div>
+          <div class="d-hint" id="edTypeHint">普通文本内容，直接注入到 prompt 中</div>
+        </div>
+
+        <!-- 内容 -->
+        <div class="d-field">
+          <label for="edContent">内容</label>
+          <textarea id="edContent" placeholder="输入条目内容…"></textarea>
+        </div>
+
+        <!-- 位置（前 / 中 / 后） -->
+        <div class="d-field">
+          <label>注入位置</label>
+          <div class="d-seg" id="edPosSeg">
+            <button class="d-seg-btn" data-pos="front" type="button">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="18 15 12 9 6 15"/></svg>
+              前位
+            </button>
+            <button class="d-seg-btn active" data-pos="middle" type="button">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
+              中位
+            </button>
+            <button class="d-seg-btn" data-pos="back" type="button">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="6 15 12 9 18 15"/></svg>
+              后位
+            </button>
+          </div>
+          <div class="d-hint">前位注入到 prompt 开头（世界观设定），中位注入到对话中间，后位注入到结尾（行为指令）</div>
+        </div>
+
+        <!-- 注入开关 -->
+        <div class="d-field">
+          <div class="d-toggle-row">
+            <span class="d-toggle-label">启用此条目</span>
+            <button class="entry-toggle on" id="edEnabled" type="button"></button>
+          </div>
+        </div>
+
+        <!-- 注入模式 -->
+        <div class="d-field">
+          <label>注入模式</label>
+          <div class="d-seg" id="edModeSeg">
+            <button class="d-seg-btn active" data-mode="always" type="button">始终注入</button>
+            <button class="d-seg-btn" data-mode="keyword" type="button">按关键词</button>
+            <button class="d-seg-btn" data-mode="probability" type="button">概率注入</button>
+          </div>
+        </div>
+
+        <!-- 关键词（仅 keyword 模式可见） -->
+        <div class="d-field" id="edKeywordsField" style="display:none;">
+          <label for="edKeywords">触发关键词（逗号分隔）</label>
+          <input id="edKeywords" type="text" placeholder="如：魔法,学院,战斗" />
+          <div class="d-hint">仅当 prompt 中包含任意关键词时才注入此条目</div>
+        </div>
+
+        <!-- 概率（仅 probability 模式可见） -->
+        <div class="d-field" id="edProbField" style="display:none;">
+          <label>注入概率</label>
+          <div class="d-prob-row">
+            <input type="range" id="edProb" min="0" max="100" value="50" />
+            <span class="d-prob-val" id="edProbVal">50%</span>
+          </div>
+          <div class="d-hint">每次构建 prompt 时按此概率决定是否注入</div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="d-sheet-actions">
+          <button class="d-btn is-light" id="btnEditDelete" type="button" style="display:none;">删除条目</button>
+          <button class="d-btn is-dark" id="btnEditSave" type="button">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="d-toast" id="dToast"></div>
+  </main>
+
+  <script src="statusbar-control.js"></script>
+  <script>
+  /* ============ 常量 ============ */
+  var STORAGE_KEY = 'phone_worldbooks';
+
+  /* ============ 工具函数 ============ */
+  function loadAll() {
+    try {
+      var arr = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (Array.isArray(arr)) return arr;
+    } catch (e) {}
+    return [];
+  }
+  function saveAll(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function genEntryId() {
+    return 'e_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+  function parseKeywords(raw) {
+    var arr = String(raw == null ? '' : raw).split(/[,，]/);
+    var seen = {}, result = [];
+    arr.forEach(function (item) {
+      var w = item.trim();
+      if (!w) return;
+      var k = w.toLowerCase();
+      if (seen[k]) return;
+      seen[k] = true;
+      result.push(w);
+    });
+    return result;
+  }
+  function showToast(text) {
+    var t = document.getElementById('dToast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1400);
+  }
+  function getQuery(id) {
+    var m = window.location.search.match(new RegExp('[?&]' + id + '=([^&]+)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  /* ============ 状态 ============ */
+  var bookId = getQuery('id');
+  var book = null;
+  var currentPos = 'all';
+  var editingEntryId = null;
+
+  function findBook() {
+    if (!bookId) return null;
+    var list = loadAll();
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(bookId)) return list[i];
+    }
+    return null;
+  }
+  function saveBook() {
+    if (!book) return;
+    var list = loadAll();
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(book.id)) {
+        list[i] = book;
+        saveAll(list);
+        return;
+      }
+    }
+  }
+
+  /* ============ 渲染 ============ */
+  function posLabel(p) {
+    return p === 'front' ? '前位' : (p === 'back' ? '后位' : '中位');
+  }
+  function injectLabel(mode) {
+    if (mode === 'keyword') return '按关键词';
+    if (mode === 'probability') return '概率注入';
+    return '始终注入';
+  }
+
+  function renderList() {
+    if (!book) return;
+    var list = book.entries || [];
+
+    // 计数
+    document.getElementById('countAll').textContent = list.length;
+    document.getElementById('countFront').textContent = list.filter(function (e) { return e.position === 'front'; }).length;
+    document.getElementById('countMiddle').textContent = list.filter(function (e) { return e.position === 'middle'; }).length;
+    document.getElementById('countBack').textContent = list.filter(function (e) { return e.position === 'back'; }).length;
+
+    // 筛选
+    var filtered = currentPos === 'all' ? list.slice() : list.filter(function (e) { return e.position === currentPos; });
+    // 排序：前位 → 中位 → 后位
+    var order = { front: 0, middle: 1, back: 2 };
+    filtered.sort(function (a, b) { return (order[a.position] || 1) - (order[b.position] || 1); });
+
+    var stage = document.getElementById('listStage');
+    if (!filtered.length) {
+      stage.innerHTML = '<div class="d-empty">还没有条目<br/>点击下方按钮新建一个</div>';
+      return;
+    }
+
+    stage.innerHTML = filtered.map(function (e) {
+      var disabled = !e.enabled;
+      var isRegex = e.type === 'regex';
+      var probText = (e.injectMode === 'probability') ? ' (' + (e.probability || 50) + '%)' : '';
+      var kwText = (e.injectMode === 'keyword' && e.keywords && e.keywords.length) ? '：' + e.keywords.join(', ') : '';
+      var contentPreview = String(e.content || '').replace(/\s+/g, ' ').trim();
+      if (!contentPreview) contentPreview = isRegex ? '(空正则表达式)' : '(空内容)';
+      if (contentPreview.length > 80) contentPreview = contentPreview.slice(0, 80) + '…';
+
+      return '<div class="entry-card' + (disabled ? ' is-disabled' : '') + '" data-eid="' + e.id + '">' +
+        '<div class="entry-card-head">' +
+          '<span class="entry-type-badge ' + (isRegex ? 'is-regex' : 'is-text') + '">' + (isRegex ? 'REGEX' : 'TEXT') + '</span>' +
+          '<span class="entry-name">' + String(e.name || '未命名条目').replace(/</g, '&lt;') + '</span>' +
+          '<span class="entry-pos-tag is-' + e.position + '">' + posLabel(e.position) + '</span>' +
+        '</div>' +
+        '<div class="entry-body">' + contentPreview.replace(/</g, '&lt;') + '</div>' +
+        '<div class="entry-meta">' +
+          '<span class="entry-inject-tag is-' + e.injectMode + '">' +
+            '<span class="dot"></span>' + injectLabel(e.injectMode) + probText + kwText +
+          '</span>' +
+          '<button class="entry-toggle' + (e.enabled ? ' on' : '') + '" data-eid="' + e.id + '" data-act="toggle" type="button"></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ============ 位置 Tab ============ */
+  document.querySelectorAll('.d-pos-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.d-pos-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      currentPos = tab.getAttribute('data-pos');
+      renderList();
+    });
+  });
+
+  /* ============ 列表事件委托 ============ */
+  document.getElementById('listStage').addEventListener('click', function (e) {
+    // 开关按钮
+    var toggle = e.target.closest('[data-act="toggle"]');
+    if (toggle) {
+      e.stopPropagation();
+      var eid = toggle.getAttribute('data-eid');
+      var entry = book.entries.find(function (x) { return x.id === eid; });
+      if (entry) {
+        entry.enabled = !entry.enabled;
+        saveBook();
+        renderList();
+      }
+      return;
+    }
+    // 卡片 → 编辑
+    var card = e.target.closest('.entry-card');
+    if (card) {
+      openEdit(card.getAttribute('data-eid'));
+    }
+  });
+
+  /* ============ 抽屉通用 ============ */
+  function openOverlay(id) { document.getElementById(id).classList.add('show'); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+  document.querySelectorAll('.d-backdrop[data-close]').forEach(function (el) {
+    el.addEventListener('click', function () { closeOverlay(el.getAttribute('data-close')); });
+  });
+
+  /* ============ 编辑抽屉 ============ */
+  var edName, edContent, edEnabledBtn, edKeywords, edProb, edProbVal, edKeywordsField, edProbField;
+  var edType = 'text', edPos = 'middle', edMode = 'always';
+
+  function initEditRefs() {
+    edName = document.getElementById('edName');
+    edContent = document.getElementById('edContent');
+    edEnabledBtn = document.getElementById('edEnabled');
+    edKeywords = document.getElementById('edKeywords');
+    edProb = document.getElementById('edProb');
+    edProbVal = document.getElementById('edProbVal');
+    edKeywordsField = document.getElementById('edKeywordsField');
+    edProbField = document.getElementById('edProbField');
+  }
+
+  function openEdit(eid) {
+    if (!book) return;
+    var entry;
+    if (eid) {
+      entry = book.entries.find(function (x) { return x.id === eid; });
+    } else {
+      // 新建
+      var type = arguments[1] || 'text';
+      entry = {
+        id: genEntryId(),
+        name: type === 'regex' ? '新正则条目' : '新条目',
+        type: type,
+        content: '',
+        position: 'middle',
+        enabled: true,
+        injectMode: 'always',
+        keywords: [],
+        probability: 50
+      };
+      book.entries.push(entry);
+    }
+    if (!entry) return;
+    editingEntryId = entry.id;
+
+    // 填表单
+    document.getElementById('sheetTitle').textContent = eid ? '编辑条目' : '新建条目';
+    document.getElementById('btnEditDelete').style.display = eid ? 'flex' : 'none';
+    edName.value = entry.name;
+    edContent.value = entry.content || '';
+    edKeywords.value = (entry.keywords || []).join(',');
+    edProb.value = entry.probability || 50;
+    edProbVal.textContent = (entry.probability || 50) + '%';
+    edEnabledBtn.classList.toggle('on', entry.enabled !== false);
+
+    // 同步 seg 高亮
+    edType = entry.type === 'regex' ? 'regex' : 'text';
+    edPos = (entry.position === 'front' || entry.position === 'back') ? entry.position : 'middle';
+    edMode = (entry.injectMode === 'keyword' || entry.injectMode === 'probability') ? entry.injectMode : 'always';
+    syncSeg2('edTypeSeg', edType, 'data-type');
+    syncSeg2('edPosSeg', edPos, 'data-pos');
+    syncSeg2('edModeSeg', edMode, 'data-mode');
+    updateModeFields();
+
+    openOverlay('editOverlay');
+  }
+
+  // 通用版：遍历 data-xxx 匹配
+  function syncSeg2(containerId, value, attrName) {
+    document.querySelectorAll('#' + containerId + ' .d-seg-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute(attrName) === value);
+    });
+  }
+
+  function updateModeFields() {
+    edKeywordsField.style.display = (edMode === 'keyword') ? 'block' : 'none';
+    edProbField.style.display = (edMode === 'probability') ? 'block' : 'none';
+  }
+
+  // seg 切换：类型
+  document.getElementById('edTypeSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest('.d-seg-btn');
+    if (!btn) return;
+    edType = btn.getAttribute('data-type');
+    syncSeg2('edTypeSeg', edType, 'data-type');
+    document.getElementById('edTypeHint').textContent = edType === 'regex'
+      ? '正则表达式，匹配到的文本会被替换/注入'
+      : '普通文本内容，直接注入到 prompt 中';
+  });
+  // seg 切换：位置
+  document.getElementById('edPosSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest('.d-seg-btn');
+    if (!btn) return;
+    edPos = btn.getAttribute('data-pos');
+    syncSeg2('edPosSeg', edPos, 'data-pos');
+  });
+  // seg 切换：注入模式
+  document.getElementById('edModeSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest('.d-seg-btn');
+    if (!btn) return;
+    edMode = btn.getAttribute('data-mode');
+    syncSeg2('edModeSeg', edMode, 'data-mode');
+    updateModeFields();
+  });
+
+  // 启用开关（抽屉内）
+  edEnabledBtn = null;  // 先 null 防报错，initEditRefs 后赋值
+  document.addEventListener('DOMContentLoaded', function () {
+    initEditRefs();
+
+    document.getElementById('edEnabled').addEventListener('click', function () {
+      this.classList.toggle('on');
+    });
+
+    edProb.addEventListener('input', function () {
+      edProbVal.textContent = this.value + '%';
+    });
+
+    // 保存
+    document.getElementById('btnEditSave').addEventListener('click', function () {
+      var entry = book.entries.find(function (x) { return x.id === editingEntryId; });
+      if (!entry) return;
+      var name = edName.value.trim();
+      if (!name) { showToast('请填写条目名称'); edName.focus(); return; }
+      entry.name = name;
+      entry.type = edType;
+      entry.content = edContent.value;
+      entry.position = edPos;
+      entry.enabled = edEnabledBtn.classList.contains('on');
+      entry.injectMode = edMode;
+      entry.keywords = parseKeywords(edKeywords.value);
+      entry.probability = parseInt(edProb.value, 10) || 50;
+      saveBook();
+      closeOverlay('editOverlay');
+      renderList();
+      showToast('已保存');
+    });
+
+    // 删除
+    document.getElementById('btnEditDelete').addEventListener('click', function () {
+      if (!window.confirm('确定删除此条目吗？')) return;
+      book.entries = book.entries.filter(function (x) { return x.id !== editingEntryId; });
+      saveBook();
+      closeOverlay('editOverlay');
+      renderList();
+      showToast('已删除');
+    });
+
+    // 新建按钮
+    document.getElementById('btnNewText').addEventListener('click', function () { openEdit(null, 'text'); });
+    document.getElementById('btnNewRegex').addEventListener('click', function () { openEdit(null, 'regex'); });
+
+    // 返回
+    document.getElementById('btnBack').addEventListener('click', function () {
+      window.location.href = 'worldbook.html';
+    });
+  });
+
+  /* ============ 初始化 ============ */
+  function init() {
+    if (!bookId) {
+      showToast('参数错误');
+      setTimeout(function () { window.location.href = 'worldbook.html'; }, 1200);
+      return;
+    }
+    book = findBook();
+    if (!book) {
+      showToast('世界书不存在');
+      setTimeout(function () { window.location.href = 'worldbook.html'; }, 1200);
+      return;
+    }
+    // 确保 entries 数组存在
+    if (!Array.isArray(book.entries)) book.entries = [];
+
+    document.getElementById('bookTitleCn').textContent = book.title || '未命名世界书';
+    initEditRefs();
+    renderList();
+  }
+  init();
+
+  /* ============ 状态栏时间 ============ */
+  (function () {
+    function update() {
+      var d = new Date();
+      var h = String(d.getHours()).padStart(2, '0');
+      var m = String(d.getMinutes()).padStart(2, '0');
+      var el = document.getElementById('statusTime');
+      if (el) el.textContent = h + ':' + m;
+    }
+    update();
+    setInterval(update, 30000);
+  })();
+  </script>
+</body>
+</html>

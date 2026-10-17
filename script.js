@@ -1,41 +1,33 @@
 // ===== 状态栏时间 =====
-const timeElement = document.querySelector('#status-time');
-const toast = document.querySelector('#toast');
-let toastTimer;
+(function () {
+  var el = document.querySelector('#status-time');
+  function tick() {
+    if (!el) return;
+    var now = new Date();
+    el.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
 
-function updateTime() {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-  if (timeElement) timeElement.textContent = timeStr;
-}
-
-// ===== Toast 提示 =====
-function showToast(message) {
-  toast.textContent = `${message} · UI 预览`;
-  toast.classList.add('show');
+// ===== Toast =====
+var toastEl = document.querySelector('#toast');
+var toastTimer = null;
+function showToast(msg) {
+  if (!toastEl) return;
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
 }
 
-// ===== 桌面 / Dock 栏图标点击 → 页面跳转 =====
-document.querySelectorAll('.app-card, .dock-item').forEach((app) => {
-  app.addEventListener('click', () => {
-    switch (app.dataset.app) {
-      case '消息':       window.location.href = 'chat.html'; break;
-      case '角色管理':   window.location.href = 'characters.html'; break;
-      case '设置':       window.location.href = 'settings.html'; break;
-      case '记忆':       window.location.href = 'memory.html'; break;
-      case '钱包':       window.location.href = 'wallet.html'; break;
-      case '音乐':       window.location.href = 'music.html'; break;
-      default: showToast(app.dataset.app);
-    }
-  });
+// ===== 统一事件委托：所有 data-href 点击跳转 =====
+document.addEventListener('click', function (e) {
+  var target = e.target.closest('[data-href]');
+  if (!target) return;
+  var href = target.dataset.href;
+  if (!href) return;
+  e.preventDefault();
+  if (e.button === 2) return; // 右键不跳转
+  window.location.href = href;
 });
-
-// ===== 启动 =====
-updateTime();
-setInterval(updateTime, 1000);
