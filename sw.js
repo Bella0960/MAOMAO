@@ -1,7 +1,7 @@
 /* 小手机 PWA Service Worker
  * 页面采用网络优先，静态资源采用缓存回退，避免旧 HTML 长期锁住不更新。
  */
-const CACHE_NAME = 'phone-app-pwa-v8';
+const CACHE_NAME = 'phone-app-pwa-v10';
 const APP_SHELL = [
   './',
   './index.html',
@@ -47,16 +47,22 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // HTML 导航网络优先：尽量拿到最新版；断网时回退缓存。
+  // HTML 导航缓存优先：有缓存立即秒开（不等网络），同时在后台悄悄更新缓存；
+  // 首次访问无缓存时才走网络，断网兜底回退到首页缓存。
   if (req.mode === 'navigate') {
+    const fresh = fetch(req).then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+      }
+      return response;
+    }).catch(() => null);
+    event.waitUntil(fresh);
     event.respondWith(
-      fetch(req).then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
-        }
-        return response;
-      }).catch(() => caches.match(req).then(cached => cached || caches.match('./index.html')))
+      caches.match(req).then(cached =>
+        cached ||
+        fresh.then(r => r || caches.match('./index.html'))
+      )
     );
     return;
   }
