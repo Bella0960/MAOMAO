@@ -1,25 +1,25 @@
 /* 小手机 PWA Service Worker
  * 页面采用网络优先，静态资源采用缓存回退，避免旧 HTML 长期锁住不更新。
  */
-const CACHE_NAME = 'phone-app-pwa-v7';
+const CACHE_NAME = 'phone-app-pwa-v8';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './styles.css',
-  './settings.css',
-  './mobile-fit.css',
-  './font-loader.js',
-  './native-feel.js',
-  './script.js',
-  './statusbar-control.js',
-  './nav.js',
-  './sound-system.js',
-  './memory.js',
-  './mask.js',
-  './settings.js',
-  './icon-192.png',
-  './icon-512.png'
+  './css/styles.css',
+  './css/settings.css',
+  './css/mobile-fit.css',
+  './js/font-loader.js',
+  './js/native-feel.js',
+  './js/script.js',
+  './js/statusbar-control.js',
+  './js/nav.js',
+  './js/sound-system.js',
+  './js/memory.js',
+  './js/mask.js',
+  './js/settings.js',
+  './assets/icon-192.png',
+  './assets/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
