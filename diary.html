@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>日记 · 小手机</title>
+<script src="native-feel.js"></script>
+<style>
+:root{color-scheme:light;--ink:#171717;--text:#444;--muted:#999;--line:#e9e9e9;--paper:#fff;--soft:#f6f6f6;--soft2:#f0f0f0;--shadow:0 12px 40px rgba(0,0,0,.07)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#ededed;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+button{color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #777;outline-offset:3px}
+.phone-mockup{position:relative;width:min(410px,calc(100vw - 24px));height:min(890px,calc(100dvh - 24px));min-height:620px;margin:12px auto;background:#fff;border:7px solid #fff;border-radius:43px;box-shadow:0 24px 80px rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column}
+.status-bar{height:34px;flex:0 0 34px;padding:7px 20px 0;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:650;letter-spacing:.02em;background:rgba(255,255,255,.92);z-index:3}
+.status-right{display:flex;align-items:center;gap:6px;color:#222}
+.signal{display:flex;align-items:flex-end;gap:2px;height:11px}.signal i{display:block;width:3px;background:#222;border-radius:3px}.signal i:nth-child(1){height:4px}.signal i:nth-child(2){height:6px}.signal i:nth-child(3){height:8px}.signal i:nth-child(4){height:10px}
+.wifi{width:13px;height:9px;border:1.5px solid transparent;border-top-color:#222;border-radius:50%;position:relative;transform:translateY(2px)}.wifi:after{content:"";position:absolute;width:4px;height:4px;border:1.5px solid transparent;border-top-color:#222;border-radius:50%;left:3px;top:2px}
+.battery{width:19px;height:10px;border:1.4px solid #222;border-radius:3px;padding:1.5px;position:relative}.battery:before{content:"";position:absolute;right:-3px;top:2px;width:2px;height:4px;background:#222;border-radius:0 2px 2px 0}.battery b{display:block;background:#222;width:70%;height:100%;border-radius:1px}
+.app-head{display:flex;align-items:center;justify-content:space-between;padding:12px 21px 8px;flex:0 0 auto}
+.head-left{display:flex;align-items:center;gap:11px}.round-btn{width:35px;height:35px;border:1px solid #ededed;background:rgba(255,255,255,.84);border-radius:50%;display:grid;place-items:center;transition:background .18s,transform .18s;flex-shrink:0}.round-btn:active{background:#eee;transform:scale(.94)}.round-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.brand-mark{font-size:10px;letter-spacing:.2em;color:#777;font-weight:650}.head-actions{display:flex;gap:7px}
+.app-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 22px 22px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.app-scroll::-webkit-scrollbar{display:none}
+.hero{padding:17px 0 21px;position:relative}.eyebrow{font-size:10px;color:#9a9a9a;letter-spacing:.18em;text-transform:uppercase;font-weight:650}.hero h1{font-size:43px;line-height:1.04;letter-spacing:-.065em;margin:10px 0 8px;font-weight:760}.hero p{font-size:12px;line-height:1.7;color:#888;margin:0;max-width:245px}.hero-date{position:absolute;right:0;top:27px;text-align:right;color:#b1b1b1}.hero-date strong{display:block;font-size:34px;line-height:1;font-weight:350;letter-spacing:-.07em;color:#333}.hero-date span{font-size:9px;letter-spacing:.12em}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 22px}.stat{padding:14px 15px 13px;background:#f7f7f7;border-radius:15px;min-height:77px}.stat-label{font-size:10px;color:#999;letter-spacing:.06em}.stat-main{display:flex;align-items:baseline;gap:6px;margin-top:7px}.stat-main strong{font-size:23px;font-weight:620;letter-spacing:-.05em}.stat-main span{font-size:10px;color:#999}
+.prompt{display:flex;align-items:flex-start;gap:13px;padding:16px 15px;margin-bottom:26px;border:1px solid #ededed;border-radius:16px;background:linear-gradient(125deg,rgba(255,255,255,.98),rgba(247,247,247,.88));box-shadow:0 7px 24px rgba(0,0,0,.025)}.prompt-mark{font-size:22px;line-height:1;color:#c1c1c1;font-family:Georgia,serif}.prompt-copy{flex:1}.prompt-copy .label{font-size:9px;letter-spacing:.16em;color:#999;margin-bottom:6px}.prompt-copy p{font-size:12px;line-height:1.65;color:#555;margin:0}.prompt-refresh{border:0;background:transparent;color:#888;padding:3px;font-size:10px;white-space:nowrap}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.section-head h2{margin:0;font-size:16px;font-weight:680;letter-spacing:-.04em}.section-meta{font-size:10px;color:#aaa;letter-spacing:.05em}
+.search-wrap{display:flex;align-items:center;gap:9px;background:#f6f6f6;border:1px solid transparent;border-radius:13px;padding:0 12px;height:43px;margin-bottom:16px;transition:border-color .2s,background .2s}.search-wrap:focus-within{border-color:#dedede;background:#fff}.search-wrap svg{width:16px;height:16px;stroke:#888;fill:none;stroke-width:1.6;flex-shrink:0}.search-wrap input{border:0;background:transparent;outline:0;min-width:0;flex:1;font-size:12px;color:#222}.search-wrap input::placeholder{color:#aaa}
+.filter-row{display:flex;gap:7px;overflow:auto;scrollbar-width:none;margin:0 -1px 16px;padding:0 1px 2px}.filter-row::-webkit-scrollbar{display:none}.filter-chip{border:1px solid #e9e9e9;border-radius:99px;background:#fff;color:#777;padding:7px 11px;font-size:10px;white-space:nowrap;transition:all .18s}.filter-chip.active{background:#171717;border-color:#171717;color:#fff}
+.entries{display:flex;flex-direction:column;gap:11px}.entry-card{position:relative;border:1px solid #ededed;border-radius:17px;padding:16px 16px 14px;background:rgba(255,255,255,.9);box-shadow:0 6px 22px rgba(0,0,0,.018);transition:transform .2s,border-color .2s}.entry-card:active{transform:scale(.99)}.entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:9px}.entry-date{display:flex;align-items:baseline;gap:7px}.entry-date strong{font-size:21px;line-height:1;font-weight:620;letter-spacing:-.055em}.entry-date span{font-size:10px;color:#999}.entry-mood{font-size:10px;color:#777;border:1px solid #eee;border-radius:99px;padding:5px 8px;white-space:nowrap}.entry-title{font-size:15px;font-weight:650;letter-spacing:-.025em;margin:0 0 7px;line-height:1.4;overflow-wrap:anywhere}.entry-text{font-size:12px;line-height:1.8;color:#666;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:0}.entry-photo{display:block;width:100%;max-height:155px;object-fit:cover;filter:grayscale(100%);border-radius:10px;margin-top:11px;background:#f4f4f4}.entry-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:13px;padding-top:10px;border-top:1px solid #f0f0f0}.entry-tags{display:flex;gap:5px;flex-wrap:wrap;min-width:0}.tiny-tag{font-size:9px;color:#888;background:#f5f5f5;padding:4px 7px;border-radius:5px}.entry-actions{display:flex;gap:5px;align-items:center;flex-shrink:0}.mini-action{border:0;background:transparent;color:#9a9a9a;padding:3px;font-size:14px;line-height:1}.mini-action.active{color:#171717}.empty-state{padding:38px 20px 30px;text-align:center;border:1px dashed #dedede;border-radius:17px;background:linear-gradient(145deg,#fff,#fafafa)}.empty-mark{font-size:30px;font-weight:250;color:#c6c6c6;letter-spacing:-.1em}.empty-state h3{margin:13px 0 6px;font-size:15px;font-weight:650}.empty-state p{margin:0 auto 16px;max-width:215px;font-size:11px;line-height:1.8;color:#999}.text-btn{border:0;background:transparent;font-size:11px;color:#333;text-decoration:underline;text-underline-offset:4px}
+.calendar-top{display:flex;align-items:center;justify-content:space-between;margin:8px 0 21px}.calendar-title{font-size:25px;letter-spacing:-.06em;font-weight:670}.calendar-actions{display:flex;gap:6px}.calendar-actions button{width:30px;height:30px;border:1px solid #eaeaea;background:#fff;border-radius:50%;font-size:17px;display:grid;place-items:center}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px 2px;margin-bottom:22px}.weekday{text-align:center;font-size:9px;color:#aaa;padding:4px 0 8px}.date-cell{height:42px;display:flex;align-items:center;justify-content:center;position:relative;border:0;background:transparent;border-radius:12px;font-size:11px;color:#666}.date-cell.muted{color:#d0d0d0}.date-cell.today{color:#111;font-weight:750}.date-cell.selected{background:#171717;color:#fff}.date-cell .date-dot{position:absolute;bottom:5px;width:3px;height:3px;border-radius:50%;background:#8a8a8a}.date-cell.selected .date-dot{background:#fff}.date-cell.today:not(.selected):after{content:"";position:absolute;bottom:1px;width:18px;height:1px;background:#111}.calendar-day{border-top:1px solid #eaeaea;padding-top:18px}.calendar-day-title{font-size:12px;font-weight:650;margin:0 0 13px}.calendar-day-title span{color:#999;font-weight:400;margin-left:6px}
+.bottom-tabs{flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;padding:8px 20px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid rgba(0,0,0,.045);z-index:4}.tab-btn{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:#999;padding:5px 13px;min-width:54px;font-size:9px;transition:color .2s}.tab-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.tab-btn.active{color:#171717}.tab-btn.active span{font-weight:700}.tab-add{width:42px;height:42px;border:0;border-radius:50%;background:#171717;color:#fff;display:grid;place-items:center;box-shadow:0 7px 16px rgba(0,0,0,.16);transition:transform .2s,box-shadow .2s;margin-top:-11px}.tab-add:active{transform:scale(.93);box-shadow:0 3px 7px rgba(0,0,0,.13)}.tab-add svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
+.editor-backdrop,.menu-backdrop{position:absolute;inset:0;background:rgba(20,20,20,.28);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:20;display:none;align-items:flex-end;justify-content:center}.editor-backdrop.show,.menu-backdrop.show{display:flex;animation:fadeIn .18s ease}.editor-sheet{width:100%;max-height:92%;background:rgba(255,255,255,.97);border-radius:25px 25px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.12);padding:17px 21px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;overflow:auto;animation:sheetUp .25s cubic-bezier(.2,.75,.25,1)}.sheet-grabber{width:34px;height:4px;border-radius:9px;background:#dedede;margin:0 auto 17px}.editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}.editor-heading{font-size:19px;font-weight:700;letter-spacing:-.05em}.editor-sub{font-size:9px;letter-spacing:.13em;color:#aaa;margin-top:4px}.sheet-link{border:0;background:transparent;color:#777;font-size:11px;padding:6px}.field-label{font-size:10px;color:#999;letter-spacing:.08em;display:block;margin:13px 0 8px}.editor-date{width:100%;border:1px solid #ececec;background:#fafafa;border-radius:11px;padding:11px 12px;font-size:12px;color:#333}.editor-title{width:100%;border:0;border-bottom:1px solid #ededed;padding:9px 0 12px;font-size:20px;font-weight:650;letter-spacing:-.035em;outline:none;background:transparent;color:#171717}.editor-title::placeholder{color:#d0d0d0}.editor-content{width:100%;min-height:165px;resize:vertical;border:0;outline:none;background:transparent;font-size:13px;line-height:1.9;padding:11px 0;color:#333}.editor-content::placeholder{color:#bcbcbc}.editor-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mood-choices{display:flex;gap:5px;flex-wrap:wrap}.mood-choice{border:1px solid #e7e7e7;border-radius:99px;background:#fff;color:#777;font-size:10px;padding:7px 10px}.mood-choice.active{background:#171717;color:#fff;border-color:#171717}.tag-input{width:100%;border:1px solid #ececec;border-radius:10px;padding:10px;background:#fafafa;font-size:11px;outline:none}.photo-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:15px}.photo-pick{display:inline-flex;align-items:center;gap:6px;border:1px solid #e7e7e7;background:#fff;border-radius:99px;padding:8px 11px;font-size:10px;color:#555}.photo-pick svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}.photo-preview{position:relative;display:none;margin-top:10px}.photo-preview img{width:100%;max-height:115px;object-fit:cover;filter:grayscale(100%);border-radius:10px}.photo-remove{position:absolute;top:6px;right:6px;border:0;background:rgba(255,255,255,.9);border-radius:50%;width:25px;height:25px;font-size:16px}.editor-footer{display:flex;gap:9px;margin-top:18px;padding-top:14px;border-top:1px solid #eeeeee}.btn-secondary,.btn-primary{height:43px;border-radius:12px;font-size:12px;font-weight:600}.btn-secondary{border:1px solid #e8e8e8;background:#fff;padding:0 15px}.btn-primary{flex:1;border:1px solid #171717;background:#171717;color:#fff}.delete-entry{border:0;background:transparent;color:#999;font-size:10px;padding:0 5px}
+.menu-sheet{width:calc(100% - 28px);max-width:360px;margin:0 14px 18px;background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);animation:sheetUp .2s ease}.menu-head{display:flex;justify-content:space-between;align-items:center;padding:12px 11px;border-bottom:1px solid #eee;font-size:13px;font-weight:650}.menu-item{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;border:0;background:transparent;padding:14px 11px;font-size:12px;color:#444;border-radius:10px}.menu-item:active{background:#f3f3f3}.menu-item small{display:block;font-size:9px;color:#aaa;margin-top:4px}.menu-item svg{width:17px;height:17px;stroke:#777;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.toast{position:absolute;z-index:50;left:50%;bottom:86px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:rgba(25,25,25,.92);color:#fff;padding:10px 14px;border-radius:99px;font-size:11px;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:opacity .2s,transform .2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes sheetUp{from{transform:translateY(22px);opacity:.6}to{transform:translateY(0);opacity:1}}
+@media(max-width:500px){html,body{background:#fff}.phone-mockup{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none}.app-head{padding-top:7px}.hero h1{font-size:41px}.editor-backdrop,.menu-backdrop{position:fixed}.editor-sheet{max-height:94dvh;padding-bottom:calc(15px + env(safe-area-inset-bottom,0px))}.app-scroll{padding-bottom:18px}}
+@media(min-width:501px){.phone-mockup{height:min(890px,calc(100vh - 28px))}.app-scroll{padding-bottom:26px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="phone-mockup">
+  <div class="status-bar">
+    <span id="statusTime">09:41</span>
+    <div class="status-right" aria-label="设备状态"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="battery"><b></b></span></div>
+  </div>
+  <header class="app-head">
+    <div class="head-left">
+      <button class="round-btn" id="backHome" aria-label="返回桌面" title="返回桌面"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg></button>
+      <div><div class="brand-mark">PERSONAL JOURNAL</div></div>
+    </div>
+    <div class="head-actions">
+      <button class="round-btn" id="searchToggle" aria-label="搜索日记" title="搜索"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.5 4.5"/></svg></button>
+      <button class="round-btn" id="moreBtn" aria-label="更多选项" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+    </div>
+  </header>
+  <main class="app-scroll" id="appScroll"><div id="viewRoot"></div></main>
+  <nav class="bottom-tabs" aria-label="日记导航">
+    <button class="tab-btn active" data-view="home"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v15H4z"/><path d="M8 3.5v4M16 3.5v4M4 10h16M8 14h4M8 17h7"/></svg><span>记录</span></button>
+    <button class="tab-btn" data-view="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg><span>日历</span></button>
+    <button class="tab-add" id="newEntryBtn" aria-label="写日记" title="写一篇日记"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab-btn" data-view="favorites"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg><span>收藏</span></button>
+    <button class="tab-btn" data-view="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>关于</span></button>
+  </nav>
+
+  <div class="editor-backdrop" id="editorBackdrop" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
+    <section class="editor-sheet">
+      <div class="sheet-grabber"></div>
+      <div class="editor-header"><div><div class="editor-heading" id="editorHeading">写下一页</div><div class="editor-sub">A MOMENT, KEPT FOR YOURSELF</div></div><button class="sheet-link" id="closeEditor">关闭</button></div>
+      <label class="field-label" for="entryDate">日期</label><input class="editor-date" id="entryDate" type="date">
+      <label class="field-label" for="entryTitle">标题 · 可留空</label><input class="editor-title" id="entryTitle" maxlength="80" placeholder="给今天一个名字">
+      <label class="field-label" for="entryContent">今天发生了什么？</label><textarea class="editor-content" id="entryContent" maxlength="12000" placeholder="不需要把每一天都写得很完整。&#10;&#10;你可以从任何一个小片段开始……"></textarea>
+      <div class="editor-meta">
+        <div><label class="field-label">此刻心情</label><div class="mood-choices" id="moodChoices">
+          <button type="button" class="mood-choice active" data-mood="平静">平静</button><button type="button" class="mood-choice" data-mood="开心">开心</button><button type="button" class="mood-choice" data-mood="疲惫">疲惫</button><button type="button" class="mood-choice" data-mood="低落">低落</button><button type="button" class="mood-choice" data-mood="期待">期待</button>
+        </div></div>
+        <div><label class="field-label" for="entryTags">标签 · 用逗号分开</label><input class="tag-input" id="entryTags" maxlength="120" placeholder="生活, 灵感, 旅行"></div>
+      </div>
+      <div class="photo-tools"><label class="photo-pick" for="entryPhoto"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>添加一张照片</label><input type="file" id="entryPhoto" accept="image/*" hidden><span style="font-size:9px;color:#aaa">照片会压缩后保存在本机</span></div>
+      <div class="photo-preview" id="photoPreview"><img id="previewImage" alt="日记照片预览"><button type="button" class="photo-remove" id="removePhoto" aria-label="移除照片">×</button></div>
+      <div class="editor-footer"><button type="button" class="delete-entry" id="deleteEntry" hidden>删除这篇</button><button type="button" class="btn-secondary" id="cancelEditor">取消</button><button type="button" class="btn-primary" id="saveEntry">保存日记</button></div>
+    </section>
+  </div>
+  <div class="menu-backdrop" id="menuBackdrop" role="dialog" aria-modal="true">
+    <section class="menu-sheet">
+      <div class="menu-head"><span>日记空间</span><button class="sheet-link" id="closeMenu">关闭</button></div>
+      <button class="menu-item" id="exportBtn"><span>导出备份<small>将日记保存为 JSON 文件</small></span><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 20h14"/></svg></button>
+      <button class="menu-item" id="importBtn"><span>导入备份<small>从以前导出的 JSON 恢复记录</small></span><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button class="menu-item" id="clearSearchBtn"><span>清除搜索与筛选<small>回到全部日记</small></span><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg></button>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  'use strict';
+  var STORAGE_KEY='maomao_diary_entries_v1';
+  var entries=loadEntries();
+  var currentView='home', query='', moodFilter='全部', selectedMood='平静';
+  var editId=null, activePhoto='', calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1), selectedCalendarDate=todayKey();
+  var prompts=[
+    '今天有没有一个很小的瞬间，让你觉得生活还不错？',
+    '如果把今天拍成一张照片，你会留下哪个画面？',
+    '今天有什么事情，你想对未来的自己说？',
+    '现在的你，最想好好记住什么？',
+    '不用总结整天，只写下一件真实发生的事就好。',
+    '今天有没有某个瞬间，让你比昨天更了解自己？',
+    '最近有什么小小的期待，正在慢慢靠近？'
+  ];
+  var promptIndex=Math.floor(Date.now()/86400000)%prompts.length;
+  var root=document.getElementById('viewRoot'), scroll=document.getElementById('appScroll');
+  var editor=document.getElementById('editorBackdrop'), menu=document.getElementById('menuBackdrop');
+  var $=function(id){return document.getElementById(id)};
+  function loadEntries(){
+    try{var v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(v)?v.filter(function(x){return x&&x.id&&x.date;}):[]}
+    catch(e){return []}
+  }
+  function persist(){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(entries));return true}
+    catch(e){showToast('本机存储空间不足，请移除较大的照片后再试');return false}
+  }
+  function todayKey(d){
+    d=d||new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function shortDate(key){var p=String(key).split('-');return p[1]+'/'+p[2]}
+  function weekday(key){var d=new Date(key+'T12:00:00');return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]}
+  function friendlyDate(key){var p=String(key).split('-');return p[0]+'年'+Number(p[1])+'月'+Number(p[2])+'日 · '+weekday(key)}
+  function monthLabel(d){return d.getFullYear()+'年 '+String(d.getMonth()+1).padStart(2,'0')+'月'}
+  function sorted(list){return list.slice().sort(function(a,b){return (b.date+' '+(b.updatedAt||b.createdAt||'' )).localeCompare(a.date+' '+(a.updatedAt||a.createdAt||''))})}
+  function filteredEntries(){
+    var list=entries.slice();
+    if(currentView==='favorites')list=list.filter(function(e){return !!e.favorite});
+    if(currentView==='calendar')list=list.filter(function(e){return e.date===selectedCalendarDate});
+    if(moodFilter!=='全部')list=list.filter(function(e){return e.mood===moodFilter});
+    if(query.trim()){
+      var q=query.trim().toLowerCase();
+      list=list.filter(function(e){return [e.title,e.content,e.date,e.mood,(e.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q)!==-1});
+    }
+    return sorted(list);
+  }
+  function showToast(message){
+    var el=$('toast');el.textContent=message;el.classList.add('show');
+    clearTimeout(showToast.timer);showToast.timer=setTimeout(function(){el.classList.remove('show')},2300);
+  }
+  function svg(name){
+    var paths={
+      search:'<circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.5 4.5"/>',
+      edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>',
+      arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>'
+    };
+    return '<svg viewBox="0 0 24 24">'+(paths[name]||'')+'</svg>';
+  }
+  function renderEntryCard(e){
+    var tags=(e.tags||[]).slice(0,4).map(function(t){return '<span class="tiny-tag"># '+esc(t)+'</span>'}).join('');
+    var text=(e.content||'').trim();
+    if(!text)text='这一天，留下一点空白。';
+    return '<article class="entry-card" data-open-entry="'+esc(e.id)+'">'+
+      '<div class="entry-top"><div class="entry-date"><strong>'+esc(shortDate(e.date))+'</strong><span>'+esc(weekday(e.date))+'</span></div><span class="entry-mood">'+esc(e.mood||'平静')+'</span></div>'+
+      (e.title?'<h3 class="entry-title">'+esc(e.title)+'</h3>':'')+
+      '<p class="entry-text">'+esc(text)+'</p>'+
+      (e.photo?'<img class="entry-photo" src="'+esc(e.photo)+'" alt="日记照片" loading="lazy">':'')+
+      '<div class="entry-bottom"><div class="entry-tags">'+tags+'</div><div class="entry-actions"><button class="mini-action '+(e.favorite?'active':'')+'" data-favorite="'+esc(e.id)+'" aria-label="'+(e.favorite?'取消收藏':'收藏')+'" title="收藏">'+(e.favorite?'★':'☆')+'</button><button class="mini-action" data-edit="'+esc(e.id)+'" aria-label="编辑日记" title="编辑">↗</button></div></div></article>';
+  }
+  function renderCards(list,emptyTitle,emptyText){
+    if(!list.length)return '<div class="empty-state"><div class="empty-mark">01 / —</div><h3>'+esc(emptyTitle)+'</h3><p>'+esc(emptyText)+'</p><button class="text-btn" data-create="1">写下第一篇</button></div>';
+    return '<div class="entries">'+list.map(renderEntryCard).join('')+'</div>';
+  }
+  function renderHome(){
+    var d=new Date(), key=todayKey();
+    var list=filteredEntries();
+    var todayCount=entries.filter(function(e){return e.date===key}).length;
+    var savedDays={};entries.forEach(function(e){savedDays[e.date]=1});
+    var days=Object.keys(savedDays).length;
+    var filters=['全部','平静','开心','疲惫','低落','期待'];
+    return '<section class="hero"><div class="eyebrow">A PLACE TO PAUSE</div><h1>日记<span style="font-weight:350;color:#aaa">。</span></h1><p>把生活收进字里行间。<br>不必完美，只要真实。</p><div class="hero-date"><strong>'+String(d.getDate()).padStart(2,'0')+'</strong><span>'+d.getFullYear()+' / '+String(d.getMonth()+1).padStart(2,'0')+'</span></div></section>'+
+      '<div class="stats-row"><div class="stat"><div class="stat-label">已写下的片段</div><div class="stat-main"><strong>'+entries.length+'</strong><span>篇记录</span></div></div><div class="stat"><div class="stat-label">留下印记的日子</div><div class="stat-main"><strong>'+days+'</strong><span>天 · 今天 '+todayCount+' 篇</span></div></div></div>'+
+      '<aside class="prompt"><div class="prompt-mark">“</div><div class="prompt-copy"><div class="label">A SMALL PROMPT FOR TODAY</div><p>'+esc(prompts[promptIndex])+'</p></div><button class="prompt-refresh" id="refreshPrompt">换一句</button></aside>'+
+      '<div class="section-head"><h2>最近记录</h2><span class="section-meta">'+(query?'搜索结果 '+list.length+' 篇':list.length+' ENTRIES')+'</span></div>'+
+      '<div class="search-wrap" id="searchWrap">'+svg('search')+'<input id="diarySearch" type="search" value="'+esc(query)+'" placeholder="搜索标题、文字或标签" aria-label="搜索日记"><button class="mini-action" id="clearSearch" style="'+(query?'':'display:none')+'" aria-label="清除搜索">×</button></div>'+
+      '<div class="filter-row">'+filters.map(function(f){return '<button class="filter-chip '+(moodFilter===f?'active':'')+'" data-mood-filter="'+esc(f)+'">'+esc(f)+'</button>'}).join('')+'</div>'+
+      renderCards(list,'这一页还是空白','给今天留下一点文字、一个心情，或者一张照片。');
+  }
+  function renderCalendar(){
+    var first=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth(),1);
+    var start=new Date(first);start.setDate(first.getDate()-first.getDay());
+    var marked={};entries.forEach(function(e){marked[e.date]=true});
+    var cells='';
+    for(var i=0;i<42;i++){
+      var d=new Date(start);d.setDate(start.getDate()+i);
+      var k=todayKey(d),inMonth=d.getMonth()===calendarMonth.getMonth();
+      cells+='<button class="date-cell '+(!inMonth?'muted ':'')+(k===todayKey()?'today ':'')+(k===selectedCalendarDate?'selected':'')+'" data-date="'+k+'">'+d.getDate()+(marked[k]?'<i class="date-dot"></i>':'')+'</button>';
+    }
+    var list=entries.filter(function(e){return e.date===selectedCalendarDate}).sort(function(a,b){return (b.updatedAt||'').localeCompare(a.updatedAt||'')});
+    return '<section class="hero"><div class="eyebrow">YOUR DAYS, AT A GLANCE</div><h1>日历<span style="font-weight:350;color:#aaa">。</span></h1><p>每一个留下记录的日子，<br>都在这里有一个小小的标记。</p></section>'+
+      '<div class="calendar-top"><div class="calendar-title">'+esc(monthLabel(calendarMonth))+'</div><div class="calendar-actions"><button id="prevMonth" aria-label="上个月">‹</button><button id="todayMonth" aria-label="回到本月">·</button><button id="nextMonth" aria-label="下个月">›</button></div></div>'+
+      '<div class="calendar-grid">'+['日','一','二','三','四','五','六'].map(function(x){return '<div class="weekday">'+x+'</div>'}).join('')+cells+'</div>'+
+      '<div class="calendar-day"><h3 class="calendar-day-title">'+esc(friendlyDate(selectedCalendarDate))+'<span>'+list.length+' 篇记录</span></h3>'+
+      (list.length?renderCards(list,'',''):'<div class="empty-state"><div class="empty-mark">'+esc(shortDate(selectedCalendarDate))+'</div><h3>这一天还没有记录</h3><p>留一个小小的标记吧，不需要写很多。</p><button class="text-btn" data-create-date="'+selectedCalendarDate+'">写下这一天</button></div>')+'</div>';
+  }
+  function renderFavorites(){
+    var list=filteredEntries();
+    return '<section class="hero"><div class="eyebrow">THE MOMENTS YOU KEEP</div><h1>收藏<span style="font-weight:350;color:#aaa">。</span></h1><p>把不想忘记的片段，<br>放在一个容易找到的地方。</p></section>'+
+      '<div class="section-head"><h2>珍藏的记录</h2><span class="section-meta">'+list.length+' SAVED</span></div>'+
+      renderCards(list,'还没有收藏','在日记右下角点一下星星，喜欢的片段就会出现在这里。');
+  }
+  function renderAbout(){
+    return '<section class="hero"><div class="eyebrow">A QUIET PLACE, ON YOUR DEVICE</div><h1>关于<span style="font-weight:350;color:#aaa">。</span></h1><p>简单记录，不急着整理人生。<br>先把此刻的自己留下来。</p></section>'+
+      '<div class="prompt"><div class="prompt-mark">01</div><div class="prompt-copy"><div class="label">YOUR PRIVACY</div><p>日记保存在当前浏览器的本地存储中，不会主动上传到服务器。清理浏览器数据或更换设备前，请先导出备份。</p></div></div>'+
+      '<div class="stat" style="margin-bottom:10px"><div class="stat-label">本机记录数量</div><div class="stat-main"><strong>'+entries.length+'</strong><span>篇</span></div></div>'+
+      '<div class="stat" style="margin-bottom:10px"><div class="stat-label">保存方式</div><div class="stat-main"><strong style="font-size:17px">仅本机</strong><span>Local Storage</span></div></div>'+
+      '<div class="section-head" style="margin-top:24px"><h2>备份与迁移</h2><span class="section-meta">YOUR DATA</span></div>'+
+      '<div class="entry-card"><h3 class="entry-title">留一份自己的副本</h3><p class="entry-text">导出的文件包含日记文字、日期、心情、标签和照片数据。请妥善保管备份文件。</p><div class="entry-actions" style="justify-content:flex-start;margin-top:14px"><button class="btn-secondary" id="aboutExport">导出备份</button><button class="btn-secondary" id="aboutImport">导入备份</button></div></div>';
+  }
+  function render(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view===currentView)});
+    root.innerHTML=currentView==='calendar'?renderCalendar():currentView==='favorites'?renderFavorites():currentView==='about'?renderAbout():renderHome();
+    if(currentView==='home'){
+      var inp=$('diarySearch');
+      if(inp){
+        inp.addEventListener('input',function(){var pos=inp.selectionStart;query=inp.value;var y=scroll.scrollTop;render();scroll.scrollTop=y;var next=$('diarySearch');if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch(e){}}});
+      }
+      var clear=$('clearSearch');if(clear)clear.addEventListener('click',function(e){e.stopPropagation();query='';render();});
+      var refresh=$('refreshPrompt');if(refresh)refresh.addEventListener('click',function(){promptIndex=(promptIndex+1)%prompts.length;render()});
+    }
+    if(currentView==='calendar'){
+      $('prevMonth').addEventListener('click',function(){calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);render()});
+      $('nextMonth').addEventListener('click',function(){calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);render()});
+      $('todayMonth').addEventListener('click',function(){calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedCalendarDate=todayKey();render()});
+    }
+    var aboutExport=$('aboutExport');if(aboutExport)aboutExport.addEventListener('click',exportBackup);
+    var aboutImport=$('aboutImport');if(aboutImport)aboutImport.addEventListener('click',function(){$('importFile').click()});
+    scroll.scrollTop=0;
+  }
+  function openEditor(id,date){
+    editId=id||null;
+    var entry=id?entries.find(function(e){return e.id===id}):null;
+    selectedMood=entry?(entry.mood||'平静'):'平静';
+    activePhoto=entry?(entry.photo||''):'';
+    $('editorHeading').textContent=entry?'编辑这篇日记':'写下一页';
+    $('entryDate').value=entry?entry.date:(date||todayKey());
+    $('entryTitle').value=entry?(entry.title||''):'';
+    $('entryContent').value=entry?(entry.content||''):'';
+    $('entryTags').value=entry?(entry.tags||[]).join(', '):'';
+    document.querySelectorAll('.mood-choice').forEach(function(b){b.classList.toggle('active',b.dataset.mood===selectedMood)});
+    $('deleteEntry').hidden=!entry;
+    $('previewImage').src=activePhoto||'';$('photoPreview').style.display=activePhoto?'block':'none';
+    $('entryPhoto').value='';
+    editor.classList.add('show');
+    document.body.style.overflow='hidden';
+    setTimeout(function(){(entry?$('entryTitle'):$('entryTitle')).focus({preventScroll:true})},150);
+  }
+  function closeEditor(){editor.classList.remove('show');document.body.style.overflow=''}
+  function saveEntry(){
+    var date=$('entryDate').value||todayKey();
+    var title=$('entryTitle').value.trim();
+    var content=$('entryContent').value.trim();
+    if(!title&&!content&&!activePhoto){showToast('先写下一点内容吧');$('entryContent').focus();return}
+    var old=editId?entries.find(function(e){return e.id===editId}):null;
+    var record=old||{id:'d_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8),createdAt:new Date().toISOString(),favorite:false};
+    record.date=date;record.title=title;record.content=content;record.mood=selectedMood;
+    record.tags=$('entryTags').value.split(/[,，、]/).map(function(t){return t.trim().replace(/^#+/,'')}).filter(Boolean).slice(0,12);
+    record.photo=activePhoto;record.updatedAt=new Date().toISOString();
+    if(!old)entries.push(record);
+    if(!persist()){if(!old)entries.pop();return}
+    currentView='home';moodFilter='全部';query='';closeEditor();render();showToast(old?'日记已更新':'已保存到你的日记'); 
+  }
+  function deleteCurrent(){
+    if(!editId)return;
+    if(!window.confirm('确定删除这篇日记吗？删除后无法撤销。'))return;
+    entries=entries.filter(function(e){return e.id!==editId});
+    persist();closeEditor();currentView='home';render();showToast('这篇日记已删除');
+  }
+  function toggleFavorite(id){
+    var e=entries.find(function(x){return x.id===id});if(!e)return;
+    e.favorite=!e.favorite;e.updatedAt=new Date().toISOString();
+    if(persist()){render();showToast(e.favorite?'已加入收藏':'已取消收藏')}
+  }
+  function processImage(file){
+    if(!file)return;
+    if(!file.type||file.type.indexOf('image/')!==0){showToast('请选择图片文件');return}
+    var reader=new FileReader();
+    reader.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var max=1400,scale=Math.min(1,max/Math.max(img.width,img.height));
+        var canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+        var ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        try{activePhoto=canvas.toDataURL('image/jpeg',.76);$('previewImage').src=activePhoto;$('photoPreview').style.display='block';showToast('照片已添加（保存时写入日记）')}
+        catch(e){showToast('这张图片暂时无法处理')}
+      };
+      img.onerror=function(){showToast('图片读取失败，请换一张试试')};img.src=reader.result;
+    };
+    reader.onerror=function(){showToast('图片读取失败')};reader.readAsDataURL(file);
+  }
+  function exportBackup(){
+    var data={app:'MAOMAO Journal',version:1,exportedAt:new Date().toISOString(),entries:entries};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='maomao-diary-backup-'+todayKey()+'.json';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1500);
+    menu.classList.remove('show');showToast('备份文件已生成');
+  }
+  function importBackup(file){
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(){
+      try{
+        var data=JSON.parse(reader.result),list=Array.isArray(data)?data:data.entries;
+        if(!Array.isArray(list))throw new Error('invalid');
+        if(!window.confirm('文件包含 '+list.length+' 篇记录。选择“确定”后将与本机日记合并，重复编号会保留本机版本。'))return;
+        var seen={};entries.forEach(function(e){seen[e.id]=1});
+        var added=0;
+        list.forEach(function(e){
+          if(!e||!e.id||!e.date||seen[e.id])return;
+          var clean={id:String(e.id),date:String(e.date),title:String(e.title||''),content:String(e.content||''),mood:String(e.mood||'平静'),tags:Array.isArray(e.tags)?e.tags.map(String).slice(0,12):[],photo:typeof e.photo==='string'?e.photo:'',favorite:!!e.favorite,createdAt:e.createdAt||new Date().toISOString(),updatedAt:e.updatedAt||new Date().toISOString()};
+          entries.push(clean);seen[e.id]=1;added++;
+        });
+        if(persist()){currentView='home';query='';render();menu.classList.remove('show');showToast('已导入 '+added+' 篇新记录')}
+      }catch(e){showToast('备份文件格式不正确')}
+    };
+    reader.onerror=function(){showToast('读取备份失败')};reader.readAsText(file);
+  }
+  function openMenu(){menu.classList.add('show')}
+  function closeMenu(){menu.classList.remove('show')}
+  root.addEventListener('click',function(e){
+    var filter=e.target.closest('[data-mood-filter]');
+    if(filter){moodFilter=filter.dataset.moodFilter;render();return}
+    var create=e.target.closest('[data-create]');
+    if(create){openEditor();return}
+    var createDate=e.target.closest('[data-create-date]');
+    if(createDate){openEditor(null,createDate.dataset.createDate);return}
+    var date=e.target.closest('[data-date]');
+    if(date){selectedCalendarDate=date.dataset.date;var dt=new Date(selectedCalendarDate+'T12:00:00');calendarMonth=new Date(dt.getFullYear(),dt.getMonth(),1);render();return}
+    var fav=e.target.closest('[data-favorite]');
+    if(fav){e.stopPropagation();toggleFavorite(fav.dataset.favorite);return}
+    var edit=e.target.closest('[data-edit]');
+    if(edit){e.stopPropagation();openEditor(edit.dataset.edit);return}
+    var card=e.target.closest('[data-open-entry]');
+    if(card){openEditor(card.dataset.openEntry);return}
+  });
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){currentView=b.dataset.view;render()})});
+  $('backHome').addEventListener('click',function(){location.href='index.html'});
+  $('newEntryBtn').addEventListener('click',function(){openEditor()});
+  $('searchToggle').addEventListener('click',function(){if(currentView!=='home'){currentView='home';render()}var inp=$('diarySearch');if(inp){inp.focus();inp.scrollIntoView({block:'nearest',behavior:'smooth'})}});
+  $('moreBtn').addEventListener('click',openMenu);$('closeMenu').addEventListener('click',closeMenu);
+  menu.addEventListener('click',function(e){if(e.target===menu)closeMenu()});
+  $('exportBtn').addEventListener('click',exportBackup);$('importBtn').addEventListener('click',function(){$('importFile').click()});
+  $('importFile').addEventListener('change',function(){importBackup(this.files&&this.files[0]);this.value=''});
+  $('clearSearchBtn').addEventListener('click',function(){query='';moodFilter='全部';currentView='home';closeMenu();render();showToast('已清除筛选')});
+  $('closeEditor').addEventListener('click',closeEditor);$('cancelEditor').addEventListener('click',closeEditor);
+  editor.addEventListener('click',function(e){if(e.target===editor)closeEditor()});
+  $('saveEntry').addEventListener('click',saveEntry);$('deleteEntry').addEventListener('click',deleteCurrent);
+  $('moodChoices').addEventListener('click',function(e){var b=e.target.closest('[data-mood]');if(!b)return;selectedMood=b.dataset.mood;document.querySelectorAll('.mood-choice').forEach(function(x){x.classList.toggle('active',x===b)})});
+  $('entryPhoto').addEventListener('change',function(){processImage(this.files&&this.files[0]);this.value=''});
+  $('removePhoto').addEventListener('click',function(){activePhoto='';$('previewImage').src='';$('photoPreview').style.display='none'});
+  $('aboutExport')&&$('aboutExport').addEventListener('click',exportBackup);
+  $('aboutImport')&&$('aboutImport').addEventListener('click',function(){$('importFile').click()});
+  function updateTime(){var d=new Date();$('statusTime').textContent=d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false})}
+  updateTime();setInterval(updateTime,30000);
+  render();
+})();
+</script>
+</body>
+</html>
