@@ -269,7 +269,7 @@ incoming.favorites.forEach(function(id){if(destinations.some(function(p){return 
 incoming.visited=(incoming.visited||[]).filter(function(id){return destinations.some(function(p){return p.id===id})}).forEach(function(id){if(!has(data.visited,id))data.visited.push(id)});
 incoming.bookings.forEach(function(t){if(t&&t.id&&!data.bookings.some(function(x){return x.id===t.id}))data.bookings.push(t)});
 incoming.notes.forEach(function(n){if(n&&n.id&&!data.notes.some(function(x){return x.id===n.id}))data.notes.push(n)});
-incoming.souvenirs=(incoming.souvenirs||[]).forEach? (incoming.souvenirs||[]).forEach(function(s){if(s&&s.id&&!data.souvenirs.some(function(x){return x.id===s.id}))data.souvenirs.push(s)}):null;
+(incoming.souvenirs||[]).forEach(function(s){if(s&&s.id&&!data.souvenirs.some(function(x){return x.id===s.id}))data.souvenirs.push(s)});
 if(persist()){setView('explore');$('menuOverlay').classList.remove('show');toast('旅行资料已合并导入')}
 }catch(e){toast('文件格式不正确，请选择触梦旅行备份文件')}}
 ;r.onerror=function(){toast('读取备份失败')};r.readAsText(file);
