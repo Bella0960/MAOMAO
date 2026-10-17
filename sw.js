@@ -1,11 +1,12 @@
 /* 小手机 PWA Service Worker
  * 页面采用网络优先，静态资源采用缓存回退，避免旧 HTML 长期锁住不更新。
  */
-const CACHE_NAME = 'phone-app-pwa-v8';
+const CACHE_NAME = 'phone-app-pwa-v9';
 const APP_SHELL = [
   './',
   './index.html',
   './diary.html',
+  './dream-travel.html',
   './manifest.json',
   './styles.css',
   './settings.css',
