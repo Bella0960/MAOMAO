@@ -10,6 +10,48 @@
   "orientation": "portrait",
   "background_color": "#F7F7F9",
   "theme_color": "#F7F7F9",
+  "shortcuts": [
+    {
+      "name": "游戏大厅",
+      "short_name": "游戏",
+      "description": "默契猜词、双人侦探社、棋盘挑战赛",
+      "url": "./games/index.html",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "日记",
+      "short_name": "日记",
+      "url": "./diary/diary.html",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "世界书",
+      "short_name": "世界书",
+      "url": "./worldbook/worldbook.html",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "./assets/icon-192.png",
