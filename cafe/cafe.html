@@ -37,6 +37,39 @@
 .active-decor-card{border:1px solid #e3e3e3;margin:0 0 20px;overflow:hidden;display:grid;grid-template-columns:88px minmax(0,1fr);background:#fafafa}.active-decor-art{background:#f0f0f0;display:grid;place-items:center;min-height:90px}.active-decor-art svg{width:85px;height:65px;stroke:#333;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}.active-decor-copy{padding:12px 13px}.active-decor-copy strong{font-size:12px;display:block}.active-decor-copy p{font-size:10px;line-height:1.65;color:#777;margin:5px 0 0}
 .partner-episode{border:1px solid #dcdcdc;margin:0 0 20px;padding:15px;background:linear-gradient(140deg,#fff,#f8f8f8)}.partner-episode-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.partner-episode-title{font:21px/1.3 var(--serif);letter-spacing:-.035em;margin:8px 0}.partner-episode-text{font-size:11px;color:#666;line-height:1.85;margin:0}.partner-episode-voice{font:13px/1.7 var(--serif);margin-top:9px;color:#333}.partner-episode-actions{display:grid;gap:8px;margin-top:13px}.partner-episode-action{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;text-align:left;align-items:center;padding:11px 12px;background:#fff;border:1px solid #dedede}.partner-episode-action strong{font-size:11px;display:block}.partner-episode-action span{font-size:10px;color:#777;line-height:1.6;display:block;margin-top:4px}.partner-episode-action em{font-size:10px;white-space:nowrap;font-style:normal;color:#555}.partner-episode-action:disabled{opacity:.4}
 .achievement-list{display:grid;gap:8px;margin-top:12px}.achievement{border:1px solid #e2e2e2;padding:11px;display:grid;grid-template-columns:33px minmax(0,1fr) auto;gap:10px;align-items:center}.achievement.unlocked{background:#f7f7f7;border-color:#bfbfbf}.achievement-icon{width:32px;height:32px;border:1px solid #dedede;display:grid;place-items:center;background:#fff;font-family:var(--serif);font-size:15px;color:#333}.achievement-copy strong{font-size:11px;display:block}.achievement-copy span{font-size:9px;line-height:1.6;color:#888;display:block;margin-top:4px}.achievement-reward{font-size:9px;color:#666;white-space:nowrap}.achievement-progress{height:2px;background:#e7e7e7;margin-top:7px}.achievement-progress span{display:block;height:100%;background:#222}
+
+/* Cafe micro-interactions — restrained grayscale */
+@keyframes cafe-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cafe-pop{0%{transform:scale(.96);opacity:.3}70%{transform:scale(1.015)}100%{transform:scale(1);opacity:1}}
+@keyframes cafe-shimmer{0%{background-position:130% 0}100%{background-position:-130% 0}}
+@keyframes cafe-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes cafe-pulse{0%,100%{box-shadow:0 0 0 0 rgba(30,30,30,0)}50%{box-shadow:0 0 0 5px rgba(30,30,30,.055)}}
+@keyframes cafe-spark{0%{transform:translateY(4px) scale(.7);opacity:0}25%{opacity:1}100%{transform:translateY(-28px) scale(1.15);opacity:0}}
+.view-panel:not([hidden]){animation:cafe-enter .38s cubic-bezier(.2,.7,.2,1) both}
+.module,.progression-card,.active-decor-card,.partner-episode,.achievement,.decor,.report-card{animation:cafe-enter .42s both;animation-delay:calc(var(--stagger,0)*45ms)}
+button,.decor,.partner-episode-action,.achievement,.decor-thumb,.shop-preview{transition:transform .22s ease,border-color .22s ease,background-color .22s ease,box-shadow .22s ease}
+button:not(:disabled):active,.partner-episode-action:not(:disabled):active,.decor-btn:not(:disabled):active{transform:scale(.975)}
+button:focus-visible{outline:2px solid #444;outline-offset:3px}
+button:disabled{cursor:not-allowed}
+.progression-bar span,.achievement-progress span,.progress span{transition:width .65s cubic-bezier(.2,.7,.2,1)}
+.active-decor-card{transition:box-shadow .25s ease,transform .25s ease}
+.active-decor-card.is-changing{animation:cafe-pop .42s ease both;box-shadow:0 8px 28px #0000000c}
+.decor:hover{border-color:#aaa;transform:translateY(-2px)}
+.decor-thumb svg,.shop-preview svg{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.decor:hover .decor-thumb svg{transform:scale(1.055)}
+.partner-episode{position:relative;overflow:hidden}
+.partner-episode::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:30%;pointer-events:none;background:linear-gradient(90deg,transparent,#00000004,transparent);transform:skewX(-16deg);animation:cafe-shimmer 5.5s ease-in-out infinite;background-size:250% 100%}
+.partner-episode-action:hover:not(:disabled){border-color:#888;transform:translateX(2px);box-shadow:0 3px 12px #00000008}
+.partner-episode-action em{transition:transform .2s ease}
+.partner-episode-action:hover em{transform:translateX(-2px)}
+.achievement.unlocked{animation:cafe-pop .35s ease both}
+.achievement-icon{transition:background .25s ease,transform .25s ease}
+.achievement.unlocked .achievement-icon{background:#222;color:#fff;border-color:#222}
+.cafe-feedback{position:fixed;z-index:999;left:50%;top:32%;pointer-events:none;transform:translateX(-50%);display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:88vw}
+.cafe-feedback span{font-size:10px;letter-spacing:.03em;color:#222;background:#fff;border:1px solid #dedede;padding:7px 10px;box-shadow:0 6px 22px #0000000d;animation:cafe-spark 1.25s ease forwards;white-space:nowrap}
+.cafe-toast{transition:opacity .2s ease,transform .2s ease}
+.cafe-toast.show{animation:cafe-pop .25s ease both}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -470,6 +503,26 @@ function runDay(){
  recordClosedDay(report);evaluateGoal(report);checkAchievements();
  st.report=report;st.history.unshift(report);st.history=st.history.slice(0,8);st.day++;st.event=rand(EVENTS.length);st.eventChoice=null;st.eventFx={};st.ad=20;st.service='warm';save();advisorPlan=null;TAB='overview';renderAll();toast('今日结算完成：净利润 '+(profit>=0?'+':'−')+money(Math.abs(profit)));
 }
+
+/* Lightweight feedback, delegated interactions, and animated transitions */
+function cafeFeedback(labels){
+ var layer=document.getElementById('cafeFeedback');
+ if(!layer){layer=document.createElement('div');layer.id='cafeFeedback';layer.className='cafe-feedback';layer.setAttribute('aria-live','polite');document.body.appendChild(layer);}
+ layer.innerHTML=(labels||[]).slice(0,4).map(function(t){return '<span>'+esc(t)+'</span>';}).join('');
+ if(layer._timer)clearTimeout(layer._timer);layer._timer=setTimeout(function(){layer.innerHTML='';},1350);
+}
+function cafeAnimateChanged(el){if(!el)return;el.classList.remove('is-changing');void el.offsetWidth;el.classList.add('is-changing');setTimeout(function(){el.classList.remove('is-changing');},500);}
+function cafeBindMotion(){
+ var panels=['view-overview','view-menu','view-stock','view-shop'];
+ panels.forEach(function(id){var el=document.getElementById(id);if(!el)return;var obs=new MutationObserver(function(){Array.prototype.forEach.call(el.children,function(node,i){if(node.nodeType===1)node.style.setProperty('--stagger',Math.min(i,8));});});obs.observe(el,{childList:true});});
+ document.addEventListener('click',function(e){
+  var tab=e.target.closest('[data-tab]');if(tab&&!tab.disabled){cafeFeedback(['切换到 '+(tab.textContent||'新页面').trim().slice(0,16)]);return;}
+  var episode=e.target.closest('[data-partner-episode]');if(episode&&!episode.disabled){cafeFeedback(['正在记录这次合作','奖励将加入经营账本']);return;}
+  var decor=e.target.closest('[data-decor]');if(decor&&!decor.disabled){cafeAnimateChanged(document.querySelector('.active-decor-card'));cafeFeedback(['空间已更新','经营效果同步生效']);return;}
+  var action=e.target.closest('[data-action], [data-make], [data-buy], [data-service], [data-event], [data-story]');if(action&&!action.disabled){cafeFeedback(['行动已记录','经营数据正在更新']);}
+ });
+}
+
 function bind(){
  document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){setTab(b.getAttribute('data-tab'));});});
  $('partnerSelect').addEventListener('change',function(){var r=roles.find(function(x){return String(x.id)===String($('partnerSelect').value);});if(!r)return;partnerOpinionToken++;partnerOpinionBusy=false;partnerOpinionTarget='';role=r;localStorage.setItem('maomao_cafe_partner',String(r.id));advisorPlan=null;renderPartner();if(TAB==='overview')renderOverview();toast('经营搭档已切换。');});
@@ -477,7 +530,7 @@ function bind(){
 }
 getRoles();
 if(!localStorage.getItem('maomao_cafe_state_v1'))save();
-renderPartner();bind();renderAll();
+renderPartner();bind();renderAll();cafeBindMotion();
 })();
 </script>
 <script src="../js/nav.js"></script>
