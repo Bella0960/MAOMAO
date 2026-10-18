@@ -35,26 +35,25 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .section-title{font-size:17px;letter-spacing:-.04em;font-weight:650}
 .micro-note{font-size:10px;color:#92928c}
 .role-area{margin-bottom:28px}
-.role-rail{display:flex;gap:9px;overflow-x:auto;padding:2px 1px 5px;scrollbar-width:none}
+.role-rail{display:flex;gap:16px;overflow-x:auto;padding:6px 1px 5px;scrollbar-width:none}
 .role-rail::-webkit-scrollbar{display:none}
-.role-chip{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 13px 6px 6px;color:#77776f;max-width:190px;transition:background .2s,border-color .2s,color .2s}
-.role-chip.active{background:var(--white);border-color:#222;color:var(--ink)}
+.role-chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:9px;background:transparent;border:0;padding:0;color:#8e8e87;width:60px;transition:color .2s}
+.role-chip.active{background:transparent;color:var(--ink)}
 .role-avatar{width:31px;height:31px;flex:0 0 31px;border-radius:50%;background:#ddd;display:grid;place-items:center;overflow:hidden;font-size:12px;color:#fff;font-weight:600}
 .role-avatar img{width:100%;height:100%;object-fit:cover}
-.role-chip-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:115px}
-.role-chip-mark{font-size:10px;margin-left:2px;color:#aaa}
+.role-chip .role-avatar{width:46px;height:46px;flex-basis:46px;outline:1px solid transparent;outline-offset:3px;transition:outline-color .2s}
+.role-chip.active .role-avatar{outline-color:#111}
+.role-chip-name{font-size:10px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;text-align:center}
+.role-chip-mark{display:none}
 .games-list{border-top:1px solid var(--line)}
-.game-row{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid var(--line)}
-.game-symbol{width:52px;height:57px;background:#f2f2f2;display:grid;place-items:center;position:relative;overflow:hidden}
-.game-symbol svg{width:27px;height:27px;stroke:#292926;fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
-.game-index{position:absolute;left:5px;top:4px;font-size:8px;color:#8a8a83;letter-spacing:.06em}
-.game-tag{font-size:9px;letter-spacing:.13em;color:#92928c;text-transform:uppercase;margin-bottom:5px}
-.game-name{font-size:15px;font-weight:650;letter-spacing:-.035em;margin-bottom:5px}
-.game-desc{font-size:11px;line-height:1.65;color:#777770;max-width:230px}
-.game-record{font-size:10px;color:#8a8a83;margin-top:7px}
-.play-arrow{width:32px;height:32px;border-radius:50%;border:1px solid #d8d8d2;background:transparent;display:grid;place-items:center;color:#333;transition:all .18s}
-.play-arrow:active{background:#222;color:white;transform:scale(.95)}
-.play-arrow svg{width:15px;height:15px}
+.game-row{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:17px;padding:21px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.game-symbol{width:34px;display:flex;flex-direction:column;align-items:center;gap:7px}
+.game-symbol svg{width:24px;height:24px;stroke:#1c1c1a;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.game-index{font-family:var(--serif);font-size:9px;color:#a3a39c;letter-spacing:.08em;line-height:1}
+.game-tag{font-size:8px;letter-spacing:.22em;color:#a6a69f;text-transform:uppercase;margin-bottom:6px}
+.game-name{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
+.game-desc{font-size:11px;line-height:1.7;color:#777770;max-width:240px}
+.game-record{font-size:10px;color:#9a9a94;margin-top:8px}
 .bottom-note{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:9px;letter-spacing:.1em;color:#96968f}
 .bottom-note strong{font-weight:500;color:#50504c}
 #gameView{display:none}
@@ -79,9 +78,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .field-label{font-size:10px;display:block;color:#888880;margin-bottom:8px;letter-spacing:.06em}
 .input-row{display:flex;gap:8px}
 .text-input{min-width:0;flex:1;height:43px;border:1px solid #e2e2e2;background:#fafaf8;border-radius:2px;padding:0 12px;font-size:13px;color:var(--ink)}
-.primary-btn{min-height:42px;padding:0 16px;border:1px solid var(--ink);background:var(--ink);color:white;font-size:12px;white-space:nowrap;transition:opacity .15s,transform .15s}
-.primary-btn:active{transform:scale(.98);opacity:.85}
-.secondary-btn{min-height:39px;padding:0 14px;border:1px solid #d8d8d2;background:transparent;color:#44443e;font-size:11px}
+.primary-btn{min-height:42px;padding:0 18px;border:1px solid #111;background:transparent;color:#111;font-size:12px;letter-spacing:.02em;white-space:nowrap;transition:background .18s,color .18s}
+.primary-btn:active{background:#111;color:#fff}
+.secondary-btn{min-height:39px;padding:0 15px;border:1px solid #111;background:transparent;color:#111;font-size:11px;transition:background .18s,color .18s}
+.secondary-btn:active{background:#111;color:#fff}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .feedback{font-size:12px;line-height:1.75;color:#65655f;min-height:21px;margin-top:12px}
 .feedback strong{font-weight:650;color:#222}
@@ -101,22 +101,22 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .suspect{min-height:68px;border:1px solid #e2e2e2;background:transparent;padding:11px 8px;text-align:left}
 .suspect-name{font-size:12px;font-weight:650}
 .suspect-role{font-size:10px;color:#8e8e87;margin-top:6px;line-height:1.3}
-.suspect:active{background:#e9e9e3}
+.suspect:active{background:#f4f3f1}
 .suspect:disabled{opacity:.5;cursor:default}
-.suspect.correct{border-color:#1e1e1b;background:#222;color:white}
-.suspect.correct .suspect-role{color:#d2d2ca}
-.tic-controls{display:flex;align-items:center;gap:8px;margin-bottom:13px}
-.difficulty{height:31px;display:flex;background:#f2f2f2;padding:3px;gap:2px}
-.diff-btn{padding:0 10px;border:0;background:transparent;color:#77776f;font-size:10px}
-.diff-btn.active{background:#fff;color:#181816;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.tic-board{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:300px;margin:0 auto}
-.tic-cell{aspect-ratio:1;border:1px solid #dfdfd8;background:#fafafa;font-family:var(--serif);font-size:47px;color:#222;display:grid;place-items:center;min-width:0}
+.suspect.correct{border-color:#111;background:transparent;color:#111}
+.suspect.correct .suspect-role{color:#111}
+.tic-controls{display:flex;align-items:center;gap:14px;margin-bottom:15px}
+.difficulty{height:auto;display:flex;background:transparent;padding:0;gap:20px}
+.diff-btn{padding:0;border:0;background:transparent;color:#b4b4ae;font-size:11px;letter-spacing:.06em;transition:color .18s}
+.diff-btn.active{background:transparent;color:#111;box-shadow:none}
+.tic-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:300px;margin:0 auto}
+.tic-cell{aspect-ratio:1;border:0;background:#f6f5f3;font-family:var(--serif);font-size:47px;color:#222;display:grid;place-items:center;min-width:0}
 .tic-cell:disabled{cursor:default}
 .tic-cell.x{color:#222}
-.tic-cell.o{color:#8e8e86}
-.tic-cell.winning{background:#ededed;border-color:#999990}
+.tic-cell.o{color:#a3a39c}
+.tic-cell.winning{background:#eceae6;color:#111}
 .board-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid #e9e9e9;font-size:10px;color:#83837d}
-.role-quote{font-size:12px;line-height:1.8;color:#4f4f49;border-left:2px solid #2b2b27;padding:9px 12px;background:#f2f2f2;margin-top:13px}
+.role-quote{font-size:12px;line-height:1.9;color:#4f4f49;border-left:1px solid #1c1c1a;padding:2px 0 2px 13px;background:transparent;margin-top:16px}
 .toast{position:fixed;left:50%;bottom:85px;transform:translate(-50%,8px);background:#222;color:#fff;border-radius:999px;padding:9px 14px;font-size:11px;opacity:0;pointer-events:none;transition:.22s;z-index:999;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .empty-state{padding:20px;border:1px dashed #d4d4cd;font-size:12px;line-height:1.8;color:#777770}
@@ -124,42 +124,33 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 
 /* Editorial polish: pure white canvas, neutral gray and sharp black accents */
-.spotlight{position:relative;overflow:hidden;background:#171717;color:#fff;padding:17px 17px 15px;margin:-7px 0 29px;min-height:184px;cursor:pointer;outline-offset:4px;isolation:isolate}
-.spotlight:active{transform:scale(.992)}
-.spotlight:after{content:"";position:absolute;z-index:-1;right:-17px;bottom:-70px;width:190px;height:190px;border:1px solid rgba(255,255,255,.12);border-radius:50%;box-shadow:0 0 0 19px rgba(255,255,255,.025),0 0 0 39px rgba(255,255,255,.02)}
+.spotlight{position:relative;overflow:hidden;background:#222220;color:#e8e6e0;padding:30px 25px 25px;margin:-7px 0 33px;cursor:pointer;outline-offset:4px;transition:background .2s}
+.spotlight:active{background:#2a2a28}
 .spotlight-top,.spotlight-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.spotlight-top{font-size:9px;letter-spacing:.16em;color:#c8c8c8}
-.spotlight-status{display:flex;align-items:center;gap:6px;letter-spacing:.04em}
-.spotlight-status i{width:5px;height:5px;display:inline-block;border-radius:50%;background:#fff}
-.spotlight-title{font-family:var(--serif);font-size:28px;line-height:1.15;letter-spacing:-.055em;margin:24px 0 7px;max-width:265px}
-.spotlight-copy{font-size:11px;line-height:1.75;color:#c9c9c9;max-width:278px;margin:0 0 20px;position:relative;z-index:1}
-.spotlight-bottom{border-top:1px solid rgba(255,255,255,.2);padding-top:12px;font-size:10px;color:#d5d5d5;position:relative;z-index:1}
-.spotlight-bottom b{font-weight:400;color:#808080;margin:0 3px}
-.spotlight-cta{display:flex;align-items:center;gap:8px;color:white;font-size:10px;white-space:nowrap}
+.spotlight-top{font-size:9px;letter-spacing:.22em;color:#9a978f}
+.spotlight-status{display:flex;align-items:center;gap:6px;letter-spacing:.04em;color:#b0aca4}
+.spotlight-status i{width:4px;height:4px;display:inline-block;border-radius:50%;background:#e8e6e0}
+.spotlight-title{font-family:var(--serif);font-size:36px;line-height:1.14;letter-spacing:-.05em;margin:34px 0 16px;max-width:300px}
+.spotlight-copy{font-size:12px;line-height:1.9;color:#b8b4ac;max-width:300px;margin:0 0 34px;position:relative;z-index:1}
+.spotlight-bottom{border-top:1px solid rgba(255,255,255,.16);padding-top:15px;font-size:10px;color:#c6c2ba;position:relative;z-index:1}
+.spotlight-bottom b{font-weight:400;color:#8f8b84;margin:0 3px}
+.spotlight-cta{display:flex;align-items:center;gap:8px;color:#e8e6e0;font-size:10px;white-space:nowrap}
 .spotlight-cta span{font-size:17px;line-height:1}
-.spotlight-watermark{position:absolute;right:18px;top:44px;font-family:var(--serif);font-size:103px;line-height:1;color:rgba(255,255,255,.055);letter-spacing:-.1em;pointer-events:none}
 .hero-meta{margin-bottom:22px}
 .role-area{margin-bottom:27px}
-.game-row{transition:background .18s}
-.game-row:active{background:#fafafa}
-.game-symbol{border:1px solid #ededed}
-.play-arrow{border-color:#dedede}
-.play-arrow:hover{background:#171717;color:#fff;border-color:#171717}
-.board-panel{border-color:#e5e5e5;box-shadow:0 7px 24px rgba(0,0,0,.018)}
+.board-panel{border-color:#e5e5e5}
 .round-label{white-space:nowrap}
 .memory-scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
 .memory-score{border:1px solid #e4e4e4;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}
 .memory-score strong{font-family:var(--serif);font-weight:500;font-size:22px}
-.memory-score.active{border-color:#222;background:#fafafa}
+.memory-score.active{border-color:#111;background:transparent}
 .memory-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:340px;margin:0 auto}
-.memory-card{aspect-ratio: .82;border:1px solid #dedede;background:#f7f7f7;display:grid;place-items:center;min-width:0;padding:0;color:#222;transition:background .2s,transform .18s,border-color .2s;position:relative}
-.memory-card:before{content:"";position:absolute;inset:5px;border:1px solid #e6e6e6;pointer-events:none}
+.memory-card{aspect-ratio: .82;border:1px solid transparent;background:#f6f5f3;display:grid;place-items:center;min-width:0;padding:0;color:#222;transition:background .2s,transform .18s,border-color .2s;position:relative}
+.memory-card:before{content:none}
 .memory-card .memory-mark{font-family:var(--serif);font-size:28px;line-height:1}
-.memory-card .memory-num{position:absolute;bottom:7px;right:7px;font-size:8px;letter-spacing:.08em;color:#a1a1a1}
-.memory-card.flipped{background:#fff;border-color:#222;transform:translateY(-1px)}
-.memory-card.flipped:before{border-color:#e2e2e2}
-.memory-card.matched{background:#ededed;border-color:#d4d4d4;cursor:default}
-.memory-card.matched:before{border-color:#d9d9d9}
+.memory-card .memory-num{position:absolute;bottom:7px;right:7px;font-size:8px;letter-spacing:.08em;color:#b0b0aa}
+.memory-card.flipped{background:#fff;border-color:#111;transform:translateY(-1px)}
+.memory-card.matched{background:#eceae6;border-color:transparent;cursor:default}
 .memory-card:disabled{opacity:1}
 .code-panel{border:1px solid #e2e2e2;padding:13px;margin:13px 0 0;background:#fafafa}
 .code-attempt{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #e9e9e9;font-size:11px;color:#545454}
@@ -170,16 +161,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .quiz-options{display:grid;gap:8px;margin-top:17px}
 .quiz-option{width:100%;display:grid;grid-template-columns:25px minmax(0,1fr);align-items:center;gap:10px;text-align:left;min-height:49px;padding:10px 12px;border:1px solid #e1e1e1;background:#fff;color:#222;font-size:12px;line-height:1.5}
 .quiz-option .option-letter{width:23px;height:23px;border:1px solid #dedede;display:grid;place-items:center;font-size:10px;color:#777}
-.quiz-option.correct{border-color:#222;background:#f1f1f1}
-.quiz-option.correct .option-letter{background:#222;color:#fff;border-color:#222}
-.quiz-option.incorrect{border-color:#777;background:#fafafa}
+.quiz-option.correct{border-color:#111;background:transparent}
+.quiz-option.correct .option-letter{background:transparent;color:#111;border-color:#111}
+.quiz-option.incorrect{border-color:#bcbcb5;background:transparent}
 .quiz-option:disabled{cursor:default;opacity:1}
 .quiz-progress{height:2px;background:#e9e9e9;margin-top:16px;overflow:hidden}
 .quiz-progress span{display:block;height:100%;background:#222;transition:width .25s}
 .quiz-result{text-align:center;padding:22px 8px 15px}
 .quiz-result-number{font-family:var(--serif);font-size:64px;line-height:1;letter-spacing:-.07em}
 .quiz-result-caption{font-size:11px;color:#777;margin:9px 0 14px}
-@media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:15px}.spotlight-title{font-size:25px}.game-row{grid-template-columns:47px minmax(0,1fr) auto;gap:10px}.game-symbol{width:46px;height:51px}.game-desc{font-size:10px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
+@media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.game-row{grid-template-columns:30px minmax(0,1fr);gap:14px}.game-symbol{width:30px}.game-desc{font-size:10px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
 
 </style>
 </head>
@@ -207,8 +198,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       <div class="spotlight-top"><span>EDITOR'S PICK / 02</span><span class="spotlight-status"><i></i> 今日推荐</span></div>
       <div class="spotlight-title">真相就在细节里。</div>
       <p class="spotlight-copy">一份新案件已经归档。和你的搭档一起拆开证据、找出矛盾，再决定谁在说谎。</p>
-      <div class="spotlight-bottom"><span>双人侦探社 <b>·</b> 约 5 分钟</span><span class="spotlight-cta">开始推理 <span aria-hidden="true">↗</span></span></div>
-      <span class="spotlight-watermark" aria-hidden="true">02</span>
+      <div class="spotlight-bottom"><span>双人侦探社 <b>·</b> 约 5 分钟</span><span class="spotlight-cta">开始推理 </span></div>
     </section>
 
     <section class="role-area">
@@ -225,36 +215,30 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <div class="micro-note">01 — 03</div>
       </div>
       <div class="games-list">
-        <article class="game-row">
+        <article class="game-row" data-game="word" role="button" tabindex="0" aria-label="开始默契猜词">
           <div class="game-symbol"><span class="game-index">01</span><svg viewBox="0 0 24 24"><path d="M8 4h8l2 4 3 1-1 7-3-2H7l-3 2-1-7 3-1z"/><path d="M8 9v4M6 11h4M15.5 10.5h.01M18 12.5h.01"/></svg></div>
           <div><div class="game-tag">WORD / WARM-UP</div><div class="game-name">默契猜词</div><div class="game-desc">TA 给出线索，你来猜答案。猜错也没关系，提示会越来越明显。</div><div class="game-record" id="wordRecord">适合三分钟热身</div></div>
-          <button class="play-arrow" data-game="word" aria-label="开始默契猜词"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
-        <article class="game-row">
+        <article class="game-row" data-game="detective" role="button" tabindex="0" aria-label="开始双人侦探社">
           <div class="game-symbol"><span class="game-index">02</span><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10.5h5M10.5 8v5"/><path d="M17 3h4v4"/></svg></div>
           <div><div class="game-tag">MYSTERY / CO-OP</div><div class="game-name">双人侦探社</div><div class="game-desc">检查证据、盘问嫌疑人，和 TA 一起还原案件真相。</div><div class="game-record" id="caseRecord">每一案都有答案</div></div>
-          <button class="play-arrow" data-game="detective" aria-label="开始双人侦探社"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
-        <article class="game-row">
+        <article class="game-row" data-game="tic" role="button" tabindex="0" aria-label="开始棋盘挑战赛">
           <div class="game-symbol"><span class="game-index">03</span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM9.33 4v16M14.67 4v16M4 9.33h16M4 14.67h16"/><path d="m6 6 4 4m0-4-4 4M15 15l3 3m0-3-3 3"/></svg></div>
           <div><div class="game-tag">STRATEGY / VS</div><div class="game-name">棋盘挑战赛</div><div class="game-desc">来一局井字棋。难度由你选，输赢都可以马上再来。</div><div class="game-record" id="ticRecord">简单 / 普通 / 困难</div></div>
-          <button class="play-arrow" data-game="tic" aria-label="开始棋盘挑战赛"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
 
-        <article class="game-row">
+        <article class="game-row" data-game="memory" role="button" tabindex="0" aria-label="开始记忆翻牌">
           <div class="game-symbol"><span class="game-index">04</span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="8" rx="1"/><rect x="14" y="3" width="6" height="8" rx="1"/><rect x="4" y="13" width="6" height="8" rx="1"/><rect x="14" y="13" width="6" height="8" rx="1"/><path d="M7 7h.01M17 17h.01"/></svg></div>
           <div><div class="game-tag">MEMORY / DUEL</div><div class="game-name">记忆翻牌</div><div class="game-desc">轮流翻开卡牌找对子。看看谁记得更多，也别低估 TA 的记忆力。</div><div class="game-record" id="memoryRecord">6 组图案 · 双人对战</div></div>
-          <button class="play-arrow" data-game="memory" aria-label="开始记忆翻牌"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
-        <article class="game-row">
+        <article class="game-row" data-game="code" role="button" tabindex="0" aria-label="开始三位数密码">
           <div class="game-symbol"><span class="game-index">05</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9h.01M12 9h.01M17 9h.01M7 15h10M7 12h10"/></svg></div>
           <div><div class="game-tag">LOGIC / CRACK</div><div class="game-name">三位数密码</div><div class="game-desc">破解一个由不同数字组成的密码。每次猜测都会告诉你数字和位置的线索。</div><div class="game-record" id="codeRecord">7 次机会 · 逻辑挑战</div></div>
-          <button class="play-arrow" data-game="code" aria-label="开始三位数密码"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
-        <article class="game-row">
+        <article class="game-row" data-game="quiz" role="button" tabindex="0" aria-label="开始脑洞快问">
           <div class="game-symbol"><span class="game-index">06</span><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="5"/><path d="m10 12 1.3 1.3L14.5 10"/></svg></div>
           <div><div class="game-tag">QUIZ / QUICK THINK</div><div class="game-name">脑洞快问</div><div class="game-desc">5 道随机小题，科学、常识和逻辑轮番上场。答完看看你们的默契分数。</div><div class="game-record" id="quizRecord">5 题一局 · 即时判分</div></div>
-          <button class="play-arrow" data-game="quiz" aria-label="开始脑洞快问"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
       </div>
     </section>
@@ -310,7 +294,7 @@ function renderRoles(){
   var html='';
   roleList.forEach(function(r){
     var isActive=String(r.id)===String(activeRole.id);
-    html+='<button class="role-chip '+(isActive?'active':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(isActive?'true':'false')+'">'+avatarMarkup(r,'')+'<span class="role-chip-name">'+esc(roleName(r))+'</span><span class="role-chip-mark">'+(isActive?'✓':'＋')+'</span></button>';
+    html+='<button class="role-chip '+(isActive?'active':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(isActive?'true':'false')+'">'+avatarMarkup(r,'')+'<span class="role-chip-name">'+esc(roleName(r))+'</span></button>';
   });
   byId('roleRail').innerHTML=html;
   byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
@@ -791,7 +775,7 @@ byId('backHome').addEventListener('click',function(){if(history.length>1)history
 byId('backLobby').addEventListener('click',returnLobby);
 byId('toLobbyFromGame').addEventListener('click',returnLobby);
 byId('restartGame').addEventListener('click',restartGame);
-document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(e){if(b.classList.contains('spotlight')&&e.target.closest('button'))return;showGame(b.getAttribute('data-game'));});if(b.classList.contains('spotlight'))b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showGame(b.getAttribute('data-game'));}});});
+document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(e){if(b.classList.contains('spotlight')&&e.target.closest('button'))return;showGame(b.getAttribute('data-game'));});b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showGame(b.getAttribute('data-game'));}});});
 loadRoles();renderRoles();
 if(window.PhoneStorage&&typeof window.PhoneStorage.getCurrentContactId==='function'){
   var current=window.PhoneStorage.getCurrentContactId();
