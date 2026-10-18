@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f5f2">
+<meta name="theme-color" content="#ffffff">
 <title>游戏 · MAOMAO</title>
 <script src="../js/native-feel.js"></script>
 <script src="../js/phone/phone_storage.js"></script>
 <script src="../js/phone/phone_api.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
-:root{--paper:#f5f5f2;--white:#fff;--ink:#171717;--muted:#858580;--line:#deded9;--soft:#ecece7;--black:#20201e;--serif:Georgia,"Songti SC","Noto Serif CJK SC",serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}
+:root{--paper:#ffffff;--white:#fff;--ink:#171717;--muted:#858580;--line:#e2e2e2;--soft:#f3f3f3;--black:#20201e;--serif:Georgia,"Songti SC","Noto Serif CJK SC",serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--paper);min-height:100%;overscroll-behavior-y:none}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);max-width:460px;min-height:100vh;margin-inline:auto;position:relative;-webkit-font-smoothing:antialiased}
@@ -45,7 +45,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .role-chip-mark{font-size:10px;margin-left:2px;color:#aaa}
 .games-list{border-top:1px solid var(--line)}
 .game-row{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid var(--line)}
-.game-symbol{width:52px;height:57px;background:#e9e9e4;display:grid;place-items:center;position:relative;overflow:hidden}
+.game-symbol{width:52px;height:57px;background:#f2f2f2;display:grid;place-items:center;position:relative;overflow:hidden}
 .game-symbol svg{width:27px;height:27px;stroke:#292926;fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
 .game-index{position:absolute;left:5px;top:4px;font-size:8px;color:#8a8a83;letter-spacing:.06em}
 .game-tag{font-size:9px;letter-spacing:.13em;color:#92928c;text-transform:uppercase;margin-bottom:5px}
@@ -75,10 +75,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .panel-kicker{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#92928c;margin-bottom:10px}
 .prompt-title{font-family:var(--serif);font-size:24px;line-height:1.25;letter-spacing:-.035em;margin-bottom:8px}
 .prompt-copy{font-size:12px;line-height:1.8;color:#777770}
-.clue-box{background:#f3f3ef;border-left:2px solid #252522;padding:12px 13px;margin:14px 0 16px;font-size:13px;line-height:1.8}
+.clue-box{background:#f4f4f4;border-left:2px solid #252522;padding:12px 13px;margin:14px 0 16px;font-size:13px;line-height:1.8}
 .field-label{font-size:10px;display:block;color:#888880;margin-bottom:8px;letter-spacing:.06em}
 .input-row{display:flex;gap:8px}
-.text-input{min-width:0;flex:1;height:43px;border:1px solid #dcdcd5;background:#fafaf8;border-radius:2px;padding:0 12px;font-size:13px;color:var(--ink)}
+.text-input{min-width:0;flex:1;height:43px;border:1px solid #e2e2e2;background:#fafaf8;border-radius:2px;padding:0 12px;font-size:13px;color:var(--ink)}
 .primary-btn{min-height:42px;padding:0 16px;border:1px solid var(--ink);background:var(--ink);color:white;font-size:12px;white-space:nowrap;transition:opacity .15s,transform .15s}
 .primary-btn:active{transform:scale(.98);opacity:.85}
 .secondary-btn{min-height:39px;padding:0 14px;border:1px solid #d8d8d2;background:transparent;color:#44443e;font-size:11px}
@@ -86,19 +86,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .feedback{font-size:12px;line-height:1.75;color:#65655f;min-height:21px;margin-top:12px}
 .feedback strong{font-weight:650;color:#222}
 .hint-progress{display:flex;gap:5px;margin:12px 0 15px}
-.hint-dot{height:3px;flex:1;background:#e6e6e0}
+.hint-dot{height:3px;flex:1;background:#e4e4e4}
 .hint-dot.seen{background:#242421}
 .divider-label{display:flex;align-items:center;gap:9px;font-size:10px;color:#94948d;margin:17px 0 12px}
 .divider-label:after{content:"";height:1px;background:var(--line);flex:1}
 .clue-list{display:grid;gap:8px}
-.evidence{width:100%;text-align:left;background:#fff;border:1px solid #e0e0da;padding:12px;display:grid;grid-template-columns:26px 1fr 15px;gap:9px;align-items:start;color:#272723}
+.evidence{width:100%;text-align:left;background:#fff;border:1px solid #e1e1e1;padding:12px;display:grid;grid-template-columns:26px 1fr 15px;gap:9px;align-items:start;color:#272723}
 .evidence-num{font-family:var(--serif);font-size:16px;color:#8a8a83}
 .evidence-text{font-size:12px;line-height:1.7}
 .evidence-mark{font-size:12px;color:#8e8e87;padding-top:3px}
-.evidence.revealed{background:#efefea;border-color:#cfcfc7}
+.evidence.revealed{background:#f1f1f1;border-color:#cfcfc7}
 .evidence.revealed .evidence-mark{color:#292925}
 .suspect-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.suspect{min-height:68px;border:1px solid #dcdcd5;background:transparent;padding:11px 8px;text-align:left}
+.suspect{min-height:68px;border:1px solid #e2e2e2;background:transparent;padding:11px 8px;text-align:left}
 .suspect-name{font-size:12px;font-weight:650}
 .suspect-role{font-size:10px;color:#8e8e87;margin-top:6px;line-height:1.3}
 .suspect:active{background:#e9e9e3}
@@ -106,22 +106,81 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .suspect.correct{border-color:#1e1e1b;background:#222;color:white}
 .suspect.correct .suspect-role{color:#d2d2ca}
 .tic-controls{display:flex;align-items:center;gap:8px;margin-bottom:13px}
-.difficulty{height:31px;display:flex;background:#e9e9e4;padding:3px;gap:2px}
+.difficulty{height:31px;display:flex;background:#f2f2f2;padding:3px;gap:2px}
 .diff-btn{padding:0 10px;border:0;background:transparent;color:#77776f;font-size:10px}
 .diff-btn.active{background:#fff;color:#181816;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .tic-board{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:300px;margin:0 auto}
-.tic-cell{aspect-ratio:1;border:1px solid #dfdfd8;background:#f8f8f5;font-family:var(--serif);font-size:47px;color:#222;display:grid;place-items:center;min-width:0}
+.tic-cell{aspect-ratio:1;border:1px solid #dfdfd8;background:#fafafa;font-family:var(--serif);font-size:47px;color:#222;display:grid;place-items:center;min-width:0}
 .tic-cell:disabled{cursor:default}
 .tic-cell.x{color:#222}
 .tic-cell.o{color:#8e8e86}
-.tic-cell.winning{background:#e8e8e1;border-color:#999990}
-.board-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid #ebebe6;font-size:10px;color:#83837d}
-.role-quote{font-size:12px;line-height:1.8;color:#4f4f49;border-left:2px solid #2b2b27;padding:9px 12px;background:#f0f0eb;margin-top:13px}
+.tic-cell.winning{background:#ededed;border-color:#999990}
+.board-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid #e9e9e9;font-size:10px;color:#83837d}
+.role-quote{font-size:12px;line-height:1.8;color:#4f4f49;border-left:2px solid #2b2b27;padding:9px 12px;background:#f2f2f2;margin-top:13px}
 .toast{position:fixed;left:50%;bottom:85px;transform:translate(-50%,8px);background:#222;color:#fff;border-radius:999px;padding:9px 14px;font-size:11px;opacity:0;pointer-events:none;transition:.22s;z-index:999;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .empty-state{padding:20px;border:1px dashed #d4d4cd;font-size:12px;line-height:1.8;color:#777770}
-@media(min-width:600px){body{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #e4e4de}.shell{padding-left:27px;padding-right:27px}.toast{bottom:35px}}
+@media(min-width:600px){body{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #e5e5e5}.shell{padding-left:27px;padding-right:27px}.toast{bottom:35px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Editorial polish: pure white canvas, neutral gray and sharp black accents */
+.spotlight{position:relative;overflow:hidden;background:#171717;color:#fff;padding:17px 17px 15px;margin:-7px 0 29px;min-height:184px;cursor:pointer;outline-offset:4px;isolation:isolate}
+.spotlight:active{transform:scale(.992)}
+.spotlight:after{content:"";position:absolute;z-index:-1;right:-17px;bottom:-70px;width:190px;height:190px;border:1px solid rgba(255,255,255,.12);border-radius:50%;box-shadow:0 0 0 19px rgba(255,255,255,.025),0 0 0 39px rgba(255,255,255,.02)}
+.spotlight-top,.spotlight-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.spotlight-top{font-size:9px;letter-spacing:.16em;color:#c8c8c8}
+.spotlight-status{display:flex;align-items:center;gap:6px;letter-spacing:.04em}
+.spotlight-status i{width:5px;height:5px;display:inline-block;border-radius:50%;background:#fff}
+.spotlight-title{font-family:var(--serif);font-size:28px;line-height:1.15;letter-spacing:-.055em;margin:24px 0 7px;max-width:265px}
+.spotlight-copy{font-size:11px;line-height:1.75;color:#c9c9c9;max-width:278px;margin:0 0 20px;position:relative;z-index:1}
+.spotlight-bottom{border-top:1px solid rgba(255,255,255,.2);padding-top:12px;font-size:10px;color:#d5d5d5;position:relative;z-index:1}
+.spotlight-bottom b{font-weight:400;color:#808080;margin:0 3px}
+.spotlight-cta{display:flex;align-items:center;gap:8px;color:white;font-size:10px;white-space:nowrap}
+.spotlight-cta span{font-size:17px;line-height:1}
+.spotlight-watermark{position:absolute;right:18px;top:44px;font-family:var(--serif);font-size:103px;line-height:1;color:rgba(255,255,255,.055);letter-spacing:-.1em;pointer-events:none}
+.hero-meta{margin-bottom:22px}
+.role-area{margin-bottom:27px}
+.game-row{transition:background .18s}
+.game-row:active{background:#fafafa}
+.game-symbol{border:1px solid #ededed}
+.play-arrow{border-color:#dedede}
+.play-arrow:hover{background:#171717;color:#fff;border-color:#171717}
+.board-panel{border-color:#e5e5e5;box-shadow:0 7px 24px rgba(0,0,0,.018)}
+.round-label{white-space:nowrap}
+.memory-scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.memory-score{border:1px solid #e4e4e4;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}
+.memory-score strong{font-family:var(--serif);font-weight:500;font-size:22px}
+.memory-score.active{border-color:#222;background:#fafafa}
+.memory-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:340px;margin:0 auto}
+.memory-card{aspect-ratio: .82;border:1px solid #dedede;background:#f7f7f7;display:grid;place-items:center;min-width:0;padding:0;color:#222;transition:background .2s,transform .18s,border-color .2s;position:relative}
+.memory-card:before{content:"";position:absolute;inset:5px;border:1px solid #e6e6e6;pointer-events:none}
+.memory-card .memory-mark{font-family:var(--serif);font-size:28px;line-height:1}
+.memory-card .memory-num{position:absolute;bottom:7px;right:7px;font-size:8px;letter-spacing:.08em;color:#a1a1a1}
+.memory-card.flipped{background:#fff;border-color:#222;transform:translateY(-1px)}
+.memory-card.flipped:before{border-color:#e2e2e2}
+.memory-card.matched{background:#ededed;border-color:#d4d4d4;cursor:default}
+.memory-card.matched:before{border-color:#d9d9d9}
+.memory-card:disabled{opacity:1}
+.code-panel{border:1px solid #e2e2e2;padding:13px;margin:13px 0 0;background:#fafafa}
+.code-attempt{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #e9e9e9;font-size:11px;color:#545454}
+.code-attempt:last-child{border-bottom:0}
+.code-attempt strong{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px;letter-spacing:.14em;color:#222}
+.code-digits{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.2em;font-size:18px}
+.code-slot{border:1px solid #dedede;background:#fff;padding:8px 12px;min-width:0;flex:1;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;letter-spacing:.18em}
+.quiz-options{display:grid;gap:8px;margin-top:17px}
+.quiz-option{width:100%;display:grid;grid-template-columns:25px minmax(0,1fr);align-items:center;gap:10px;text-align:left;min-height:49px;padding:10px 12px;border:1px solid #e1e1e1;background:#fff;color:#222;font-size:12px;line-height:1.5}
+.quiz-option .option-letter{width:23px;height:23px;border:1px solid #dedede;display:grid;place-items:center;font-size:10px;color:#777}
+.quiz-option.correct{border-color:#222;background:#f1f1f1}
+.quiz-option.correct .option-letter{background:#222;color:#fff;border-color:#222}
+.quiz-option.incorrect{border-color:#777;background:#fafafa}
+.quiz-option:disabled{cursor:default;opacity:1}
+.quiz-progress{height:2px;background:#e9e9e9;margin-top:16px;overflow:hidden}
+.quiz-progress span{display:block;height:100%;background:#222;transition:width .25s}
+.quiz-result{text-align:center;padding:22px 8px 15px}
+.quiz-result-number{font-family:var(--serif);font-size:64px;line-height:1;letter-spacing:-.07em}
+.quiz-result-caption{font-size:11px;color:#777;margin:9px 0 14px}
+@media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:15px}.spotlight-title{font-size:25px}.game-row{grid-template-columns:47px minmax(0,1fr) auto;gap:10px}.game-symbol{width:46px;height:51px}.game-desc{font-size:10px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
+
 </style>
 </head>
 <body>
@@ -141,8 +200,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <div class="hero-meta">
       <div class="meta-item"><span class="meta-number" id="totalRounds">00</span><span class="meta-label">累计对局</span></div>
       <div class="meta-item"><span class="meta-number" id="totalWins">00</span><span class="meta-label">获得胜利</span></div>
-      <div class="meta-item"><span class="meta-number">03</span><span class="meta-label">首发游戏</span></div>
+      <div class="meta-item"><span class="meta-number">06</span><span class="meta-label">可玩游戏</span></div>
     </div>
+
+    <section class="spotlight" data-game="detective" role="button" tabindex="0" aria-label="开始今日推荐：双人侦探社">
+      <div class="spotlight-top"><span>EDITOR'S PICK / 02</span><span class="spotlight-status"><i></i> 今日推荐</span></div>
+      <div class="spotlight-title">真相就在细节里。</div>
+      <p class="spotlight-copy">一份新案件已经归档。和你的搭档一起拆开证据、找出矛盾，再决定谁在说谎。</p>
+      <div class="spotlight-bottom"><span>双人侦探社 <b>·</b> 约 5 分钟</span><span class="spotlight-cta">开始推理 <span aria-hidden="true">↗</span></span></div>
+      <span class="spotlight-watermark" aria-hidden="true">02</span>
+    </section>
 
     <section class="role-area">
       <div class="section-head">
@@ -173,6 +240,22 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
           <div><div class="game-tag">STRATEGY / VS</div><div class="game-name">棋盘挑战赛</div><div class="game-desc">来一局井字棋。难度由你选，输赢都可以马上再来。</div><div class="game-record" id="ticRecord">简单 / 普通 / 困难</div></div>
           <button class="play-arrow" data-game="tic" aria-label="开始棋盘挑战赛"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         </article>
+
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">04</span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="8" rx="1"/><rect x="14" y="3" width="6" height="8" rx="1"/><rect x="4" y="13" width="6" height="8" rx="1"/><rect x="14" y="13" width="6" height="8" rx="1"/><path d="M7 7h.01M17 17h.01"/></svg></div>
+          <div><div class="game-tag">MEMORY / DUEL</div><div class="game-name">记忆翻牌</div><div class="game-desc">轮流翻开卡牌找对子。看看谁记得更多，也别低估 TA 的记忆力。</div><div class="game-record" id="memoryRecord">6 组图案 · 双人对战</div></div>
+          <button class="play-arrow" data-game="memory" aria-label="开始记忆翻牌"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">05</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9h.01M12 9h.01M17 9h.01M7 15h10M7 12h10"/></svg></div>
+          <div><div class="game-tag">LOGIC / CRACK</div><div class="game-name">三位数密码</div><div class="game-desc">破解一个由不同数字组成的密码。每次猜测都会告诉你数字和位置的线索。</div><div class="game-record" id="codeRecord">7 次机会 · 逻辑挑战</div></div>
+          <button class="play-arrow" data-game="code" aria-label="开始三位数密码"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">06</span><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="5"/><path d="m10 12 1.3 1.3L14.5 10"/></svg></div>
+          <div><div class="game-tag">QUIZ / QUICK THINK</div><div class="game-name">脑洞快问</div><div class="game-desc">5 道随机小题，科学、常识和逻辑轮番上场。答完看看你们的默契分数。</div><div class="game-record" id="quizRecord">5 题一局 · 即时判分</div></div>
+          <button class="play-arrow" data-game="quiz" aria-label="开始脑洞快问"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
       </div>
     </section>
     <div class="bottom-note"><span>BUILT FOR TWO</span><strong>PLAY NICE. THINK SHARP.</strong></div>
@@ -200,6 +283,8 @@ var roleList=[];
 var activeRole=null;
 var activeGame='';
 var roundNumber=1;
+var reactionSequence=0;
+var gameSession=0;
 var gameState={};
 var defaultRole={id:'default-partner',name:'默认搭档',avatarBg:'#777777',avatar:'',description:'一位随时可以陪你玩游戏的搭档。',personality:'自然、聪明、偶尔开玩笑。'};
 function loadRoles(){
@@ -235,9 +320,13 @@ function renderRoles(){
   byId('wordRecord').textContent='已猜中 '+(st.wordWins||0)+' 题';
   byId('caseRecord').textContent='已侦破 '+(st.caseWins||0)+' 案';
   byId('ticRecord').textContent='胜 '+(st.ticWins||0)+' · 负 '+(st.ticLosses||0);
+  if(byId('memoryRecord'))byId('memoryRecord').textContent='记忆赛胜 '+(st.memoryWins||0)+' 局';
+  if(byId('codeRecord'))byId('codeRecord').textContent='已破解 '+(st.codeWins||0)+' 次密码';
+  if(byId('quizRecord'))byId('quizRecord').textContent='快问快答胜 '+(st.quizWins||0)+' 局';
 }
 function pad(n){return String(n||0).padStart(2,'0');}
 function selectRole(id){
+  reactionSequence++;
   var next=roleList.find(function(r){return String(r.id)===String(id);});
   if(!next)return;
   activeRole=next;localStorage.setItem('maomao_game_role',String(next.id));
@@ -255,12 +344,12 @@ function statsRoot(){
 }
 function statsFor(r){
   var all=statsRoot();var key=String(r&&r.id||'default-partner');
-  if(!all[key]) all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0};
+  if(!all[key]) all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0,memoryWins:0,codeWins:0,quizWins:0};
   return all[key];
 }
 function saveStat(type,result){
   var all=statsRoot();var key=String(activeRole&&activeRole.id||'default-partner');
-  if(!all[key])all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0};
+  if(!all[key])all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0,memoryWins:0,codeWins:0,quizWins:0};
   var s=all[key];s.plays=(s.plays||0)+1;
   if(result==='win')s.wins=(s.wins||0)+1;
   if(type==='word'&&result==='win')s.wordWins=(s.wordWins||0)+1;
@@ -268,6 +357,9 @@ function saveStat(type,result){
   if(type==='tic'&&result==='win')s.ticWins=(s.ticWins||0)+1;
   if(type==='tic'&&result==='loss')s.ticLosses=(s.ticLosses||0)+1;
   if(type==='tic'&&result==='draw')s.ticDraws=(s.ticDraws||0)+1;
+  if(type==='memory'&&result==='win')s.memoryWins=(s.memoryWins||0)+1;
+  if(type==='code'&&result==='win')s.codeWins=(s.codeWins||0)+1;
+  if(type==='quiz'&&result==='win')s.quizWins=(s.quizWins||0)+1;
   all[key]=s;localStorage.setItem('maomao_game_stats_v1',JSON.stringify(all));renderRoles();
 }
 function showToast(text){
@@ -285,6 +377,7 @@ function characterTraits(){
   ].join('\n');
 }
 function roleLine(context,fallback){
+  var reactionId=++reactionSequence;
   byId('roleQuote').textContent=fallback;
   var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
   if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function')return;
@@ -297,15 +390,20 @@ function showGame(id){
   activeGame=id;gameState={};roundNumber=1;
   byId('lobbyView').style.display='none';byId('gameView').style.display='block';
   renderPartner();
+  reactionSequence++;
   if(id==='word'){byId('gameCode').textContent='GAME 01';byId('gameTitle').textContent='默契猜词';byId('gameSubtitle').textContent='看线索，猜一个词。答对之前，TA 会继续给你提示。';startWord();}
   else if(id==='detective'){byId('gameCode').textContent='GAME 02';byId('gameTitle').textContent='双人侦探社';byId('gameSubtitle').textContent='找出线索之间的矛盾，选出最可能的真相。';startCase();}
   else if(id==='tic'){byId('gameCode').textContent='GAME 03';byId('gameTitle').textContent='棋盘挑战赛';byId('gameSubtitle').textContent='你先手执 X，TA 执 O。三子连线就能获胜。';startTic();}
+  else if(id==='memory'){byId('gameCode').textContent='GAME 04';byId('gameTitle').textContent='记忆翻牌';byId('gameSubtitle').textContent='轮流找出相同图案。配对成功可以继续，记住对方翻过的位置。';startMemory();}
+  else if(id==='code'){byId('gameCode').textContent='GAME 05';byId('gameTitle').textContent='三位数密码';byId('gameSubtitle').textContent='猜中由三个不重复数字组成的密码。每条反馈都是下一步的线索。';startCode();}
+  else if(id==='quiz'){byId('gameCode').textContent='GAME 06';byId('gameTitle').textContent='脑洞快问';byId('gameSubtitle').textContent='五道随机小题，看看你的知识面和判断力。';startQuiz();}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function returnLobby(){
+  reactionSequence++;
   activeGame='';byId('gameView').style.display='none';byId('lobbyView').style.display='block';renderRoles();window.scrollTo({top:0,behavior:'smooth'});
 }
-function restartGame(){roundNumber++;if(activeGame==='word')startWord();else if(activeGame==='detective')startCase();else if(activeGame==='tic')startTic();}
+function restartGame(){roundNumber++;reactionSequence++;if(activeGame==='word')startWord();else if(activeGame==='detective')startCase();else if(activeGame==='tic')startTic();else if(activeGame==='memory')startMemory();else if(activeGame==='code')startCode();else if(activeGame==='quiz')startQuiz();}
 function setRoundLabel(){byId('roundLabel').textContent='ROUND '+pad(roundNumber);}
 var WORDS=[
  {word:'月亮',aliases:['月亮','月球'],hints:['夜幕降临时，它常常挂在天上。','它会有圆有缺，却不是被谁咬了一口。','潮汐和它有关系，诗人也很喜欢写它。']},
@@ -392,6 +490,240 @@ function startTic(){
   byId('resetBoard').addEventListener('click',function(){roundNumber++;startTic();});
   byId('roleQuote').textContent='我先不放水，你也认真一点。准备好了就落子。';
 }
+
+/* ===== GAME 04: cooperative memory duel ===== */
+var MEMORY_SYMBOLS=['○','△','□','☆','◇','＋'];
+function shuffleCopy(list){
+  var out=list.slice();
+  for(var i=out.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=out[i];out[i]=out[j];out[j]=tmp;}
+  return out;
+}
+function startMemory(){
+  setRoundLabel();
+  var deck=shuffleCopy(MEMORY_SYMBOLS.concat(MEMORY_SYMBOLS));
+  gameState={session:++gameSession,deck:deck,matched:[],open:[],turn:'human',scores:{human:0,ai:0},aiSeen:{},busy:false,ended:false};
+  byId('gameContent').innerHTML=
+    '<div class="memory-scoreboard">'+
+      '<div class="memory-score active" id="memoryHumanScore"><span>你 / YOU</span><strong id="memoryHumanNum">0</strong></div>'+
+      '<div class="memory-score" id="memoryAiScore"><span>'+esc(roleName(activeRole))+' / TA</span><strong id="memoryAiNum">0</strong></div>'+
+    '</div>'+
+    '<div class="board-panel"><div class="panel-kicker">SIX PAIRS / TWO PLAYERS</div><div class="prompt-title">找到相同的图案。</div><div class="prompt-copy">你和搭档轮流翻两张牌。配对成功就再来一次；没配对成功，轮到对方。记忆好的人会占优势。</div>'+
+    '<div class="memory-grid" id="memoryGrid">'+deck.map(function(_,i){return '<button class="memory-card" data-memory="'+i+'" aria-label="卡牌 '+(i+1)+'"><span class="memory-mark">·</span><span class="memory-num">'+String(i+1).padStart(2,'0')+'</span></button>';}).join('')+'</div>'+
+    '<div class="board-foot"><span id="memoryStatus">轮到你翻牌。</span><span id="memoryPairs">已找到 0 / 6 对</span></div><div class="btn-row"><button class="secondary-btn" id="memoryReset">重新洗牌</button></div></div>';
+  byId('gameContent').querySelectorAll('[data-memory]').forEach(function(btn){btn.addEventListener('click',function(){tapMemory(Number(btn.getAttribute('data-memory')));});});
+  byId('memoryReset').addEventListener('click',function(){roundNumber++;startMemory();});
+  byId('roleQuote').textContent='我会认真记住每一张牌。你也一样，别小看这局。';
+  updateMemoryScore();
+}
+function memoryAvailable(){
+  var out=[];for(var i=0;i<gameState.deck.length;i++){if(gameState.matched.indexOf(i)<0&&gameState.open.indexOf(i)<0)out.push(i);}return out;
+}
+function renderMemory(){
+  var grid=byId('memoryGrid');if(!grid)return;
+  grid.querySelectorAll('[data-memory]').forEach(function(btn){
+    var i=Number(btn.getAttribute('data-memory'));var shown=gameState.matched.indexOf(i)>=0||gameState.open.indexOf(i)>=0;
+    btn.classList.toggle('flipped',shown);btn.classList.toggle('matched',gameState.matched.indexOf(i)>=0);
+    btn.querySelector('.memory-mark').textContent=shown?gameState.deck[i]:'·';
+    btn.setAttribute('aria-label',shown?'卡牌 '+(i+1)+'：'+gameState.deck[i]:'隐藏卡牌 '+(i+1));
+    btn.disabled=gameState.ended||gameState.turn!=='human'||gameState.busy||shown;
+  });
+}
+function updateMemoryScore(){
+  if(!byId('memoryHumanNum'))return;
+  byId('memoryHumanNum').textContent=gameState.scores.human;
+  byId('memoryAiNum').textContent=gameState.scores.ai;
+  byId('memoryPairs').textContent='已找到 '+gameState.matched.length/2+' / 6 对';
+  byId('memoryHumanScore').classList.toggle('active',gameState.turn==='human'&&!gameState.ended);
+  byId('memoryAiScore').classList.toggle('active',gameState.turn==='ai'&&!gameState.ended);
+  renderMemory();
+}
+function tapMemory(i){
+  if(gameState.ended||gameState.turn!=='human'||gameState.busy||gameState.open.indexOf(i)>=0||gameState.matched.indexOf(i)>=0)return;
+  gameState.open.push(i);renderMemory();
+  if(gameState.open.length<2){byId('memoryStatus').textContent='再翻一张，看看是不是同一对。';return;}
+  resolveMemoryTurn('human');
+}
+function resolveMemoryTurn(player){
+  var token=gameState.session;gameState.busy=true;renderMemory();
+  var first=gameState.open[0],second=gameState.open[1],matched=gameState.deck[first]===gameState.deck[second];
+  if(player==='ai'){gameState.aiSeen[first]=gameState.deck[first];gameState.aiSeen[second]=gameState.deck[second];}
+  byId('memoryStatus').textContent=matched?'配对成功！':'两张牌不一样。';
+  setTimeout(function(){
+    if(!isGameSession('memory',token))return;
+    if(matched){
+      gameState.matched.push(first,second);gameState.scores[player]++;
+    }else{
+      gameState.open=[];
+    }
+    gameState.open=[];
+    gameState.busy=false;
+    if(gameState.matched.length===gameState.deck.length){finishMemory();return;}
+    if(matched){
+      gameState.turn=player;
+      byId('memoryStatus').textContent=player==='human'?'你配对成功，再来一组。':roleName(activeRole)+' 配对成功，继续找。';
+      updateMemoryScore();
+      if(player==='ai')setTimeout(function(){if(isGameSession('memory',token)&&!gameState.ended)aiMemoryTurn();},530);
+      return;
+    }
+    gameState.turn=player==='human'?'ai':'human';
+    byId('memoryStatus').textContent=gameState.turn==='human'?'轮到你了。记住刚才出现的图案。':roleName(activeRole)+' 正在回忆卡牌位置…';
+    updateMemoryScore();
+    if(gameState.turn==='ai')setTimeout(function(){if(isGameSession('memory',token)&&!gameState.ended)aiMemoryTurn();},480);
+  },680);
+}
+function isGameSession(id,token){return activeGame===id&&gameState&&gameState.session===token&&!gameState.ended;}
+function aiMemoryTurn(){
+  if(gameState.ended||gameState.turn!=='ai'||gameState.busy)return;
+  var token=gameState.session;gameState.busy=true;updateMemoryScore();
+  byId('memoryStatus').textContent=roleName(activeRole)+' 正在选牌…';
+  setTimeout(function(){
+    if(!isGameSession('memory',token))return;
+    var available=memoryAvailable();if(available.length<2){gameState.busy=false;return;}
+    var knownPair=null;
+    for(var a=0;a<available.length&&!knownPair;a++)for(var b=a+1;b<available.length;b++){
+      if(gameState.aiSeen[available[a]]&&gameState.aiSeen[available[a]]===gameState.aiSeen[available[b]]){knownPair=[available[a],available[b]];break;}
+    }
+    var first;
+    if(knownPair)first=knownPair[0];
+    else{
+      var unknown=available.filter(function(i){return !gameState.aiSeen[i];});
+      first=(unknown.length?unknown:available)[Math.floor(Math.random()*(unknown.length?unknown:available).length)];
+    }
+    gameState.open=[first];gameState.aiSeen[first]=gameState.deck[first];gameState.busy=false;updateMemoryScore();
+    byId('memoryStatus').textContent=roleName(activeRole)+' 翻开了第一张…';
+    setTimeout(function(){
+      if(!isGameSession('memory',token))return;
+      var remaining=memoryAvailable().filter(function(i){return i!==first;});
+      if(!remaining.length){gameState.open=[];gameState.turn='human';gameState.busy=false;updateMemoryScore();return;}
+      var second=-1;
+      if(knownPair&&knownPair[1]!==first&&remaining.indexOf(knownPair[1])>=0)second=knownPair[1];
+      if(second<0){
+        for(var i=0;i<remaining.length;i++){if(gameState.aiSeen[remaining[i]]===gameState.deck[first]){second=remaining[i];break;}}
+      }
+      if(second<0){
+        var unknown2=remaining.filter(function(i){return !gameState.aiSeen[i];});
+        var pool=unknown2.length?unknown2:remaining;second=pool[Math.floor(Math.random()*pool.length)];
+      }
+      gameState.open=[first,second];gameState.aiSeen[second]=gameState.deck[second];gameState.busy=false;updateMemoryScore();
+      byId('memoryStatus').textContent='看看这两张是不是一对。';
+      setTimeout(function(){if(isGameSession('memory',token))resolveMemoryTurn('ai');},590);
+    },550);
+  },520);
+}
+function finishMemory(){
+  gameState.ended=true;updateMemoryScore();
+  var h=gameState.scores.human,a=gameState.scores.ai,result=h>a?'win':h<a?'loss':'draw';
+  byId('memoryStatus').textContent=result==='win'?'你赢下了记忆赛！':result==='loss'?roleName(activeRole)+' 赢下了这局。':'平局，记忆力不相上下。';
+  saveStat('memory',result);
+  roleLine('记忆翻牌结束。玩家获得 '+h+' 对，角色 '+roleName(activeRole)+' 获得 '+a+' 对。结果：'+(result==='win'?'玩家获胜':result==='loss'?'角色获胜':'平局')+'。请自然回应。',result==='win'?'好吧，你记得比我牢。再来一盘？':result==='loss'?'这盘我记住了。来，下一盘你先手。':'打成平手了。看来我们都没少动脑筋。');
+  renderMemory();
+}
+
+/* ===== GAME 05: three-digit code breaker ===== */
+function createSecret(){
+  var digits=shuffleCopy(['0','1','2','3','4','5','6','7','8','9']);
+  return digits.slice(0,3).join('');
+}
+function startCode(){
+  setRoundLabel();gameState={session:++gameSession,secret:createSecret(),attempts:0,maxAttempts:7,ended:false,history:[]};
+  byId('gameContent').innerHTML=
+    '<div class="board-panel"><div class="panel-kicker">LOGIC LOCK / 03 DIGITS</div><div class="prompt-title">破解三位数密码。</div><div class="prompt-copy">密码由 0–9 中三个不重复的数字组成，首位也可能是 0。每次猜测会显示：数字和位置都正确的数量，以及数字正确但位置不对的数量。</div>'+
+    '<div class="memory-scoreboard" style="margin-top:15px"><div class="memory-score"><span>剩余机会</span><strong id="codeRemaining">7</strong></div><div class="memory-score"><span>已用尝试</span><strong id="codeUsed">0</strong></div></div>'+
+    '<label class="field-label" for="codeInput">输入三个不同的数字</label><div class="input-row"><input id="codeInput" class="code-slot" type="text" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]*" placeholder="0 0 0"><button class="primary-btn" id="submitCode">试一下</button></div>'+
+    '<div class="feedback" id="codeFeedback" aria-live="polite">线索会逐次累积。你有 7 次机会。</div><div class="code-panel"><div class="panel-kicker">YOUR ATTEMPTS</div><div id="codeHistory"><div class="code-attempt"><span>还没有尝试记录</span><span>—</span></div></div></div>'+
+    '<div class="btn-row"><button class="secondary-btn" id="newCode">重新生成密码</button></div></div>';
+  byId('submitCode').addEventListener('click',submitCodeGuess);
+  byId('codeInput').addEventListener('keydown',function(e){if(e.key==='Enter')submitCodeGuess();});
+  byId('codeInput').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,3);});
+  byId('newCode').addEventListener('click',function(){roundNumber++;startCode();roleLine('玩家要求重新生成密码，鼓励对方重新挑战。','密码重置！这次可得盯紧每一条线索。');});
+  byId('roleQuote').textContent='密码已经设好了。七次机会，看看你能不能破解。';
+}
+function submitCodeGuess(){
+  if(gameState.ended)return;
+  var input=byId('codeInput').value.trim();
+  if(!/^\d{3}$/.test(input)){byId('codeFeedback').textContent='请输入恰好三位数字。';return;}
+  if(new Set(input.split('')).size!==3){byId('codeFeedback').textContent='三个数字不能重复，换一个组合试试。';return;}
+  gameState.attempts++;
+  var exact=0,common=0;
+  for(var i=0;i<3;i++)if(input[i]===gameState.secret[i])exact++;
+  for(var j=0;j<3;j++)if(gameState.secret.indexOf(input[j])>=0)common++;
+  var misplaced=common-exact;
+  gameState.history.unshift({guess:input,exact:exact,misplaced:misplaced});
+  byId('codeRemaining').textContent=gameState.maxAttempts-gameState.attempts;
+  byId('codeUsed').textContent=gameState.attempts;
+  byId('codeHistory').innerHTML=gameState.history.map(function(h,i){
+    return '<div class="code-attempt"><span><strong>'+esc(h.guess.split('').join(' '))+'</strong><span style="display:block;font-size:9px;color:#929292;margin-top:4px">尝试 '+String(gameState.attempts-i).padStart(2,'0')+'</span></span><span>位置正确 '+h.exact+' · 数字正确 '+h.misplaced+'</span></div>';
+  }).join('');
+  byId('codeInput').value='';
+  if(exact===3){
+    gameState.ended=true;byId('codeFeedback').innerHTML='<strong>密码破解成功。</strong> 答案是 '+esc(gameState.secret)+'，用了 '+gameState.attempts+' 次。';
+    saveStat('code','win');byId('submitCode').disabled=true;
+    roleLine('玩家破解了三位数密码 '+gameState.secret+'，用了 '+gameState.attempts+' 次。请用角色语气夸奖或轻松回应。',gameState.attempts<=3?'这么快就破解了？我得把下一题出难一点。':'密码被你抓住了。不错嘛，侦探。');
+  }else if(gameState.attempts>=gameState.maxAttempts){
+    gameState.ended=true;byId('codeFeedback').innerHTML='<strong>机会用完了。</strong> 正确密码是 '+esc(gameState.secret)+'。';
+    saveStat('code','loss');byId('submitCode').disabled=true;
+    roleLine('玩家没有在七次内破解密码。正确答案是 '+gameState.secret+'。请用角色语气安慰并鼓励再来一局。','这次差一点点。看过答案，下轮就能用上新思路。');
+  }else{
+    byId('codeFeedback').textContent='位置正确 '+exact+' 位；数字正确但位置不对 '+misplaced+' 位。继续推理。';
+    if(gameState.attempts%2===0)roleLine('玩家猜了 '+input+'，反馈为位置正确 '+exact+' 位，数字正确但位置不对 '+misplaced+' 位。请用角色语气给一条鼓励或提醒，不可泄漏答案。','线索已经多了一条。别急，逐位排除就好。');
+  }
+}
+
+/* ===== GAME 06: five-question quick quiz ===== */
+var QUIZ_BANK=[
+ {q:'太阳系中体积最大的行星是哪一颗？',options:['地球','木星','海王星','金星'],answer:1,why:'木星是太阳系中体积和质量最大的行星。'},
+ {q:'水的化学式是什么？',options:['CO₂','O₂','H₂O','NaCl'],answer:2,why:'一个水分子由两个氢原子和一个氧原子组成。'},
+ {q:'地球的大气中，含量最多的气体是什么？',options:['氧气','氮气','二氧化碳','氢气'],answer:1,why:'氮气约占地球大气体积的 78%，氧气约占 21%。'},
+ {q:'三角形的内角和是多少度？',options:['90°','120°','180°','360°'],answer:2,why:'在欧氏平面几何中，三角形的三个内角之和为 180°。'},
+ {q:'“光年”主要用来表示什么？',options:['时间长度','光的亮度','距离','速度'],answer:2,why:'光年是距离单位，表示光在真空中一年走过的距离。'},
+ {q:'植物进行光合作用时，会吸收哪种气体？',options:['二氧化碳','氦气','氮气','氢气'],answer:0,why:'植物利用光能把水和二氧化碳转化为有机物，并释放氧气。'},
+ {q:'一个字节（Byte）通常等于多少比特（bit）？',options:['4','8','16','32'],answer:1,why:'一个字节通常由 8 个比特组成。'},
+ {q:'海洋中面积最大的洋是哪一个？',options:['大西洋','印度洋','北冰洋','太平洋'],answer:3,why:'太平洋是地球面积最大的海洋。'},
+ {q:'日本的首都是哪里？',options:['大阪','京都','东京','札幌'],answer:2,why:'日本现今的首都是东京。'},
+ {q:'哺乳动物最典型的特征之一是什么？',options:['所有种类都会飞','用鳃呼吸','雌性有乳腺哺育幼体','全部生活在陆地'],answer:2,why:'哺乳动物的名称就来自乳腺哺育幼体这一重要特征。'}
+];
+function startQuiz(){
+  setRoundLabel();
+  gameState={session:++gameSession,questions:shuffleCopy(QUIZ_BANK).slice(0,5),index:0,score:0,answered:false,ended:false};
+  renderQuizQuestion();
+  byId('roleQuote').textContent='五道题，别慌。我也想看看你会怎么选。';
+}
+function renderQuizQuestion(){
+  if(gameState.ended)return;
+  reactionSequence++;
+  var q=gameState.questions[gameState.index];var idx=gameState.index;
+  byId('roundLabel').textContent='QUESTION '+String(idx+1).padStart(2,'0')+' / 05';
+  byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">QUICK THINK / '+String(idx+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(q.q)+'</div><div class="quiz-options" id="quizOptions">'+q.options.map(function(opt,i){return '<button class="quiz-option" data-choice="'+i+'"><span class="option-letter">'+String.fromCharCode(65+i)+'</span><span>'+esc(opt)+'</span></button>';}).join('')+'</div><div class="feedback" id="quizFeedback" aria-live="polite">选出你认为正确的答案。</div><div class="quiz-progress"><span style="width:'+Math.round(idx/5*100)+'%"></span></div><div class="board-foot"><span id="quizCount">第 '+(idx+1)+' / 5 题</span><span id="quizScore">当前答对 '+gameState.score+' 题</span></div></div>';
+  byId('quizOptions').querySelectorAll('[data-choice]').forEach(function(btn){btn.addEventListener('click',function(){answerQuiz(Number(btn.getAttribute('data-choice')));});});
+}
+function answerQuiz(choice){
+  if(gameState.ended||gameState.answered)return;
+  gameState.answered=true;
+  var token=gameState.session,q=gameState.questions[gameState.index],correct=choice===q.answer;
+  if(correct)gameState.score++;
+  byId('quizOptions').querySelectorAll('[data-choice]').forEach(function(btn){
+    var n=Number(btn.getAttribute('data-choice'));btn.disabled=true;
+    if(n===q.answer)btn.classList.add('correct');
+    else if(n===choice&&!correct)btn.classList.add('incorrect');
+  });
+  byId('quizFeedback').innerHTML=(correct?'<strong>答对了。</strong> ':'<strong>还差一点。</strong> ')+esc(q.why);
+  byId('quizScore').textContent='当前答对 '+gameState.score+' 题';
+  roleLine('脑洞快问第 '+(gameState.index+1)+' 题，玩家'+(correct?'答对了':'答错了')+'。知识点：'+q.why+'。请用角色口吻简短回应，不要直接复述解释。',correct?'漂亮，反应很快嘛。':'这题设了个小陷阱，记住这个知识点。');
+  setTimeout(function(){
+    if(!isGameSession('quiz',token))return;
+    gameState.index++;gameState.answered=false;
+    if(gameState.index>=gameState.questions.length)finishQuiz();else renderQuizQuestion();
+  },1450);
+}
+function finishQuiz(){
+  gameState.ended=true;var score=gameState.score;var result=score>=4?'win':'loss';
+  byId('roundLabel').textContent='RESULT / 05';
+  byId('gameContent').innerHTML='<div class="board-panel quiz-result"><div class="panel-kicker">YOUR RESULT</div><div class="quiz-result-number">'+score+'<span style="font-size:25px;color:#888"> / 5</span></div><div class="quiz-result-caption">'+(score===5?'全对！状态非常好。':score>=4?'发挥不错，知识储备很扎实。':score>=2?'再玩一局，看看能不能突破自己。':'这局当热身，下一次肯定更熟练。')+'</div><div class="quiz-progress"><span style="width:'+score/5*100+'%"></span></div><div class="btn-row" style="justify-content:center;margin-top:20px"><button class="primary-btn" id="quizAgain">再答一组</button></div></div>';
+  byId('quizAgain').addEventListener('click',function(){roundNumber++;startQuiz();});
+  saveStat('quiz',result);
+  roleLine('脑洞快问结束，玩家答对 '+score+' / 5 题。请用角色口吻点评一下，不要重复题目。',score>=4?'答得挺稳的嘛，下次我们冲个满分。':'下一轮我们再冲高一点。刚才那几题还挺有意思。');
+}
+
 function winningLine(board){
   for(var i=0;i<WIN_LINES.length;i++){var l=WIN_LINES[i];if(board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[1]]===board[l[2]])return l;}
   return null;
@@ -459,7 +791,7 @@ byId('backHome').addEventListener('click',function(){if(history.length>1)history
 byId('backLobby').addEventListener('click',returnLobby);
 byId('toLobbyFromGame').addEventListener('click',returnLobby);
 byId('restartGame').addEventListener('click',restartGame);
-document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(){showGame(b.getAttribute('data-game'));});});
+document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(e){if(b.classList.contains('spotlight')&&e.target.closest('button'))return;showGame(b.getAttribute('data-game'));});if(b.classList.contains('spotlight'))b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showGame(b.getAttribute('data-game'));}});});
 loadRoles();renderRoles();
 if(window.PhoneStorage&&typeof window.PhoneStorage.getCurrentContactId==='function'){
   var current=window.PhoneStorage.getCurrentContactId();
