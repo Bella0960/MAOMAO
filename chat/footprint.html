@@ -1,487 +1,836 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#F7F7F9" />
-<title>角色足迹</title>
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MAOMAO · 角色足迹</title>
 <script src="../js/native-feel.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html { background: #E8E8EC; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-    background: #F7F7F9;
-    color: #111;
-    min-height: 100vh;
-    max-width: 390px;
-    margin: 0 auto;
-    padding-bottom: 24px;
-    position: relative;
+  /* ================= 基础变量与重置 ================= */
+  :root {
+    --bg: #FFFFFF; /* 改为纯白 */
+    --ink: #111111; /* 改为纯黑 */
+    --muted: #8E8E93;
+    --line: #E5E5E5; /* 极细浅灰线 */
+    --serif: "Georgia", "Songti SC", "Noto Serif CJK SC", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", sans-serif;
   }
-
-  /* 顶部导航 */
-  .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px 8px;
-    padding-top: calc(16px + env(safe-area-inset-top));
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { 
+    background: #f0f0f0; 
+    font-family: var(--sans); 
+    color: var(--ink); 
+    display: flex; 
+    justify-content: center; 
   }
-  .nav-left { display: flex; align-items: center; gap: 12px; }
-  .icon-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: #fff;
-    border: 1px solid #ECECEF;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-  .nav-title { font-size: 1.063rem; font-weight: 600; }
-
-  /* 日期头部 */
-  .header {
-    padding: 8px 20px 16px;
-  }
-  .header-date {
-    font-size: 0.813rem;
-    color: #999;
-    letter-spacing: 0.04em;
-    margin-bottom: 6px;
-  }
-  .header-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  /* 周历条 */
-  .week-strip {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px 18px;
-  }
-
-  /* 角色切换头像条 */
-  .role-strip {
-    display: flex;
-    gap: 14px;
-    padding: 0 20px 18px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .role-strip::-webkit-scrollbar { display: none; }
-  .role-avatar {
-    flex-shrink: 0;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.063rem;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    border: 2.5px solid transparent;
-    transition: all 0.2s ease;
-    position: relative;
+  
+  /* 手机外壳 */
+  .app { 
+    width: 100%; 
+    max-width: 390px; 
+    background: var(--bg); 
+    height: 100dvh;
+    position: relative; 
     overflow: hidden;
-  }
-  .role-avatar img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-  }
-  .role-avatar.active {
-    border-color: #111;
-    transform: scale(1.08);
-  }
-  .role-avatar .r-name {
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.625rem;
-    color: #999;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .role-avatar.active .r-name { opacity: 1; }
-  .role-name-label {
-    padding: 0 20px 14px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #111;
-  }
-  .role-name-label small {
-    color: #999;
-    font-weight: 400;
-    margin-left: 6px;
-  }
-  .day-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 4px;
-    border-radius: 16px;
-    min-width: 36px;
-  }
-  .day-cell .d-num {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #bbb;
-  }
-  .day-cell .d-week {
-    font-size: 0.625rem;
-    color: #bbb;
-    letter-spacing: 0.05em;
-  }
-  .day-cell.today {
-    background: #111;
-    border-radius: 18px;
-  }
-  .day-cell.today .d-num,
-  .day-cell.today .d-week { color: #fff; }
-  .day-cell.today .d-num { position: relative; }
-  .day-cell.today .d-num::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: #fff;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
   }
 
-  /* 时间线 */
-  .timeline {
-    position: relative;
-    padding: 0 20px;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 35px;
-    top: 12px;
-    bottom: 12px;
-    width: 1.5px;
-    background: #E0E0E5;
-  }
-  .tl-item {
-    position: relative;
-    padding-left: 48px;
-    margin-bottom: 16px;
-  }
-  .tl-dot {
-    position: absolute;
-    left: 28px;
-    top: 18px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    border: 2px solid #111;
-    z-index: 1;
-  }
-  .tl-card {
-    border-radius: 18px;
-    padding: 16px;
-  }
-  .tl-card.dark {
-    background: #111;
-    color: #fff;
-  }
-  .tl-card.light {
-    background: #fff;
-    border: 1px solid #ECECEF;
-  }
-  .tl-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .tl-time {
-    font-size: 0.75rem;
-    font-weight: 600;
-    white-space: nowrap;
-    opacity: 0.9;
-  }
-  .tl-card.light .tl-time { color: #999; }
-  .tl-title {
-    font-size: 0.938rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .tl-desc {
-    font-size: 0.781rem;
-    line-height: 1.5;
-    opacity: 0.7;
-  }
-  .tl-card.light .tl-desc { color: #888; }
+  /* 页面路由控制 */
+  .page { display: none; height: 100%; overflow-y: auto; padding-bottom: 80px; scrollbar-width: none; }
+  .page::-webkit-scrollbar { display: none; }
+  .page.active { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
-  /* 空状态 / 加载 */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-    font-size: 0.875rem;
-  }
-  .loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: #999;
-    font-size: 0.813rem;
-  }
-  .spin {
-    display: inline-block;
-    width: 20px; height: 20px;
-    border: 2px solid #E5E5EA;
-    border-top-color: #111;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* ================= 图1：主页 ================= */
+  .top-bar { display: flex; justify-content: space-between; align-items: flex-end; padding: calc(env(safe-area-inset-top) + 24px) 22px 10px; }
+  .top-title { font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: 2px; margin-top: 6px; }
+  .top-sub { font-size: 10px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+  .eyebrow { font-size: 8px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+  .icon-btn { background: none; border: none; outline: none; padding: 4px; }
+  .icon-btn svg { width: 20px; height: 20px; stroke: #555; fill: none; stroke-width: 1.5; stroke-linecap: round; }
 
-  /* toast */
-  .toast {
-    position: fixed;
-    bottom: 40px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #111; color: #fff;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 0.813rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.25s ease;
-    z-index: 999;
+  /* 主视觉图 */
+  .hero-image { padding: 16px 22px; position: relative; }
+  .hero-image img { width: 100%; height: 160px; object-fit: cover; filter: grayscale(1) contrast(0.9) brightness(1.05); }
+  .hero-handwriting { position: absolute; right: 30px; bottom: 30px; font-family: "Snell Roundhand", "Brush Script MT", cursive; font-size: 16px; color: #444; transform: rotate(-5deg); }
+
+  /* 角色条 */
+  .role-section { display: flex; align-items: center; justify-content: space-between; padding: 10px 22px 20px; }
+  .roles-scroll { display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; }
+  .roles-scroll::-webkit-scrollbar { display: none; }
+  .role-item { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; padding: 2px; border: 1px solid transparent; transition: all .2s; }
+  .role-item.active .avatar { border-color: #111; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; filter: grayscale(1); }
+  .role-name { font-size: 10px; color: var(--muted); }
+  .role-item.active .role-name { color: #111; font-weight: 600; }
+  .today-count { text-align: right; }
+  .today-count small { display: block; font-size: 9px; color: var(--muted); margin-bottom: 4px; }
+  .today-count strong { font-family: var(--serif); font-size: 32px; font-weight: 400; line-height: 0.8; }
+
+  /* ================= 重点修改：行程时间线周历条 (图二样式) ================= */
+  .week-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 22px; }
+  .week-header h3 { font-family: var(--serif); font-size: 14px; font-weight: 400; letter-spacing: 1px; }
+  .week-header span { font-size: 8px; color: var(--muted); letter-spacing: 1.5px; }
+  
+  .week-days { display: flex; justify-content: space-between; padding: 10px 22px 20px; }
+  
+  .w-day { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    gap: 6px; 
+    width: 38px; 
+    height: 64px;
+    border-radius: 20px; /* 胶囊圆角 */
+    transition: all 0.2s;
+    cursor: pointer;
   }
+  .w-day span:first-child { font-size: 9px; color: var(--muted); }
+  .w-day span:last-child { font-size: 15px; font-family: var(--serif); color: var(--ink); }
+  
+  /* 选中状态：纯黑胶囊 */
+  .w-day.active { 
+    background: #111; 
+  }
+  .w-day.active span:first-child { color: #888; } /* 选中的星期几变成灰色 */
+  .w-day.active span:last-child { color: #fff; } /* 选中的数字变成白色 */
+
+  /* ================= 时间线 (完全不动) ================= */
+  .timeline { padding: 0 22px; position: relative; }
+  .timeline::before { content: ""; position: absolute; left: 26px; top: 8px; bottom: 20px; width: 1px; background: var(--line); }
+  .t-item { position: relative; display: flex; gap: 16px; padding-bottom: 24px; cursor: pointer; }
+  .t-item::before { content: ""; position: absolute; left: 2px; top: 4px; width: 5px; height: 5px; background: #111; border-radius: 50%; z-index: 2; }
+  .t-content { flex: 1; padding-left: 14px; }
+  .t-time { font-size: 9px; color: var(--muted); margin-bottom: 4px; font-family: var(--serif); }
+  .t-title { font-family: var(--serif); font-size: 15px; font-weight: 600; margin-bottom: 6px; color: #222; }
+  .t-desc { font-size: 11px; color: #777; line-height: 1.6; margin-bottom: 8px; }
+  .t-tags { font-size: 9px; color: #999; display: flex; gap: 8px; align-items: center; }
+  .t-img { width: 85px; height: 85px; object-fit: cover; filter: grayscale(1); flex-shrink: 0; }
+
+  /* ================= 图2：日历 (完全不动，只变纯白) ================= */
+  .cal-header { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 16px) 22px 10px; }
+  .cal-roles { display: flex; justify-content: center; gap: 24px; padding: 10px 0 20px; }
+  .cal-roles .avatar { width: 40px; height: 40px; }
+  
+  .cal-month { display: flex; justify-content: space-between; align-items: flex-end; padding: 10px 22px; margin-top: 10px; }
+  .cal-month h1 { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: 1px; }
+  .cal-arrows { display: flex; gap: 12px; }
+  .cal-arrows svg { width: 16px; height: 16px; stroke: #888; fill: none; stroke-width: 1.5; }
+
+  .calendar-grid { padding: 0 22px; margin-top: 10px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px 0; text-align: center; }
+  .cal-head { font-size: 9px; color: var(--muted); margin-bottom: 4px; }
+  .cal-day { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-family: var(--serif); font-size: 14px; position: relative; border-radius: 50%; }
+  .cal-day.outside { color: #d0d0d0; }
+  .cal-day.active { background: #111; color: #fff; }
+  .cal-day .dot { position: absolute; bottom: 2px; width: 3px; height: 3px; background: #111; border-radius: 50%; }
+  .cal-day.active .dot { background: #fff; }
+
+  .cal-list-header { padding: 30px 22px 10px; display: flex; justify-content: space-between; align-items: baseline; }
+  .cal-list-header h3 { font-family: var(--serif); font-size: 15px; font-weight: 400; }
+  .cal-list-header span { font-size: 9px; color: var(--muted); }
+  .cal-list { padding: 0 22px; }
+  .cal-list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .cal-list-item time { font-family: var(--serif); font-size: 13px; color: #777; }
+  .cal-list-item .title { font-size: 12px; flex: 1; padding-left: 20px; color: #222; }
+  .cal-list-item svg { width: 14px; height: 14px; stroke: #ccc; fill: none; stroke-width: 1.5; }
+  
+  /* 底部植物插画与引言 */
+  .cal-footer { padding: 30px 22px 60px; position: relative; }
+  .cal-quote { font-family: var(--serif); font-size: 11px; color: #888; font-style: italic; line-height: 2; max-width: 200px; }
+  .plant-svg { position: absolute; right: 22px; bottom: 20px; width: 60px; height: 80px; opacity: 0.4; }
+
+  /* ================= 图3：记忆详情 (完全不动) ================= */
+  .detail-top { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 16px) 22px 10px; }
+  .detail-top svg { width: 22px; height: 22px; stroke: #333; fill: none; stroke-width: 1.5; }
+
+  .collage-area { position: relative; height: 340px; margin: 10px 22px 20px; }
+  .main-photo-wrapper { position: absolute; top: 20px; right: 0; width: 75%; height: 230px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); transform: rotate(1.5deg); background: #fff; padding: 3px; clip-path: polygon(1% 0, 99% 1%, 100% 15%, 98% 35%, 100% 50%, 99% 70%, 100% 90%, 97% 100%, 75% 98%, 50% 100%, 25% 99%, 10% 100%, 0 85%, 2% 60%, 0 40%, 1% 15%); }
+  .main-photo-wrapper img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(0.9) brightness(1.05); }
+  .tape { position: absolute; width: 80px; height: 22px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(3px); box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10; clip-path: polygon(2% 0, 100% 3%, 98% 100%, 0 97%); }
+  .tape-top { top: 12px; left: 40%; transform: rotate(-3deg); }
+  .note-paper { position: absolute; top: 45px; left: 0; width: 115px; height: 175px; background: #ffffff; box-shadow: 2px 5px 15px rgba(0,0,0,0.06); transform: rotate(-5deg); z-index: 5; padding: 15px 12px; clip-path: polygon(5% 0, 95% 2%, 100% 10%, 97% 35%, 100% 60%, 96% 85%, 98% 100%, 80% 97%, 60% 100%, 30% 98%, 5% 100%, 0 80%, 2% 50%, 0 20%); }
+  .date-text { font-family: "Courier New", Courier, monospace; font-size: 12px; line-height: 1.6; color: #333; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+  .handwritten { font-family: "Snell Roundhand", "Brush Script MT", "Zapfino", cursive; font-size: 42px; color: #111; transform: rotate(-15deg); margin-top: 15px; margin-left: -10px; }
+  .small-photo-wrapper { position: absolute; bottom: 50px; left: 20px; width: 75px; height: 80px; background: #fff; padding: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transform: rotate(-4deg); z-index: 6; }
+  .small-photo-wrapper img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); }
+
+  .detail-content { padding: 0 22px; }
+  .tag { display: inline-block; background: #f0f0f0; color: #666; font-size: 9px; padding: 3px 6px; letter-spacing: 1.5px; margin-bottom: 14px; }
+  .detail-title { font-family: var(--serif); font-size: 34px; font-weight: 400; line-height: 1.2; letter-spacing: 2px; margin-bottom: 16px; }
+  .story { font-size: 13px; line-height: 2.1; color: #444; margin-bottom: 16px; letter-spacing: 0.5px; }
+  .location { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #777; margin-bottom: 25px; }
+  .location svg { width: 12px; height: 12px; fill: none; stroke: #777; stroke-width: 1.5; }
+
+  .divider { height: 1px; background: var(--line); margin: 0 22px; }
+  .related-section { padding: 20px 22px; }
+  .related-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .related-header h3 { font-size: 13px; font-weight: 400; color: #333; letter-spacing: 1px; }
+  .related-header svg { width: 16px; height: 16px; stroke: #888; fill: none; stroke-width: 1.2; }
+  .thumbs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .thumb { height: 65px; width: 100%; object-fit: cover; filter: grayscale(1); }
+  .quote-block { margin: 10px 22px 40px; padding: 20px; background: #f7f7f7; text-align: center; font-family: var(--serif); font-size: 11px; font-style: italic; color: #666; letter-spacing: 1px; line-height: 1.8; }
+
+  /* ================= 底部导航 (完全不动) ================= */
+  .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #999; width: 50px; height: 100%; }
+  .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+  .nav-btn.active { color: #111; }
+
+  /* ================= 互动辅助样式 ================= */
+  .cal-arrows svg, .cal-day, .cal-list-item { cursor: pointer; }
+  .top-bar .icon-btn svg.rot { animation: spin360 .5s ease; }
+  @keyframes spin360 { to { transform: rotate(360deg); } }
+  .t-empty { font-family: var(--serif); font-size: 12px; color: #999; text-align: center; padding: 30px 0; }
+  .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: #111; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 12px; opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 999; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ================= 底部抽屉：今日足迹 ================= */
+  .more-dots { cursor: pointer; }
+  .drawer-mask {
+    position: fixed; inset: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 390px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 90;
+  }
+  .drawer {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 390px;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 26px 22px calc(20px + env(safe-area-inset-bottom));
+    transition: transform 0.32s cubic-bezier(0.22, 0.8, 0.36, 1);
+    z-index: 91;
+  }
+  body.drawer-open .drawer { transform: translateX(-50%) translateY(0); }
+  body.drawer-open .drawer-mask { opacity: 1; pointer-events: auto; }
+  .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .drawer-head h2 { font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: 1px; color: #111; }
+  .drawer-close {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid #E5E5E5; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .drawer-close svg { width: 14px; height: 14px; stroke: #8E8E93; fill: none; stroke-width: 1.5; stroke-linecap: round; }
+  .drawer-item {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    background: none; border: none; padding: 15px 0;
+    border-bottom: 1px solid #E5E5E5;
+    text-align: left; cursor: pointer;
+  }
+  .drawer-item:last-child { border-bottom: none; }
+  .drawer-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #F2F2F2;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .drawer-icon svg { width: 18px; height: 18px; stroke: #111; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .drawer-text { display: flex; flex-direction: column; gap: 3px; }
+  .drawer-title { font-size: 15px; color: #111; }
+  .drawer-sub { font-size: 11px; color: #8E8E93; }
 </style>
 </head>
 <body>
 
-  <div class="navbar">
-    <div class="nav-left">
-      <button class="icon-btn" onclick="window.location.href='../index.html'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+<div class="app" id="app">
+
+  <!-- ================= 页面 1：主页 ================= -->
+  <div id="page-home" class="page">
+    <div class="top-bar" style="width: 390px; height: 107.6px;">
+      <div>
+        <div class="eyebrow">MY / FOOTPRINT</div>
+        <h1 class="top-title">角色足迹</h1>
+        <div class="top-sub">——记载每一次相遇与告别——</div>
+      </div>
+      <button class="icon-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
       </button>
-      <div class="nav-title">角色足迹</div>
     </div>
-    <button class="icon-btn" onclick="refreshDay()" title="补充生成">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+
+    <div class="hero-image" style="width: 388.4px; height: 188.8px; transform: matrix(1, 0, 0, 1, 0, -13.6);">
+      <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&amp;fit=crop&amp;w=800&amp;q=80" alt="花">
+      <div class="hero-handwriting" style="font-size: 14px; margin-left: 0px; margin-right: auto;">a little trace, a long story</div>
+    </div>
+
+    <div class="role-section" style="width: 390px; height: 76px;">
+      <div class="roles-scroll">
+        <button class="role-item active">
+          <div class="avatar"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+          <span class="role-name">宝宝</span>
+        </button>
+        <button class="role-item">
+          <div class="avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+          <span class="role-name">梦</span>
+        </button>
+        <button class="role-item">
+          <div class="avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+          <span class="role-name">灵</span>
+        </button>
+      </div>
+      <div class="today-count">
+        <small>今日足迹</small>
+        <strong>3</strong>
+        <small>条记录</small>
+      </div>
+    </div>
+
+    <div class="week-header" style="width: 391.6px; height: 34.3875px; transform: matrix(1, 0, 0, 1, 0.799988, -6.375);">
+      <h3>本周 · 行程时间线</h3>
+      <span>APRIL / 2025</span>
+    </div>
+    <div class="week-days" style="width: 382.8px; height: 90.7875px; transform: matrix(1, 0, 0, 1, 0, -16);">
+      <div class="w-day"><span>一</span><span>13</span></div>
+      <div class="w-day"><span>二</span><span>14</span></div>
+      <div class="w-day"><span>三</span><span>15</span></div>
+      <!-- 这里是修改后的黑色胶囊 -->
+      <div class="w-day active"><span>四</span><span>16</span></div>
+      <div class="w-day"><span>五</span><span>17</span></div>
+      <div class="w-day"><span>六</span><span>18</span></div>
+      <div class="w-day"><span>日</span><span>19</span></div>
+    </div>
+
+    <div class="timeline"><div class="t-item" data-id="b-0416-1">
+        <div class="t-content">
+          <div class="t-time">08:24　上午</div>
+          <div class="t-title">与小主人的早安时光</div>
+          <div class="t-desc">阳光透过窗帘洒进来，在桌着歌里慢慢苏醒。开心。</div>
+          <div class="t-tags">♡ 家里 · 松弛</div>
+        </div>
+        <img class="t-img" src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="">
+      </div><div class="t-item" data-id="b-0416-2">
+        <div class="t-content">
+          <div class="t-time">13:17　中午</div>
+          <div class="t-title">一起去看海</div>
+          <div class="t-desc">海风很轻，像你笑的样子。让海浪带着温柔。</div>
+          <div class="t-tags">⌖ 海边 · 开心</div>
+        </div>
+        <img class="t-img" src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="">
+      </div><div class="t-item" data-id="b-0416-3">
+        <div class="t-content">
+          <div class="t-time">21:03　夜晚</div>
+          <div class="t-title">夜晚的星空</div>
+          <div class="t-desc">把今天收藏进记忆里。</div>
+          <div class="t-tags">✦ 阳台 · 安静</div>
+        </div>
+        <img class="t-img" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="">
+      </div></div>
+  </div>
+
+  <!-- ================= 页面 2：日历 ================= -->
+  <div id="page-calendar" class="page">
+    <div class="cal-header">
+      <button class="icon-btn" onclick="switchPage('home')">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+      </button>
+      <span style="font-family:var(--serif); font-size:16px;">角色足迹</span>
+      <button class="icon-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+      </button>
+    </div>
+
+    <div class="cal-roles" style="width: 390px; height: 74.8px;">
+      <button class="role-item active">
+        <div class="avatar"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+        <span class="role-name">宝宝</span>
+      </button>
+      <button class="role-item">
+        <div class="avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+        <span class="role-name">梦</span>
+      </button>
+      <button class="role-item">
+        <div class="avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&amp;fit=crop&amp;w=100&amp;q=80"></div>
+        <span class="role-name">灵</span>
+      </button>
+    </div>
+
+    <div class="cal-month" style="width: 396.4px; height: 43.1875px; transform: matrix(1, 0, 0, 1, 0, -6.375);">
+      <h1>2025.05</h1>
+      <div class="cal-arrows">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+      </div>
+    </div>
+
+    <div class="calendar-grid"><div class="cal-head">一</div><div class="cal-head">二</div><div class="cal-head">三</div><div class="cal-head">四</div><div class="cal-head">五</div><div class="cal-head">六</div><div class="cal-head">日</div><div class="cal-day outside">28</div><div class="cal-day outside">29</div><div class="cal-day outside">30</div><div class="cal-day" data-day="1">1</div><div class="cal-day" data-day="2">2</div><div class="cal-day" data-day="3">3</div><div class="cal-day" data-day="4">4</div><div class="cal-day" data-day="5">5</div><div class="cal-day" data-day="6">6</div><div class="cal-day" data-day="7">7</div><div class="cal-day" data-day="8">8</div><div class="cal-day" data-day="9">9</div><div class="cal-day" data-day="10">10</div><div class="cal-day" data-day="11">11</div><div class="cal-day" data-day="12">12</div><div class="cal-day" data-day="13">13</div><div class="cal-day" data-day="14">14</div><div class="cal-day" data-day="15">15</div><div class="cal-day" data-day="16">16</div><div class="cal-day" data-day="17">17</div><div class="cal-day" data-day="18">18</div><div class="cal-day" data-day="19">19</div><div class="cal-day" data-day="20">20</div><div class="cal-day" data-day="21">21</div><div class="cal-day" data-day="22">22</div><div class="cal-day" data-day="23">23</div><div class="cal-day" data-day="24">24</div><div class="cal-day" data-day="25">25</div><div class="cal-day" data-day="26">26</div><div class="cal-day" data-day="27">27</div><div class="cal-day" data-day="28">28</div><div class="cal-day" data-day="29">29</div><div class="cal-day" data-day="30">30</div><div class="cal-day" data-day="31">31</div><div class="cal-day outside">1</div></div>
+
+    <div class="cal-list-header">
+      <h3>04 / 16 · 今日足迹</h3>
+      <span>3 条</span>
+    </div>
+    
+    <div class="cal-list"><div class="cal-list-item" data-id="b-0416-1">
+      <time>08:24</time>
+      <span class="title">与小主人的早安时光</span>
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+    </div><div class="cal-list-item" data-id="b-0416-2">
+      <time>13:17</time>
+      <span class="title">一起去看海</span>
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+    </div><div class="cal-list-item" data-id="b-0416-3">
+      <time>21:03</time>
+      <span class="title">夜晚的星空</span>
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+    </div></div>
+
+    <div class="cal-footer">
+      <div class="cal-quote">
+        有些日子很平凡，<br>
+        却因为有你，变得特别。
+      </div>
+      <!-- 用极简 SVG 画一朵线稿花 -->
+      <svg class="plant-svg" viewBox="0 0 50 100">
+        <path d="M25 100 Q20 70 25 40" fill="none" stroke="#666" stroke-width="1"></path>
+        <path d="M25 60 Q10 50 5 60 Q15 70 25 60" fill="none" stroke="#666" stroke-width="1"></path>
+        <path d="M25 70 Q40 55 45 65 Q35 80 25 70" fill="none" stroke="#666" stroke-width="1"></path>
+        <path d="M25 40 Q15 30 20 20 Q25 25 25 40" fill="none" stroke="#666" stroke-width="1"></path>
+        <path d="M25 40 Q35 25 30 15 Q25 20 25 40" fill="none" stroke="#666" stroke-width="1"></path>
+        <path d="M25 40 Q22 20 25 5 Q28 20 25 40" fill="none" stroke="#666" stroke-width="1"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ================= 页面 3：详情拼贴 ================= -->
+  <div id="page-detail" class="page active">
+    <div class="detail-top">
+      <button class="icon-btn" onclick="switchPage('home')">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+      </button>
+      <span class="more-dots" style="font-size: 20px; letter-spacing: 2px; position: relative;">...</span>
+    </div>
+
+    <div class="collage-area" style="width: 359.6px; height: 300px;">
+      <div class="tape tape-top"></div>
+      <div class="main-photo-wrapper">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="花" style=""><img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="海" style="">
+      </div>
+      <div class="note-paper">
+        <div class="date-text">04 / 16<br>08:24</div>
+        <div class="handwritten" style="text-align: left; font-weight: normal; font-size: 37px;"><span style="font-weight: 600; color: rgb(15, 17, 21); font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; font-size: 16px; text-align: start;">MEMORY</span>.</div>
+      </div>
+      
+    </div>
+
+    <div class="detail-content" style="width: 390px; height: 293.3px; transform: matrix(1, 0, 0, 1, 0, -44.8);">
+      <div class="tag">♡ 家里 · 松弛</div>
+      <h1 class="detail-title">与小主人的早安时光</h1>
+      <p class="story">阳光透过窗帘洒进来，在桌着歌里慢慢苏醒。开心。</p>
+      <div class="location">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>家里 · 松弛</span>
+      </div>
+    </div>
+
+    <div class="divider" style=""></div>
+
+    <div class="related-section" style="width: 390px; height: 229.8px; transform: matrix(1, 0, 0, 1, 0, -93.6);">
+      <div class="related-header">
+        <h3>相关记忆</h3>
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+      </div>
+      <div class="thumbs-grid">
+        <img class="thumb" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&amp;fit=crop&amp;w=300&amp;q=80">
+        <img class="thumb" src="https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&amp;fit=crop&amp;w=300&amp;q=80">
+        <img class="thumb" src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&amp;fit=crop&amp;w=300&amp;q=80">
+      </div>
+    </div>
+
+    <div class="quote-block" style="width: 346px; height: 107.6px; transform: matrix(1, 0, 0, 1, 0, -178.4);">
+      「和你在一起的每一刻，<br>都是值得珍藏的记忆。」
+    </div>
+  </div>
+
+  <!-- ================= 底部导航 ================= -->
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="switchPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
     </button>
+    <button class="nav-btn" onclick="switchPage('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    </button>
+    <button class="nav-btn active" onclick="switchPage('detail')">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+    </button>
+  </nav>
+
+  <!-- ================= 底部抽屉：今日足迹 ================= -->
+  <div class="drawer-mask" id="drawerMask"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <h2>今日足迹</h2>
+      <button class="drawer-close" aria-label="关闭">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="drawer-list">
+      <button class="drawer-item" data-action="all">
+        <span class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path><path d="M14 3v4h4"></path><path d="M9 13h6M9 17h6"></path></svg></span>
+        <span class="drawer-text">
+          <span class="drawer-title">查看全部足迹</span>
+          <span class="drawer-sub">按日期整理所有记忆</span>
+        </span>
+      </button>
+      <button class="drawer-item" data-action="role">
+        <span class="drawer-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg></span>
+        <span class="drawer-text">
+          <span class="drawer-title">切换角色</span>
+          <span class="drawer-sub">选择要查看的角色足迹</span>
+        </span>
+      </button>
+      <button class="drawer-item" data-action="today">
+        <span class="drawer-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg></span>
+        <span class="drawer-text">
+          <span class="drawer-title">回到今日足迹</span>
+          <span class="drawer-sub">从最近的一天重新开始</span>
+        </span>
+      </button>
+      <button class="drawer-item" data-action="about">
+        <span class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path></svg></span>
+        <span class="drawer-text">
+          <span class="drawer-title">关于这段记忆</span>
+          <span class="drawer-sub">每一个瞬间都值得被收藏</span>
+        </span>
+      </button>
+    </div>
   </div>
 
-  <div class="header">
-    <div class="header-date" id="dateStr"></div>
-    <div class="header-title">今日足迹</div>
-  </div>
+  <input type="file" accept="image/*" id="photoPicker" style="display:none" aria-hidden="true">
 
-  <div class="week-strip" id="weekStrip"></div>
-
-  <div class="role-strip" id="roleStrip"></div>
-  <div class="role-name-label" id="roleNameLabel"></div>
-
-  <div class="timeline" id="timeline"></div>
-
-  <div class="toast" id="toast"></div>
+</div>
 
 <script>
-  // ===== 角色数据 =====
-  let ROLES = [];
-  let currentRoleId = null;
+  // ================= 演示数据模型（角色 × 日期） =================
+  const IMG = {
+    plant:  'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=300&q=80',
+    sea:    'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=300&q=80',
+    star:   'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=300&q=80',
+    flower: 'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=300&q=80',
+    beach:  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80',
+    meadow: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=300&q=80'
+  };
 
-  function loadRoles() {
-    try {
-      const raw = localStorage.getItem('ai_custom_characters');
-      if (raw) {
-        ROLES = JSON.parse(raw).filter(r => r && r.id);
-        return;
-      }
-    } catch(e) {}
-    // fallback 默认角色
-    ROLES = [
-      { id: 'role_1', name: '宝宝', avatarBg: '#FF6B81', avatar: '' },
-      { id: 'role_2', name: '苏格拉底', avatarBg: '#3B9EFF', avatar: '' },
-      { id: 'role_3', name: '灵感助手', avatarBg: '#10B981', avatar: '' },
-    ];
-  }
-
-  // ===== 工具：今天日期 key =====
-  function todayKey(roleId) {
-    const d = new Date();
-    return 'footprint_' + roleId + '_' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-  }
-
-  // ===== 默认一天行程模板（按角色人设变体） =====
-  const DEFAULT_DAY = [
-    { time: '07:30', title: '起床', desc: '闹钟响了两次才爬起来，伸了个懒腰，拉开窗帘看了看天。', dark: true },
-    { time: '08:00', title: '早餐', desc: '烤了片面包，冲了杯咖啡，边吃边刷了会儿手机。', dark: false },
-    { time: '09:30', title: '出门上班', desc: '挤上地铁，戴耳机听了一路歌，到站前提前挤到门口。', dark: false },
-    { time: '12:00', title: '午饭', desc: '跟同事一起去楼下吃了碗面，聊了聊周末的安排。', dark: true },
-    { time: '14:30', title: '开会', desc: '周会汇报进度，被问了几个问题，有点紧张但答上来了。', dark: false },
-    { time: '18:30', title: '下班', desc: '打卡下班，在楼下便利店买了瓶水，慢悠悠走回家。', dark: false },
-  ];
-
-  const EXTRA_POOL = [
-    { time: '07:45', title: '洗漱', desc: '刷牙洗脸，对着镜子发了会儿呆，然后开始挑今天穿什么。' },
-    { time: '08:20', title: '通勤路上', desc: '地铁上看了半集播客，旁边大爷在听京剧，声音开得挺大。' },
-    { time: '10:30', title: '摸鱼', desc: '躲在工位角落刷了五分钟短视频，听到脚步声赶紧切回表格。' },
-    { time: '15:00', title: '下午茶', desc: '点了杯奶茶，三分糖去冰，拿到手拍了张照发朋友圈。' },
-    { time: '16:00', title: '接了个电话', desc: '家里来的电话，聊了十分钟，被催了两句找对象的事。' },
-    { time: '19:00', title: '晚饭', desc: '一个人煮了碗泡面，加了个蛋和一根肠，觉得今天也算丰盛。' },
-    { time: '20:30', title: '追剧', desc: '窝在沙发上看了两集剧，剧情有点老套但还是想看下去。' },
-    { time: '22:00', title: '洗澡', desc: '热水冲了十分钟，把一天的疲惫都冲掉了，出来觉得很放松。' },
-    { time: '23:30', title: '睡觉', desc: '躺床上翻了半小时手机，定好明天闹钟，关灯睡了。' },
-    { time: '13:30', title: '午休', desc: '趴在工位上眯了二十分钟，被空调吹得有点冷，醒了拉了拉外套。' },
-    { time: '11:00', title: '买咖啡', desc: '下楼买了杯美式，顺便在门口站了会儿，晒了晒太阳。' },
-    { time: '21:00', title: '运动', desc: '跟着视频做了二十分钟拉伸，做完浑身酸痛，但感觉很舒服。' },
-  ];
-
-  // ===== 渲染日期 =====
-  function renderDate() {
-    const d = new Date();
-    const weeks = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    document.getElementById('dateStr').textContent =
-      (d.getMonth()+1) + '月' + d.getDate() + '日 · ' + weeks[d.getDay()];
-  }
-
-  // ===== 渲染周历条 =====
-  function renderWeek() {
-    const strip = document.getElementById('weekStrip');
-    const now = new Date();
-    const day = now.getDay() === 0 ? 7 : now.getDay();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - day + 1);
-    const weekNames = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-    let html = '';
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const isToday = d.toDateString() === now.toDateString();
-      html += `<div class="day-cell ${isToday ? 'today' : ''}">
-        <div class="d-num">${d.getDate()}</div>
-        <div class="d-week">${weekNames[i]}</div>
-      </div>`;
+  const DATA = {
+    '宝宝': {
+      '2025-04-13': [{ id: 'b-0413-1', time: '09:15', title: '窗边的第一缕光', desc: '阳光悄悄爬上窗台，在书页上落下一小块暖黄色。', tag: '♡ 家里 · 安静', loc: '窗台 · 安静', img: IMG.meadow }],
+      '2025-04-14': [{ id: 'b-0414-1', time: '11:40', title: '给多肉浇水', desc: '每一片叶子都鼓鼓的，像在说谢谢。', tag: '♡ 阳台 · 松弛', loc: '阳台 · 松弛', img: IMG.plant }],
+      '2025-04-16': [
+        { id: 'b-0416-1', time: '08:24', title: '与小主人的早安时光', desc: '阳光透过窗帘洒进来，在桌着歌里慢慢苏醒。开心。', tag: '♡ 家里 · 松弛', loc: '家里 · 松弛', img: IMG.plant },
+        { id: 'b-0416-2', time: '13:17', title: '一起去看海', desc: '海风很轻，像你笑的样子。让海浪带着温柔。', story: '海风很轻，像你笑的样子。\n比海边还要温柔。\n那一刻，我觉得时间好像变慢了。', tag: '⌖ 海边 · 开心', loc: '海边 · 开心', img: IMG.sea },
+        { id: 'b-0416-3', time: '21:03', title: '夜晚的星空', desc: '把今天收藏进记忆里。', tag: '✦ 阳台 · 安静', loc: '阳台 · 安静', img: IMG.star }
+      ],
+      '2025-04-17': [{ id: 'b-0417-1', time: '18:20', title: '黄昏散步', desc: '绕着小区走了两圈，路灯一盏一盏亮起来。', tag: '⌖ 楼下 · 放松', loc: '楼下 · 放松', img: IMG.flower }],
+      '2025-04-19': [
+        { id: 'b-0419-1', time: '10:05', title: '煮一壶花茶', desc: '水汽袅袅升起，满屋子都是干净的香气。', tag: '♡ 厨房 · 温暖', loc: '厨房 · 温暖', img: IMG.meadow },
+        { id: 'b-0419-2', time: '22:40', title: '睡前日记', desc: '写下今天最想记住的三件事，然后关灯。', tag: '✦ 卧室 · 安静', loc: '卧室 · 安静', img: IMG.star }
+      ]
+    },
+    '梦': {
+      '2025-04-15': [{ id: 'm-0415-1', time: '23:11', title: '深夜读诗', desc: '读到一半停下来，想起一些很久以前的事。', tag: '✦ 书房 · 沉静', loc: '书房 · 沉静', img: IMG.star }],
+      '2025-04-16': [{ id: 'm-0416-1', time: '14:02', title: '梦里的海', desc: '午睡时梦见一片发光的海，醒来记不清细节。', tag: '⌖ 梦境 · 奇妙', loc: '梦境 · 奇妙', img: IMG.sea }],
+      '2025-04-17': [{ id: 'm-0417-1', time: '07:58', title: '醒得很早', desc: '天还没亮透，窗外的鸟先叫了。', tag: '♡ 家里 · 宁静', loc: '家里 · 宁静', img: IMG.meadow }],
+      '2025-04-19': [{ id: 'm-0419-1', time: '20:30', title: '旧照片', desc: '翻到一张旧照片，看了很久，笑了很久。', tag: '♡ 家里 · 怀念', loc: '家里 · 怀念', img: IMG.flower }]
+    },
+    '灵': {
+      '2025-04-16': [
+        { id: 'l-0416-1', time: '10:30', title: '灵感闪现', desc: '把突然冒出的念头写进手机备忘录，怕一转身就忘。', tag: '✦ 工作室 · 专注', loc: '工作室 · 专注', img: IMG.flower },
+        { id: 'l-0416-2', time: '16:45', title: '傍晚的风', desc: '站在窗边吹了一会儿风，脑子清爽了很多。', tag: '⌖ 窗边 · 舒展', loc: '窗边 · 舒展', img: IMG.meadow }
+      ],
+      '2025-04-18': [{ id: 'l-0418-1', time: '12:20', title: '午间小憩', desc: '在沙发上眯了二十分钟，像充了一格电。', tag: '♡ 家里 · 松弛', loc: '家里 · 松弛', img: IMG.plant }],
+      '2025-04-19': [{ id: 'l-0419-1', time: '21:15', title: '写一封信', desc: '给未来的自己写了三行字，封好放进抽屉。', tag: '✦ 书桌 · 郑重', loc: '书桌 · 郑重', img: IMG.star }],
+      '2025-04-21': [{ id: 'l-0421-1', time: '09:00', title: '周一的咖啡', desc: '换了一家店的美式，意外地好喝。', tag: '⌖ 咖啡店 · 新鲜', loc: '咖啡店 · 新鲜', img: IMG.beach }]
     }
-    strip.innerHTML = html;
-  }
+  };
 
-  // ===== 渲染角色头像条 =====
-  function renderRoles() {
-    const strip = document.getElementById('roleStrip');
-    let html = '';
-    ROLES.forEach(r => {
-      const isActive = r.id === currentRoleId;
-      const inner = r.avatar
-        ? `<img src="${r.avatar}" alt="">`
-        : (r.name || '?').charAt(0);
-      const bg = r.avatarBg || '#888';
-      html += `<div class="role-avatar ${isActive ? 'active' : ''}" 
-        style="background:${bg}" onclick="switchRole('${r.id}')">
-        ${inner}
-        <span class="r-name">${r.name}</span>
+  // ================= 当前状态 =================
+  let currentRole = '宝宝';
+  let currentDate = '2025-04-16';
+  let viewMonth = '2025-04';
+
+  const pad = n => n < 10 ? '0' + n : '' + n;
+  const periodOf = h => h < 6 ? '凌晨' : h < 12 ? '上午' : h < 14 ? '中午' : h < 18 ? '下午' : '夜晚';
+  const itemsOf = (role, date) => (DATA[role] && DATA[role][date]) || [];
+
+  // ================= 主页：时间线 =================
+  function renderTimeline() {
+    const box = document.querySelector('.timeline');
+    const items = itemsOf(currentRole, currentDate);
+    if (!items.length) { box.innerHTML = '<div class="t-empty">这一天还没有足迹。</div>'; return; }
+    box.innerHTML = items.map(it => {
+      const h = parseInt(it.time.split(':')[0], 10);
+      return `<div class="t-item" data-id="${it.id}">
+        <div class="t-content">
+          <div class="t-time">${it.time}　${periodOf(h)}</div>
+          <div class="t-title">${it.title}</div>
+          <div class="t-desc">${it.desc}</div>
+          <div class="t-tags">${it.tag}</div>
+        </div>
+        <img class="t-img" src="${it.img}" alt="">
       </div>`;
-    });
-    strip.innerHTML = html;
-
-    const cur = ROLES.find(r => r.id === currentRoleId);
-    document.getElementById('roleNameLabel').innerHTML =
-      (cur ? cur.name : '') + '<small>今天的行程</small>';
+    }).join('');
   }
 
-  function switchRole(roleId) {
-    currentRoleId = roleId;
-    localStorage.setItem('footprint_current_role', roleId);
-    renderRoles();
-    loadDayAndRender();
+  function updateCount() {
+    const n = itemsOf(currentRole, currentDate).length;
+    document.querySelector('.today-count strong').textContent = n;
   }
 
-  // ===== 读/写当天数据（按角色） =====
-  function loadDay() {
-    try {
-      const raw = localStorage.getItem(todayKey(currentRoleId));
-      if (raw) return JSON.parse(raw);
-    } catch(e) {}
+  // ================= 日历页 =================
+  function renderCalendar() {
+    const grid = document.querySelector('.calendar-grid');
+    const [y, m] = viewMonth.split('-').map(Number);
+    document.querySelector('.cal-month h1').textContent = y + '.' + pad(m);
+
+    const first = new Date(y, m - 1, 1);
+    const lead = first.getDay() === 0 ? 6 : first.getDay() - 1; // 周一为一周起始
+    const daysIn = new Date(y, m, 0).getDate();
+    const prevDays = new Date(y, m - 1, 0).getDate();
+    const inMonth = viewMonth === currentDate.slice(0, 7);
+    const curDay = Number(currentDate.slice(8, 10));
+    const roleDays = DATA[currentRole] || {};
+
+    let cells = '<div class="cal-head">一</div><div class="cal-head">二</div><div class="cal-head">三</div><div class="cal-head">四</div><div class="cal-head">五</div><div class="cal-head">六</div><div class="cal-head">日</div>';
+    for (let i = 0; i < 35; i++) {
+      const dayNum = i - lead + 1;
+      if (dayNum < 1) {
+        cells += `<div class="cal-day outside">${prevDays + dayNum}</div>`;
+      } else if (dayNum > daysIn) {
+        cells += `<div class="cal-day outside">${dayNum - daysIn}</div>`;
+      } else {
+        const key = viewMonth + '-' + pad(dayNum);
+        const isActive = inMonth && dayNum === curDay;
+        const dot = isActive || roleDays[key] ? '<div class="dot"></div>' : '';
+        cells += `<div class="cal-day${isActive ? ' active' : ''}" data-day="${dayNum}">${dayNum}${dot}</div>`;
+      }
+    }
+    grid.innerHTML = cells;
+    renderCalList();
+  }
+
+  function renderCalList() {
+    const items = itemsOf(currentRole, currentDate);
+    const mm = currentDate.slice(5, 7), dd = currentDate.slice(8, 10);
+    document.querySelector('.cal-list-header h3').textContent = mm + ' / ' + dd + ' · 今日足迹';
+    document.querySelector('.cal-list-header span').textContent = items.length + ' 条';
+    const list = document.querySelector('.cal-list');
+    if (!items.length) { list.innerHTML = '<div class="t-empty">这一天还没有足迹。</div>'; return; }
+    list.innerHTML = items.map(it => `<div class="cal-list-item" data-id="${it.id}">
+      <time>${it.time}</time>
+      <span class="title">${it.title}</span>
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </div>`).join('');
+  }
+
+  // ================= 详情联动（按 ID） =================
+  function findItem(id) {
+    const role = DATA[currentRole];
+    if (!role) return null;
+    for (const date in role) {
+      const it = role[date].find(x => x.id === id);
+      if (it) return { item: it, date: date };
+    }
     return null;
   }
-  function saveDay(data) {
-    localStorage.setItem(todayKey(currentRoleId), JSON.stringify(data));
-  }
 
-  // ===== 渲染时间线 =====
-  function renderTimeline(items) {
-    const box = document.getElementById('timeline');
-    box.innerHTML = '';
-    items.sort((a,b) => a.time.localeCompare(b.time)).forEach(it => {
-      const el = document.createElement('div');
-      el.className = 'tl-item';
-      el.innerHTML = `
-        <div class="tl-dot"></div>
-        <div class="tl-card ${it.dark ? 'dark' : 'light'}">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">${it.title}</div>
-              <div class="tl-desc">${it.desc}</div>
-            </div>
-            <div class="tl-time">${it.time}</div>
-          </div>
-        </div>`;
-      box.appendChild(el);
-    });
-  }
-
-  function loadDayAndRender() {
-    let data = loadDay();
-    if (!data) {
-      data = { items: DEFAULT_DAY.slice(), generatedAt: Date.now() };
-      saveDay(data);
+  function openDetail(id) {
+    const found = findItem(id);
+    if (found) {
+      const it = found.item;
+      document.querySelector('#page-detail .detail-title').textContent = it.title;
+      document.querySelector('#page-detail .story').textContent = it.story || it.desc;
+      document.querySelector('#page-detail .tag').textContent = it.tag;
+      document.querySelector('#page-detail .main-photo-wrapper img:last-of-type').src = it.img;
+      document.querySelector('#page-detail .date-text').innerHTML =
+        found.date.slice(5, 7) + ' / ' + found.date.slice(8, 10) + '<br>' + it.time;
+      const loc = document.querySelector('#page-detail .location span');
+      if (loc) loc.textContent = it.loc || '今日 · 珍藏';
     }
-    renderTimeline(data.items);
+    switchPage('detail');
   }
 
-  // ===== 初始化 =====
-  function init() {
-    loadRoles();
-    currentRoleId = localStorage.getItem('footprint_current_role') || (ROLES[0] && ROLES[0].id);
-    renderDate();
-    renderWeek();
-    renderRoles();
-    loadDayAndRender();
-  }
-
-  // ===== 右上角刷新 =====
-  function refreshDay() {
-    const box = document.getElementById('timeline');
-    box.innerHTML = '<div class="loading"><span class="spin"></span>正在生成…</div>';
-
+  // ================= 刷新（右上角 ↻） =================
+  function refreshToday() {
+    const icon = document.querySelector('.top-bar .icon-btn svg');
+    if (icon) { icon.classList.remove('rot'); void icon.offsetWidth; icon.classList.add('rot'); }
     setTimeout(() => {
-      const data = loadDay() || { items: [], generatedAt: Date.now() };
-      const existingTimes = data.items.map(i => i.time);
-      const pool = EXTRA_POOL.filter(p => !existingTimes.includes(p.time));
-      for (let i = 0; i < 2 && pool.length > 0; i++) {
-        const idx = Math.floor(Math.random() * pool.length);
-        const pick = pool.splice(idx, 1)[0];
-        data.items.push({ ...pick, dark: Math.random() < 0.3 });
-      }
-      saveDay(data);
-      renderTimeline(data.items);
-      showToast('已补充 ' + data.items.length + ' 条足迹');
+      renderTimeline();
+      updateCount();
+      showToast('已刷新今日行程');
     }, 600);
   }
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
+    let t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'toast';
+      t.id = 'toast';
+      document.querySelector('.app').appendChild(t);
+    }
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove('show'), 1800);
   }
 
-  init();
+  // ================= 页面切换 =================
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+
+    const navs = document.querySelectorAll('.nav-btn');
+    navs.forEach(n => n.classList.remove('active'));
+    if (pageId === 'home') navs[0].classList.add('active');
+    if (pageId === 'calendar') navs[1].classList.add('active');
+    if (pageId === 'detail') navs[2].classList.add('active');
+  }
+
+  // ================= 周历胶囊与日历同步 =================
+  function syncWeekCapsule() {
+    const dn = Number(currentDate.slice(8, 10));
+    document.querySelectorAll('.week-days .w-day').forEach(d => {
+      const span = d.querySelector('span:last-child');
+      d.classList.toggle('active', span && span.textContent === String(dn));
+    });
+  }
+
+  // ================= 点击委托 =================
+  document.addEventListener('click', function(e) {
+    // 角色切换（主页 + 日历两条角色条同步高亮）
+    const item = e.target.closest('.role-item');
+    if (item) {
+      const nameEl = item.querySelector('.role-name');
+      if (nameEl) {
+        const key = nameEl.textContent;
+        currentRole = key;
+        document.querySelectorAll('.roles-scroll .role-item, .cal-roles .role-item').forEach(b => {
+          const n = b.querySelector('.role-name');
+          b.classList.toggle('active', !!(n && n.textContent === key));
+        });
+        renderTimeline();
+        updateCount();
+        renderCalendar();
+      }
+      return;
+    }
+    // 周历胶囊切换（黑色胶囊移动，数据刷新为该日期）
+    const day = e.target.closest('.w-day');
+    if (day) {
+      const span = day.querySelector('span:last-child');
+      if (span) {
+        currentDate = '2025-04-' + pad(Number(span.textContent));
+        viewMonth = '2025-04';
+        syncWeekCapsule();
+        renderTimeline();
+        updateCount();
+        renderCalendar();
+      }
+      return;
+    }
+    // 主页时间线 → 详情（带 ID）
+    const tItem = e.target.closest('.t-item');
+    if (tItem && tItem.dataset.id) { openDetail(tItem.dataset.id); return; }
+    // 日历选日期（纯黑反白 + 列表切换）
+    const calDay = e.target.closest('.cal-day');
+    if (calDay && calDay.dataset.day) {
+      currentDate = viewMonth + '-' + pad(Number(calDay.dataset.day));
+      renderCalendar();
+      renderTimeline();
+      updateCount();
+      syncWeekCapsule();
+      return;
+    }
+    // 日历列表 → 详情（带 ID）
+    const calItem = e.target.closest('.cal-list-item');
+    if (calItem && calItem.dataset.id) { openDetail(calItem.dataset.id); return; }
+    // 月份切换 ‹ ›
+    const arrow = e.target.closest('.cal-arrows svg');
+    if (arrow) {
+      const svgs = document.querySelectorAll('.cal-arrows svg');
+      const idx = Array.prototype.indexOf.call(svgs, arrow);
+      const [y, m] = viewMonth.split('-').map(Number);
+      let mm = idx === 1 ? m + 1 : m - 1, yy = y;
+      if (mm === 0) { mm = 12; yy -= 1; }
+      if (mm === 13) { mm = 1; yy += 1; }
+      viewMonth = yy + '-' + pad(mm);
+      renderCalendar();
+      return;
+    }
+    // 详情页 ··· → 打开底部抽屉
+    if (e.target.closest('.more-dots')) { document.body.classList.add('drawer-open'); return; }
+    // 关闭：遮罩 / 关闭按钮
+    if (e.target.closest('#drawerMask') || e.target.closest('.drawer-close')) {
+      document.body.classList.remove('drawer-open');
+      return;
+    }
+    // 菜单项：点击收起，并按语义执行
+    const dItem = e.target.closest('.drawer-item');
+    if (dItem) {
+      document.body.classList.remove('drawer-open');
+      const act = dItem.dataset.action;
+      if (act === 'all') { switchPage('calendar'); }
+      else if (act === 'role') { switchPage('home'); }
+      else if (act === 'today') {
+        currentDate = '2025-04-16';
+        viewMonth = '2025-04';
+        syncWeekCapsule();
+        renderTimeline();
+        updateCount();
+        renderCalendar();
+        switchPage('home');
+      }
+      // 'about'：仅收起，留在详情
+      return;
+    }
+    // 右上角刷新
+    if (e.target.closest('.top-bar .icon-btn')) { refreshToday(); return; }
+  });
+
+  // ================= 初始化 =================
+  renderTimeline();
+  updateCount();
+  renderCalendar();
 </script>
-</body>
-</html>
+
+<script>
+  // ================= 静默换图：点击照片直接从相册选图，无缝替换为原色（无任何标识） =================
+  (function () {
+    const picker = document.getElementById('photoPicker');
+    if (!picker) return;
+    const SELECTOR = '.hero-image img, .main-photo-wrapper img, .small-photo-wrapper img, .thumb';
+    let targetImg = null;
+
+    document.addEventListener('click', function (e) {
+      const img = e.target.closest ? e.target.closest(SELECTOR) : null;
+      if (!img) return;
+      // 仅限记忆照片，避开角色头像与时间线缩略图（它们已有各自交互）
+      if (img.closest('.role-item') || img.classList.contains('t-img')) return;
+      targetImg = img;
+      picker.value = '';
+      picker.click();
+      if (e.cancelable) e.stopPropagation();
+    }, true);
+
+    picker.addEventListener('change', function () {
+      const file = picker.files && picker.files[0];
+      if (!file || !targetImg) return;
+      const url = URL.createObjectURL(file);
+      targetImg.src = url;
+      targetImg.style.filter = 'none'; // 保持原色
+    });
+  })();
+</script>
+
+
+
+
+
+
+
+
+</body></html>

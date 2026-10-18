@@ -433,7 +433,7 @@ button { color: inherit; font: inherit; }
   outline: none;
 }
 
-/* 图标容器：54px x 54px，圆角 20px，纯净灰底 */
+/* 图标容器：54px x 54px，圆角 20px，纯白底 + 发丝边 + 双层精细阴影 */
 .app-icon {
   position: relative !important;
   display: grid !important;
@@ -441,30 +441,30 @@ button { color: inherit; font: inherit; }
   width: 54px !important;
   height: 54px !important;
   border-radius: 20px !important;
-  background: var(--icon-bg, #F8F8FA) !important;
+  background: var(--icon-bg, #FFFFFF) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  border: 0.5px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06) !important;
   overflow: hidden;
   transition: background-color .2s ease;
 }
 
-/* 图标 SVG：尺寸 22px，颜色 #111，线条粗细 1.5 */
+/* 图标 SVG：尺寸 22px，颜色 #111，线条粗细 1.25（Thin） */
 .app-icon svg {
   width: 22px !important;
   height: 22px !important;
   stroke: #111111 !important;
-  stroke-width: 1.5 !important;
+  stroke-width: 1.25 !important;
   color: #111111 !important;
   fill: none !important;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* 图标下方文字：11px，颜色 #666，字重 400 */
+/* 图标下方文字：11px，颜色 #48484A，字重 400 */
 .app-name {
-  color: #666666 !important;
+  color: #48484A !important;
   font-size: 0.688rem !important;
   font-weight: 400 !important;
   letter-spacing: 0.02em;
@@ -535,7 +535,7 @@ button { color: inherit; font: inherit; }
   width: 22px !important;
   height: 22px !important;
   stroke: #111111 !important;
-  stroke-width: 1.5 !important;
+  stroke-width: 1.25 !important;
   color: #111111 !important;
   fill: none !important;
   stroke-linecap: round;
@@ -626,19 +626,20 @@ button { color: inherit; font: inherit; }
   width: 100%;
   height: 40px;
   padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  background: #f7f7f7;
+  border-radius: 12px;
+  border: none;
+  background: #F5F5F7;
   font-size: 0.875rem;
-  color: #333;
+  color: #1D1D1F;
   outline: none;
   box-sizing: border-box;
   text-align: center;
+  transition: background .15s ease, box-shadow .15s ease;
 }
 
 .modal-input:focus {
-  border-color: #999;
   background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .modal-actions {
@@ -651,7 +652,7 @@ button { color: inherit; font: inherit; }
   flex: 1;
   height: 38px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.813rem;
   font-weight: 500;
   cursor: pointer;
@@ -735,7 +736,7 @@ button { color: inherit; font: inherit; }
 }
 .desktop-grid .app-name {
   display: block !important;
-  color: #333333 !important;
+  color: #48484A !important;
   font-size: 0.688rem !important;
   font-weight: 400 !important;
   letter-spacing: 0.02em;
@@ -825,8 +826,8 @@ button { color: inherit; font: inherit; }
 /* 拖拽占位符与自动让位效果 */
 .drag-placeholder {
   box-sizing: border-box !important;
-  border: 2px dashed rgba(0, 122, 255, 0.45) !important;
-  background: rgba(0, 122, 255, 0.08) !important;
+  border: 1.5px dashed rgba(0, 0, 0, 0.18) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
   border-radius: 20px !important;
   pointer-events: none !important;
   animation: placeholderPulse 1.2s ease-in-out infinite alternate !important;

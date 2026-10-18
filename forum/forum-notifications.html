@@ -9,82 +9,100 @@
 <script src="../js/phone/phone_storage.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
+  :root{
+    color-scheme:light;
+    --ink:#181818;--body:#454545;--muted:#969696;--faint:#b9b9b9;
+    --line:#e7e7e7;--paper:#fff;--wash:#f7f7f6;
+    --serif:Georgia,"Times New Roman","Songti SC",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { display: none; width: 0; height: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-    background: #F7F7F9; color: #111;
+    font-family: var(--sans);
+    background: repeating-linear-gradient(0deg,rgba(0,0,0,.008) 0,rgba(0,0,0,.008) 1px,transparent 1px,transparent 5px),#fff;
+    color: var(--ink);
     min-height: 100vh; max-width: 390px; margin: 0 auto;
-    padding-bottom: 40px;
+    padding-bottom: 40px; -webkit-font-smoothing: antialiased;
   }
   .topbar {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px;
-    padding-top: calc(16px + env(safe-area-inset-top));
-    position: sticky; top: 0; background: #fff; z-index: 10;
-    border-bottom: 1px solid #F0F0F0;
+    height: 59px; padding: 0 22px;
+    padding-top: calc(env(safe-area-inset-top,0px) + 12px);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid rgba(0,0,0,.055);
+    background: rgba(255,255,255,.93);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   }
-  .back-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-  }
-  .title { font-size: 1rem; font-weight: 700; flex: 1; }
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+  .brand-rule { height: 24px; width: 1px; background: #dedede; flex-shrink: 0; }
+  .brand-copy { min-width: 0; display: flex; flex-direction: column; }
+  .brand-name { font: 400 15px/1 var(--serif); letter-spacing: .04em; color: var(--ink); }
+  .brand-copy small { font-size: 8px; font-weight: 400; letter-spacing: .16em; color: #a0a0a0; margin-top: 5px; display: block; }
+  .back-btn { border:0; background:transparent; padding:6px 8px 6px 0; color:#444; display:grid; place-items:center; }
+  .back-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+  .head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .clear-btn {
-    font-size: 0.75rem; color: #999; background: none; border: none; cursor: pointer;
-    font-family: inherit;
+    border: 0; background: transparent; cursor: pointer; padding: 4px 0;
+    font-family: var(--serif); font-style: italic; font-size: 10px;
+    color: #888; letter-spacing: .03em; border-bottom: 1px solid #ccc;
   }
-  .notif {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 14px 16px; background: #fff;
-    border-bottom: 1px solid #F0F0F0;
-    cursor: pointer;
-  }
-  .n-avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
-  .n-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.813rem; font-weight: 700;
-    overflow: hidden;
-  }
-  .n-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .n-icon-badge {
-    position: absolute; bottom: -2px; right: -2px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid #fff;
-  }
-  .n-icon-badge.like { background: #FF3B30; }
-  .n-icon-badge.comment { background: #007AFF; }
-  .n-icon-badge.mention { background: #FF9500; }
-  .n-icon-badge.post { background: #34C759; }
-  .n-icon-badge svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; }
-  .n-text { flex: 1; font-size: 0.875rem; line-height: 1.4; min-width: 0; }
-  .n-text b { font-weight: 600; color: #111; }
+  /* 参考 profile-head：刊头 */
+  .profile-head { padding: 26px 22px 24px; border-bottom: 1px solid #ddd; }
+  .overline { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#9a9a9a; font-size:8px; letter-spacing:.19em; font-weight:650; }
+  .edition { font-family: var(--serif); letter-spacing: .09em; color: #b1b1b1; white-space: nowrap; }
+  .profile-title { font: 44px/.98 var(--serif); letter-spacing: -.07em; margin: 15px 0; color: var(--ink); }
+  .profile-title span { color: #aaa; }
+  .profile-copy { font-size: 11px; color: #777; line-height: 1.9; max-width: 290px; margin: 0; }
+  /* 参考 feed-header */
+  .feed-header { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin:21px 22px 0; padding-bottom:11px; border-bottom:1px solid #202020; }
+  .feed-header h2 { font-size: 15px; font-weight: 650; letter-spacing: -.045em; margin: 0; color: var(--ink); }
+  .feed-header p { font-size: 7px; letter-spacing: .17em; color: #aaa; margin: 0; }
+  /* 通知列表：参考 post 行 */
+  #notifList { padding: 0 22px; }
+  .notif { display: grid; grid-template-columns: 27px minmax(0,1fr); gap: 11px; padding: 17px 0 16px; border-bottom: 1px solid #e8e8e8; cursor: pointer; }
+  .n-avatar-wrap { position: relative; flex-shrink: 0; }
+  .n-avatar { width: 27px; height: 27px; border-radius: 50%; background: #ececec; color: #505050; display: grid; place-items: center; font: 11px var(--serif); overflow: hidden; box-shadow: none; }
+  .n-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.03); }
+  .n-icon-badge { display: none; }
+  .n-text { font-size: 11px; line-height: 1.95; color: #656565; min-width: 0; }
+  .n-text b { font-size: 9px; font-weight: 600; color: #444; }
   .n-content-snippet {
-    font-size: 0.75rem; color: #8E8E93; margin-top: 3px;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 15px; line-height: 1.55; font-weight: 650; letter-spacing: -.025em; color: var(--ink);
+    margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .n-time { font-size: 0.625rem; color: #B0B0B5; margin-top: 4px; font-family: monospace; }
-  .empty { text-align: center; color: #999; padding: 60px 20px; font-size: 0.875rem; }
+  .n-time { font-size: 8px; color: #aaa; margin-top: 6px; letter-spacing: .04em; }
+  /* 空状态：参考 empty-state */
+  .empty { text-align: center; padding: 35px 20px 31px; border-top: 1px solid #e7e7e7; border-bottom: 1px solid #e7e7e7; font: 30px var(--serif); color: #b5b5b5; letter-spacing: .02em; line-height: 1.5; }
+  .empty small { display: block; font-family: var(--sans); font-size: 10px; color: #999; margin-top: 12px; line-height: 1.8; letter-spacing: 0; font-weight: 400; }
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="back-btn" onclick="location.href='forum.html'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <div class="brand">
+      <button class="back-btn" onclick="location.href='forum.html'">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="brand-rule"></div>
+      <div class="brand-copy">
+        <span class="brand-name">The Forum</span>
+        <small>一个认真说话的地方</small>
+      </div>
     </div>
-    <div class="title">通知</div>
-    <button class="clear-btn" id="btnClearNotifs" type="button">全部清空</button>
+    <div class="head-actions">
+      <button class="clear-btn" id="btnClearNotifs" type="button">全部清空</button>
+    </div>
   </div>
 
+  <section class="profile-head">
+    <div class="overline"><span>COMMUNITY / INBOX</span><span class="edition">MESSAGES 01</span></div>
+    <h1 class="profile-title">消息<span>.</span></h1>
+    <p class="profile-copy">这里留给新的回应、被喜欢的文字，以及讨论里那些细小的连接。</p>
+  </section>
+
+  <div class="feed-header"><h2>最近的互动</h2><p>YOUR ACTIVITY</p></div>
   <div id="notifList"></div>
 
 <script>

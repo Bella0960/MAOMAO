@@ -9,105 +9,246 @@
 <script src="../js/phone/phone_storage.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
+  :root{
+    color-scheme:light;
+    --ink:#181818;--body:#454545;--muted:#969696;--faint:#b9b9b9;
+    --line:#e7e7e7;--paper:#fff;--wash:#f7f7f6;
+    --serif:Georgia,"Times New Roman","Songti SC",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { display: none; width: 0; height: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-    background: #F7F7F9; color: #111;
+    font-family: var(--sans);
+    background: repeating-linear-gradient(0deg,rgba(0,0,0,.008) 0,rgba(0,0,0,.008) 1px,transparent 1px,transparent 5px),#fff;
+    color: var(--ink);
     min-height: 100vh; max-width: 390px; margin: 0 auto;
-    padding-bottom: 40px;
+    padding-bottom: 50px; -webkit-font-smoothing: antialiased;
   }
   .topbar {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px;
-    padding-top: calc(16px + env(safe-area-inset-top));
-    position: sticky; top: 0; background: #fff; z-index: 10;
-    border-bottom: 1px solid #F0F0F0;
+    height: 59px; padding: 0 22px;
+    padding-top: calc(env(safe-area-inset-top,0px) + 12px);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid rgba(0,0,0,.055);
+    background: rgba(255,255,255,.93);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   }
-  .back-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+  .brand-rule { height: 24px; width: 1px; background: #dedede; flex-shrink: 0; }
+  .brand-copy { min-width: 0; display: flex; flex-direction: column; }
+  .brand-name { font: 400 15px/1 var(--serif); letter-spacing: .04em; color: var(--ink); }
+  .brand-copy small { font-size: 8px; font-weight: 400; letter-spacing: .16em; color: #a0a0a0; margin-top: 5px; display: block; }
+  .back-btn { border:0; background:transparent; padding:6px 8px 6px 0; color:#444; display:grid; place-items:center; }
+  .back-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+  .head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .edit-btn { border:0; background:transparent; padding:4px 0; font-family:var(--serif); font-style:italic; font-size:10px; color:#888; letter-spacing:.03em; border-bottom:1px solid #ccc; cursor:pointer; }
+  /* 页内通用：斜杠编号眉行 */
+  .meta-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:8px; letter-spacing:.19em; color:#9a9a9a; font-weight:650; }
+  .meta-zh { font-family: var(--serif); font-style: italic; font-size:10px; letter-spacing:.05em; color:#aaa; font-weight:400; }
+  /* ===== 方案A：作者档案 ===== */
+  .author-archive { padding: 18px 30px 0; }
+  .archive-body { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-top:16px; }
+  .archive-left { min-width:0; }
+  .overline { font-size:8px; letter-spacing:.19em; color:#9a9a9a; font-weight:650; display:block; }
+  .archive-title {
+    font: 400 clamp(40px,12vw,52px)/.98 var(--serif);
+    letter-spacing: -.07em; margin: 12px 0 8px; color: var(--ink);
   }
-  .title { font-size: 1rem; font-weight: 700; flex: 1; text-align: center; margin-right: 32px; }
-  .profile { padding: 24px 16px; text-align: center; background: #fff; position: relative; }
-  .settings-btn {
-    position: absolute; top: 16px; right: 16px;
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  .archive-title .dot { color:#aaa; }
+  .archive-sub { font-size: 11px; color: #777; line-height: 1.9; max-width: 220px; }
+  .fig-square {
+    width: 76px; height: 100px; flex-shrink: 0;
+    background: #ececec; color: #505050;
+    border: 1px solid #e5e5e5;
+    display: grid; place-items: center;
+    font: 40px var(--serif); font-weight: 400;
+    cursor: pointer; overflow: hidden;
   }
-  .big-avatar {
-    width: 72px; height: 72px; border-radius: 50%;
-    background: #E8E8EC; margin: 0 auto 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; font-weight: 700; color: #666;
+  .fig-caption { font-size: 7px; letter-spacing: .14em; color: #aaa; margin-top: 7px; text-align: right; }
+  .hairline { height: 1px; background: #e5e5e5; margin: 18px 0 0; }
+  .bio-row { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0 20px; }
+  .bio-row .overline { margin-top: 3px; white-space: nowrap; }
+  .bio-text { flex:1; font-size:11px; line-height:1.9; color:#555; min-width:0; }
+  /* ===== 方案B：紧凑三栏目录索引（一大两小非对称） ===== */
+  .content-index { padding: 18px 30px 0; }
+  .index-title { font: 650 10px var(--sans); letter-spacing: .19em; color: var(--ink); margin: 14px 0 3px; }
+  .index-sub { font-size: 11px; color: #737373; line-height: 1.9; margin-bottom: 12px; }
+  .idx-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: "main c2" "main c3";
+    gap: 1px; background: #e8e8e8; border: 1px solid #e8e8e8;
   }
-  .nickname { font-size: 1.125rem; font-weight: 700; }
-  .bio { font-size: 0.813rem; color: #999; margin-top: 4px; }
-  .stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
-  .stat-num { font-size: 1.125rem; font-weight: 700; }
-  .stat-label { font-size: 0.625rem; color: #999; margin-top: 2px; }
-  .section-label { padding: 16px 16px 10px; font-size: 0.75rem; font-weight: 700; color: #999; }
-  .my-posts { padding: 0 16px; }
-  .my-post {
-    background: #fff; border-radius: 14px; padding: 14px;
-    margin-bottom: 10px; cursor: pointer;
+  .idx-cell {
+    background: #fff; text-decoration: none; color: inherit; cursor: pointer;
+    position: relative;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    padding: 13px 12px 15px;
+    transition: transform .12s ease;
   }
-  .my-post img { width: 100%; border-radius: 10px; margin-bottom: 8px; }
-  .mp-content { font-size: 0.875rem; line-height: 1.5; }
-  .mp-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: #999; }
+  .idx-cell:active { transform: translateY(1px); }
+  /* 底部细线：悬停/点击时从左延伸 */
+  .idx-cell::after {
+    content: ""; position: absolute; left: 12px; right: 12px; bottom: 9px; height: 1px;
+    background: #202020; transform: scaleX(0); transform-origin: left;
+    transition: transform .25s ease;
+  }
+  .idx-cell:hover::after, .idx-cell:active::after { transform: scaleX(1); }
+  .idx-cell:nth-child(1) { grid-area: main; }
+  .idx-cell:nth-child(2) { grid-area: c2; }
+  .idx-cell:nth-child(3) { grid-area: c3; }
+  .ic-no { font: 11px var(--serif); color: #999; }
+  .ic-title { font-size: 13px; font-weight: 650; letter-spacing: -.02em; color: var(--ink); line-height: 1.5; }
+  .idx-cell:nth-child(1) .ic-title { font-size: 15px; letter-spacing: -.025em; }
+  .ic-count { font: 18px var(--serif); color: var(--ink); line-height: 1; }
+  .ic-count small { font-family: var(--sans); font-size: 7px; letter-spacing: .14em; color: #aaa; display: block; margin-top: 4px; font-weight: 400; }
+  .idx-total { display: flex; align-items: baseline; justify-content: space-between; padding: 11px 0 0; }
+  .foot-label { font-size: 7px; letter-spacing: .17em; color: #aaa; }
+  .foot-count { font: 14px var(--serif); color: var(--ink); }
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="back-btn" onclick="location.href='forum.html'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </div>
-    <div class="title">我的主页</div>
-  </div>
-
-  <div class="profile">
-    <div class="settings-btn" onclick="location.href='forum-settings.html'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </div>
-    <div class="big-avatar" id="bigAvatar"></div>
-    <div class="nickname" id="nickname"></div>
-    <div class="bio" id="bio"></div>
-    <div class="stats">
-      <div><div class="stat-num" id="postCount">0</div><div class="stat-label">帖子</div></div>
-      <div><div class="stat-num" id="likeCount">0</div><div class="stat-label">获赞</div></div>
-      <div><div class="stat-num" id="followCount">0</div><div class="stat-label">关注</div></div>
-    </div>
-  </div>
-
-  <div class="section-label">我的帖子</div>
-  <div class="my-posts" id="myPosts"></div>
-
-<script>
-  try {
-    const me = JSON.parse(localStorage.getItem('myProfile') || '{}');
-    document.getElementById('bigAvatar').textContent = (me.nickname || '我')[0];
-    document.getElementById('nickname').textContent = me.nickname || '我';
-    document.getElementById('bio').textContent = me.sign || '这个人很懒，什么都没写';
-  } catch(e){}
-
-  const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
-  const myPosts = posts.filter(p => p.name === '我').sort((a,b) => b.time - a.time);
-  document.getElementById('postCount').textContent = myPosts.length;
-  document.getElementById('likeCount').textContent = myPosts.reduce((s, p) => s + (p.likes || 0), 0);
-  document.getElementById('followCount').textContent = JSON.parse(localStorage.getItem('forum_follows') || '[]').length;
-
-  document.getElementById('myPosts').innerHTML = myPosts.length ? myPosts.map(p => `
-    <div class="my-post" onclick="location.href='forum-detail.html?id=${p.id}'">
-      ${p.img ? `<img src="${p.img}">` : ''}
-      <div class="mp-content">${p.content}</div>
-      <div class="mp-foot">
-        <span>${new Date(p.time).toLocaleDateString()}</span>
-        <span>♥ ${p.likes || 0}</span>
+    <div class="brand">
+      <button class="back-btn" onclick="location.href='forum.html'">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="brand-rule"></div>
+      <div class="brand-copy">
+        <span class="brand-name">The Forum</span>
+        <small>一个认真说话的地方</small>
       </div>
     </div>
-  `).join('') : '<div style="text-align:center;color:#999;padding:40px 0;font-size:0.813rem;">还没发过帖子</div>';
+    <div class="head-actions">
+      <button class="edit-btn" aria-label="编辑档案" onclick="location.href='forum-settings.html'">编辑</button>
+    </div>
+  </div>
+
+  <!-- 方案A：作者档案 -->
+  <section class="author-archive">
+    <div class="meta-row"><span>PROFILE / 01</span><span class="meta-zh">个人档案</span></div>
+    <div class="archive-body">
+      <div class="archive-left">
+        <span class="overline">THE AUTHOR</span>
+        <h1 class="archive-title"><span id="nickname"></span><br>私人页刊<span class="dot">。</span></h1>
+        <p class="archive-sub" id="bio"></p>
+      </div>
+      <figure>
+        <div class="fig-square" id="bigAvatar" onclick="document.getElementById('avatarInput').click()" title="点击更换头像"></div>
+        <figcaption class="fig-caption">FIG. 001 — PORTRAIT</figcaption>
+      </figure>
+    </div>
+    <div class="hairline"></div>
+    <div class="bio-row">
+      <span class="overline">BIOGRAPHY</span>
+      <p class="bio-text" id="bio2"></p>
+    </div>
+  </section>
+
+  <!-- 方案B：紧凑三栏目录索引 -->
+  <section class="content-index">
+    <div class="meta-row"><span>INDEX / 02</span><span class="meta-zh">个人内容索引</span></div>
+    <h2 class="index-title">MY COLLECTION</h2>
+    <p class="index-sub">一个人的数字收藏室</p>
+    <div class="idx-grid">
+      <a class="idx-cell" href="forum-my-content.html?tab=posts">
+        <span class="ic-no">01</span>
+        <span class="ic-title">发表的文章</span>
+        <span class="ic-count" id="cntPosts">0<small>NOTES</small></span>
+      </a>
+      <a class="idx-cell" href="forum-my-content.html?tab=fav">
+        <span class="ic-no">02</span>
+        <span class="ic-title">私人收藏</span>
+        <span class="ic-count" id="cntFav">0<small>SAVED</small></span>
+      </a>
+      <a class="idx-cell" href="forum-my-content.html?tab=comments">
+        <span class="ic-no">03</span>
+        <span class="ic-title">留下的痕迹</span>
+        <span class="ic-count" id="cntComments">0<small>TRACES</small></span>
+      </a>
+    </div>
+    <div class="idx-total">
+      <span class="foot-label">TOTAL ENTRIES</span>
+      <span class="foot-count" id="totalCount">000</span>
+    </div>
+  </section>
+
+  <input type="file" id="avatarInput" accept="image/*" style="display:none">
+
+<script>
+  let me = {};
+  let nick = '我';
+  let sign = '在日常里收集一点不寻常。';
+  try {
+    me = JSON.parse(localStorage.getItem('myProfile') || '{}');
+    nick = me.nickname || '我';
+    sign = me.sign || '在日常里收集一点不寻常。';
+  } catch(e){}
+  document.getElementById('nickname').textContent = nick + '的';
+  document.getElementById('bio').textContent = '记录想法、收藏与生活碎片';
+  document.getElementById('bio2').textContent = sign;
+
+  /* 头像：已上传显示图片，否则显示首字 */
+  const avatarBox = document.getElementById('bigAvatar');
+  const storedAvatar = (me.avatar || '').indexOf('data:') === 0 ? me.avatar : '';
+  if (storedAvatar) {
+    avatarBox.innerHTML = '<img src="' + storedAvatar + '" alt="" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.03);display:block">';
+  } else {
+    avatarBox.textContent = nick[0];
+  }
+  document.getElementById('avatarInput').addEventListener('change', function (e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+      const img = new Image();
+      img.onload = function () {
+        try {
+          const maxW = 400;
+          const scale = Math.min(1, maxW / img.width);
+          const cv = document.createElement('canvas');
+          cv.width = Math.round(img.width * scale);
+          cv.height = Math.round(img.height * scale);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          const dataUrl = cv.toDataURL('image/jpeg', 0.8);
+          try {
+            const mp = JSON.parse(localStorage.getItem('myProfile') || '{}');
+            mp.avatar = dataUrl;
+            localStorage.setItem('myProfile', JSON.stringify(mp));
+            if (window.PhoneStorage && PhoneStorage.saveMyProfile) PhoneStorage.saveMyProfile(mp);
+          } catch (err) {}
+          avatarBox.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.03);display:block">';
+        } catch (err) {}
+      };
+      img.onerror = function () {};
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
+  const pad = n => String(n).padStart(3, '0');
+
+  const myPosts = posts.filter(p => p.owner === 'me' || p.name === '我');
+  const favPosts = posts.filter(p => p.liked);
+  const myComments = [];
+  posts.forEach(p => {
+    const arr = Array.isArray(p.comments) ? p.comments : [];
+    arr.forEach(c => { if (c.name === '我' || c.owner === 'me') myComments.push(c); });
+    arr.forEach(c => {
+      if (Array.isArray(c.replies)) c.replies.forEach(r => { if (r.name === '我' || r.owner === 'me') myComments.push(r); });
+    });
+  });
+
+  document.getElementById('cntPosts').textContent = myPosts.length;
+  document.getElementById('cntFav').textContent = favPosts.length;
+  document.getElementById('cntComments').textContent = myComments.length;
+  document.getElementById('totalCount').textContent = pad(posts.length);
 </script>
 </body>
 </html>

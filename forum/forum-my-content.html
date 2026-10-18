@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>个人档案 · 栏目</title>
+<script src="../js/font-loader.js"></script>
+<script src="../js/native-feel.js"></script>
+<script src="../js/phone/phone_storage.js"></script>
+<link rel="stylesheet" href="../css/mobile-fit.css">
+<style>
+  :root{
+    color-scheme:light;
+    --ink:#181818;--body:#454545;--muted:#969696;--faint:#b9b9b9;
+    --line:#e7e7e7;--paper:#fff;--wash:#f7f7f6;
+    --serif:Georgia,"Times New Roman","Songti SC",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  body {
+    font-family: var(--sans);
+    background: repeating-linear-gradient(0deg,rgba(0,0,0,.008) 0,rgba(0,0,0,.008) 1px,transparent 1px,transparent 5px),#fff;
+    color: var(--ink);
+    min-height: 100vh; max-width: 390px; margin: 0 auto;
+    padding-bottom: 50px; -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    height: 59px; padding: 0 22px;
+    padding-top: calc(env(safe-area-inset-top,0px) + 12px);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid rgba(0,0,0,.055);
+    background: rgba(255,255,255,.93);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  }
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+  .brand-rule { height: 24px; width: 1px; background: #dedede; flex-shrink: 0; }
+  .brand-copy { min-width: 0; display: flex; flex-direction: column; }
+  .brand-name { font: 400 15px/1 var(--serif); letter-spacing: .04em; color: var(--ink); }
+  .brand-copy small { font-size: 8px; font-weight: 400; letter-spacing: .16em; color: #a0a0a0; margin-top: 5px; display: block; }
+  .back-btn { border:0; background:transparent; padding:6px 8px 6px 0; color:#444; display:grid; place-items:center; }
+  .back-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+  /* 栏目头：档案式大标题 */
+  .archive-head { padding: 26px 30px 24px; border-bottom: 1px solid #ddd; }
+  .overline { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#9a9a9a; font-size:8px; letter-spacing:.19em; font-weight:650; }
+  .overline .en { font-family: var(--serif); font-style: italic; font-size:10px; letter-spacing:.05em; color:#aaa; font-weight:400; }
+  .archive-title { font: 400 clamp(40px,12vw,48px)/.98 var(--serif); letter-spacing: -.07em; margin: 16px 0 0; color: var(--ink); }
+  .archive-title .dot { color: #aaa; }
+  /* 列表行 */
+  .content-list { padding: 0 30px; }
+  .arch-row {
+    display: grid; grid-template-columns: 30px minmax(0,1fr);
+    gap: 12px; align-items: center;
+    padding: 16px 0; border-bottom: 1px solid #e8e8e8;
+    text-decoration: none; color: inherit; cursor: pointer;
+    position: relative;
+    transition: transform .12s ease;
+  }
+  .arch-row:active { transform: translateY(1px); }
+  /* 底部细线：悬停/点击时从左延伸 */
+  .arch-row::after {
+    content: ""; position: absolute; left: 42px; right: 0; bottom: -1px; height: 1px;
+    background: #202020; transform: scaleX(0); transform-origin: left;
+    transition: transform .25s ease;
+  }
+  .arch-row:hover::after, .arch-row:active::after { transform: scaleX(1); }
+  .ar-no { font: italic 10px var(--serif); color: #c1c1c1; }
+  .ar-main { font-size: 15px; font-weight: 650; letter-spacing: -.025em; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+  .ar-main small { display: block; font-size: 8px; font-weight: 400; color: #aaa; letter-spacing: .04em; margin-top: 4px; }
+  .sec-empty { text-align:center; padding: 34px 20px; border-top: 1px solid #e7e7e7; border-bottom: 1px solid #e7e7e7; font: 22px var(--serif); color:#b5b5b5; }
+  .sec-empty small { display:block; font-family:var(--sans); font-size:10px; color:#999; margin-top:10px; font-weight:400; letter-spacing:0; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <button class="back-btn" onclick="history.length>1?history.back():location.href='forum-profile.html'">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="brand-rule"></div>
+      <div class="brand-copy">
+        <span class="brand-name">The Forum</span>
+        <small>一个认真说话的地方</small>
+      </div>
+    </div>
+  </div>
+
+  <section class="archive-head">
+    <div class="overline"><span id="headOver">ARCHIVE / 01</span><span class="en" id="headEn">MY NOTES</span></div>
+    <h1 class="archive-title" id="headTitle">发表的文章<span class="dot">。</span></h1>
+  </section>
+
+  <div class="content-list" id="contentList"></div>
+
+<script>
+  const pad2 = n => String(n).padStart(2, '0');
+  function esc(v){ return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function pTime(p){ return (typeof p.time==='number') ? new Date(p.time).toLocaleDateString() : (p.time || '刚刚'); }
+  function pTitle(p){ return p.title || p.content || ''; }
+  const sortT = (a,b) => (typeof b.time==='number'?b.time:(b.created||0)) - (typeof a.time==='number'?a.time:(a.created||0));
+
+  const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
+  const tab = new URLSearchParams(location.search).get('tab') || 'posts';
+
+  const META = {
+    posts:    { no: '01', over: 'ARCHIVE / 01', en: 'MY NOTES', title: '发表的文章', empty: '先写下第一段话', emptySub: '一个念头、一件小事，都可以成为开始。' },
+    fav:      { no: '02', over: 'ARCHIVE / 02', en: 'SAVED / RE-READ', title: '私人收藏', empty: '收藏还空着', emptySub: '遇到想再读的内容，点一下 ♥ 就会收进这里。' },
+    comments: { no: '03', over: 'ARCHIVE / 03', en: 'COMMENTS & REPLIES', title: '留下的痕迹', empty: '还没有留下痕迹', emptySub: '去喜欢的帖子里说点什么吧。' }
+  }[tab] || META.posts;
+
+  document.getElementById('headOver').textContent = META.over;
+  document.getElementById('headEn').textContent = META.en;
+  document.getElementById('headTitle').innerHTML = META.title + '<span class="dot">。</span>';
+
+  let rows = [];
+  if (tab === 'posts') {
+    rows = posts.filter(p => p.owner === 'me' || p.name === '我').sort(sortT)
+      .map((p, i) => ({ id: p.id, main: pTitle(p), sub: pTime(p) + ' · ♥ ' + (p.likes || 0) }));
+  } else if (tab === 'fav') {
+    rows = posts.filter(p => p.liked).sort(sortT)
+      .map((p, i) => ({ id: p.id, main: pTitle(p), sub: p.name + ' · ' + pTime(p) }));
+  } else {
+    const mine = [];
+    posts.forEach(p => {
+      const arr = Array.isArray(p.comments) ? p.comments : [];
+      arr.forEach(c => { if (c.name === '我' || c.owner === 'me') mine.push({ p: p, text: c.text, time: c.time }); });
+      arr.forEach(c => {
+        if (Array.isArray(c.replies)) c.replies.forEach(r => { if (r.name === '我' || r.owner === 'me') mine.push({ p: p, text: r.text, time: r.time }); });
+      });
+    });
+    mine.sort((a,b) => (typeof b.time==='number'?b.time:0) - (typeof a.time==='number'?a.time:0));
+    rows = mine.map((m, i) => ({
+      id: m.p.id,
+      main: m.text,
+      sub: '在「' + pTitle(m.p).slice(0, 20) + '」下 · ' + ((typeof m.time==='number') ? new Date(m.time).toLocaleDateString() : (m.time || '刚刚'))
+    }));
+  }
+
+  document.getElementById('contentList').innerHTML = rows.length ? rows.map((r, i) => `
+    <a class="arch-row" href="forum-detail.html?id=${esc(r.id)}">
+      <span class="ar-no">${pad2(i + 1)}</span>
+      <span class="ar-main">${esc(r.main)}<small>${esc(r.sub)}</small></span>
+    </a>`).join('') : '<div class="sec-empty">' + META.empty + '<small>' + META.emptySub + '</small></div>';
+</script>
+</body>
+</html>

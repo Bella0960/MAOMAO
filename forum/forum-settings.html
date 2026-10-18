@@ -8,82 +8,145 @@
 <script src="../js/native-feel.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 <style>
+  :root{
+    color-scheme:light;
+    --ink:#181818;--body:#454545;--muted:#969696;--faint:#b9b9b9;
+    --line:#e7e7e7;--paper:#fff;--wash:#f7f7f6;
+    --serif:Georgia,"Times New Roman","Songti SC",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { display: none; width: 0; height: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-    background: #F7F7F9; color: #111;
+    font-family: var(--sans);
+    background: repeating-linear-gradient(0deg,rgba(0,0,0,.008) 0,rgba(0,0,0,.008) 1px,transparent 1px,transparent 5px),#fff;
+    color: var(--ink);
     min-height: 100vh; max-width: 390px; margin: 0 auto;
-    padding-bottom: 40px;
+    padding-bottom: 40px; -webkit-font-smoothing: antialiased;
   }
   .topbar {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px;
-    padding-top: calc(16px + env(safe-area-inset-top));
-    position: sticky; top: 0; background: #fff; z-index: 10;
-    border-bottom: 1px solid #F0F0F0;
+    height: 59px; padding: 0 22px;
+    padding-top: calc(env(safe-area-inset-top,0px) + 12px);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid rgba(0,0,0,.055);
+    background: rgba(255,255,255,.93);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   }
-  .back-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+  .brand-rule { height: 24px; width: 1px; background: #dedede; flex-shrink: 0; }
+  .brand-copy { min-width: 0; display: flex; flex-direction: column; }
+  .brand-name { font: 400 15px/1 var(--serif); letter-spacing: .04em; color: var(--ink); }
+  .brand-copy small { font-size: 8px; font-weight: 400; letter-spacing: .16em; color: #a0a0a0; margin-top: 5px; display: block; }
+  .back-btn { border:0; background:transparent; padding:6px 8px 6px 0; color:#444; display:grid; place-items:center; }
+  .back-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+  .head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .save-btn { border:0; background:transparent; cursor:pointer; padding:4px 0; font-family:var(--serif); font-style:italic; font-size:10px; color:#888; letter-spacing:.03em; border-bottom:1px solid #ccc; }
+  /* 设置页头：参考 profile-head */
+  .settings-head { padding: 26px 22px 24px; border-bottom: 1px solid #ddd; }
+  .overline { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#9a9a9a; font-size:8px; letter-spacing:.19em; font-weight:650; }
+  .edition { font-family: var(--serif); letter-spacing: .09em; color: #b1b1b1; white-space: nowrap; }
+  .settings-title { font: 44px/.98 var(--serif); letter-spacing: -.07em; margin: 15px 0 0; color: var(--ink); }
+  .settings-title span { color: #aaa; }
+  /* 表单：参考 sheet 字段规范 */
+  .settings-form { padding: 14px 22px 40px; }
+  .field-group { padding-bottom: 4px; }
+  .field-label { display: block; margin: 20px 0 7px; font-size: 9px; color: #999; letter-spacing: .06em; }
+  .field-group:first-child .field-label { margin-top: 14px; }
+  .field, .field-area {
+    display: block; width: 100%; border: 0; border-bottom: 1px solid #ddd;
+    background: transparent; border-radius: 0; padding: 10px 0;
+    font-size: 12px; color: #252525; outline: 0; font-family: var(--sans);
   }
-  .title { font-size: 1rem; font-weight: 700; flex: 1; text-align: center; margin-right: 32px; }
-  .save-btn { font-size: 0.875rem; font-weight: 700; color: #111; cursor: pointer; }
-  .section { padding: 20px 16px 8px; font-size: 0.75rem; color: #999; font-weight: 700; }
-  .card {
-    margin: 0 16px; background: #fff; border-radius: 14px;
-    padding: 16px;
-  }
-  .input-row { margin-bottom: 16px; }
-  .input-row label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 6px; }
-  .input-row input, .input-row textarea {
-    width: 100%; border: 1px solid #ECECEF; border-radius: 10px;
-    padding: 10px 12px; font-size: 0.875rem; outline: none;
-    font-family: inherit; background: #FAFAFA;
-  }
-  .input-row textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
-  .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .field::placeholder, .field-area::placeholder { color: #b8b8b8; }
+  .field:focus, .field-area:focus { border-color: #888; }
+  .field-area { min-height: 130px; resize: vertical; line-height: 1.9; border-top: 1px solid #ededed; margin-top: 6px; padding-top: 12px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .opt-chip {
-    padding: 6px 14px; border-radius: 999px;
-    background: #F4F4F6; font-size: 0.813rem; cursor: pointer;
+    padding: 9px 14px; border: 1px solid #e0e0e0; font-size: 10px; color: #444;
+    background: transparent; cursor: pointer; letter-spacing: .02em; font-family: var(--sans);
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
   }
-  .opt-chip.active { background: #111; color: #fff; }
+  .opt-chip.active { background: #181818; color: #fff; border-color: #181818; }
+  .opt-chip.add-chip { color: #999; }
+  .custom-theme-box { margin-top: 16px; border-top: 1px solid #ededed; padding-top: 2px; }
+  .custom-theme-box .field-group:first-child .field-label { margin-top: 12px; }
+  .custom-area { min-height: 64px; }
+  .custom-hint { display: block; font-size: 8px; color: #b8b8b8; letter-spacing: .04em; margin-top: 2px; min-height: 12px; }
+  .custom-actions { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+  .text-btn { border: 0; background: transparent; color: #888; cursor: pointer; font-family: var(--serif); font-style: italic; font-size: 10px; border-bottom: 1px solid #ccc; padding: 0 0 2px; letter-spacing: .03em; }
+  .submit-sm { margin-top: 0; width: auto; padding: 9px 14px; flex-shrink: 0; }
+  .submit-button {
+    border: 0; background: #181818; color: #fff; border-radius: 2px;
+    padding: 12px 16px; font-size: 10px; letter-spacing: .05em;
+    margin-top: 26px; width: 100%; cursor: pointer; font-family: var(--sans);
+  }
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="back-btn" onclick="location.href='forum.html'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <div class="brand">
+      <button class="back-btn" onclick="location.href='forum.html'">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="brand-rule"></div>
+      <div class="brand-copy">
+        <span class="brand-name">The Forum</span>
+        <small>一个认真说话的地方</small>
+      </div>
     </div>
-    <div class="title">论坛设置</div>
-    <div class="save-btn" onclick="save()">保存</div>
+    <div class="head-actions">
+      <button class="save-btn" onclick="save()">保存</button>
+    </div>
   </div>
 
-  <div class="section">基本信息</div>
-  <div class="card">
-    <div class="input-row">
-      <label>论坛名称</label>
-      <input type="text" id="forumName" placeholder="比如：吃瓜前线">
+  <section class="settings-head">
+    <div class="overline"><span>FORUM SETTINGS</span><span class="edition">EDITORIAL 01</span></div>
+    <h1 class="settings-title">设置<span>.</span></h1>
+  </section>
+
+  <div class="settings-form">
+    <div class="field-group">
+      <label class="field-label" for="forumName">论坛名称</label>
+      <input class="field" type="text" id="forumName" placeholder="比如：吃瓜前线">
     </div>
-    <div class="input-row">
-      <label>论坛主题</label>
+    <div class="field-group">
+      <div class="field-label">论坛主题</div>
       <div class="opts" id="themeOpts">
         <div class="opt-chip" data-id="xiuxian">修仙界</div>
         <div class="opt-chip" data-id="reality">现代都市</div>
         <div class="opt-chip" data-id="bagua">八卦吃瓜</div>
         <div class="opt-chip" data-id="academy">校园</div>
         <div class="opt-chip" data-id="future">赛博朋克</div>
+        <div class="opt-chip add-chip" id="addThemeBtn" title="自定义主题">＋</div>
+      </div>
+      <div class="custom-theme-box" id="customThemeRow" style="display:none">
+        <div class="field-group">
+          <label class="field-label" for="customThemeInput">主题名称</label>
+          <input class="field" id="customThemeInput" maxlength="12" placeholder="如：深夜电台">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="customTopicsInput">话题列表（逗号分隔，至少 3 个）</label>
+          <input class="field" id="customTopicsInput" placeholder="如：深夜节目, 失眠夜话, 电台来信">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="customWorldInput">世界书设定（这个论坛里都是什么人）</label>
+          <textarea class="field-area custom-area" id="customWorldInput" placeholder="比如：深夜电台的听众，白天沉默、深夜话多……"></textarea>
+        </div>
+        <span class="custom-hint" id="customHint"></span>
+        <div class="custom-actions">
+          <button class="submit-button submit-sm" id="confirmThemeBtn" type="button">添加主题</button>
+          <button class="text-btn" id="cancelThemeBtn" type="button">取消</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="section">论坛世界书（网友设定）</div>
-  <div class="card">
-    <div class="input-row" style="margin-bottom:0">
-      <textarea id="forumWorld" placeholder="写清楚这个论坛里都是什么人，他们会聊什么话题。比如：这是一个八卦论坛，网友们天天讨论娱乐圈的瓜，谁出轨了谁塌房了，语气都是吃瓜群众的样子..."></textarea>
+    <div class="field-group">
+      <label class="field-label" for="forumWorld">论坛世界书（网友设定）</label>
+      <textarea class="field-area" id="forumWorld" placeholder="写清楚这个论坛里都是什么人，他们会聊什么话题。比如：这是一个八卦论坛，网友们天天讨论娱乐圈的瓜，谁出轨了谁塌房了，语气都是吃瓜群众的样子..."></textarea>
     </div>
+    <button class="submit-button" type="button" onclick="save()">保存设置 ↗</button>
   </div>
 
 <script>
@@ -92,32 +155,85 @@
     catch(e) { return {}; }
   }
   function saveConfig(c) { localStorage.setItem('forum_config', JSON.stringify(c)); }
+  function esc(v){ return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
   let theme = 'reality';
+  let customThemes = [];
+
+  function selectChip() {
+    theme = this.dataset.id;
+    document.querySelectorAll('#themeOpts .opt-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  }
+
   function render() {
     const cfg = loadConfig();
+    customThemes = Array.isArray(cfg.customThemes) ? cfg.customThemes : [];
     document.getElementById('forumName').value = cfg.name || '';
     document.getElementById('forumWorld').value = cfg.world || '';
     theme = cfg.theme || 'reality';
-    document.querySelectorAll('.opt-chip').forEach(chip => {
+    // 在加号前插入自定义主题 chips
+    const box = document.getElementById('themeOpts');
+    const addBtn = document.getElementById('addThemeBtn');
+    box.querySelectorAll('.opt-chip.custom').forEach(c => c.remove());
+    customThemes.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'opt-chip custom';
+      el.dataset.id = t.id;
+      el.textContent = t.name;
+      el.onclick = selectChip;
+      box.insertBefore(el, addBtn);
+    });
+    box.querySelectorAll('.opt-chip').forEach(chip => {
       chip.classList.toggle('active', chip.dataset.id === theme);
     });
   }
 
-  document.querySelectorAll('.opt-chip').forEach(chip => {
-    chip.onclick = () => {
-      theme = chip.dataset.id;
-      document.querySelectorAll('.opt-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-    };
-  });
+  document.querySelectorAll('#themeOpts .opt-chip:not(#addThemeBtn)').forEach(chip => { chip.onclick = selectChip; });
+
+  function addTheme() {
+    const nameInput = document.getElementById('customThemeInput');
+    const topicsInput = document.getElementById('customTopicsInput');
+    const worldInput = document.getElementById('customWorldInput');
+    const hint = document.getElementById('customHint');
+    const name = nameInput.value.trim();
+    if (!name) { hint.textContent = '请先填写主题名称'; nameInput.focus(); return; }
+    const topics = topicsInput.value.split(/[,，]/).map(s => s.trim()).filter(Boolean).map(s => (s[0] === '#' ? s : '#' + s));
+    if (topics.length < 3) { hint.textContent = '请至少填写 3 个话题（逗号分隔）'; topicsInput.focus(); return; }
+    const world = worldInput.value.trim();
+    const cfg = loadConfig();
+    customThemes = Array.isArray(cfg.customThemes) ? cfg.customThemes : [];
+    if (customThemes.some(t => t.name === name)) { hint.textContent = '这个主题名称已存在'; nameInput.focus(); return; }
+    const t = { id: 'custom_' + Date.now().toString(36), name: name, topics: topics.slice(0, 6), world: world };
+    customThemes.push(t);
+    cfg.customThemes = customThemes;
+    cfg.theme = t.id;
+    saveConfig(cfg);
+    theme = t.id;
+    nameInput.value = ''; topicsInput.value = ''; worldInput.value = ''; hint.textContent = '';
+    document.getElementById('customThemeRow').style.display = 'none';
+    render();
+  }
+
+  document.getElementById('addThemeBtn').onclick = () => {
+    document.getElementById('customThemeRow').style.display = 'block';
+    document.getElementById('customHint').textContent = '';
+    document.getElementById('customThemeInput').focus();
+  };
+  document.getElementById('cancelThemeBtn').onclick = () => {
+    document.getElementById('customThemeRow').style.display = 'none';
+    document.getElementById('customHint').textContent = '';
+  };
+  document.getElementById('confirmThemeBtn').onclick = addTheme;
+  document.getElementById('customThemeInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTheme(); });
 
   function save() {
-    saveConfig({
-      name: document.getElementById('forumName').value.trim() || '我的论坛',
-      theme: theme,
-      world: document.getElementById('forumWorld').value.trim()
-    });
+    const cfg = loadConfig();
+    cfg.name = document.getElementById('forumName').value.trim() || '我的论坛';
+    cfg.theme = theme;
+    cfg.world = document.getElementById('forumWorld').value.trim();
+    cfg.customThemes = customThemes;
+    saveConfig(cfg);
     location.href = 'forum.html';
   }
 
