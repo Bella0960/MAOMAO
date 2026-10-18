@@ -433,7 +433,7 @@
         </button>
       </div>
       <div class="np-cover-wrap" style="position:relative;height:280px;padding:8px 30px 0;">
-        <div class="np-cover" id="npCover" style="cursor:pointer" title="点击更换封面" onclick="document.getElementById('coverUpload').click()">
+        <div class="np-cover" id="npCover" style="cursor:pointer" title="点击更换封面">
           <svg viewBox="0 0 300 300" width="100%" height="100%">
             <rect width="300" height="300" fill="#0d0d10"/>
             <circle cx="150" cy="155" r="22" fill="none" stroke="#e8e8e6" stroke-width="3"/>
@@ -465,6 +465,7 @@
           </div>
         </div>
       </div>
+      <div id="npBars" class="np-bars" style="padding:0 30px;margin-top:14px;"></div>
       <!-- 简洁进度条 -->
       <div style="padding:0 30px;margin:20px 0 10px;">
         <div style="height:3px;background:#E5E5EA;border-radius:2px;position:relative;cursor:pointer;" id="progressBar">
@@ -719,7 +720,7 @@
 
   // 播完自动切下一首
   window.audio.addEventListener('ended', () => {
-    if (isLoop) { window.audio.currentTime = 0; window.audio.play(); }
+    if (window.loopState === 2) { window.audio.currentTime = 0; window.audio.play(); }
     else nextTrack();
   });
 

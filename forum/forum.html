@@ -178,7 +178,7 @@ function refreshFeed(){
   seeds.forEach(s=>{if(!posts.some(p=>p.id===s.id))posts.push({...s})});
   save();render();
 }
-render();
+save();render();
 })();
 </script>
 </body>

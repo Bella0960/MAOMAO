@@ -1333,7 +1333,10 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
                 openCommentDrawer(id);
             }
         });
+        var toastEl = document.getElementById('momentsToast');
+        var toastTimer = null;
         function showToast(text) {
+            if (!toastEl) return;
             toastEl.textContent = text;
             toastEl.classList.add('show');
             if (toastTimer) clearTimeout(toastTimer);
@@ -1465,6 +1468,10 @@ a:active, button:active, [role="button"]:active { transform: scale(0.97); }</sty
             if (addBtn) addBtn.addEventListener('click', function (e) { e.stopPropagation(); });
             var aiBtn = document.getElementById('btnAiPost');
             if (aiBtn) aiBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var refreshBtn = document.getElementById('btnRefreshAll');
+            if (refreshBtn) refreshBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var roleSel = document.getElementById('roleSelect');
+            if (roleSel) roleSel.addEventListener('click', function (e) { e.stopPropagation(); });
 
             bindFileChange(coverInput, 'cover', 'cover');
             bindFileChange(avatarInput, 'avatar', 'avatar');

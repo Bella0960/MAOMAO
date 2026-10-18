@@ -194,7 +194,7 @@
     </div>
   </div>
 
-  <div id="postCover" style="display:none !important"></div>
+  <div id="postCover" style="display:none"></div>
   <div class="post-body">
     <div class="p-head">
       <div class="p-avatar" id="pAvatar"></div>
@@ -298,7 +298,10 @@
     const posts = loadPosts();
     post = posts.find(p => p.id === id);
     if (!post) { document.body.innerHTML = '<div style="padding:40px;text-align:center;">帖子不存在</div>'; return; }
+    const rawComments = post.comments;
     if (!Array.isArray(post.comments)) post.comments = [];
+    // 兼容旧数据结构：comments 为数字时保留其展示计数
+    post._seedCount = (typeof rawComments === 'number' && rawComments > 0) ? rawComments : 0;
     renderPost();
     renderComments();
     if (new URLSearchParams(location.search).get('focus') === 'comment') {
@@ -327,8 +330,9 @@
       (title ? '<div class="p-title">' + esc(title) + '</div>' : '') +
       (body ? '<p class="p-body">' + esc(body) + '</p>' : '');
     document.getElementById('likeCount').textContent = post.likes || 0;
-    document.getElementById('commentCount').textContent = post.comments.length;
-    const ct = document.querySelector('.c-title'); if (ct) ct.setAttribute('data-count', post.comments.length);
+    const shownCount = (post._seedCount || 0) + post.comments.length;
+    document.getElementById('commentCount').textContent = shownCount;
+    const ct = document.querySelector('.c-title'); if (ct) ct.setAttribute('data-count', shownCount);
     document.getElementById('likeBtn').classList.toggle('liked', !!post.liked);
   }
 

@@ -248,6 +248,10 @@
 
     NS.pushApiLog = function (entry) {
         var logs = NS.getApiLogs();
+        entry = entry || {};
+        // 统一补齐展示所需字段，避免写入方遗漏导致时间/耗时显示异常
+        if (entry.time == null) entry.time = Date.now();
+        if (entry.duration == null) entry.duration = 0;
         logs.unshift(entry);
         while (logs.length > 50) logs.pop();
         NS.rawSet('api_call_logs', logs);

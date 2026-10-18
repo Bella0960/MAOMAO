@@ -105,11 +105,12 @@
   const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
   const tab = new URLSearchParams(location.search).get('tab') || 'posts';
 
-  const META = {
+  const META_TABLE = {
     posts:    { no: '01', over: 'ARCHIVE / 01', en: 'MY NOTES', title: '发表的文章', empty: '先写下第一段话', emptySub: '一个念头、一件小事，都可以成为开始。' },
     fav:      { no: '02', over: 'ARCHIVE / 02', en: 'SAVED / RE-READ', title: '私人收藏', empty: '收藏还空着', emptySub: '遇到想再读的内容，点一下 ♥ 就会收进这里。' },
     comments: { no: '03', over: 'ARCHIVE / 03', en: 'COMMENTS & REPLIES', title: '留下的痕迹', empty: '还没有留下痕迹', emptySub: '去喜欢的帖子里说点什么吧。' }
-  }[tab] || META.posts;
+  };
+  const META = META_TABLE[tab] || META_TABLE.posts;
 
   document.getElementById('headOver').textContent = META.over;
   document.getElementById('headEn').textContent = META.en;

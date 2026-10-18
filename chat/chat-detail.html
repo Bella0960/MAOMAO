@@ -327,28 +327,6 @@
             transform: scale(0.92);
             background: #FFFFFF;
         }
-        /* 让TA回复按钮 */
-        .ask-reply-btn {
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.9);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            transition: transform 0.15s ease;
-            padding: 0;
-            margin-bottom: 5px;
-        }
-        .ask-reply-btn:active {
-            transform: scale(0.92);
-            background: #FFFFFF;
-        }
-
         /* ===== 消息多选模式 ===== */
         .chat-messages.selecting .msg-row { cursor: pointer; }
         .msg-select-check {
@@ -1332,7 +1310,7 @@
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                         <span class="plus-label">纪念日</span>
                     </button>
-                    <button class="plus-item" data-feat="narration" type="button" onclick="openNarrationModal()">
+                    <button class="plus-item" data-feat="narration" type="button">
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
                         <span class="plus-label">旁白动作</span>
                     </button>
@@ -3078,6 +3056,8 @@
                         // 模型只输出了标记：移除空白气泡、不落文本（来电卡/红包卡仍会插入）
                         const onlyRow = streamBubble.closest('.msg-row');
                         if (onlyRow) onlyRow.remove();
+                        // 恢复 header 名字（避免只输出标记时页头卡在“对方正在输入…”）
+                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                     }
                     if (parsedCall.wantCall) {
                         // AI 侧插入黑底「发起语音通话」卡并落库；是否拨号由 chat_auto_call 开关决定
@@ -3217,18 +3197,6 @@
             window.__regenMid = mid;
             if (typeof window.openRegen === 'function') window.openRegen(mid);
         };
-
-        // ================= 让TA回复（不发新消息，AI 主动说一句） =================
-        var askReplyBtn = document.getElementById('askReplyBtn');
-        if (askReplyBtn) {
-            askReplyBtn.addEventListener('click', function () {
-                // 输入框有内容时不做静默回复，走正常发送
-                var v = document.getElementById('chat-input');
-                if (v && v.value.trim()) { sendMsg(); return; }
-                if (typeof showToast === 'function') showToast('TA 正在输入...');
-                sendMsg({ isRegenerate: true });
-            });
-        }
 
         // ================= 消息多选（长按进入） =================
         var selectingMode = false;

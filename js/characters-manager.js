@@ -1,12 +1,22 @@
 const STORAGE_KEY = 'ai_custom_characters';
-const CURRENT_CONTACT_KEY = 'currentPhoneContactId';
+const CURRENT_CONTACT_KEY = 'phone_current_contact';
+const LEGACY_CONTACT_KEY = 'currentPhoneContactId';
 
 const DEFAULT_ROLES = [];
 
 // 获取当前选中的角色 ID
 function getCurrentPhoneContactId() {
     try {
-        return localStorage.getItem(CURRENT_CONTACT_KEY) || null;
+        var v = localStorage.getItem(CURRENT_CONTACT_KEY);
+        if (v) return v;
+        // 兼容旧键（一次性迁移到与 PhoneStorage 一致的键名）
+        var legacy = localStorage.getItem(LEGACY_CONTACT_KEY);
+        if (legacy) {
+            localStorage.setItem(CURRENT_CONTACT_KEY, legacy);
+            localStorage.removeItem(LEGACY_CONTACT_KEY);
+            return legacy;
+        }
+        return null;
     } catch (e) {
         return null;
     }
@@ -343,6 +353,7 @@ function handleDeleteRole(id) {
 
     if (getCurrentPhoneContactId() === id) {
         localStorage.removeItem(CURRENT_CONTACT_KEY);
+        localStorage.removeItem(LEGACY_CONTACT_KEY);
     }
 
     renderRoleList();

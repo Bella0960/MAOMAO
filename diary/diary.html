@@ -399,7 +399,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     if(card){openEditor(card.dataset.openEntry);return}
   });
   document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){currentView=b.dataset.view;render()})});
-  $('backHome').addEventListener('click',function(){location.href='index.html'});
+  $('backHome').addEventListener('click',function(){location.href='../index.html'});
   $('newEntryBtn').addEventListener('click',function(){openEditor()});
   $('searchToggle').addEventListener('click',function(){if(currentView!=='home'){currentView='home';render()}var inp=$('diarySearch');if(inp){inp.focus();inp.scrollIntoView({block:'nearest',behavior:'smooth'})}});
   $('moreBtn').addEventListener('click',openMenu);$('closeMenu').addEventListener('click',closeMenu);

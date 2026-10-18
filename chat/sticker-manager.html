@@ -303,16 +303,6 @@
     }
 
     /* 新建库 */
-    document.getElementById('addBtn').addEventListener('click', function () {
-        if (currentLibId) {
-            // 库内视图：addBtn = 上传表情
-            document.getElementById('stickerFileInput').click();
-            return;
-        }
-        document.getElementById('libOverlay').classList.add('is-show');
-        document.getElementById('libNameInput').value = '';
-        setTimeout(function(){ document.getElementById('libNameInput').focus(); }, 300);
-    });
     document.getElementById('libSaveBtn').addEventListener('click', function () {
         var name = document.getElementById('libNameInput').value.trim();
         if (!name) return;

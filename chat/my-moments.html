@@ -586,8 +586,9 @@
       return [];
     }
     function getLiked(m) {
-      if (typeof m.isLiked === 'boolean') return m.isLiked;
-      return !!m.liked;
+      // 以 moments.html 写入的 liked 为准确字段，isLiked 仅作兼容兜底
+      if (typeof m.liked === 'boolean') return m.liked;
+      return !!m.isLiked;
     }
 
     /* ===== 渲染我的动态 ===== */

@@ -466,8 +466,9 @@
           <div style="width:10px;height:10px;border-radius:50%;background:#111;"></div>
         </div>
       </div>`;
-    // 临时覆盖 shopCart 用于支付
-    shopCart = tmpCart;
+    // 使用临时订单支付，不覆盖真实购物车
+    payItems = tmpCart;
+    payFromCart = false;
     document.getElementById('detailView').classList.remove('show');
     document.getElementById('payView').style.display = 'block';
     window.scrollTo(0, 0);
@@ -491,6 +492,9 @@
   }
   function saveCart(c) { localStorage.setItem('shop_cart', JSON.stringify(c)); updateBadge(); }
   let shopCart = loadCart();
+  // 支付流程使用的商品快照（避免污染真实购物车）
+  let payItems = [];
+  let payFromCart = false;
 
   function updateBadge() {
     const b = document.getElementById('cartBadge');
@@ -625,6 +629,8 @@
 
   function checkout() {
     if (shopCart.length === 0) return;
+    payItems = shopCart.slice();
+    payFromCart = true;
     const total = shopCart.reduce((s,c) => s + c.price, 0);
     document.getElementById('payAmount').textContent = '¥' + total;
     document.getElementById('payTotal').textContent = '¥' + total;
@@ -652,7 +658,7 @@
     try {
       const list = JSON.parse(localStorage.getItem('finance_records') || '[]');
       const now = new Date();
-      shopCart.forEach(c => {
+      payItems.forEach(c => {
         list.push({ amount: c.price, type: 'expense', category: '购物',
           note: '商店 · ' + c.cn,
           time: (now.getMonth()+1) + '月' + now.getDate() + '日' });
@@ -660,22 +666,22 @@
       localStorage.setItem('finance_records', JSON.stringify(list));
     } catch(e) {}
     // 写入订单
-    const total = shopCart.reduce((s,c) => s + c.price, 0);
+    const total = payItems.reduce((s,c) => s + c.price, 0);
     const orders = loadOrders();
-    orders.push({ roleName: '我', roleBg: '#111', items: shopCart.map(c=>({cn:c.cn,price:c.price})), total, ts: Date.now() });
+    orders.push({ roleName: '我', roleBg: '#111', items: payItems.map(c=>({cn:c.cn,price:c.price})), total, ts: Date.now() });
     saveOrders(orders);
     // 弹小票
     document.getElementById('rOrder').textContent = String(Math.floor(Math.random()*9000)+1000);
     document.getElementById('rBody').innerHTML =
-      shopCart.map(c => `
+      payItems.map(c => `
         <div class="r-row"><span class="name">${c.cn}</span><span>¥${c.price}</span></div>
       `).join('') +
       `<div class="r-divider"></div>
-       <div class="r-row"><span>商品件数</span><span>${shopCart.length} 件</span></div>
+       <div class="r-row"><span>商品件数</span><span>${payItems.length} 件</span></div>
        <div class="r-row r-total"><span>合计</span><span>¥${total}.00</span></div>`;
     document.getElementById('rFoot').textContent =
       new Date().toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-') + ' · 谢谢惠顾';
-    document.getElementById('doneItems').innerHTML = shopCart.map(c =>
+    document.getElementById('doneItems').innerHTML = payItems.map(c =>
       `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.813rem;">
          <span>${c.cn}</span><span style="font-weight:600;">¥${c.price}</span>
        </div>`).join('');
@@ -685,7 +691,9 @@
 
   function closeReceipt() {
     document.getElementById('receiptBox').classList.remove('show');
-    shopCart = []; saveCart(shopCart);
+    // 仅购物车结算时清空真实购物车；“立即购买”不动购物车
+    if (payFromCart) { shopCart = []; saveCart(shopCart); }
+    payItems = [];
     document.getElementById('doneView').style.display = 'block';
     window.scrollTo(0, 0);
   }

@@ -1,613 +1,1332 @@
 <!doctype html>
-<html lang="zh-CN" class="nf-hide"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#F7F7F9">
-<title>角色足迹</title>
-<script src="../js/native-feel.js"></script><style>html {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-    overscroll-behavior-y: none;
-    -webkit-overflow-scrolling: touch;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    opacity: 1;
-}
-@keyframes nfPushIn { from { opacity: 0; transform: translateX(22px) scale(0.97); } to { opacity: 1; transform: none; } }
-@keyframes nfPopIn  { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
-@keyframes nfTabIn  { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
-html.nf-enter {
-    animation-duration: 0.28s;
-    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-    animation-fill-mode: backwards;
-    will-change: transform, opacity;
-}
-html.nf-enter-push { animation-name: nfPushIn; }
-html.nf-enter-pop  { animation-name: nfPopIn; }
-html.nf-enter-tab  { animation-name: nfTabIn; }
-html.nf-hide { opacity: 0; transform: scale(0.96); }
-@media (prefers-reduced-motion: reduce) {
-    html.nf-enter { animation: none !important; }
-    html { transition: none !important; }
-}
-* { -webkit-tap-highlight-color: transparent; }
-html, body { overscroll-behavior-y: none; }
-[class*="scroll"], .chat-stage { overscroll-behavior-y: none; }
-input, textarea, select, [contenteditable="true"] {
-    -webkit-user-select: text;
-    user-select: text;
-    -webkit-touch-callout: default;
-}
-a, button, [role="button"] { touch-action: manipulation; }
-a:active, button:active, [role="button"]:active { transform: scale(0.97); }</style>
-<link rel="stylesheet" href="../css/mobile-fit.css">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html { background: #E8E8EC; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
-    background: #F7F7F9;
-    color: #111;
-    min-height: 100vh;
-    max-width: 390px;
-    margin: 0 auto;
-    padding-bottom: 24px;
-    position: relative;
-  }
-
-  /* 顶部导航 */
-  .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px 8px;
-    padding-top: calc(16px + env(safe-area-inset-top));
-  }
-  .nav-left { display: flex; align-items: center; gap: 12px; }
-  .icon-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: #fff;
-    border: 1px solid #ECECEF;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-  .nav-title { font-size: 1.063rem; font-weight: 600; }
-
-  /* 日期头部 */
-  .header {
-    padding: 8px 20px 16px;
-  }
-  .header-date {
-    font-size: 0.813rem;
-    color: #999;
-    letter-spacing: 0.04em;
-    margin-bottom: 6px;
-  }
-  .header-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  /* 周历条 */
-  .week-strip {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px 18px;
-  }
-
-  /* 角色切换头像条 */
-  .role-strip {
-    display: flex;
-    gap: 14px;
-    padding: 0 20px 18px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .role-strip::-webkit-scrollbar { display: none; }
-  .role-avatar {
-    flex-shrink: 0;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.063rem;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    border: 2.5px solid transparent;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .role-avatar img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-  }
-  .role-avatar.active {
-    border-color: #111;
-    transform: scale(1.08);
-  }
-  .role-avatar .r-name {
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.625rem;
-    color: #999;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .role-avatar.active .r-name { opacity: 1; }
-  .role-name-label {
-    padding: 0 20px 14px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #111;
-  }
-  .role-name-label small {
-    color: #999;
-    font-weight: 400;
-    margin-left: 6px;
-  }
-  .day-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 4px;
-    border-radius: 16px;
-    min-width: 36px;
-  }
-  .day-cell .d-num {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #bbb;
-  }
-  .day-cell .d-week {
-    font-size: 0.625rem;
-    color: #bbb;
-    letter-spacing: 0.05em;
-  }
-  .day-cell.today {
-    background: #111;
-    border-radius: 18px;
-  }
-  .day-cell.today .d-num,
-  .day-cell.today .d-week { color: #fff; }
-  .day-cell.today .d-num { position: relative; }
-  .day-cell.today .d-num::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: #fff;
-  }
-
-  /* 时间线 */
-  .timeline {
-    position: relative;
-    padding: 0 20px;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 35px;
-    top: 12px;
-    bottom: 12px;
-    width: 1.5px;
-    background: #E0E0E5;
-  }
-  .tl-item {
-    position: relative;
-    padding-left: 48px;
-    margin-bottom: 16px;
-  }
-  .tl-dot {
-    position: absolute;
-    left: 28px;
-    top: 18px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    border: 2px solid #111;
-    z-index: 1;
-  }
-  .tl-card {
-    border-radius: 18px;
-    padding: 16px;
-  }
-  .tl-card.dark {
-    background: #111;
-    color: #fff;
-  }
-  .tl-card.light {
-    background: #fff;
-    border: 1px solid #ECECEF;
-  }
-  .tl-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .tl-time {
-    font-size: 0.75rem;
-    font-weight: 600;
-    white-space: nowrap;
-    opacity: 0.9;
-  }
-  .tl-card.light .tl-time { color: #999; }
-  .tl-title {
-    font-size: 0.938rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .tl-desc {
-    font-size: 0.781rem;
-    line-height: 1.5;
-    opacity: 0.7;
-  }
-  .tl-card.light .tl-desc { color: #888; }
-
-  /* 空状态 / 加载 */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-    font-size: 0.875rem;
-  }
-  .loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: #999;
-    font-size: 0.813rem;
-  }
-  .spin {
-    display: inline-block;
-    width: 20px; height: 20px;
-    border: 2px solid #E5E5EA;
-    border-top-color: #111;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* toast */
-  .toast {
-    position: fixed;
-    bottom: 40px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #111; color: #fff;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 0.813rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.25s ease;
-    z-index: 999;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-</style>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#F7F7F9" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="manifest.json" />
+    <title>手机模拟器</title>
+    <meta name="description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
+    <meta property="og:title" content="手机模拟器" />
+    <meta property="og:description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
+    <script src="js/font-loader.js"></script>
+    <script src="js/native-feel.js"></script>
+    <link rel="stylesheet" href="css/styles.css?v=20261017v1">
+  <link rel="stylesheet" href="css/mobile-fit.css?v=20261015v3">
 </head>
-<body>
+  <body>
+    <main class="simulator-stage">
+      <section class="phone" aria-label="手机模拟器">
+        <div class="phone-camera" aria-hidden="true"></div>
 
-  <div class="navbar">
-    <div class="nav-left">
-      <button class="icon-btn" onclick="window.location.href='../index.html'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"></path></svg>
-      </button>
-      <div class="nav-title">角色足迹</div>
+        <div class="phone-screen">
+          <header class="status-bar">
+            <time id="status-time">09:41</time>
+            <div class="edit-mode-indicator" id="editModeIndicator" style="display: none;">
+              <button class="edit-done-btn" id="editDoneBtn" type="button">✓ 完成</button>
+            </div>
+            <div class="status-icons" aria-label="设备状态">
+              <span class="signal-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <span class="wifi-icon" aria-hidden="true"></span>
+              <span class="battery-icon" aria-hidden="true"><b></b></span>
+            </div>
+          </header>
+
+          <section class="pages-container" id="homeScreen">
+            <!-- 第一页：主屏幕全部应用，进页面即展示完整手机应用网格（4×4共16个应用） -->
+            <div class="home-page" data-page="0">
+              <div class="desktop-grid" id="gridPage0">
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/worldbook.html" data-drag="app_worldbook" data-name="世界书" title="世界书">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  </span>
+                  <span class="app-name">世界书</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/memory.html" data-drag="app_memory" data-name="记忆" title="记忆">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/></svg>
+                  </span>
+                  <span class="app-name">记忆</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="profile/profile.html" data-drag="app_profile" data-name="档案" title="档案">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+                  </span>
+                  <span class="app-name">档案</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/moments.html" data-drag="app_moments" data-name="时刻" title="时刻">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </span>
+                  <span class="app-name">时刻</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="forum/forum.html" data-drag="app_forum" data-name="论坛" title="论坛">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </span>
+                  <span class="app-name">论坛</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="wallet/wallet.html" data-drag="app_wallet" data-name="钱包" title="钱包">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><circle cx="18" cy="14" r="1"/></svg>
+                  </span>
+                  <span class="app-name">钱包</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="music/music.html" data-drag="app_music" data-name="音乐" title="音乐">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  </span>
+                  <span class="app-name">音乐</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="beauty/beauty.html" data-drag="app_beauty" data-name="头像馆" title="头像馆">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                  </span>
+                  <span class="app-name">头像馆</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/characters.html" data-drag="app_characters" data-name="角色库" title="角色库">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </span>
+                  <span class="app-name">角色库</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="settings/settings.html" data-drag="app_settings" data-name="设置" title="设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </span>
+                  <span class="app-name">设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="wallet/finance.html" data-drag="app_finance" data-name="记账" title="记账">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </span>
+                  <span class="app-name">记账</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/footprint.html" data-drag="app_footprint" data-name="足迹" title="足迹">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </span>
+                  <span class="app-name">足迹</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/mask.html" data-drag="app_mask" data-name="面具" title="面具">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v2a8 8 0 0 1-8 8H10a8 8 0 0 1-8-8v-2z"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="16" y2="11"/><path d="M9 15c1 1 3 1 4 0"/></svg>
+                  </span>
+                  <span class="app-name">面具</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/sticker-manager.html" data-drag="app_stickers" data-name="贴纸" title="贴纸">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 15h8"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                  </span>
+                  <span class="app-name">贴纸</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/bubble-theme.html" data-drag="app_bubble" data-name="气泡" title="气泡">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
+                  </span>
+                  <span class="app-name">气泡</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="settings/font-settings.html" data-drag="app_font" data-name="字体" title="字体">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                  </span>
+                  <span class="app-name">字体</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- 第二页：更多应用与趣味互动小组件 -->
+            <div class="home-page" data-page="1">
+              <div class="desktop-grid" id="gridPage1">
+
+                <!-- 日记 App：黑白极简私人手账 -->
+                <button class="app-card app-tile" type="button" data-href="diary/diary.html" data-drag="app_diary" data-name="日记" title="日记">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Z"/><path d="M14.5 3.5V8H19M8 12h8M8 15.5h8"/></svg>
+                  </span>
+                  <span class="app-name">日记</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <!-- 触梦旅行：幻想目的地探索 -->
+                <button class="app-card app-tile" type="button" data-href="travel/dream-travel.html" data-drag="app_dreamtravel" data-name="触梦旅行" title="触梦旅行">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.2 5.4-5.4 2.2 2.2-5.4z"/></svg>
+                  </span>
+                  <span class="app-name">触梦旅行</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="settings/sound-settings.html" data-drag="app_sound" data-name="声音" title="声音">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  </span>
+                  <span class="app-name">声音</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/call-settings.html" data-drag="app_callsettings" data-name="通话设置" title="通话设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><circle cx="18" cy="6" r="3"/></svg>
+                  </span>
+                  <span class="app-name">通话设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="chat/chat-settings.html" data-drag="app_chatsettings" data-name="聊天设置" title="聊天设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
+                  </span>
+                  <span class="app-name">聊天设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="forum/forum-settings.html" data-drag="app_forumsettings" data-name="论坛设置" title="论坛设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                  </span>
+                  <span class="app-name">论坛设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="tools/api-logs.html" data-drag="app_apilogs" data-name="系统日志" title="系统日志">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                  </span>
+                  <span class="app-name">系统日志</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/regex-settings.html" data-drag="app_regex" data-name="正则设置" title="正则设置">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  </span>
+                  <span class="app-name">正则设置</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="worldbook/rp-protocol.html" data-drag="app_rp" data-name="伴侣协议" title="伴侣协议">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="app-name">伴侣协议</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <button class="app-card app-tile" type="button" data-href="wallet/shop-admin.html" data-drag="app_shopadmin" data-name="店铺管理" title="店铺管理">
+                  <span class="app-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  </span>
+                  <span class="app-name">店铺管理</span>
+                  <span class="ds-del" title="移除">×</span>
+                </button>
+
+                <!-- ========== 明信片组件（4×2）：3层设计 ========== -->
+                <div class="ds-postcard ds-widget" data-drag="postcard">
+                  <div class="pc-bg-top" id="pcBgTop"></div>
+                  <div class="pc-bg-bottom"></div>
+                  <div class="pc-body">
+                    <div class="pc-avatar" id="pcAvatar"></div>
+                    <div class="pc-name" id="pcName">关于我</div>
+                    <div class="pc-sign" id="pcSign">保持微笑 每一刻都值得被记录</div>
+                  </div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
+                <!-- ========== 拍立得相框（2×2）：倾斜双层 ========== -->
+                <div class="po-wrapper ds-widget" data-drag="polaroid">
+                  <div class="po-card po-back2"></div>
+                  <div class="po-card po-back1"></div>
+                  <div class="po-card po-front">
+                    <div class="po-img" id="poImg">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#C0C0C5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="m21 15-5-5L5 21"/>
+                      </svg>
+                    </div>
+                    <span class="po-text">CLICK · UPLOAD</span>
+                  </div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
+                <!-- ========== 小对话组件（2×2） ========== -->
+                <div class="ds-dialog ds-widget" data-drag="dialog">
+                  <div class="dl-row them">
+                    <div class="dl-avatar" id="dlAvatarThem"></div>
+                    <div class="dl-bubble" id="dlBubbleThem">在吗～</div>
+                  </div>
+                  <div class="dl-row me">
+                    <div class="dl-bubble" id="dlBubbleMe">刚到，找我？</div>
+                    <div class="dl-avatar" id="dlAvatarMe"></div>
+                  </div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
+                <!-- ========== 音乐箱组件（2×2） ========== -->
+                <div class="ds-music ds-widget" data-drag="music">
+                  <div class="ms-title">♫ 正在播放</div>
+                  <div class="ms-song" id="msSong">未命名歌曲</div>
+                  <div class="ms-artist" id="msArtist">点击编辑</div>
+                  <div class="ms-play-row">
+                    <button class="ms-btn" id="msPlayBtn" type="button">
+                      <svg viewBox="0 0 24 24" id="msPlayIcon"><path d="M6 4l14 8-14 8z"/></svg>
+                    </button>
+                    <div class="ms-track">
+                      <div class="ms-bar"><div class="ms-bar-fill" id="msFill"></div></div>
+                      <div class="ms-times">
+                        <span id="msCur">0:00</span>
+                        <span id="msDur">3:30</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- 页面指示器 -->
+            <div class="page-dots" aria-label="页面指示器">
+              <span class="dot active" data-page="0"></span>
+              <span class="dot" data-page="1"></span>
+            </div>
+          </section>
+
+          <!-- 底部 Dock 栏：可自由拖入拖出自定义应用 -->
+          <footer class="dock-wrapper">
+            <div class="dock-bar" id="dockBar" aria-label="快捷应用栏">
+
+              <button class="dock-item app-tile" type="button" data-href="chat/call.html" data-drag="app_call" data-name="通话" title="通话">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <span class="app-name">通话</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+              <button class="dock-item app-tile" type="button" data-href="chat/chat.html" data-drag="app_chat" data-name="聊天" title="聊天">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span class="app-name">聊天</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+              <button class="dock-item app-tile" type="button" data-href="chat/contacts.html" data-drag="app_contacts" data-name="通讯录" title="通讯录">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="app-name">通讯录</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+              <button class="dock-item app-tile" type="button" data-href="wallet/shop.html" data-drag="app_shop" data-name="商店" title="商店">
+                <span class="app-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+                </span>
+                <span class="app-name">商店</span>
+                <span class="ds-del" title="移除">×</span>
+              </button>
+
+            </div>
+            <div class="gesture-bar" aria-hidden="true"></div>
+          </footer>
+        </div>
+      </section>
+      <p class="stage-caption">MOBILE OS <span>•</span> UI CONCEPT</p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- 挂件编辑弹窗 -->
+    <div class="modal-backdrop" id="widgetModal" style="display: none;">
+      <div class="modal-box">
+        <h3 class="modal-title" id="widgetModalTitle">修改挂件文字</h3>
+        <input type="text" id="widgetModalInput" class="modal-input" maxlength="20" placeholder="请输入挂件文字" />
+        <div class="modal-actions">
+          <button type="button" class="modal-btn btn-cancel" id="widgetModalCancel">取消</button>
+          <button type="button" class="modal-btn btn-confirm" id="widgetModalSave">保存</button>
+        </div>
+      </div>
     </div>
-    <button class="icon-btn" onclick="refreshDay()" title="补充生成">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
-    </button>
-  </div>
 
-  <div class="header">
-    <div class="header-date" id="dateStr">10月18日 · SUN</div>
-    <div class="header-title">今日足迹</div>
-  </div>
+    <script src="js/script.js"></script>
+  <script src="js/statusbar-control.js"></script>
+  <script>
+    // ===== 手机桌面拖拽引擎：实时自动让位 + 跨页流转 + Dock 自由布局 =====
+    (function () {
+      var LS_KEY = 'ds_layout_v4';
 
-  <div class="week-strip" id="weekStrip"><div class="day-cell ">
-        <div class="d-num">12</div>
-        <div class="d-week">MON</div>
-      </div><div class="day-cell ">
-        <div class="d-num">13</div>
-        <div class="d-week">TUE</div>
-      </div><div class="day-cell ">
-        <div class="d-num">14</div>
-        <div class="d-week">WED</div>
-      </div><div class="day-cell ">
-        <div class="d-num">15</div>
-        <div class="d-week">THU</div>
-      </div><div class="day-cell ">
-        <div class="d-num">16</div>
-        <div class="d-week">FRI</div>
-      </div><div class="day-cell ">
-        <div class="d-num">17</div>
-        <div class="d-week">SAT</div>
-      </div><div class="day-cell today">
-        <div class="d-num">18</div>
-        <div class="d-week">SUN</div>
-      </div></div>
+      var editing = false;
+      var isDragging = false;
+      var dragEl = null;
+      var dragClone = null;
+      var placeholder = null;
 
-  <div class="role-strip" id="roleStrip"><div class="role-avatar active" style="background:#FF6B81" onclick="switchRole('role_1')">
-        宝
-        <span class="r-name">宝宝</span>
-      </div><div class="role-avatar " style="background:#3B9EFF" onclick="switchRole('role_2')">
-        苏
-        <span class="r-name">苏格拉底</span>
-      </div><div class="role-avatar " style="background:#10B981" onclick="switchRole('role_3')">
-        灵
-        <span class="r-name">灵感助手</span>
-      </div></div>
-  <div class="role-name-label" id="roleNameLabel">宝宝<small>今天的行程</small></div>
+      var activePageIndex = 0;
+      var edgeTimer = null;
+      var edgeCooldown = false;
+      var lastEdgeSide = null;
 
-  <div class="timeline" id="timeline"><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card dark">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">起床</div>
-              <div class="tl-desc">闹钟响了两次才爬起来，伸了个懒腰，拉开窗帘看了看天。</div>
-            </div>
-            <div class="tl-time">07:30</div>
-          </div>
-        </div></div><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card light">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">早餐</div>
-              <div class="tl-desc">烤了片面包，冲了杯咖啡，边吃边刷了会儿手机。</div>
-            </div>
-            <div class="tl-time">08:00</div>
-          </div>
-        </div></div><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card light">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">出门上班</div>
-              <div class="tl-desc">挤上地铁，戴耳机听了一路歌，到站前提前挤到门口。</div>
-            </div>
-            <div class="tl-time">09:30</div>
-          </div>
-        </div></div><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card dark">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">午饭</div>
-              <div class="tl-desc">跟同事一起去楼下吃了碗面，聊了聊周末的安排。</div>
-            </div>
-            <div class="tl-time">12:00</div>
-          </div>
-        </div></div><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card light">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">开会</div>
-              <div class="tl-desc">周会汇报进度，被问了几个问题，有点紧张但答上来了。</div>
-            </div>
-            <div class="tl-time">14:30</div>
-          </div>
-        </div></div><div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-card light">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">下班</div>
-              <div class="tl-desc">打卡下班，在楼下便利店买了瓶水，慢悠悠走回家。</div>
-            </div>
-            <div class="tl-time">18:30</div>
-          </div>
-        </div></div></div>
+      var pressTimer = null;
+      var startX = 0, startY = 0;
+      var hasMoved = false;
 
-  <div class="toast" id="toast"></div>
+      var homeScreen = document.getElementById('homeScreen');
+      var dockBar = document.getElementById('dockBar');
+      var editModeIndicator = document.getElementById('editModeIndicator');
+      var editDoneBtn = document.getElementById('editDoneBtn');
 
-<script>
-  // ===== 角色数据 =====
-  let ROLES = [];
-  let currentRoleId = null;
-
-  function loadRoles() {
-    try {
-      const raw = localStorage.getItem('ai_custom_characters');
-      if (raw) {
-        ROLES = JSON.parse(raw).filter(r => r && r.id);
-        return;
+      // 震动反馈兼容
+      function vibrate(ms) {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(ms); } catch (e) {}
+        }
       }
-    } catch(e) {}
-    // fallback 默认角色
-    ROLES = [
-      { id: 'role_1', name: '宝宝', avatarBg: '#FF6B81', avatar: '' },
-      { id: 'role_2', name: '苏格拉底', avatarBg: '#3B9EFF', avatar: '' },
-      { id: 'role_3', name: '灵感助手', avatarBg: '#10B981', avatar: '' },
-    ];
-  }
 
-  // ===== 工具：今天日期 key =====
-  function todayKey(roleId) {
-    const d = new Date();
-    return 'footprint_' + roleId + '_' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-  }
+      // ===== 布局数据加载与默认全应用首页 =====
+      var LS_KEY = 'ds_layout_v5';
 
-  // ===== 默认一天行程模板（按角色人设变体） =====
-  const DEFAULT_DAY = [
-    { time: '07:30', title: '起床', desc: '闹钟响了两次才爬起来，伸了个懒腰，拉开窗帘看了看天。', dark: true },
-    { time: '08:00', title: '早餐', desc: '烤了片面包，冲了杯咖啡，边吃边刷了会儿手机。', dark: false },
-    { time: '09:30', title: '出门上班', desc: '挤上地铁，戴耳机听了一路歌，到站前提前挤到门口。', dark: false },
-    { time: '12:00', title: '午饭', desc: '跟同事一起去楼下吃了碗面，聊了聊周末的安排。', dark: true },
-    { time: '14:30', title: '开会', desc: '周会汇报进度，被问了几个问题，有点紧张但答上来了。', dark: false },
-    { time: '18:30', title: '下班', desc: '打卡下班，在楼下便利店买了瓶水，慢悠悠走回家。', dark: false },
-  ];
-
-  const EXTRA_POOL = [
-    { time: '07:45', title: '洗漱', desc: '刷牙洗脸，对着镜子发了会儿呆，然后开始挑今天穿什么。' },
-    { time: '08:20', title: '通勤路上', desc: '地铁上看了半集播客，旁边大爷在听京剧，声音开得挺大。' },
-    { time: '10:30', title: '摸鱼', desc: '躲在工位角落刷了五分钟短视频，听到脚步声赶紧切回表格。' },
-    { time: '15:00', title: '下午茶', desc: '点了杯奶茶，三分糖去冰，拿到手拍了张照发朋友圈。' },
-    { time: '16:00', title: '接了个电话', desc: '家里来的电话，聊了十分钟，被催了两句找对象的事。' },
-    { time: '19:00', title: '晚饭', desc: '一个人煮了碗泡面，加了个蛋和一根肠，觉得今天也算丰盛。' },
-    { time: '20:30', title: '追剧', desc: '窝在沙发上看了两集剧，剧情有点老套但还是想看下去。' },
-    { time: '22:00', title: '洗澡', desc: '热水冲了十分钟，把一天的疲惫都冲掉了，出来觉得很放松。' },
-    { time: '23:30', title: '睡觉', desc: '躺床上翻了半小时手机，定好明天闹钟，关灯睡了。' },
-    { time: '13:30', title: '午休', desc: '趴在工位上眯了二十分钟，被空调吹得有点冷，醒了拉了拉外套。' },
-    { time: '11:00', title: '买咖啡', desc: '下楼买了杯美式，顺便在门口站了会儿，晒了晒太阳。' },
-    { time: '21:00', title: '运动', desc: '跟着视频做了二十分钟拉伸，做完浑身酸痛，但感觉很舒服。' },
-  ];
-
-  // ===== 渲染日期 =====
-  function renderDate() {
-    const d = new Date();
-    const weeks = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    document.getElementById('dateStr').textContent =
-      (d.getMonth()+1) + '月' + d.getDate() + '日 · ' + weeks[d.getDay()];
-  }
-
-  // ===== 渲染周历条 =====
-  function renderWeek() {
-    const strip = document.getElementById('weekStrip');
-    const now = new Date();
-    const day = now.getDay() === 0 ? 7 : now.getDay();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - day + 1);
-    const weekNames = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-    let html = '';
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const isToday = d.toDateString() === now.toDateString();
-      html += `<div class="day-cell ${isToday ? 'today' : ''}">
-        <div class="d-num">${d.getDate()}</div>
-        <div class="d-week">${weekNames[i]}</div>
-      </div>`;
-    }
-    strip.innerHTML = html;
-  }
-
-  // ===== 渲染角色头像条 =====
-  function renderRoles() {
-    const strip = document.getElementById('roleStrip');
-    let html = '';
-    ROLES.forEach(r => {
-      const isActive = r.id === currentRoleId;
-      const inner = r.avatar
-        ? `<img src="${r.avatar}" alt="">`
-        : (r.name || '?').charAt(0);
-      const bg = r.avatarBg || '#888';
-      html += `<div class="role-avatar ${isActive ? 'active' : ''}" 
-        style="background:${bg}" onclick="switchRole('${r.id}')">
-        ${inner}
-        <span class="r-name">${r.name}</span>
-      </div>`;
-    });
-    strip.innerHTML = html;
-
-    const cur = ROLES.find(r => r.id === currentRoleId);
-    document.getElementById('roleNameLabel').innerHTML =
-      (cur ? cur.name : '') + '<small>今天的行程</small>';
-  }
-
-  function switchRole(roleId) {
-    currentRoleId = roleId;
-    localStorage.setItem('footprint_current_role', roleId);
-    renderRoles();
-    loadDayAndRender();
-  }
-
-  // ===== 读/写当天数据（按角色） =====
-  function loadDay() {
-    try {
-      const raw = localStorage.getItem(todayKey(currentRoleId));
-      if (raw) return JSON.parse(raw);
-    } catch(e) {}
-    return null;
-  }
-  function saveDay(data) {
-    localStorage.setItem(todayKey(currentRoleId), JSON.stringify(data));
-  }
-
-  // ===== 渲染时间线 =====
-  function renderTimeline(items) {
-    const box = document.getElementById('timeline');
-    box.innerHTML = '';
-    items.sort((a,b) => a.time.localeCompare(b.time)).forEach(it => {
-      const el = document.createElement('div');
-      el.className = 'tl-item';
-      el.innerHTML = `
-        <div class="tl-dot"></div>
-        <div class="tl-card ${it.dark ? 'dark' : 'light'}">
-          <div class="tl-row">
-            <div>
-              <div class="tl-title">${it.title}</div>
-              <div class="tl-desc">${it.desc}</div>
-            </div>
-            <div class="tl-time">${it.time}</div>
-          </div>
-        </div>`;
-      box.appendChild(el);
-    });
-  }
-
-  function loadDayAndRender() {
-    let data = loadDay();
-    if (!data) {
-      data = { items: DEFAULT_DAY.slice(), generatedAt: Date.now() };
-      saveDay(data);
-    }
-    renderTimeline(data.items);
-  }
-
-  // ===== 初始化 =====
-  function init() {
-    loadRoles();
-    currentRoleId = localStorage.getItem('footprint_current_role') || (ROLES[0] && ROLES[0].id);
-    renderDate();
-    renderWeek();
-    renderRoles();
-    loadDayAndRender();
-  }
-
-  // ===== 右上角刷新 =====
-  function refreshDay() {
-    const box = document.getElementById('timeline');
-    box.innerHTML = '<div class="loading"><span class="spin"></span>正在生成…</div>';
-
-    setTimeout(() => {
-      const data = loadDay() || { items: [], generatedAt: Date.now() };
-      const existingTimes = data.items.map(i => i.time);
-      const pool = EXTRA_POOL.filter(p => !existingTimes.includes(p.time));
-      for (let i = 0; i < 2 && pool.length > 0; i++) {
-        const idx = Math.floor(Math.random() * pool.length);
-        const pick = pool.splice(idx, 1)[0];
-        data.items.push({ ...pick, dark: Math.random() < 0.3 });
+      function getDefaultLayout() {
+        return {
+          pages: [
+            [
+              'app_worldbook', 'app_memory', 'app_profile', 'app_moments',
+              'app_forum', 'app_wallet', 'app_music', 'app_beauty',
+              'app_characters', 'app_settings', 'app_finance', 'app_footprint',
+              'app_mask', 'app_stickers', 'app_bubble', 'app_font'
+            ],
+            [
+              'app_diary', 'app_dreamtravel', 'app_sound', 'app_callsettings', 'app_chatsettings', 'app_forumsettings',
+              'app_apilogs', 'app_regex', 'app_rp', 'app_shopadmin',
+              'postcard', 'polaroid', 'dialog', 'music'
+            ]
+          ],
+          dock: ['app_call', 'app_chat', 'app_contacts', 'app_shop']
+        };
       }
-      saveDay(data);
-      renderTimeline(data.items);
-      showToast('已补充 ' + data.items.length + ' 条足迹');
-    }, 600);
-  }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
-  }
+      function loadLayout() {
+        try {
+          var v = JSON.parse(localStorage.getItem(LS_KEY));
+          if (v && Array.isArray(v.pages) && v.pages.length > 0 && Array.isArray(v.pages[0]) && v.pages[0].length >= 4 && Array.isArray(v.dock)) {
+            return v;
+          }
+        } catch (e) {}
+        return getDefaultLayout();
+      }
 
-  init();
-</script>
+      function saveLayout(data) {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(data));
+        } catch (e) {}
+      }
 
+      var currentLayout = loadLayout();
 
-</body></html>
+      // ===== 恢复布局到 DOM =====
+      function restoreLayout() {
+        if (!homeScreen || !dockBar) return;
+
+        // 确保桌面页数与配置匹配
+        var pages = Array.from(homeScreen.querySelectorAll('.home-page'));
+        var requiredPages = Math.max(2, currentLayout.pages.length);
+
+        while (pages.length < requiredPages) {
+          var newPageIndex = pages.length;
+          var newPage = document.createElement('div');
+          newPage.className = 'home-page';
+          newPage.dataset.page = String(newPageIndex);
+          newPage.innerHTML = '<div class="desktop-grid" id="gridPage' + newPageIndex + '"></div>';
+          homeScreen.appendChild(newPage);
+          pages.push(newPage);
+        }
+
+        // 把现有所有 data-drag 元素建立索引
+        var itemMap = {};
+        document.querySelectorAll('[data-drag]').forEach(function (el) {
+          var id = el.dataset.drag;
+          if (id) itemMap[id] = el;
+        });
+
+        // 1. 恢复 Dock
+        if (Array.isArray(currentLayout.dock)) {
+          currentLayout.dock.forEach(function (id) {
+            var el = itemMap[id];
+            if (el) {
+              setElementAsDock(el);
+              dockBar.appendChild(el);
+              delete itemMap[id];
+            }
+          });
+        }
+
+        // 2. 恢复桌面各页
+        pages = Array.from(homeScreen.querySelectorAll('.home-page'));
+        if (Array.isArray(currentLayout.pages)) {
+          currentLayout.pages.forEach(function (pageIds, pi) {
+            var page = pages[pi];
+            if (!page) return;
+            var grid = page.querySelector('.desktop-grid');
+            if (!grid) return;
+            if (Array.isArray(pageIds)) {
+              pageIds.forEach(function (id) {
+                var el = itemMap[id];
+                if (el) {
+                  setElementAsDesktop(el);
+                  grid.appendChild(el);
+                  delete itemMap[id];
+                }
+              });
+            }
+          });
+        }
+
+        // 3. 如果还有未放置的应用，自动补到第二页或第一页末尾
+        var remainingIds = Object.keys(itemMap);
+        if (remainingIds.length > 0) {
+          var fallbackPage = pages[1] || pages[0];
+          var fallbackGrid = fallbackPage ? fallbackPage.querySelector('.desktop-grid') : null;
+          if (fallbackGrid) {
+            remainingIds.forEach(function (id) {
+              var el = itemMap[id];
+              setElementAsDesktop(el);
+              fallbackGrid.appendChild(el);
+            });
+          }
+        }
+
+        updateDotsUI();
+      }
+
+      // 样式归一化转换
+      function setElementAsDock(el) {
+        if (!el) return;
+        el.classList.remove('app-card');
+        el.classList.add('dock-item', 'app-tile');
+      }
+
+      function setElementAsDesktop(el) {
+        if (!el) return;
+        el.classList.remove('dock-item');
+        if (!el.classList.contains('ds-widget')) {
+          el.classList.add('app-card', 'app-tile');
+        }
+      }
+
+      // ===== 当前可见页与指示点 =====
+      function getPages() {
+        return Array.from(homeScreen.querySelectorAll('.home-page'));
+      }
+
+      function getCurrentPageFromScroll() {
+        if (!homeScreen) return 0;
+        var pw = homeScreen.clientWidth || 360;
+        return Math.max(0, Math.round(homeScreen.scrollLeft / pw));
+      }
+
+      function updateDotsUI() {
+        var dotsContainer = document.querySelector('.page-dots');
+        if (!dotsContainer) return;
+        var pages = getPages();
+        dotsContainer.innerHTML = '';
+        pages.forEach(function (_, i) {
+          var dot = document.createElement('span');
+          dot.className = 'dot' + (i === activePageIndex ? ' active' : '');
+          dot.dataset.page = String(i);
+          dot.addEventListener('click', function () {
+            goToPage(i);
+          });
+          dotsContainer.appendChild(dot);
+        });
+      }
+
+      function goToPage(index) {
+        var pages = getPages();
+        if (index < 0 || index >= pages.length) return;
+        activePageIndex = index;
+        var pw = homeScreen.clientWidth || 360;
+        homeScreen.scrollTo({ left: index * pw, behavior: 'smooth' });
+        var dots = document.querySelectorAll('.page-dots .dot');
+        dots.forEach(function (d, i) {
+          d.classList.toggle('active', i === index);
+        });
+      }
+
+      // 动态新建页面（最多 4 页）
+      function createPageIfNeeded() {
+        var pages = getPages();
+        if (pages.length >= 4) return null;
+        var newIdx = pages.length;
+        var newPage = document.createElement('div');
+        newPage.className = 'home-page';
+        newPage.dataset.page = String(newIdx);
+        newPage.innerHTML = '<div class="desktop-grid" id="gridPage' + newIdx + '"></div>';
+        homeScreen.appendChild(newPage);
+        updateDotsUI();
+        return newPage;
+      }
+
+      // 清理末尾空页
+      function cleanupEmptyTrailingPages() {
+        var pages = getPages();
+        if (pages.length <= 2) return;
+        for (var i = pages.length - 1; i >= 2; i--) {
+          var p = pages[i];
+          var items = p.querySelectorAll('[data-drag]');
+          if (items.length === 0) {
+            p.remove();
+          } else {
+            break;
+          }
+        }
+        updateDotsUI();
+      }
+
+      // ===== 进入与退出编辑模式 =====
+      function enterEdit() {
+        if (editing) return;
+        editing = true;
+        document.body.classList.add('home-editing');
+        if (editModeIndicator) editModeIndicator.style.display = 'flex';
+        vibrate(25);
+      }
+
+      function exitEdit() {
+        if (!editing) return;
+        editing = false;
+        document.body.classList.remove('home-editing');
+        if (editModeIndicator) editModeIndicator.style.display = 'none';
+
+        if (isDragging) endDrag();
+        cleanupEmptyTrailingPages();
+        persistCurrentDOM();
+      }
+
+      if (editDoneBtn) {
+        editDoneBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          exitEdit();
+        });
+      }
+
+      // ===== 保存当前 DOM 顺序 =====
+      function persistCurrentDOM() {
+        var pages = getPages();
+        var pagesOrder = [];
+        pages.forEach(function (p) {
+          var ids = [];
+          p.querySelectorAll('.desktop-grid > [data-drag]').forEach(function (el) {
+            if (el.dataset.drag) ids.push(el.dataset.drag);
+          });
+          pagesOrder.push(ids);
+        });
+
+        var dockOrder = [];
+        dockBar.querySelectorAll('#dockBar > [data-drag]').forEach(function (el) {
+          if (el.dataset.drag) dockOrder.push(el.dataset.drag);
+        });
+
+        currentLayout = { pages: pagesOrder, dock: dockOrder };
+        saveLayout(currentLayout);
+      }
+
+      // ===== 拖拽系统核心实现 =====
+      function startDrag(targetItem, cx, cy) {
+        if (!targetItem) return;
+        if (!editing) enterEdit();
+
+        isDragging = true;
+        dragEl = targetItem;
+
+        var isWidget = dragEl.classList.contains('ds-widget');
+        var dragId = dragEl.dataset.drag;
+
+        // 创建占位符（保持尺寸，确保 CSS 网格其他元素自然推移让位）
+        placeholder = document.createElement('div');
+        placeholder.className = 'drag-placeholder';
+
+        if (isWidget) {
+          if (dragId === 'postcard') {
+            placeholder.classList.add('span-4');
+          } else {
+            placeholder.classList.add('span-2');
+          }
+        }
+
+        // 把占位符插入源位置
+        if (dragEl.parentNode) {
+          dragEl.parentNode.insertBefore(placeholder, dragEl);
+        }
+
+        // 隐藏原元素
+        dragEl.classList.add('is-dragging-source');
+
+        // 创建浮动镜像并跟随手势
+        dragClone = dragEl.cloneNode(true);
+        dragClone.classList.add('drag-avatar');
+        dragClone.classList.remove('is-dragging-source');
+        var delIcon = dragClone.querySelector('.ds-del');
+        if (delIcon) delIcon.remove();
+
+        dragClone.style.left = cx + 'px';
+        dragClone.style.top = cy + 'px';
+        document.body.appendChild(dragClone);
+
+        vibrate(18);
+      }
+
+      function moveDrag(cx, cy) {
+        if (!isDragging || !dragClone || !placeholder) return;
+
+        // 1. 跟随手指
+        dragClone.style.left = cx + 'px';
+        dragClone.style.top = cy + 'px';
+
+        // 2. 跨页边缘触发检测（拖拽至左右边缘停留时滑向上一页/下一页）
+        var cRect = homeScreen.getBoundingClientRect();
+        var edgeThreshold = 42;
+        var pages = getPages();
+
+        if (cx < cRect.left + edgeThreshold) {
+          // 左边缘
+          if (activePageIndex > 0 && !edgeCooldown) {
+            if (lastEdgeSide !== 'left') {
+              lastEdgeSide = 'left';
+              clearTimeout(edgeTimer);
+              edgeTimer = setTimeout(function () {
+                if (!isDragging) return;
+                var targetIdx = activePageIndex - 1;
+                goToPage(targetIdx);
+                // 把占位符带到新页
+                var newGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                if (newGrid && placeholder.parentNode !== newGrid) {
+                  newGrid.appendChild(placeholder);
+                }
+                vibrate(15);
+                edgeCooldown = true;
+                setTimeout(function () { edgeCooldown = false; }, 480);
+              }, 320);
+            }
+          }
+        } else if (cx > cRect.right - edgeThreshold) {
+          // 右边缘
+          if (!edgeCooldown) {
+            if (lastEdgeSide !== 'right') {
+              lastEdgeSide = 'right';
+              clearTimeout(edgeTimer);
+              edgeTimer = setTimeout(function () {
+                if (!isDragging) return;
+                var targetIdx = activePageIndex + 1;
+                if (targetIdx < pages.length) {
+                  goToPage(targetIdx);
+                  var newGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                  if (newGrid && placeholder.parentNode !== newGrid) {
+                    newGrid.appendChild(placeholder);
+                  }
+                  vibrate(15);
+                } else if (pages.length < 4) {
+                  // 在末尾拉出新页
+                  createPageIfNeeded();
+                  pages = getPages();
+                  targetIdx = pages.length - 1;
+                  goToPage(targetIdx);
+                  var freshGrid = pages[targetIdx] ? pages[targetIdx].querySelector('.desktop-grid') : null;
+                  if (freshGrid && placeholder.parentNode !== freshGrid) {
+                    freshGrid.appendChild(placeholder);
+                  }
+                  vibrate(15);
+                }
+                edgeCooldown = true;
+                setTimeout(function () { edgeCooldown = false; }, 480);
+              }, 320);
+            }
+          }
+        } else {
+          // 离开了边缘区
+          lastEdgeSide = null;
+          if (edgeTimer) {
+            clearTimeout(edgeTimer);
+            edgeTimer = null;
+          }
+        }
+
+        // 3. 实时碰撞检测与自动让位
+        var dockRect = dockBar.getBoundingClientRect();
+        var isOverDock = (
+          cy >= dockRect.top - 16 &&
+          cy <= dockRect.bottom + 20 &&
+          cx >= dockRect.left - 10 &&
+          cx <= dockRect.right + 10
+        );
+
+        var isWidget = dragEl.classList.contains('ds-widget');
+
+        if (isOverDock) {
+          // 悬停在底部 Dock 栏上方
+          if (isWidget) {
+            // 组件不可放置到底部 Dock 栏，提示或保持在当前桌面
+            return;
+          }
+
+          var dockItems = Array.from(dockBar.children).filter(function (child) {
+            return child !== placeholder && child !== dragEl;
+          });
+
+          // 限制 Dock 最多容纳 5 个应用
+          if (dockItems.length >= 5 && placeholder.parentNode !== dockBar) {
+            return;
+          }
+
+          // 寻找插入位置（水平排列让位）
+          var targetDockSibling = null;
+          for (var i = 0; i < dockItems.length; i++) {
+            var itemRect = dockItems[i].getBoundingClientRect();
+            var midX = itemRect.left + itemRect.width / 2;
+            if (cx < midX) {
+              targetDockSibling = dockItems[i];
+              break;
+            }
+          }
+
+          if (placeholder.parentNode !== dockBar || placeholder.nextSibling !== targetDockSibling) {
+            dockBar.insertBefore(placeholder, targetDockSibling);
+          }
+
+        } else {
+          // 悬停在桌面网格区
+          pages = getPages();
+          var curPage = pages[activePageIndex] || pages[0];
+          if (!curPage) return;
+          var curGrid = curPage.querySelector('.desktop-grid');
+          if (!curGrid) return;
+
+          var gridItems = Array.from(curGrid.children).filter(function (child) {
+            return child !== placeholder && child !== dragEl;
+          });
+
+          if (gridItems.length === 0) {
+            if (placeholder.parentNode !== curGrid) {
+              curGrid.appendChild(placeholder);
+            }
+            return;
+          }
+
+          // 寻找最佳插入网格槽位并进行动态插队让位
+          var hitSibling = null;
+          var closestSibling = null;
+          var minDistance = Infinity;
+
+          for (var j = 0; j < gridItems.length; j++) {
+            var el = gridItems[j];
+            var r = el.getBoundingClientRect();
+            var itemCenterX = r.left + r.width / 2;
+            var itemCenterY = r.top + r.height / 2;
+
+            // 1. 直接命中当前元素边界：即刻确定在其前或在其后
+            if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
+              hitSibling = (cx < itemCenterX) ? el : el.nextSibling;
+              break;
+            }
+
+            // 2. 距离中心最近的元素容差判定
+            var dist = Math.hypot(cx - itemCenterX, cy - itemCenterY);
+            if (dist < minDistance) {
+              minDistance = dist;
+              if (cy < itemCenterY - 14 || (Math.abs(cy - itemCenterY) <= 32 && cx < itemCenterX)) {
+                closestSibling = el;
+              } else {
+                closestSibling = el.nextSibling;
+              }
+            }
+          }
+
+          var targetSibling = hitSibling || closestSibling;
+          if (placeholder.parentNode !== curGrid || placeholder.nextSibling !== targetSibling) {
+            curGrid.insertBefore(placeholder, targetSibling);
+          }
+        }
+      }
+
+      function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (edgeTimer) {
+          clearTimeout(edgeTimer);
+          edgeTimer = null;
+        }
+
+        if (dragEl && placeholder && placeholder.parentNode) {
+          var targetParent = placeholder.parentNode;
+
+          // 替换占位符
+          targetParent.insertBefore(dragEl, placeholder);
+          placeholder.remove();
+          placeholder = null;
+
+          // 恢复显示
+          dragEl.classList.remove('is-dragging-source');
+          dragEl.style.display = '';
+
+          // 根据归属地应用对应样式
+          if (targetParent.id === 'dockBar') {
+            setElementAsDock(dragEl);
+          } else {
+            setElementAsDesktop(dragEl);
+          }
+
+          vibrate(22);
+        }
+
+        if (dragClone) {
+          dragClone.remove();
+          dragClone = null;
+        }
+
+        dragEl = null;
+
+        // 清理空页与持久化
+        cleanupEmptyTrailingPages();
+        persistCurrentDOM();
+      }
+
+      // ===== 事件监听：触摸手势与鼠标 =====
+      // 1. Touch Events
+      document.addEventListener('touchstart', function (e) {
+        var t = e.target.closest('[data-drag]');
+        if (!t) return;
+        if (e.target.classList.contains('ds-del')) return;
+
+        var touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        hasMoved = false;
+
+        if (editing) {
+          // 编辑模式下点按直接准备拖拽
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 40);
+        } else {
+          // 常态下长按 280ms 触发编辑模式与拖拽
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 280);
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!e.touches || !e.touches[0]) return;
+        var touch = e.touches[0];
+        var cx = touch.clientX, cy = touch.clientY;
+
+        if (pressTimer) {
+          if (Math.hypot(cx - startX, cy - startY) > 9) {
+            // 手指滑动位移大于阈值，判定为普通页面滑动，取消长按
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        }
+
+        if (isDragging) {
+          if (e.cancelable) e.preventDefault();
+          moveDrag(cx, cy);
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      document.addEventListener('touchcancel', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      // 2. Mouse Events
+      document.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        var t = e.target.closest('[data-drag]');
+        if (!t) return;
+        if (e.target.classList.contains('ds-del')) return;
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        if (editing) {
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 30);
+        } else {
+          pressTimer = setTimeout(function () {
+            pressTimer = null;
+            startDrag(t, startX, startY);
+          }, 260);
+        }
+      });
+
+      document.addEventListener('mousemove', function (e) {
+        if (pressTimer) {
+          if (Math.hypot(e.clientX - startX, e.clientY - startY) > 8) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        }
+        if (isDragging) {
+          e.preventDefault();
+          moveDrag(e.clientX, e.clientY);
+        }
+      });
+
+      document.addEventListener('mouseup', function () {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        if (isDragging) {
+          endDrag();
+        }
+      });
+
+      // 3. 点击事件处理：删除组件/退出编辑
+      document.addEventListener('click', function (e) {
+        if (!editing) return;
+
+        // 点击红叉删除组件或应用
+        if (e.target.classList.contains('ds-del')) {
+          e.stopPropagation();
+          e.preventDefault();
+          var item = e.target.closest('[data-drag]');
+          if (item) {
+            item.remove();
+            cleanupEmptyTrailingPages();
+            persistCurrentDOM();
+          }
+          return;
+        }
+
+        // 点击空白区域退出编辑模式
+        if (
+          !e.target.closest('[data-drag]') &&
+          !e.target.closest('.dot') &&
+          !e.target.closest('#editModeIndicator')
+        ) {
+          exitEdit();
+        }
+      }, true);
+
+      // 4. 监听桌面横向滑动同步 dot
+      if (homeScreen) {
+        homeScreen.addEventListener('scroll', function () {
+          var cur = getCurrentPageFromScroll();
+          if (cur !== activePageIndex) {
+            activePageIndex = cur;
+            var dots = document.querySelectorAll('.page-dots .dot');
+            dots.forEach(function (d, i) {
+              d.classList.toggle('active', i === cur);
+            });
+          }
+        }, { passive: true });
+      }
+
+      // 初始化桌面恢复
+      restoreLayout();
+    })();
+
+    // ===== 四个桌面组件交互 =====
+    (function () {
+      var POSTCARD_KEY = 'ds_postcard_v1';
+      var POLAROID_KEY = 'ds_polaroid_v1';
+      var DIALOG_KEY = 'ds_dialog_v1';
+      var MUSIC_KEY = 'ds_music_v1';
+
+      function load(k) { try { return JSON.parse(localStorage.getItem(k)) || null; } catch(e) { return null; } }
+      function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+
+      // --- 明信片 ---
+      (function () {
+        var data = load(POSTCARD_KEY) || {
+          bgTop: '', avatar: '', name: '关于我', sign: '保持微笑 每一刻都值得被记录'
+        };
+        var bgEl = document.getElementById('pcBgTop');
+        var avEl = document.getElementById('pcAvatar');
+        var nameEl = document.getElementById('pcName');
+        var signEl = document.getElementById('pcSign');
+        if (bgEl && data.bgTop) bgEl.style.backgroundImage = 'url(' + data.bgTop + ')';
+        if (avEl && data.avatar) avEl.style.backgroundImage = 'url(' + data.avatar + ')';
+        if (nameEl) nameEl.textContent = data.name;
+        if (signEl) signEl.textContent = data.sign;
+
+        // 点击头像区 → 上传头像
+        if (avEl) avEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (document.body.classList.contains('home-editing')) return;
+          var fi = document.createElement('input');
+          fi.type = 'file'; fi.accept = 'image/*';
+          fi.onchange = function () {
+            if (!fi.files[0]) return;
+            var r = new FileReader();
+            r.onload = function () {
+              avEl.style.backgroundImage = 'url(' + r.result + ')';
+              data.avatar = r.result; save(POSTCARD_KEY, data);
+            };
+            r.readAsDataURL(fi.files[0]);
+          };
+          fi.click();
+        });
+
+        // 点击上半部分 → 上传背景
+        if (bgEl) bgEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (document.body.classList.contains('home-editing')) return;
+          var fi = document.createElement('input');
+          fi.type = 'file'; fi.accept = 'image/*';
+          fi.onchange = function () {
+            if (!fi.files[0]) return;
+            var r = new FileReader();
+            r.onload = function () {
+              bgEl.style.backgroundImage = 'url(' + r.result + ')';
+              data.bgTop = r.result; save(POSTCARD_KEY, data);
+            };
+            r.readAsDataURL(fi.files[0]);
+          };
+          fi.click();
+        });
+
+        // 点击名字/签名 → 编辑
+        function makeEditable(el, key, hint) {
+          if (!el) return;
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (document.body.classList.contains('home-editing')) return;
+            if (el.isContentEditable) return;
+            el.contentEditable = 'true';
+            el.focus();
+            document.execCommand('selectAll', false, null);
+          });
+          el.addEventListener('blur', function () {
+            el.contentEditable = 'false';
+            data[key] = el.textContent.trim() || hint;
+            el.textContent = data[key];
+            save(POSTCARD_KEY, data);
+          });
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+          });
+        }
+        makeEditable(nameEl, 'name', '关于我');
+        makeEditable(signEl, 'sign', '保持微笑 每一刻都值得被记录');
+      })();
+
+      // --- 拍立得 ---
+      (function () {
+        var data = load(POLAROID_KEY) || { img: '' };
+        var imgEl = document.getElementById('poImg');
+        if (imgEl && data.img) {
+          imgEl.innerHTML = '';
+          imgEl.style.backgroundImage = 'url(' + data.img + ')';
+        }
+        if (imgEl) imgEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (document.body.classList.contains('home-editing')) return;
+          var fi = document.createElement('input');
+          fi.type = 'file'; fi.accept = 'image/*';
+          fi.onchange = function () {
+            if (!fi.files[0]) return;
+            var r = new FileReader();
+            r.onload = function () {
+              imgEl.innerHTML = '';
+              imgEl.style.backgroundImage = 'url(' + r.result + ')';
+              data.img = r.result; save(POLAROID_KEY, data);
+            };
+            r.readAsDataURL(fi.files[0]);
+          };
+          fi.click();
+        });
+      })();
+
+      // --- 小对话 ---
+      (function () {
+        var data = load(DIALOG_KEY) || {
+          themAvatar: '', meAvatar: '',
+          themText: '在吗～', meText: '刚到，找我？'
+        };
+        var tAv = document.getElementById('dlAvatarThem');
+        var mAv = document.getElementById('dlAvatarMe');
+        var tBub = document.getElementById('dlBubbleThem');
+        var mBub = document.getElementById('dlBubbleMe');
+        if (tAv && data.themAvatar) tAv.style.backgroundImage = 'url(' + data.themAvatar + ')';
+        if (mAv && data.meAvatar) mAv.style.backgroundImage = 'url(' + data.meAvatar + ')';
+        if (tBub) tBub.textContent = data.themText;
+        if (mBub) mBub.textContent = data.meText;
+
+        function editAvatar(el, key) {
+          if (!el) return;
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (document.body.classList.contains('home-editing')) return;
+            var fi = document.createElement('input');
+            fi.type = 'file'; fi.accept = 'image/*';
+            fi.onchange = function () {
+              if (!fi.files[0]) return;
+              var r = new FileReader();
+              r.onload = function () {
+                el.style.backgroundImage = 'url(' + r.result + ')';
+                data[key] = r.result; save(DIALOG_KEY, data);
+              };
+              r.readAsDataURL(fi.files[0]);
+            };
+            fi.click();
+          });
+        }
+        editAvatar(tAv, 'themAvatar');
+        editAvatar(mAv, 'meAvatar');
+
+        function editBubble(el, key) {
+          if (!el) return;
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (document.body.classList.contains('home-editing')) return;
+            if (el.isContentEditable) return;
+            el.contentEditable = 'true';
+            el.focus();
+            document.execCommand('selectAll', false, null);
+          });
+          el.addEventListener('blur', function () {
+            el.contentEditable = 'false';
+            data[key] = el.textContent.trim(); save(DIALOG_KEY, data);
+          });
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+          });
+        }
+        editBubble(tBub, 'themText');
+        editBubble(mBub, 'meText');
+      })();
+
+      // --- 音乐箱 ---
+      (function () {
+        var data = load(MUSIC_KEY) || { song: '未命名歌曲', artist: '点击编辑', duration: 210 };
+        var songEl = document.getElementById('msSong');
+        var artistEl = document.getElementById('msArtist');
+        var playBtn = document.getElementById('msPlayBtn');
+        var playIcon = document.getElementById('msPlayIcon');
+        var fillEl = document.getElementById('msFill');
+        var curEl = document.getElementById('msCur');
+        var durEl = document.getElementById('msDur');
+
+        if (songEl) songEl.textContent = data.song;
+        if (artistEl) artistEl.textContent = data.artist;
+        if (durEl) durEl.textContent = formatTime(data.duration);
+
+        var playing = false, progress = 0, tickTimer = null;
+
+        function formatTime(s) {
+          s = Math.max(0, Math.floor(s));
+          var m = Math.floor(s/60), ss = s % 60;
+          return m + ':' + (ss < 10 ? '0' : '') + ss;
+        }
+        function setPlaying(p) {
+          playing = p;
+          if (playing) {
+            playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+            tickTimer = setInterval(function () {
+              progress += 1;
+              if (progress >= data.duration) progress = 0;
+              fillEl.style.width = (progress / data.duration * 100) + '%';
+              curEl.textContent = formatTime(progress);
+            }, 1000);
+          } else {
+            playIcon.innerHTML = '<path d="M6 4l14 8-14 8z"/>';
+            if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+          }
+        }
+        if (playBtn) playBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (document.body.classList.contains('home-editing')) return;
+          setPlaying(!playing);
+        });
+
+        function makeEditable(el, key, hint) {
+          if (!el) return;
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (document.body.classList.contains('home-editing')) return;
+            if (el.isContentEditable) return;
+            el.contentEditable = 'true';
+            el.focus();
+            document.execCommand('selectAll', false, null);
+          });
+          el.addEventListener('blur', function () {
+            el.contentEditable = 'false';
+            data[key] = el.textContent.trim() || hint;
+            el.textContent = data[key]; save(MUSIC_KEY, data);
+          });
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+          });
+        }
+        makeEditable(songEl, 'song', '未命名歌曲');
+        makeEditable(artistEl, 'artist', '点击编辑');
+      })();
+    })();
+  </script>
+    <script>
+      // 注册 Service Worker（PWA 装桌面）
+      if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      }
+    </script>
+</body>
+</html>
