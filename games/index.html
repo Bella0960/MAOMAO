@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f2">
+<title>游戏 · MAOMAO</title>
+<script src="../js/native-feel.js"></script>
+<script src="../js/phone/phone_storage.js"></script>
+<script src="../js/phone/phone_api.js"></script>
+<link rel="stylesheet" href="../css/mobile-fit.css">
+<style>
+:root{--paper:#f5f5f2;--white:#fff;--ink:#171717;--muted:#858580;--line:#deded9;--soft:#ecece7;--black:#20201e;--serif:Georgia,"Songti SC","Noto Serif CJK SC",serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--paper);min-height:100%;overscroll-behavior-y:none}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);max-width:460px;min-height:100vh;margin-inline:auto;position:relative;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #555;outline-offset:3px}
+.shell{padding:calc(16px + env(safe-area-inset-top)) 21px 115px}
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:29px}
+.back{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:transparent;display:grid;place-items:center;color:var(--ink)}
+.back svg{width:17px;height:17px}
+.wordmark{font-size:10px;letter-spacing:.2em;color:#73736d;font-weight:650}
+.header-kicker{display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.kicker-dot{width:5px;height:5px;background:var(--ink);border-radius:50%}
+.hero-title{font-family:var(--serif);font-weight:500;font-size:clamp(39px,10vw,54px);line-height:1.02;letter-spacing:-.065em;margin:0;max-width:330px}
+.hero-copy{font-size:13px;line-height:1.85;color:#797973;max-width:285px;margin:15px 0 24px}
+.hero-meta{display:flex;gap:18px;padding:15px 0 17px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:26px}
+.meta-item{display:flex;flex-direction:column;gap:4px;min-width:0}
+.meta-number{font-family:var(--serif);font-size:21px;line-height:1}
+.meta-label{font-size:10px;color:var(--muted);letter-spacing:.04em}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 13px}
+.section-eyebrow{font-size:10px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px}
+.section-title{font-size:17px;letter-spacing:-.04em;font-weight:650}
+.micro-note{font-size:10px;color:#92928c}
+.role-area{margin-bottom:28px}
+.role-rail{display:flex;gap:9px;overflow-x:auto;padding:2px 1px 5px;scrollbar-width:none}
+.role-rail::-webkit-scrollbar{display:none}
+.role-chip{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 13px 6px 6px;color:#77776f;max-width:190px;transition:background .2s,border-color .2s,color .2s}
+.role-chip.active{background:var(--white);border-color:#222;color:var(--ink)}
+.role-avatar{width:31px;height:31px;flex:0 0 31px;border-radius:50%;background:#ddd;display:grid;place-items:center;overflow:hidden;font-size:12px;color:#fff;font-weight:600}
+.role-avatar img{width:100%;height:100%;object-fit:cover}
+.role-chip-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:115px}
+.role-chip-mark{font-size:10px;margin-left:2px;color:#aaa}
+.games-list{border-top:1px solid var(--line)}
+.game-row{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid var(--line)}
+.game-symbol{width:52px;height:57px;background:#e9e9e4;display:grid;place-items:center;position:relative;overflow:hidden}
+.game-symbol svg{width:27px;height:27px;stroke:#292926;fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.game-index{position:absolute;left:5px;top:4px;font-size:8px;color:#8a8a83;letter-spacing:.06em}
+.game-tag{font-size:9px;letter-spacing:.13em;color:#92928c;text-transform:uppercase;margin-bottom:5px}
+.game-name{font-size:15px;font-weight:650;letter-spacing:-.035em;margin-bottom:5px}
+.game-desc{font-size:11px;line-height:1.65;color:#777770;max-width:230px}
+.game-record{font-size:10px;color:#8a8a83;margin-top:7px}
+.play-arrow{width:32px;height:32px;border-radius:50%;border:1px solid #d8d8d2;background:transparent;display:grid;place-items:center;color:#333;transition:all .18s}
+.play-arrow:active{background:#222;color:white;transform:scale(.95)}
+.play-arrow svg{width:15px;height:15px}
+.bottom-note{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:9px;letter-spacing:.1em;color:#96968f}
+.bottom-note strong{font-weight:500;color:#50504c}
+#gameView{display:none}
+.game-top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.back-text{border:0;padding:8px 0;background:transparent;color:#77776f;display:flex;align-items:center;gap:7px;font-size:12px}
+.back-text svg{width:16px;height:16px}
+.game-code{margin-left:auto;color:#999990;font-size:10px;letter-spacing:.16em}
+.game-heading{margin-bottom:17px}
+.game-heading h2{font-family:var(--serif);font-weight:500;font-size:34px;letter-spacing:-.06em;line-height:1.07;margin:0 0 8px}
+.game-heading p{font-size:12px;color:#787871;line-height:1.7;margin:0;max-width:320px}
+.partner-line{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:19px}
+.partner-line .role-avatar{width:34px;height:34px;flex-basis:34px}
+.partner-copy{flex:1;min-width:0}
+.partner-name{font-size:12px;font-weight:650}
+.partner-caption{font-size:10px;color:#8b8b84;margin-top:3px}
+.round-label{font-size:9px;letter-spacing:.1em;color:#8e8e87;border:1px solid var(--line);border-radius:999px;padding:6px 9px}
+.board-panel{background:#fff;border:1px solid #e8e8e2;padding:17px;margin:0 0 14px}
+.panel-kicker{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#92928c;margin-bottom:10px}
+.prompt-title{font-family:var(--serif);font-size:24px;line-height:1.25;letter-spacing:-.035em;margin-bottom:8px}
+.prompt-copy{font-size:12px;line-height:1.8;color:#777770}
+.clue-box{background:#f3f3ef;border-left:2px solid #252522;padding:12px 13px;margin:14px 0 16px;font-size:13px;line-height:1.8}
+.field-label{font-size:10px;display:block;color:#888880;margin-bottom:8px;letter-spacing:.06em}
+.input-row{display:flex;gap:8px}
+.text-input{min-width:0;flex:1;height:43px;border:1px solid #dcdcd5;background:#fafaf8;border-radius:2px;padding:0 12px;font-size:13px;color:var(--ink)}
+.primary-btn{min-height:42px;padding:0 16px;border:1px solid var(--ink);background:var(--ink);color:white;font-size:12px;white-space:nowrap;transition:opacity .15s,transform .15s}
+.primary-btn:active{transform:scale(.98);opacity:.85}
+.secondary-btn{min-height:39px;padding:0 14px;border:1px solid #d8d8d2;background:transparent;color:#44443e;font-size:11px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.feedback{font-size:12px;line-height:1.75;color:#65655f;min-height:21px;margin-top:12px}
+.feedback strong{font-weight:650;color:#222}
+.hint-progress{display:flex;gap:5px;margin:12px 0 15px}
+.hint-dot{height:3px;flex:1;background:#e6e6e0}
+.hint-dot.seen{background:#242421}
+.divider-label{display:flex;align-items:center;gap:9px;font-size:10px;color:#94948d;margin:17px 0 12px}
+.divider-label:after{content:"";height:1px;background:var(--line);flex:1}
+.clue-list{display:grid;gap:8px}
+.evidence{width:100%;text-align:left;background:#fff;border:1px solid #e0e0da;padding:12px;display:grid;grid-template-columns:26px 1fr 15px;gap:9px;align-items:start;color:#272723}
+.evidence-num{font-family:var(--serif);font-size:16px;color:#8a8a83}
+.evidence-text{font-size:12px;line-height:1.7}
+.evidence-mark{font-size:12px;color:#8e8e87;padding-top:3px}
+.evidence.revealed{background:#efefea;border-color:#cfcfc7}
+.evidence.revealed .evidence-mark{color:#292925}
+.suspect-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.suspect{min-height:68px;border:1px solid #dcdcd5;background:transparent;padding:11px 8px;text-align:left}
+.suspect-name{font-size:12px;font-weight:650}
+.suspect-role{font-size:10px;color:#8e8e87;margin-top:6px;line-height:1.3}
+.suspect:active{background:#e9e9e3}
+.suspect:disabled{opacity:.5;cursor:default}
+.suspect.correct{border-color:#1e1e1b;background:#222;color:white}
+.suspect.correct .suspect-role{color:#d2d2ca}
+.tic-controls{display:flex;align-items:center;gap:8px;margin-bottom:13px}
+.difficulty{height:31px;display:flex;background:#e9e9e4;padding:3px;gap:2px}
+.diff-btn{padding:0 10px;border:0;background:transparent;color:#77776f;font-size:10px}
+.diff-btn.active{background:#fff;color:#181816;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tic-board{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:300px;margin:0 auto}
+.tic-cell{aspect-ratio:1;border:1px solid #dfdfd8;background:#f8f8f5;font-family:var(--serif);font-size:47px;color:#222;display:grid;place-items:center;min-width:0}
+.tic-cell:disabled{cursor:default}
+.tic-cell.x{color:#222}
+.tic-cell.o{color:#8e8e86}
+.tic-cell.winning{background:#e8e8e1;border-color:#999990}
+.board-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid #ebebe6;font-size:10px;color:#83837d}
+.role-quote{font-size:12px;line-height:1.8;color:#4f4f49;border-left:2px solid #2b2b27;padding:9px 12px;background:#f0f0eb;margin-top:13px}
+.toast{position:fixed;left:50%;bottom:85px;transform:translate(-50%,8px);background:#222;color:#fff;border-radius:999px;padding:9px 14px;font-size:11px;opacity:0;pointer-events:none;transition:.22s;z-index:999;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty-state{padding:20px;border:1px dashed #d4d4cd;font-size:12px;line-height:1.8;color:#777770}
+@media(min-width:600px){body{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #e4e4de}.shell{padding-left:27px;padding-right:27px}.toast{bottom:35px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topline">
+    <button class="back" id="backHome" aria-label="返回首页">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="wordmark">MAOMAO / PLAYROOM</div>
+    <div style="width:36px"></div>
+  </div>
+
+  <main id="lobbyView">
+    <div class="header-kicker"><span class="kicker-dot"></span> THE LITTLE GAME ROOM</div>
+    <h1 class="hero-title">一起玩点<br>什么？</h1>
+    <p class="hero-copy">不只是和角色聊天。挑一款游戏，让 TA 和你一起推理、猜词，或者认真赢下一局。</p>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-number" id="totalRounds">00</span><span class="meta-label">累计对局</span></div>
+      <div class="meta-item"><span class="meta-number" id="totalWins">00</span><span class="meta-label">获得胜利</span></div>
+      <div class="meta-item"><span class="meta-number">03</span><span class="meta-label">首发游戏</span></div>
+    </div>
+
+    <section class="role-area">
+      <div class="section-head">
+        <div><div class="section-eyebrow">YOUR PARTNER</div><div class="section-title">今天和谁玩？</div></div>
+        <div class="micro-note">角色独立记录</div>
+      </div>
+      <div class="role-rail" id="roleRail" aria-label="选择游戏搭档"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div><div class="section-eyebrow">PICK A GAME</div><div class="section-title">选择一场小冒险</div></div>
+        <div class="micro-note">01 — 03</div>
+      </div>
+      <div class="games-list">
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">01</span><svg viewBox="0 0 24 24"><path d="M8 4h8l2 4 3 1-1 7-3-2H7l-3 2-1-7 3-1z"/><path d="M8 9v4M6 11h4M15.5 10.5h.01M18 12.5h.01"/></svg></div>
+          <div><div class="game-tag">WORD / WARM-UP</div><div class="game-name">默契猜词</div><div class="game-desc">TA 给出线索，你来猜答案。猜错也没关系，提示会越来越明显。</div><div class="game-record" id="wordRecord">适合三分钟热身</div></div>
+          <button class="play-arrow" data-game="word" aria-label="开始默契猜词"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">02</span><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10.5h5M10.5 8v5"/><path d="M17 3h4v4"/></svg></div>
+          <div><div class="game-tag">MYSTERY / CO-OP</div><div class="game-name">双人侦探社</div><div class="game-desc">检查证据、盘问嫌疑人，和 TA 一起还原案件真相。</div><div class="game-record" id="caseRecord">每一案都有答案</div></div>
+          <button class="play-arrow" data-game="detective" aria-label="开始双人侦探社"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
+        <article class="game-row">
+          <div class="game-symbol"><span class="game-index">03</span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM9.33 4v16M14.67 4v16M4 9.33h16M4 14.67h16"/><path d="m6 6 4 4m0-4-4 4M15 15l3 3m0-3-3 3"/></svg></div>
+          <div><div class="game-tag">STRATEGY / VS</div><div class="game-name">棋盘挑战赛</div><div class="game-desc">来一局井字棋。难度由你选，输赢都可以马上再来。</div><div class="game-record" id="ticRecord">简单 / 普通 / 困难</div></div>
+          <button class="play-arrow" data-game="tic" aria-label="开始棋盘挑战赛"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </article>
+      </div>
+    </section>
+    <div class="bottom-note"><span>BUILT FOR TWO</span><strong>PLAY NICE. THINK SHARP.</strong></div>
+  </main>
+
+  <section id="gameView" aria-live="polite">
+    <div class="game-top">
+      <button class="back-text" id="backLobby"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>游戏大厅</button>
+      <div class="game-code" id="gameCode">GAME 01</div>
+    </div>
+    <div class="game-heading"><h2 id="gameTitle">默契猜词</h2><p id="gameSubtitle"></p></div>
+    <div class="partner-line"><div class="role-avatar" id="partnerAvatar"></div><div class="partner-copy"><div class="partner-name" id="partnerName"></div><div class="partner-caption">正在和你一起玩</div></div><div class="round-label" id="roundLabel">ROUND 01</div></div>
+    <div id="gameContent"></div>
+    <div class="role-quote" id="roleQuote">准备好了吗？</div>
+    <div class="btn-row" style="margin-top:16px"><button class="secondary-btn" id="restartGame">再玩一局</button><button class="secondary-btn" id="toLobbyFromGame">换一款游戏</button></div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+'use strict';
+var byId=function(id){return document.getElementById(id);};
+var esc=function(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
+var roleList=[];
+var activeRole=null;
+var activeGame='';
+var roundNumber=1;
+var gameState={};
+var defaultRole={id:'default-partner',name:'默认搭档',avatarBg:'#777777',avatar:'',description:'一位随时可以陪你玩游戏的搭档。',personality:'自然、聪明、偶尔开玩笑。'};
+function loadRoles(){
+  var list=[];
+  try{
+    if(window.PhoneStorage&&typeof window.PhoneStorage.getCharacters==='function') list=window.PhoneStorage.getCharacters()||[];
+    if(!Array.isArray(list)||!list.length){var raw=localStorage.getItem('ai_custom_characters');list=raw?JSON.parse(raw):[];}
+  }catch(e){list=[];}
+  roleList=(Array.isArray(list)?list:[]).filter(function(r){return r&&r.id;});
+  if(!roleList.length) roleList=[defaultRole];
+  var wanted=localStorage.getItem('maomao_game_role');
+  activeRole=roleList.find(function(r){return String(r.id)===String(wanted);})||roleList[0];
+  localStorage.setItem('maomao_game_role',String(activeRole.id));
+}
+function roleName(r){return r&&(r.name||r.nickname||r.charName)||'游戏搭档';}
+function roleAvatarSource(r){return r&&(r.avatar||r.avatarUrl||r.avatarData||r.image||r.icon)||'';}
+function roleColor(r){return r&&(r.avatarBg||r.color||r.themeColor)||'#777777';}
+function avatarMarkup(r,extraClass){
+  var src=roleAvatarSource(r);
+  return '<span class="role-avatar '+(extraClass||'')+'" style="background:'+esc(roleColor(r))+'">'+(src?'<img src="'+esc(src)+'" alt="">':esc(roleName(r).slice(0,1) || '伴'))+'</span>';
+}
+function renderRoles(){
+  var html='';
+  roleList.forEach(function(r){
+    var isActive=String(r.id)===String(activeRole.id);
+    html+='<button class="role-chip '+(isActive?'active':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(isActive?'true':'false')+'">'+avatarMarkup(r,'')+'<span class="role-chip-name">'+esc(roleName(r))+'</span><span class="role-chip-mark">'+(isActive?'✓':'＋')+'</span></button>';
+  });
+  byId('roleRail').innerHTML=html;
+  byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
+  var st=statsFor(activeRole);
+  byId('totalRounds').textContent=pad(st.plays||0);
+  byId('totalWins').textContent=pad(st.wins||0);
+  byId('wordRecord').textContent='已猜中 '+(st.wordWins||0)+' 题';
+  byId('caseRecord').textContent='已侦破 '+(st.caseWins||0)+' 案';
+  byId('ticRecord').textContent='胜 '+(st.ticWins||0)+' · 负 '+(st.ticLosses||0);
+}
+function pad(n){return String(n||0).padStart(2,'0');}
+function selectRole(id){
+  var next=roleList.find(function(r){return String(r.id)===String(id);});
+  if(!next)return;
+  activeRole=next;localStorage.setItem('maomao_game_role',String(next.id));
+  renderRoles();showToast('已切换搭档：'+roleName(activeRole));
+  if(activeGame) renderPartner();
+}
+function renderPartner(){
+  var r=activeRole||defaultRole; var src=roleAvatarSource(r);
+  byId('partnerAvatar').style.background=roleColor(r);
+  byId('partnerAvatar').innerHTML=src?'<img src="'+esc(src)+'" alt="">':esc(roleName(r).slice(0,1)||'伴');
+  byId('partnerName').textContent=roleName(r);
+}
+function statsRoot(){
+  try{return JSON.parse(localStorage.getItem('maomao_game_stats_v1')||'{}')||{};}catch(e){return {};}
+}
+function statsFor(r){
+  var all=statsRoot();var key=String(r&&r.id||'default-partner');
+  if(!all[key]) all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0};
+  return all[key];
+}
+function saveStat(type,result){
+  var all=statsRoot();var key=String(activeRole&&activeRole.id||'default-partner');
+  if(!all[key])all[key]={plays:0,wins:0,wordWins:0,caseWins:0,ticWins:0,ticLosses:0,ticDraws:0};
+  var s=all[key];s.plays=(s.plays||0)+1;
+  if(result==='win')s.wins=(s.wins||0)+1;
+  if(type==='word'&&result==='win')s.wordWins=(s.wordWins||0)+1;
+  if(type==='detective'&&result==='win')s.caseWins=(s.caseWins||0)+1;
+  if(type==='tic'&&result==='win')s.ticWins=(s.ticWins||0)+1;
+  if(type==='tic'&&result==='loss')s.ticLosses=(s.ticLosses||0)+1;
+  if(type==='tic'&&result==='draw')s.ticDraws=(s.ticDraws||0)+1;
+  all[key]=s;localStorage.setItem('maomao_game_stats_v1',JSON.stringify(all));renderRoles();
+}
+function showToast(text){
+  var el=byId('toast');el.textContent=text;el.classList.add('show');
+  clearTimeout(showToast.timer);showToast.timer=setTimeout(function(){el.classList.remove('show');},1900);
+}
+function characterTraits(){
+  var r=activeRole||defaultRole;
+  return [
+    '角色名称：'+roleName(r),
+    '角色简介：'+(r.description||r.bio||r.background||'未提供'),
+    '性格设定：'+(r.personality||r.character||r.profile||r.persona||'根据角色原有风格自然表达'),
+    '说话习惯：'+(r.speechStyle||r.speech||r.style||'自然简短'),
+    '原始人设：'+(r.prompt||r.systemPrompt||r.system_prompt||r.rolePrompt||'')
+  ].join('\n');
+}
+function roleLine(context,fallback){
+  byId('roleQuote').textContent=fallback;
+  var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+  if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function')return;
+  var system='你正在 MAOMAO 小手机中和用户玩小游戏。请严格扮演下面的角色，但不要声称真实存在。'+characterTraits()+'\n针对游戏场景，用简体中文回复一句自然、有角色个性的短台词，最多35个汉字。不要解释规则，不要用AI客服腔，不要输出引号。';
+  window.PhoneAPI.complete({system:system,user:context,temperature:0.85,timeoutMs:9000}).then(function(text){
+    if(typeof text==='string'&&text.trim()&&activeGame){byId('roleQuote').textContent=text.trim().replace(/^["“”' ]+|["“”' ]+$/g,'').slice(0,90);}
+  }).catch(function(){});
+}
+function showGame(id){
+  activeGame=id;gameState={};roundNumber=1;
+  byId('lobbyView').style.display='none';byId('gameView').style.display='block';
+  renderPartner();
+  if(id==='word'){byId('gameCode').textContent='GAME 01';byId('gameTitle').textContent='默契猜词';byId('gameSubtitle').textContent='看线索，猜一个词。答对之前，TA 会继续给你提示。';startWord();}
+  else if(id==='detective'){byId('gameCode').textContent='GAME 02';byId('gameTitle').textContent='双人侦探社';byId('gameSubtitle').textContent='找出线索之间的矛盾，选出最可能的真相。';startCase();}
+  else if(id==='tic'){byId('gameCode').textContent='GAME 03';byId('gameTitle').textContent='棋盘挑战赛';byId('gameSubtitle').textContent='你先手执 X，TA 执 O。三子连线就能获胜。';startTic();}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function returnLobby(){
+  activeGame='';byId('gameView').style.display='none';byId('lobbyView').style.display='block';renderRoles();window.scrollTo({top:0,behavior:'smooth'});
+}
+function restartGame(){roundNumber++;if(activeGame==='word')startWord();else if(activeGame==='detective')startCase();else if(activeGame==='tic')startTic();}
+function setRoundLabel(){byId('roundLabel').textContent='ROUND '+pad(roundNumber);}
+var WORDS=[
+ {word:'月亮',aliases:['月亮','月球'],hints:['夜幕降临时，它常常挂在天上。','它会有圆有缺，却不是被谁咬了一口。','潮汐和它有关系，诗人也很喜欢写它。']},
+ {word:'冰箱',aliases:['冰箱','雪柜'],hints:['它常驻在厨房，里面住着食物。','打开它时，里面通常比房间凉快。','剩菜、牛奶和冰淇淋都喜欢待在它里面。']},
+ {word:'雨伞',aliases:['雨伞','伞'],hints:['天气变化时，人们会把它带出门。','它撑开以后像一朵有柄的小花。','下雨的时候，它能帮你挡住雨滴。']},
+ {word:'西瓜',aliases:['西瓜'],hints:['它通常在夏天很受欢迎。','切开后常见红色果肉和黑色籽。','抱着半个它，用勺子挖着吃也很快乐。']},
+ {word:'影子',aliases:['影子','影'],hints:['它会跟着你，却永远不需要买票。','光线改变时，它的形状和方向也会变化。','太阳底下，你脚边那个黑黑的轮廓就是它。']},
+ {word:'耳机',aliases:['耳机'],hints:['它让声音更靠近一个人。','出门通勤时，它经常和手机一起出现。','戴上它，就可以安静地听歌或播客。']},
+ {word:'葡萄',aliases:['葡萄'],hints:['它们常常一串串地出现。','有紫色、绿色等不同颜色。','一颗颗圆圆的，洗好就可以吃。']},
+ {word:'电梯',aliases:['电梯','升降梯'],hints:['它能让人不用爬楼梯也上下楼。','里面通常有楼层按钮。','站进去按数字，门关上后就会移动。']},
+ {word:'彩虹',aliases:['彩虹'],hints:['雨后阳光出现时，有机会看见它。','它通常呈弧形，包含多种颜色。','红橙黄绿蓝靛紫组成的天空彩带。']},
+ {word:'牙刷',aliases:['牙刷'],hints:['它每天早晚都可能派上用场。','它常和牙膏一起使用。','放进嘴里刷牙用的小工具。']}
+];
+function startWord(){
+  setRoundLabel();var item=WORDS[Math.floor(Math.random()*WORDS.length)];
+  gameState={item:item,hintIndex:1,guesses:0,ended:false};
+  var dots='<div class="hint-progress">'+item.hints.map(function(_,i){return '<span class="hint-dot '+(i===0?'seen':'')+'" data-hint-dot="'+i+'"></span>';}).join('')+'</div>';
+  byId('gameContent').innerHTML=
+    '<div class="board-panel"><div class="panel-kicker">THE CLUE</div><div class="prompt-title">猜猜这是什么？</div><div class="prompt-copy">每次可以提交答案，也可以先要一个新提示。越往后，线索越具体。</div><div class="clue-box" id="wordHint">'+esc(item.hints[0])+'</div>'+dots+
+    '<label class="field-label" for="wordAnswer">你的答案</label><div class="input-row"><input class="text-input" id="wordAnswer" maxlength="24" placeholder="输入你猜的词…" autocomplete="off"><button class="primary-btn" id="submitGuess">提交</button></div><div class="feedback" id="wordFeedback" aria-live="polite">提示 1 / 3 · 轮到你了。</div><div class="btn-row"><button class="secondary-btn" id="nextHint">再给我一点提示</button><button class="secondary-btn" id="newWord">换一道题</button></div></div>';
+  byId('submitGuess').addEventListener('click',submitGuess);
+  byId('wordAnswer').addEventListener('keydown',function(e){if(e.key==='Enter')submitGuess();});
+  byId('nextHint').addEventListener('click',nextHint);
+  byId('newWord').addEventListener('click',function(){roundNumber++;startWord();roleLine('又换了一道题，请扮演角色邀请玩家继续猜。','行，换一道。这次我看看你能不能秒答。');});
+  byId('roleQuote').textContent='我准备好线索了。你来猜，别急着偷看答案。';
+}
+function submitGuess(){
+  if(gameState.ended)return;
+  var val=byId('wordAnswer').value.trim().replace(/[，。！？!?,.\s]/g,'');
+  if(!val){byId('wordFeedback').textContent='先写下一个猜测吧。';return;}
+  gameState.guesses++;
+  if(gameState.item.aliases.indexOf(val)>=0){
+    gameState.ended=true;byId('wordHint').textContent='答案是「'+gameState.item.word+'」——猜中了！';
+    byId('wordFeedback').innerHTML='<strong>答对啦。</strong> 你用了 '+gameState.guesses+' 次猜中。';
+    byId('nextHint').disabled=true;byId('submitGuess').disabled=true;byId('wordAnswer').disabled=true;
+    saveStat('word','win');roleLine('玩家刚刚猜中了词语“'+gameState.item.word+'”，只用了'+gameState.guesses+'次。请自然地回应并邀请继续。',gameState.guesses===1?'第一下就中了？好吧，算你厉害。':'猜中了！看来这题难不倒你。');
+  }else{
+    var responses=['还没猜中，再想想？','方向不太对哦，要不要听下一条线索？','有点接近这个世界了，但答案还不是它。'];
+    byId('wordFeedback').textContent=responses[Math.min(gameState.guesses-1,responses.length-1)];
+    roleLine('玩家猜“'+val+'”，正确答案是“'+gameState.item.word+'”，这次猜错。用角色语气鼓励或轻微吐槽一句，不要泄露答案。','唔，不是这个。再想想，我给你留了下一条线索。');
+  }
+}
+function nextHint(){
+  if(gameState.ended)return;
+  if(gameState.hintIndex>=gameState.item.hints.length){byId('wordFeedback').textContent='已经没有更多提示了，再猜一次吧。';return;}
+  var i=gameState.hintIndex;
+  byId('wordHint').textContent=gameState.item.hints[i];
+  var dot=byId('gameContent').querySelector('[data-hint-dot="'+i+'"]');if(dot)dot.classList.add('seen');
+  gameState.hintIndex++;byId('wordFeedback').textContent='提示 '+gameState.hintIndex+' / 3 · 继续猜猜看。';
+}
+var CASES=[
+ {title:'消失的草莓蛋糕',intro:'咖啡馆打烊前，展示柜里最后一块草莓蛋糕不见了。三个人都说自己没碰过它。',evidence:[{title:'柜台记录',detail:'蛋糕在 16:10 被放进展示柜，16:25 清点时已经不见。'},{title:'围裙上的奶油',detail:'只有主厨小禾的蓝围裙上沾着新鲜奶油，她说那是试做时留下的。'},{title:'订单时间',detail:'阿泽在 16:10 到 16:30 一直处理连续订单，收银记录可以对上。'},{title:'客人去向',detail:'米粒在 16:20 取走外带咖啡后就离开了，店内监控拍到了她出门。'}],suspects:[{name:'小禾',job:'主厨'},{name:'阿泽',job:'收银员'},{name:'米粒',job:'顾客'}],answer:0,explain:'小禾说奶油来自试做，但蛋糕失踪的时间就在展示柜清点之间；她是唯一能接触后厨和展示柜的人，另外两人的时间线都有记录佐证。'},
+ {title:'图书馆的借书卡',intro:'一本稀有旧书的借书卡从柜台失踪。管理员只记得三位访客来过。',evidence:[{title:'值班表',detail:'管理员在 14:00—14:15 去书库归还书籍，柜台当时无人。'},{title:'纸张碎屑',detail:'柜台旁发现的纸屑边缘带有蓝色墨水，与访客留下的蓝色便签颜色相同。'},{title:'访客留言',detail:'林同学留下的便签使用蓝色墨水，而且他承认自己曾在柜台前找笔。'},{title:'监控画面',detail:'陈女士和小周进入大厅后一直在阅览区，只有林同学在管理员离开时靠近柜台。'}],suspects:[{name:'陈女士',job:'研究者'},{name:'小周',job:'学生'},{name:'林同学',job:'来访读者'}],answer:2,explain:'蓝色墨水碎屑与林同学的便签相符，监控也显示只有他在柜台无人时靠近。线索共同指向林同学。'},
+ {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'}];
+function startCase(){
+  setRoundLabel();var index=Math.floor(Math.random()*CASES.length);var c=CASES[index];
+  gameState={caseIndex:index,item:c,revealed:{},ended:false};
+  byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">CASE FILE / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div><div class="divider-label">点击线索展开证据</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">'+(i<1?esc(ev.detail):'点击查看这条证据。')+'</span></span><span class="evidence-mark">'+(i<1?'−':'+')+'</span></button>';}).join('')+'</div><div class="divider-label">你认为谁最可疑？</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(s,i){return '<button class="suspect" data-suspect="'+i+'"><div class="suspect-name">'+esc(s.name)+'</div><div class="suspect-role">'+esc(s.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看线索，再选出你的答案。</div><div class="btn-row"><button class="secondary-btn" id="newCase">换一个案件</button></div></div>';
+  byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;gameState.revealed[i]=true;var detail=byId('evidenceDetail'+i);if(detail)detail.textContent=c.evidence[i].detail;btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='−';});});
+  byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(btn){btn.addEventListener('click',function(){chooseSuspect(Number(btn.getAttribute('data-suspect')));});});
+  byId('newCase').addEventListener('click',function(){roundNumber++;startCase();roleLine('玩家选择了另一个案件，请邀请继续推理。','换案！这次我们仔细一点，别放过小细节。');});
+  byId('roleQuote').textContent='我看这事没那么简单。我们先把证据看完，再下结论。';
+}
+function chooseSuspect(i){
+  if(gameState.ended)return;
+  var c=gameState.item;var buttons=byId('suspectList').querySelectorAll('[data-suspect]');
+  gameState.ended=true;
+  if(i===c.answer){
+    buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破。</strong> '+esc(c.explain);saveStat('detective','win');
+    roleLine('玩家正确找出了案件“'+c.title+'”的真凶。推理结论：'+c.explain+' 请用角色语气夸奖搭档，最多一句。','漂亮！证据没有白看，我们这次配合得不错。');
+  }else{
+    buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>这次判断有误。</strong> 正确答案是 '+esc(c.suspects[c.answer].name)+'。'+esc(c.explain);
+    saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中选错嫌疑人。正确答案为'+c.suspects[c.answer].name+'。用轻松、不挖苦的语气复盘一句。','这次被线索绕进去了。没事，真相已经找到了。');
+  }
+  buttons.forEach(function(b){b.disabled=true;});
+}
+var WIN_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+var DIFFICULTY='normal';
+function startTic(){
+  setRoundLabel();gameState={board:['','','','','','','','',''],ended:false,turn:'x',wins:0};
+  byId('gameContent').innerHTML='<div class="tic-controls"><span class="field-label" style="margin:0">难度</span><div class="difficulty"><button class="diff-btn '+(DIFFICULTY==='easy'?'active':'')+'" data-diff="easy">简单</button><button class="diff-btn '+(DIFFICULTY==='normal'?'active':'')+'" data-diff="normal">普通</button><button class="diff-btn '+(DIFFICULTY==='hard'?'active':'')+'" data-diff="hard">困难</button></div></div><div class="board-panel"><div class="panel-kicker">YOUR MOVE / X</div><div class="prompt-title">三子连线</div><div class="prompt-copy">你执 X，'+esc(roleName(activeRole))+' 执 O。先连成一条直线的人获胜。</div><div class="tic-board" id="ticBoard">'+gameState.board.map(function(_,i){return '<button class="tic-cell" data-cell="'+i+'" aria-label="第 '+(i+1)+' 格"></button>';}).join('')+'</div><div class="board-foot"><span id="ticStatus">轮到你落子。</span><span id="ticScore">你 X　·　TA O</span></div><div class="btn-row"><button class="secondary-btn" id="resetBoard">重新开始</button></div></div>';
+  byId('gameContent').querySelectorAll('[data-diff]').forEach(function(b){b.addEventListener('click',function(){DIFFICULTY=b.getAttribute('data-diff');startTic();});});
+  byId('gameContent').querySelectorAll('[data-cell]').forEach(function(b){b.addEventListener('click',function(){playerMove(Number(b.getAttribute('data-cell')));});});
+  byId('resetBoard').addEventListener('click',function(){roundNumber++;startTic();});
+  byId('roleQuote').textContent='我先不放水，你也认真一点。准备好了就落子。';
+}
+function winningLine(board){
+  for(var i=0;i<WIN_LINES.length;i++){var l=WIN_LINES[i];if(board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[1]]===board[l[2]])return l;}
+  return null;
+}
+function freeCells(board){var a=[];for(var i=0;i<board.length;i++)if(!board[i])a.push(i);return a;}
+function randomCell(board){var a=freeCells(board);return a.length?a[Math.floor(Math.random()*a.length)]:-1;}
+function immediateMove(board,mark){
+  var cells=freeCells(board);
+  for(var i=0;i<cells.length;i++){var copy=board.slice();copy[cells[i]]=mark;if(winningLine(copy))return cells[i];}
+  return -1;
+}
+function minimax(board,isMax){
+  var win=winningLine(board);
+  if(win){return board[win[0]]==='o'?10:board[win[0]]==='x'?-10:0;}
+  var cells=freeCells(board);if(!cells.length)return 0;
+  var best=isMax?-Infinity:Infinity;
+  for(var i=0;i<cells.length;i++){var copy=board.slice();copy[cells[i]]=isMax?'o':'x';var score=minimax(copy,!isMax);if(isMax)best=Math.max(best,score);else best=Math.min(best,score);}
+  return best;
+}
+function bestHardMove(board){
+  var cells=freeCells(board),best=-Infinity,bestCell=cells[0];
+  for(var i=0;i<cells.length;i++){var copy=board.slice();copy[cells[i]]='o';var score=minimax(copy,false);if(score>best){best=score;bestCell=cells[i];}}
+  return bestCell==null?-1:bestCell;
+}
+function aiMove(board){
+  if(DIFFICULTY==='easy')return randomCell(board);
+  var win=immediateMove(board,'o');if(win!==-1)return win;
+  var block=immediateMove(board,'x');if(block!==-1)return block;
+  if(DIFFICULTY==='hard')return bestHardMove(board);
+  if(!board[4])return 4;
+  return randomCell(board);
+}
+function playerMove(i){
+  if(gameState.ended||gameState.board[i])return;
+  gameState.board[i]='x';renderBoard();
+  if(checkTicEnd())return;
+  var cell=aiMove(gameState.board);if(cell>=0)gameState.board[cell]='o';
+  renderBoard();if(checkTicEnd())return;
+  byId('ticStatus').textContent='轮到你落子。';
+  roleLine('正在进行井字棋。玩家落下 X，当前局势为：'+gameState.board.map(function(x){return x||'-';}).join('')+'。请用一句角色台词回应棋局，不要告诉玩家最佳落点。','我看到你的想法了。下一步可别大意。');
+}
+function renderBoard(){
+  var board=byId('ticBoard');if(!board)return;
+  board.querySelectorAll('[data-cell]').forEach(function(b){var i=Number(b.getAttribute('data-cell'));b.textContent=gameState.board[i]?(gameState.board[i]==='x'?'×':'○'):'';b.classList.toggle('x',gameState.board[i]==='x');b.classList.toggle('o',gameState.board[i]==='o');b.disabled=!!gameState.board[i]||gameState.ended;});
+  var win=winningLine(gameState.board);if(win)win.forEach(function(i){var b=board.querySelector('[data-cell="'+i+'"]');if(b)b.classList.add('winning');});
+}
+function checkTicEnd(){
+  var win=winningLine(gameState.board);
+  if(win){
+    gameState.ended=true;var xWin=gameState.board[win[0]]==='x';
+    byId('ticStatus').textContent=xWin?'你赢了！':'TA 赢了。';
+    byId('ticScore').textContent=xWin?'本局胜利':'下次再战';
+    renderBoard();saveStat('tic',xWin?'win':'loss');
+    roleLine(xWin?'玩家赢下了井字棋。请以角色语气回应，愿意时可以提出再来一局。':'角色赢下了井字棋。请以角色语气自然回应，不要过分炫耀。',xWin?'好吧，这局算你赢。再来，我可要认真了。':'我赢啦！要不要再试一次？');
+    return true;
+  }
+  if(!freeCells(gameState.board).length){
+    gameState.ended=true;byId('ticStatus').textContent='平局。';byId('ticScore').textContent='棋逢对手';
+    renderBoard();saveStat('tic','draw');roleLine('这局井字棋最后平局，请用角色语气轻松回应。','平局！看来我们今天水平差不多。');
+    return true;
+  }
+  return false;
+}
+byId('backHome').addEventListener('click',function(){if(history.length>1)history.back();else location.href='../index.html';});
+byId('backLobby').addEventListener('click',returnLobby);
+byId('toLobbyFromGame').addEventListener('click',returnLobby);
+byId('restartGame').addEventListener('click',restartGame);
+document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(){showGame(b.getAttribute('data-game'));});});
+loadRoles();renderRoles();
+if(window.PhoneStorage&&typeof window.PhoneStorage.getCurrentContactId==='function'){
+  var current=window.PhoneStorage.getCurrentContactId();
+  if(current){var matched=roleList.find(function(r){return String(r.id)===String(current);});if(matched)selectRole(matched.id);}
+}
+})();
+</script>
+<script src="../js/nav.js"></script>
+</body>
+</html>
