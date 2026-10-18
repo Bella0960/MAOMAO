@@ -239,7 +239,7 @@ function runDay(){
  if(!st.menu.length){toast('先选择至少一款在售商品。');return;}
  var ad=Math.min(st.ad,Math.floor(st.cash/20)*20);st.cash-=ad;
  var mode=st.service,serviceName={warm:'温柔待客',standard:'标准服务',fast:'快速出杯'}[mode]||'标准服务',modeDemand=mode==='fast'?3:mode==='warm'?1:0;
- var demand=Math.max(0,Math.round(8+st.level+st.rep*.09+st.sat*.045+ad/20+modeDemand+(st.eventFx.customers||0)+rand(5)-1));
+ var demand=Math.max(0,Math.round(8+st.level+st.rep*.09+st.sat*.045+ad/20+modeDemand+Math.min(3,st.regulars.length)+(st.eventFx.customers||0)+rand(5)-1));
  var menu=st.menu.map(function(id){return item(id);}).filter(Boolean),revenue=0,cost=0,served=0,lost=0,sold={},factor=Number(st.eventFx.priceFactor||1);
  for(var i=0;i<demand;i++){var avail=menu.filter(canMake);if(!avail.length){lost=demand-i;break;}var p=avail[rand(avail.length)];consume(p);served++;sold[p.id]=(sold[p.id]||0)+1;revenue+=Math.round(price(p)*factor);cost+=p.cost;}
  var profit=revenue-cost-ad;st.cash+=revenue;st.totalRevenue+=revenue;st.totalCustomers+=served;
