@@ -1,7 +1,7 @@
 /* 悬浮胶囊底部导航 - 自动注入 + 自动高亮 */
 (function () {
     // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间、角色管理）
-    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html'];
+    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/index.html'];
     var path = location.pathname.toLowerCase();
     for (var i = 0; i < SKIP_PAGES.length; i++) {
         if (path.indexOf(SKIP_PAGES[i]) !== -1) return;
@@ -15,6 +15,13 @@
             href: '/chat/chat.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
             badge: true
+        },
+        {
+            key: 'games',
+            label: '游戏',
+            href: '/games/index.html',
+            svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3.2a2 2 0 0 1-3.3 1l-2.2-2H8.7l-2.2 2a2 2 0 0 1-3.3-1l-1-3.2A4 4 0 0 1 6 9z"/><path d="M7 12v4M5 14h4M16.5 13h.01M19 15h.01"/></svg>',
+            badge: false
         },
         {
             key: 'contacts',
@@ -126,7 +133,7 @@
     // 生成导航 HTML 并根据当前页面高亮
     var currentPage = location.pathname.split('/').pop().toLowerCase();
     var tabsHTML = TABS.map(function (t) {
-        var isActive = currentPage.indexOf(t.key) !== -1;
+        var isActive = (t.key === 'games' ? location.pathname.toLowerCase().indexOf('/games/') !== -1 : currentPage.indexOf(t.key) !== -1);
         return '<a class="nav-tab' + (isActive ? ' active' : '') + '" href="' + t.href + '">' +
             '<span class="nav-ico">' + t.svg + '</span>' +
             '<span>' + t.label + '</span>' +
