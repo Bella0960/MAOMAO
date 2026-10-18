@@ -12,6 +12,20 @@
   "theme_color": "#F7F7F9",
   "shortcuts": [
     {
+      "name": "咖啡馆经营",
+      "short_name": "咖啡馆",
+      "description": "与 AI 角色合作经营咖啡馆，管理菜单、库存、预算、顾客和店铺升级",
+      "url": "./cafe/cafe.html",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
       "name": "游戏大厅",
       "short_name": "游戏",
       "description": "六款可与 AI 角色一起玩的小游戏：猜词、侦探、棋盘、记忆、密码与快问快答",
