@@ -1,7 +1,7 @@
 /* 小手机 PWA Service Worker
  * 页面与静态资源均采用缓存优先+后台更新，断网/慢网时秒开。
  */
-const CACHE_NAME = 'phone-app-pwa-v19';
+const CACHE_NAME = 'phone-app-pwa-v20';
 const APP_SHELL = [
   './',
   './index.html',
@@ -15,6 +15,8 @@ const APP_SHELL = [
   './css/mobile-fit.css',
   './js/font-loader.js',
   './js/native-feel.js',
+  './js/phone/phone_storage.js',
+  './js/phone/phone_api.js',
   './js/script.js',
   './js/statusbar-control.js',
   './js/nav.js',
