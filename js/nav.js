@@ -1,7 +1,7 @@
 /* 悬浮胶囊底部导航 - 自动注入 + 自动高亮 */
 (function () {
     // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间、角色管理）
-    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/index.html'];
+    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/index.html', 'cafe/cafe.html'];
     var path = location.pathname.toLowerCase();
     for (var i = 0; i < SKIP_PAGES.length; i++) {
         if (path.indexOf(SKIP_PAGES[i]) !== -1) return;
