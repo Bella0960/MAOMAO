@@ -383,7 +383,7 @@ function roleLine(context,fallback){
   if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function')return;
   var system='你正在 MAOMAO 小手机中和用户玩小游戏。请严格扮演下面的角色，但不要声称真实存在。'+characterTraits()+'\n针对游戏场景，用简体中文回复一句自然、有角色个性的短台词，最多35个汉字。不要解释规则，不要用AI客服腔，不要输出引号。';
   window.PhoneAPI.complete({system:system,user:context,temperature:0.85,timeoutMs:9000}).then(function(text){
-    if(typeof text==='string'&&text.trim()&&activeGame){byId('roleQuote').textContent=text.trim().replace(/^["“”' ]+|["“”' ]+$/g,'').slice(0,90);}
+    if(typeof text==='string'&&text.trim()&&activeGame&&reactionId===reactionSequence){byId('roleQuote').textContent=text.trim().replace(/^["“”' ]+|["“”' ]+$/g,'').slice(0,90);}
   }).catch(function(){});
 }
 function showGame(id){
