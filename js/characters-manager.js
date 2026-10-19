@@ -476,7 +476,7 @@ function setSaveStatus(message, state) {
     el.textContent = message || '';
     el.dataset.state = state || 'info';
     el.style.opacity = message ? '1' : '0';
-    if (state === 'success' || state === 'info') {
+    if (state === 'success' || (state === 'info' && message !== '未保存')) {
         saveStatusTimer = setTimeout(() => {
             if (el.textContent === message) {
                 el.style.opacity = '0';
