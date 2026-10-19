@@ -5,7 +5,7 @@ const CACHE_NAME = 'phone-app-pwa-v22';
 const APP_SHELL = [
   './',
   './index.html',
-  './games/index.html',
+  './games/games.html',
   './cafe/cafe.html',
   './diary/diary.html',
   './travel/dream-travel.html',

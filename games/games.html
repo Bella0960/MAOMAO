@@ -45,15 +45,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .role-chip.active .role-avatar{outline-color:#111}
 .role-chip-name{font-size:10px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;text-align:center}
 .role-chip-mark{display:none}
-.games-list{border-top:1px solid var(--line)}
-.game-row{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:17px;padding:21px 2px;border-bottom:1px solid var(--line);cursor:pointer}
-.game-symbol{width:34px;display:flex;flex-direction:column;align-items:center;gap:7px}
-.game-symbol svg{width:24px;height:24px;stroke:#1c1c1a;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.games-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--line);padding-top:16px}
+.game-row{display:flex;flex-direction:column;align-items:stretch;border:1px solid var(--line);padding:14px 13px 0;cursor:pointer;min-width:0;background:#fff;transition:background .18s,border-color .18s}
+.game-row:active{background:#f7f7f5}
+.game-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.game-symbol{display:grid;place-items:center}
+.game-symbol svg{width:22px;height:22px;stroke:#1c1c1a;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .game-index{font-family:var(--serif);font-size:9px;color:#a3a39c;letter-spacing:.08em;line-height:1}
-.game-tag{font-size:8px;letter-spacing:.22em;color:#a6a69f;text-transform:uppercase;margin-bottom:6px}
-.game-name{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
-.game-desc{font-size:11px;line-height:1.7;color:#777770;max-width:240px}
-.game-record{font-size:10px;color:#9a9a94;margin-top:8px}
+.game-tag{font-size:8px;letter-spacing:.22em;color:#a6a69f;text-transform:uppercase;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-name{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.02em;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-desc{font-size:10px;line-height:1.55;color:#777770;margin:0 0 11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.game-record{font-size:9px;color:#9a9a94;padding:10px 0 12px;border-top:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
 .bottom-note{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:9px;letter-spacing:.1em;color:#96968f}
 .bottom-note strong{font-weight:500;color:#50504c}
 #gameView{display:none}
@@ -170,7 +172,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .quiz-result{text-align:center;padding:22px 8px 15px}
 .quiz-result-number{font-family:var(--serif);font-size:64px;line-height:1;letter-spacing:-.07em}
 .quiz-result-caption{font-size:11px;color:#777;margin:9px 0 14px}
-@media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.game-row{grid-template-columns:30px minmax(0,1fr);gap:14px}.game-symbol{width:30px}.game-desc{font-size:10px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
+@media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.games-list{gap:8px}.game-row{padding:12px 11px 0}.game-name{font-size:17px}.game-desc{font-size:9px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
 
 </style>
 </head>
@@ -212,33 +214,51 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <section>
       <div class="section-head">
         <div><div class="section-eyebrow">PICK A GAME</div><div class="section-title">选择一场小冒险</div></div>
-        <div class="micro-note">01 — 03</div>
+        <div class="micro-note">01 — 06</div>
       </div>
       <div class="games-list">
         <article class="game-row" data-game="word" role="button" tabindex="0" aria-label="开始默契猜词">
-          <div class="game-symbol"><span class="game-index">01</span><svg viewBox="0 0 24 24"><path d="M8 4h8l2 4 3 1-1 7-3-2H7l-3 2-1-7 3-1z"/><path d="M8 9v4M6 11h4M15.5 10.5h.01M18 12.5h.01"/></svg></div>
-          <div><div class="game-tag">WORD / WARM-UP</div><div class="game-name">默契猜词</div><div class="game-desc">TA 给出线索，你来猜答案。猜错也没关系，提示会越来越明显。</div><div class="game-record" id="wordRecord">适合三分钟热身</div></div>
+          <div class="game-topline"><span class="game-index">01</span><span class="game-symbol"><svg viewBox="0 0 24 24"><path d="M8 4h8l2 4 3 1-1 7-3-2H7l-3 2-1-7 3-1z"/><path d="M8 9v4M6 11h4M15.5 10.5h.01M18 12.5h.01"/></svg></span></div>
+          <div class="game-tag">WORD / WARM-UP</div>
+          <div class="game-name">默契猜词</div>
+          <div class="game-desc">TA 给出线索，你来猜答案。猜错也没关系，提示会越来越明显。</div>
+          <div class="game-record" id="wordRecord">适合三分钟热身</div>
         </article>
         <article class="game-row" data-game="detective" role="button" tabindex="0" aria-label="开始双人侦探社">
-          <div class="game-symbol"><span class="game-index">02</span><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10.5h5M10.5 8v5"/><path d="M17 3h4v4"/></svg></div>
-          <div><div class="game-tag">MYSTERY / CO-OP</div><div class="game-name">双人侦探社</div><div class="game-desc">检查证据、盘问嫌疑人，和 TA 一起还原案件真相。</div><div class="game-record" id="caseRecord">每一案都有答案</div></div>
+          <div class="game-topline"><span class="game-index">02</span><span class="game-symbol"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10.5h5M10.5 8v5"/><path d="M17 3h4v4"/></svg></span></div>
+          <div class="game-tag">MYSTERY / CO-OP</div>
+          <div class="game-name">双人侦探社</div>
+          <div class="game-desc">检查证据、盘问嫌疑人，和 TA 一起还原案件真相。</div>
+          <div class="game-record" id="caseRecord">每一案都有答案</div>
         </article>
         <article class="game-row" data-game="tic" role="button" tabindex="0" aria-label="开始棋盘挑战赛">
-          <div class="game-symbol"><span class="game-index">03</span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM9.33 4v16M14.67 4v16M4 9.33h16M4 14.67h16"/><path d="m6 6 4 4m0-4-4 4M15 15l3 3m0-3-3 3"/></svg></div>
-          <div><div class="game-tag">STRATEGY / VS</div><div class="game-name">棋盘挑战赛</div><div class="game-desc">来一局井字棋。难度由你选，输赢都可以马上再来。</div><div class="game-record" id="ticRecord">简单 / 普通 / 困难</div></div>
+          <div class="game-topline"><span class="game-index">03</span><span class="game-symbol"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM9.33 4v16M14.67 4v16M4 9.33h16M4 14.67h16"/><path d="m6 6 4 4m0-4-4 4M15 15l3 3m0-3-3 3"/></svg></span></div>
+          <div class="game-tag">STRATEGY / VS</div>
+          <div class="game-name">棋盘挑战赛</div>
+          <div class="game-desc">来一局井字棋。难度由你选，输赢都可以马上再来。</div>
+          <div class="game-record" id="ticRecord">简单 / 普通 / 困难</div>
         </article>
 
         <article class="game-row" data-game="memory" role="button" tabindex="0" aria-label="开始记忆翻牌">
-          <div class="game-symbol"><span class="game-index">04</span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="8" rx="1"/><rect x="14" y="3" width="6" height="8" rx="1"/><rect x="4" y="13" width="6" height="8" rx="1"/><rect x="14" y="13" width="6" height="8" rx="1"/><path d="M7 7h.01M17 17h.01"/></svg></div>
-          <div><div class="game-tag">MEMORY / DUEL</div><div class="game-name">记忆翻牌</div><div class="game-desc">轮流翻开卡牌找对子。看看谁记得更多，也别低估 TA 的记忆力。</div><div class="game-record" id="memoryRecord">6 组图案 · 双人对战</div></div>
+          <div class="game-topline"><span class="game-index">04</span><span class="game-symbol"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="8" rx="1"/><rect x="14" y="3" width="6" height="8" rx="1"/><rect x="4" y="13" width="6" height="8" rx="1"/><rect x="14" y="13" width="6" height="8" rx="1"/><path d="M7 7h.01M17 17h.01"/></svg></span></div>
+          <div class="game-tag">MEMORY / DUEL</div>
+          <div class="game-name">记忆翻牌</div>
+          <div class="game-desc">轮流翻开卡牌找对子。看看谁记得更多，也别低估 TA 的记忆力。</div>
+          <div class="game-record" id="memoryRecord">6 组图案 · 双人对战</div>
         </article>
         <article class="game-row" data-game="code" role="button" tabindex="0" aria-label="开始三位数密码">
-          <div class="game-symbol"><span class="game-index">05</span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9h.01M12 9h.01M17 9h.01M7 15h10M7 12h10"/></svg></div>
-          <div><div class="game-tag">LOGIC / CRACK</div><div class="game-name">三位数密码</div><div class="game-desc">破解一个由不同数字组成的密码。每次猜测都会告诉你数字和位置的线索。</div><div class="game-record" id="codeRecord">7 次机会 · 逻辑挑战</div></div>
+          <div class="game-topline"><span class="game-index">05</span><span class="game-symbol"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9h.01M12 9h.01M17 9h.01M7 15h10M7 12h10"/></svg></span></div>
+          <div class="game-tag">LOGIC / CRACK</div>
+          <div class="game-name">三位数密码</div>
+          <div class="game-desc">破解一个由不同数字组成的密码。每次猜测都会告诉你数字和位置的线索。</div>
+          <div class="game-record" id="codeRecord">7 次机会 · 逻辑挑战</div>
         </article>
         <article class="game-row" data-game="quiz" role="button" tabindex="0" aria-label="开始脑洞快问">
-          <div class="game-symbol"><span class="game-index">06</span><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="5"/><path d="m10 12 1.3 1.3L14.5 10"/></svg></div>
-          <div><div class="game-tag">QUIZ / QUICK THINK</div><div class="game-name">脑洞快问</div><div class="game-desc">5 道随机小题，科学、常识和逻辑轮番上场。答完看看你们的默契分数。</div><div class="game-record" id="quizRecord">5 题一局 · 即时判分</div></div>
+          <div class="game-topline"><span class="game-index">06</span><span class="game-symbol"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="5"/><path d="m10 12 1.3 1.3L14.5 10"/></svg></span></div>
+          <div class="game-tag">QUIZ / QUICK THINK</div>
+          <div class="game-name">脑洞快问</div>
+          <div class="game-desc">5 道随机小题，科学、常识和逻辑轮番上场。答完看看你们的默契分数。</div>
+          <div class="game-record" id="quizRecord">5 题一局 · 即时判分</div>
         </article>
       </div>
     </section>

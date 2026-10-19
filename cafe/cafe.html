@@ -12,7 +12,7 @@
 .shell{padding:calc(14px + env(safe-area-inset-top)) 20px 125px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:27px}.icon-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#222;display:grid;place-items:center}.icon-btn svg{width:17px;height:17px}.wordmark{font-size:10px;letter-spacing:.19em;font-weight:650;color:#777}.live{font-size:10px;display:flex;align-items:center;gap:6px;color:#666}.live:before{content:"";width:5px;height:5px;background:#222;border-radius:50%}
 .eyebrow{font-size:10px;letter-spacing:.17em;color:#888;display:flex;align-items:center;gap:8px}.eyebrow:before{content:"";width:17px;height:1px;background:#222}.hero{position:relative;padding-bottom:21px;border-bottom:1px solid var(--line);overflow:hidden}.hero h1{font:500 clamp(39px,10vw,54px)/1.04 var(--serif);letter-spacing:-.065em;margin:12px 0 10px}.hero p{font-size:12px;line-height:1.8;color:#777;max-width:275px;margin:0}.hero-num{position:absolute;right:0;bottom:1px;font:104px/1 var(--serif);letter-spacing:-.1em;color:#f0f0f0;pointer-events:none}.hero>*:not(.hero-num){position:relative;z-index:1}
 .partner{display:flex;align-items:center;gap:9px;margin-top:18px}.avatar{width:32px;height:32px;flex:0 0 32px;background:#777;border-radius:50%;overflow:hidden;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600}.avatar img{width:100%;height:100%;object-fit:cover}.partner-meta{min-width:0;flex:1}.partner-meta strong{display:block;font-size:12px}.partner-meta span{display:block;font-size:10px;color:#888;margin-top:3px}.select-wrap{position:relative;max-width:140px}.role-select{appearance:none;border:1px solid #dedede;background:#fff;border-radius:2px;padding:9px 23px 9px 9px;font-size:10px;max-width:140px;color:#333}.select-wrap:after{content:"⌄";position:absolute;right:8px;top:6px;color:#777;pointer-events:none}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:20px 0 22px;background:#f5f5f5;padding:4px}.tab{border:0;background:transparent;padding:10px 2px;color:#777;font-size:11px;white-space:nowrap}.tab.active{background:#fff;box-shadow:0 1px 4px #0000000f;color:#171717;font-weight:650}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:20px 0 22px;background:#f5f5f5;padding:4px}.tab{border:0;background:transparent;padding:10px 2px;color:#777;font-size:11px;white-space:nowrap}.tab.active{background:#fff;box-shadow:0 1px 4px #0000000f;color:#171717;font-weight:650}
 .head-row{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:0 0 13px}.kicker{font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}.section-title{font-size:18px;font-weight:650;letter-spacing:-.04em}.aside{font:18px var(--serif);color:#777}
 .cash-card{background:#191919;color:#fff;padding:18px;position:relative;overflow:hidden;margin-bottom:12px}.cash-card:after{content:"";position:absolute;right:-40px;top:-65px;width:175px;height:175px;border:1px solid #ffffff20;border-radius:50%;box-shadow:0 0 0 18px #ffffff08,0 0 0 38px #ffffff05}.cash-head{display:flex;justify-content:space-between;gap:10px;font-size:9px;letter-spacing:.14em;color:#c4c4c4;position:relative;z-index:1}.day-chip{border:1px solid #555;border-radius:999px;padding:5px 8px;font-size:9px;letter-spacing:0;white-space:nowrap}.cash-label{font-size:10px;color:#bbb;margin-top:21px;position:relative;z-index:1}.cash-value{font:42px/1.05 var(--serif);letter-spacing:-.05em;margin-top:5px;position:relative;z-index:1}.cash-foot{display:flex;justify-content:space-between;gap:8px;margin-top:17px;padding-top:12px;border-top:1px solid #444;font-size:9px;color:#ccc;position:relative;z-index:1}.cash-foot strong{display:block;font-size:11px;font-weight:550;color:#fff;margin-top:5px}
 .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:24px}.metric{padding:12px 10px;border:1px solid #e6e6e6;min-width:0}.metric-label{font-size:9px;color:#888;white-space:nowrap}.metric-value{font:24px var(--serif);margin-top:8px;white-space:nowrap;letter-spacing:-.04em}.metric-sub{font-size:9px;color:#8b8b8b;margin-top:4px;white-space:nowrap}.progress{height:3px;background:#e9e9e9;margin-top:8px;overflow:hidden}.progress span{display:block;height:100%;background:#252525}
@@ -77,8 +77,8 @@ button:disabled{cursor:not-allowed}
 <header class="topbar"><button class="icon-btn" id="goHome" aria-label="返回桌面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><span class="wordmark">MAOMAO / STORE STUDIO</span><span class="live">经营中</span></header>
 <section class="hero"><div class="eyebrow">YOUR LITTLE BUSINESS</div><h1>把一家小店，<br>慢慢经营好。</h1><p>从第一杯咖啡开始。选菜单、管库存、处理客人，和你选中的角色一起把小店做起来。</p><div class="hero-num" id="heroDay">01</div></section>
 <div class="partner"><div class="avatar" id="partnerAvatar">店</div><div class="partner-meta"><strong id="partnerName">今日经营搭档</strong><span id="partnerCaption">和你一起做决定</span></div><div class="select-wrap"><select class="role-select" id="partnerSelect" aria-label="选择经营搭档"></select></div></div>
-<nav class="tabs" aria-label="咖啡馆功能"><button class="tab active" data-tab="overview">今日经营</button><button class="tab" data-tab="menu">菜单定价</button><button class="tab" data-tab="stock">原料库存</button><button class="tab" data-tab="shop">店铺升级</button></nav>
-<main><section id="view-overview"></section><section id="view-menu" hidden></section><section id="view-stock" hidden></section><section id="view-shop" hidden></section></main>
+<nav class="tabs" aria-label="咖啡馆功能"><button class="tab active" data-tab="overview">今日经营</button><button class="tab" data-tab="menu">菜单定价</button><button class="tab" data-tab="stock">原料库存</button><button class="tab" data-tab="shop">店铺升级</button><button class="tab" data-tab="partner">伙伴回忆</button></nav>
+<main><section id="view-overview"></section><section id="view-menu" hidden></section><section id="view-stock" hidden></section><section id="view-shop" hidden></section><section id="view-partner" hidden></section></main>
 </div><div class="toast" id="toast"></div>
 <script>
 (function(){
@@ -149,9 +149,9 @@ function renderPartner(){$('partnerSelect').innerHTML=roles.map(function(r){retu
 function toast(t){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.classList.remove('show');},2000);}
 function ing(id){return ING.find(function(x){return x.id===id;});}function item(id){return ITEMS.find(function(x){return x.id===id;});}
 function price(p){return Number(st.prices[p.id]||p.price);}function stat(k,d){st[k]=clamp((Number(st[k])||0)+d,0,100);}function needed(){return st.level*60;}function eventNow(){return EVENTS[clamp(st.event,0,EVENTS.length-1)];}
-function setTab(tab){TAB=tab;document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});['overview','menu','stock','shop'].forEach(function(x){$('view-'+x).hidden=x!==tab;});renderTab();}
-function renderAll(){$('heroDay').textContent=String(st.day).padStart(2,'0');renderPartner();document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===TAB);});['overview','menu','stock','shop'].forEach(function(x){$('view-'+x).hidden=x!==TAB;});renderTab();}
-function renderTab(){if(TAB==='overview')renderOverview();if(TAB==='menu')renderMenu();if(TAB==='stock')renderStock();if(TAB==='shop')renderShop();}
+function setTab(tab){TAB=tab;document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});['overview','menu','stock','shop','partner'].forEach(function(x){$('view-'+x).hidden=x!==tab;});renderTab();}
+function renderAll(){$('heroDay').textContent=String(st.day).padStart(2,'0');renderPartner();document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===TAB);});['overview','menu','stock','shop','partner'].forEach(function(x){$('view-'+x).hidden=x!==TAB;});renderTab();}
+function renderTab(){if(TAB==='overview')renderOverview();if(TAB==='menu')renderMenu();if(TAB==='stock')renderStock();if(TAB==='shop')renderShop();if(TAB==='partner')renderPartnerTab();}
 function metrics(){return '<div class="metrics"><div class="metric"><div class="metric-label">店铺等级</div><div class="metric-value">LV.'+st.level+'</div><div class="progress"><span style="width:'+Math.round(st.xp/needed()*100)+'%"></span></div><div class="metric-sub">'+st.xp+' / '+needed()+' EXP</div></div><div class="metric"><div class="metric-label">口碑指数</div><div class="metric-value">'+st.rep+'</div><div class="progress"><span style="width:'+st.rep+'%"></span></div><div class="metric-sub">熟客与新客</div></div><div class="metric"><div class="metric-label">顾客满意度</div><div class="metric-value">'+st.sat+'</div><div class="progress"><span style="width:'+st.sat+'%"></span></div><div class="metric-sub">服务与等待</div></div></div>';}
 function finance(){return '<div class="cash-card"><div class="cash-head"><span>DAILY CASHFLOW</span><span class="day-chip">第 '+st.day+' 天 · 筹备中</span></div><div class="cash-label">可用经营资金</div><div class="cash-value">'+money(st.cash)+'</div><div class="cash-foot"><span>累计营收<strong>'+money(st.totalRevenue)+'</strong></span><span>累计客人<strong>'+st.totalCustomers+' 位</strong></span><span>在售菜单<strong>'+st.menu.length+' 款</strong></span></div></div>';}
 function renderEvent(){
@@ -330,7 +330,7 @@ function chooseStory(which){
  var option=which==='a'?s.arc.a:s.arc.b,ef=option.effect||{};
  if(st.cash+Number(ef.cash||0)<0){toast('现金不够，先积累一点资金再做这个决定。');return;}
  st.cash+=Number(ef.cash||0);if(ef.rep)stat('rep',ef.rep);if(ef.sat)stat('sat',ef.sat);
- st.storyChoices[key]=which;st.storyLog.unshift({key:key,day:st.day,title:s.arc.title,text:option.log,choice:option.title});st.storyLog=st.storyLog.slice(0,8);checkAchievements();save();renderOverview();toast('这段故事记下来了。');
+ st.storyChoices[key]=which;st.storyLog.unshift({key:key,day:st.day,title:s.arc.title,text:option.log,choice:option.title});st.storyLog=st.storyLog.slice(0,8);checkAchievements();save();renderAll();toast('这段故事记下来了。');
 }
 function renderRegulars(){
  var html='<div class="module"><div class="module-head"><div><div class="kicker">PEOPLE WHO COME BACK</div><div class="section-title">慢慢熟悉的客人</div></div><span class="tag">'+st.regulars.length+' 位熟客</span></div>';
@@ -423,15 +423,13 @@ function choosePartnerEpisode(i){
  var p=getPartnerProfile(role),r=o.reward||{};st.cash-=o.cost;if(r.cash)st.cash+=r.cash;if(r.rep)stat('rep',r.rep);if(r.sat)stat('sat',r.sat);if(r.xp)st.xp+=r.xp;if(r.stock)Object.keys(r.stock).forEach(function(k){st.stock[k]=(st.stock[k]||0)+r.stock[k];});
  st.partnerEpisodeDay=st.day;p.episodeCount=(Number(p.episodeCount)||0)+1;p.rapport=clamp(p.rapport+4,0,100);p.lastLine=styleLine(p.style,true);p.lastDecision=o.title;p.history.unshift({day:st.day,type:'exclusive-episode',eventTitle:ep.title,choice:o.title,reward:o.label});p.history=p.history.slice(0,8);
  st.partnerEpisodeResult={day:st.day,roleId:String(role&&role.id||'default-partner'),roleName:nameOf(role),title:ep.title,summary:'你选择了「'+o.title+'」。'+nameOf(role)+' 把这次合作记在心里。',line:p.lastLine,reward:o.label,choice:o.title};
- checkAchievements();save();renderOverview();toast('专属剧情完成，奖励已领取。');
+ checkAchievements();save();renderAll();toast('专属剧情完成，奖励已领取。');
 }
 
 function renderOverview(){
- var html=finance()+metrics()+renderDailyGoal()+renderActiveDecor()+renderPartnerProfile()+renderPartnerEpisode()+renderStory()+renderRegulars()+renderEvent()+renderControls()+renderAdvisor()+renderReport();
+ var html=finance()+metrics()+renderDailyGoal()+renderEvent()+renderControls()+renderAdvisor()+renderReport();
  if(st.history.length)html+='<div class="module"><div class="module-head"><div><div class="kicker">RECENT DAYS</div><div class="section-title">经营记录</div></div><span class="tag">最近 '+st.history.length+' 天</span></div><div class="history">'+st.history.slice(0,5).map(function(h){return '<div class="history-row"><div><strong>第 '+h.day+' 天 · '+esc(h.eventTitle)+'</strong><span>'+h.served+' 位客人 · '+esc(h.serviceName)+'</span></div><div class="history-value">'+(h.profit>=0?'+':'−')+money(Math.abs(h.profit))+'</div></div>';}).join('')+'</div></div>';
  $('view-overview').innerHTML=html;
- document.querySelectorAll('[data-story]').forEach(function(b){b.addEventListener('click',function(){chooseStory(b.getAttribute('data-story'));});});
- document.querySelectorAll('[data-partner-episode]').forEach(function(b){b.addEventListener('click',function(){choosePartnerEpisode(Number(b.getAttribute('data-partner-episode')));});});
  document.querySelectorAll('[data-event]').forEach(function(b){b.addEventListener('click',function(){chooseEvent(Number(b.getAttribute('data-event')),false);});});
  document.querySelectorAll('#followPartnerAdvice').forEach(function(b){b.addEventListener('click',function(){chooseEvent(adviceForToday().choice,true);});});
  document.querySelectorAll('#askPartnerAgain').forEach(function(b){b.addEventListener('click',askPartnerOpinion);});
@@ -440,6 +438,12 @@ function renderOverview(){
  $('openShop').addEventListener('click',runDay);$('askPlan').addEventListener('click',askPlan);
  if($('acceptPlan'))$('acceptPlan').addEventListener('click',acceptPlan);
  if($('rejectPlan'))$('rejectPlan').addEventListener('click',function(){advisorPlan.status='rejected';renderOverview();});
+}
+function renderPartnerTab(){
+ var html='<div class="head-row"><div><div class="kicker">PARTNER / MEMORIES</div><div class="section-title">伙伴与回忆</div></div><span class="aside">第 '+st.day+' 天</span></div>'+renderActiveDecor()+renderPartnerProfile()+renderPartnerEpisode()+renderStory()+renderRegulars();
+ $('view-partner').innerHTML=html;
+ document.querySelectorAll('[data-story]').forEach(function(b){b.addEventListener('click',function(){chooseStory(b.getAttribute('data-story'));});});
+ document.querySelectorAll('[data-partner-episode]').forEach(function(b){b.addEventListener('click',function(){choosePartnerEpisode(Number(b.getAttribute('data-partner-episode')));});});
 }
 function chooseEvent(i){var ev=eventNow(),o=ev.options[i];if(!o)return;if(st.cash<o.cost){toast('资金不足，换一个应对方案吧。');return;}var e=o.e||{};st.cash-=Number(e.cash||0);if(e.stock)Object.keys(e.stock).forEach(function(k){st.stock[k]=(st.stock[k]||0)+e.stock[k];});if(e.rep)stat('rep',e.rep);if(e.sat)stat('sat',e.sat);st.eventFx={customers:e.customers||0,priceFactor:e.priceFactor||1};st.eventChoice=i;save();renderOverview();toast('已选择：'+o.title);}
 function askPlan(){
@@ -513,7 +517,7 @@ function cafeFeedback(labels){
 }
 function cafeAnimateChanged(el){if(!el)return;el.classList.remove('is-changing');void el.offsetWidth;el.classList.add('is-changing');setTimeout(function(){el.classList.remove('is-changing');},500);}
 function cafeBindMotion(){
- var panels=['view-overview','view-menu','view-stock','view-shop'];
+ var panels=['view-overview','view-menu','view-stock','view-shop','view-partner'];
  panels.forEach(function(id){var el=document.getElementById(id);if(!el)return;var obs=new MutationObserver(function(){Array.prototype.forEach.call(el.children,function(node,i){if(node.nodeType===1)node.style.setProperty('--stagger',Math.min(i,8));});});obs.observe(el,{childList:true});});
  document.addEventListener('click',function(e){
   var tab=e.target.closest('[data-tab]');if(tab&&!tab.disabled){cafeFeedback(['切换到 '+(tab.textContent||'新页面').trim().slice(0,16)]);return;}
@@ -525,7 +529,7 @@ function cafeBindMotion(){
 
 function bind(){
  document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){setTab(b.getAttribute('data-tab'));});});
- $('partnerSelect').addEventListener('change',function(){var r=roles.find(function(x){return String(x.id)===String($('partnerSelect').value);});if(!r)return;partnerOpinionToken++;partnerOpinionBusy=false;partnerOpinionTarget='';role=r;localStorage.setItem('maomao_cafe_partner',String(r.id));advisorPlan=null;renderPartner();if(TAB==='overview')renderOverview();toast('经营搭档已切换。');});
+ $('partnerSelect').addEventListener('change',function(){var r=roles.find(function(x){return String(x.id)===String($('partnerSelect').value);});if(!r)return;partnerOpinionToken++;partnerOpinionBusy=false;partnerOpinionTarget='';role=r;localStorage.setItem('maomao_cafe_partner',String(r.id));advisorPlan=null;renderAll();toast('经营搭档已切换。');});
  $('goHome').addEventListener('click',function(){location.href='../index.html';});
 }
 getRoles();

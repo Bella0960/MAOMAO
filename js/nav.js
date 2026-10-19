@@ -1,7 +1,7 @@
 /* 悬浮胶囊底部导航 - 自动注入 + 自动高亮 */
 (function () {
     // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间、角色管理）
-    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/index.html', 'cafe/cafe.html'];
+    var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/games.html', 'cafe/cafe.html'];
     var path = location.pathname.toLowerCase();
     for (var i = 0; i < SKIP_PAGES.length; i++) {
         if (path.indexOf(SKIP_PAGES[i]) !== -1) return;
@@ -19,7 +19,7 @@
         {
             key: 'games',
             label: '游戏',
-            href: '/games/index.html',
+            href: '/games/games.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3.2a2 2 0 0 1-3.3 1l-2.2-2H8.7l-2.2 2a2 2 0 0 1-3.3-1l-1-3.2A4 4 0 0 1 6 9z"/><path d="M7 12v4M5 14h4M16.5 13h.01M19 15h.01"/></svg>',
             badge: false
         },

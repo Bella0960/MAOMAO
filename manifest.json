@@ -29,7 +29,7 @@
       "name": "游戏大厅",
       "short_name": "游戏",
       "description": "六款可与 AI 角色一起玩的小游戏：猜词、侦探、棋盘、记忆、密码与快问快答",
-      "url": "./games/index.html",
+      "url": "./games/games.html",
       "icons": [
         {
           "src": "./assets/icon-192.png",
