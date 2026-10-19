@@ -189,11 +189,12 @@
         }
     }, true);
 
-    /* ---------- 五、Service Worker 更新后自动刷新一次 ----------
-       本地开发改了代码，浏览器可能仍被旧 SW 缓存命中。
+    /* ---------- 五、Service Worker：全站注册 + 更新后自动刷新一次 ----------
+       每个页面都注册（根绝对路径 /sw.js），保证深链进入也能离线/受控。
        新 SW 接管页面时 controllerchange 触发，自动刷新一次拿到最新版。
        sessionStorage 标记防循环刷新。 */
     if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
         navigator.serviceWorker.addEventListener('controllerchange', function () {
             try {
                 if (sessionStorage.getItem('sw_reloaded')) return;

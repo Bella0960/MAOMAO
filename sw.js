@@ -1,29 +1,49 @@
 /* 小手机 PWA Service Worker
  * 页面与静态资源均采用缓存优先+后台更新，断网/慢网时秒开。
  */
-const CACHE_NAME = 'phone-app-pwa-v24';
+const CACHE_NAME = 'phone-app-pwa-v25';
 const APP_SHELL = [
   './',
   './index.html',
-  './games/index.html',
-  './cafe/cafe.html',
-  './diary/diary.html',
-  './travel/dream-travel.html',
   './manifest.json',
+  './favicon.ico',
+  // 主要应用入口（安装后离线可用）
+  './chat/chat/chat.html',
+  './chat/moments/moments.html',
+  './forum/forum.html',
+  './wallet/wallet.html',
+  './worldbook/worldbook/worldbook.html',
+  './settings/settings.html',
+  './profile/profile.html',
+  './music/music.html',
+  './diary/diary.html',
+  './cafe/cafe.html',
+  './beauty/beauty.html',
+  './travel/dream-travel.html',
+  './games/index.html',
+  './tools/api-logs.html',
+  // 公共样式
+  './shared/css/mobile-fit.css',
   './desktop/css/styles.css',
   './settings/css/settings.css',
-  './shared/css/mobile-fit.css',
+  // 公共脚本
   './shared/js/font-loader.js',
   './shared/js/native-feel.js',
-  './shared/js/phone/phone_storage.js',
-  './shared/js/phone/phone_api.js',
-  './desktop/js/script.js',
   './shared/js/statusbar-control.js',
   './shared/js/nav.js',
   './shared/js/sound-system.js',
+  './shared/js/custom-css.js',
   './shared/js/memory.js',
   './shared/js/mask.js',
+  './shared/js/phone/phone_api.js',
+  './shared/js/phone/phone_apps.js',
+  './shared/js/phone/phone_context.js',
+  './shared/js/phone/phone_engine.js',
+  './shared/js/phone/phone_storage.js',
+  './shared/js/phone/phone_ui.js',
+  './desktop/js/script.js',
   './settings/js/settings.js',
+  // 图标
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];
