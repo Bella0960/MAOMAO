@@ -467,6 +467,46 @@
             color: #999999;
             padding: 12px 4px;
         }
+
+        /* 沉浸式头像编辑器：保留原头像，确认后才进入资料草稿 */
+        .portrait-studio {
+            position: absolute; inset: 0; z-index: 120;
+            display: flex; flex-direction: column; background: #F7F7F5;
+            padding: calc(18px + env(safe-area-inset-top, 0px)) 22px calc(18px + env(safe-area-inset-bottom, 0px));
+            animation: studio-in .24s ease both;
+        }
+        .portrait-studio.hidden { display: none !important; }
+        @keyframes studio-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .studio-topline { display:flex; justify-content:space-between; align-items:center; color:#777; font-size:.65rem; letter-spacing:.12em; }
+        .studio-heading { margin: 26px 0 5px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 10vw, 2.8rem); font-weight:400; letter-spacing:-.055em; line-height:1; }
+        .studio-subtitle { color:#777; font-size:.78rem; line-height:1.6; }
+        .studio-canvas-wrap { flex:1; min-height:180px; display:flex; align-items:center; justify-content:center; padding:18px 0; }
+        #portraitCropCanvas { width:min(100%, 300px); aspect-ratio:1; height:auto; display:block; background:#E7E6E2; touch-action:none; cursor:grab; border:1px solid #D7D6D1; }
+        #portraitCropCanvas:active { cursor:grabbing; }
+        .studio-adjust { padding:14px 0 20px; border-top:1px solid #D8D7D2; }
+        .studio-adjust-row { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; font-size:.78rem; }
+        .studio-adjust-row output { font-variant-numeric:tabular-nums; color:#555; }
+        #portraitZoom { width:100%; accent-color:#222; }
+        .studio-hint { color:#888; font-size:.68rem; margin-top:10px; line-height:1.5; }
+        .studio-actions { display:grid; grid-template-columns:1fr 1.25fr; gap:10px; }
+        .studio-action { min-height:48px; border:1px solid #D2D1CC; border-radius:4px; background:transparent; color:#222; font:inherit; font-size:.85rem; cursor:pointer; }
+        .studio-action.primary { background:#222; color:#fff; border-color:#222; }
+        .studio-action:active { transform:scale(.985); }
+        .save-status { min-height:18px; font-size:.75rem; color:#777; text-align:center; letter-spacing:.02em; transition:opacity .25s ease; }
+        .save-status[data-state="success"] { color:#333; }
+        .save-status[data-state="error"] { color:#555; }
+        .recovery-dialog-backdrop { position:absolute; inset:0; z-index:110; background:rgba(20,20,20,.22); display:flex; align-items:center; justify-content:center; padding:22px; }
+        .recovery-dialog-backdrop.hidden { display:none !important; }
+        .recovery-dialog { width:100%; max-width:320px; background:#FAFAF8; padding:22px; border:1px solid #E1E0DB; box-shadow:0 18px 55px rgba(0,0,0,.12); animation:studio-in .2s ease both; }
+        .recovery-kicker { font-size:.62rem; letter-spacing:.14em; color:#888; }
+        .recovery-title { font-family:Georgia, 'Times New Roman', serif; font-size:1.75rem; font-weight:400; letter-spacing:-.04em; margin:13px 0 8px; }
+        .recovery-copy { color:#666; font-size:.8rem; line-height:1.7; margin-bottom:20px; }
+        .recovery-actions { display:flex; flex-direction:column; gap:8px; }
+        .recovery-action { min-height:44px; border:1px solid #D6D5D0; background:transparent; color:#222; font:inherit; font-size:.82rem; cursor:pointer; }
+        .recovery-action.primary { background:#222; color:#fff; border-color:#222; }
+        .recovery-action:active { transform:scale(.99); }
+        @media (prefers-reduced-motion: reduce) { .portrait-studio, .recovery-dialog { animation:none; } }
+
     </style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
@@ -539,6 +579,37 @@
                 <button class="btn-save-fixed" id="btnSaveRole" type="button">保存设定</button>
             </main>
         </div>
+
+        <!-- 沉浸式头像裁切页 -->
+        <section class="portrait-studio hidden" id="portraitStudio" aria-label="头像照片编辑器">
+            <div class="studio-topline"><span>MAOMAO / IMAGE STUDIO</span><span>01 — PORTRAIT</span></div>
+            <h2 class="studio-heading">Portrait</h2>
+            <p class="studio-subtitle">拖动照片调整构图，使用滑杆微调缩放。</p>
+            <div class="studio-canvas-wrap"><canvas id="portraitCropCanvas" width="600" height="600" aria-label="拖动以调整头像裁切"></canvas></div>
+            <div class="studio-adjust">
+                <div class="studio-adjust-row"><label for="portraitZoom">缩放比例</label><output id="portraitZoomValue">100%</output></div>
+                <input id="portraitZoom" type="range" min="100" max="300" step="1" value="100">
+                <p class="studio-hint">照片只会在确认后进入待保存资料，正式头像不会被提前覆盖。</p>
+            </div>
+            <div class="studio-actions">
+                <button class="studio-action" id="btnCancelPortrait" type="button">取消</button>
+                <button class="studio-action primary" id="btnConfirmPortrait" type="button">确认头像</button>
+            </div>
+        </section>
+
+        <!-- 草稿恢复提示 -->
+        <div class="recovery-dialog-backdrop hidden" id="recoveryDialog" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+            <div class="recovery-dialog">
+                <div class="recovery-kicker">MAOMAO / LOCAL ARCHIVE</div>
+                <h2 class="recovery-title" id="recoveryTitle">A moment left unfinished.</h2>
+                <p class="recovery-copy" id="recoveryCopy">检测到上次未正式保存的角色资料。要恢复这份草稿吗？</p>
+                <div class="recovery-actions">
+                    <button class="recovery-action primary" id="btnRecoverDraft" type="button">恢复上次编辑</button>
+                    <button class="recovery-action" id="btnDiscardDraft" type="button">放弃草稿</button>
+                </div>
+            </div>
+        </div>
+
     </div>
     <script src="../js/characters-manager.js"></script>
     <script src="../js/nav.js"></script>
