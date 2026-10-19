@@ -2578,15 +2578,20 @@
                 const personaLines = members.map(function (m, i) {
                     const r = getRoleById(m.id);
                     const p = (r && (r.persona || r.prompt || '').trim()) || '一个善解人意的朋友';
-                    return (i + 1) + '. ' + (m.name || '成员') + '：' + p;
+                    const t = (r && r.tone || '').trim();
+                    return (i + 1) + '. ' + (m.name || '成员') + '：' + p + (t ? '；语气：' + t : '');
                 });
                 rolePersona = '你是群聊「' + currentGroup.name + '」中的成员之一，成员名单如下：\n' + (personaLines.join('\n') || '暂无成员');
                 if (members.length) {
                     groupReplyPick = members[Math.floor(Math.random() * members.length)];
                 }
             } else {
-                rolePersona = (currentCharacter.persona || currentCharacter.prompt || '').trim()
-                    || '你是一个善解人意、回复自然的AI助手。';
+                var basePersona = (currentCharacter.persona || currentCharacter.prompt || '').trim();
+                var roleTone = (currentCharacter.tone || '').trim();
+                rolePersona = basePersona || '你是一个善解人意、回复自然的AI助手。';
+                if (roleTone) {
+                    rolePersona += '\n说话语气风格：' + roleTone + '（必须严格遵循这个语气风格说话）';
+                }
             }
 
             // 用户资料（myProfile 里可能有：nickname/age/hobbies/likes/dislikes/about/sign）

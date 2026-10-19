@@ -167,7 +167,7 @@ function renderEvent(){
 }
 
 function renderControls(){var max=Math.max(0,Math.min(100,Math.floor(st.cash/20)*20));st.ad=clamp(st.ad,0,max);var modes=[{id:'warm',n:'温柔待客',s:'满意度更高'},{id:'standard',n:'标准服务',s:'收支均衡'},{id:'fast',n:'快速出杯',s:'客流更高'}];return '<div class="module"><div class="module-head"><div><div class="kicker">DAILY PLAN / 02</div><div class="section-title">今天怎么经营？</div></div><span class="tag">随时可调整</span></div><div class="control"><div class="control-row"><div><div class="label">宣传预算</div><div class="hint">投入一点资金，让更多附近客人知道你。</div></div><div class="budget"><button data-ad="-20" aria-label="减少预算">−</button><div class="budget-value">'+money(st.ad)+'</div><button data-ad="20" aria-label="增加预算" '+(st.ad>=max?'disabled':'')+'>＋</button></div></div><div class="control-row" style="display:block"><div class="label">服务策略</div><div class="modes">'+modes.map(function(m){return '<button class="mode '+(st.service===m.id?'active':'')+'" data-service="'+m.id+'">'+m.n+'<span>'+m.s+'</span></button>';}).join('')+'</div></div></div><div style="margin-top:12px"><button class="primary" id="openShop" '+(st.eventChoice===null||st.eventChoice===undefined?'disabled':'')+'>开始营业 · 结算今日账本　↗</button><div class="notice">'+(st.eventChoice===null||st.eventChoice===undefined?'先处理上面的今日事件，再开始营业。':'每天只能结算一次。菜单、库存、宣传预算和服务方式都会影响结果。')+'</div></div></div>';}
-function roleTraits(){var r=role||fallbackRole;return '角色名称：'+nameOf(r)+'\n角色简介：'+(r.description||r.bio||r.background||'无')+'\n性格设定：'+(r.personality||r.character||r.profile||r.persona||'自然、有自己的主见')+'\n说话习惯：'+(r.speechStyle||r.speech||r.style||'自然简短')+'\n角色原始提示：'+(r.prompt||r.systemPrompt||r.system_prompt||r.rolePrompt||'');}
+function roleTraits(){var r=role||fallbackRole;return '角色名称：'+nameOf(r)+'\n角色简介：'+(r.description||r.bio||r.background||'无')+'\n性格设定：'+(r.personality||r.character||r.profile||r.persona||'自然、有自己的主见')+'\n说话习惯：'+(r.tone||r.speechStyle||r.speech||r.style||'自然简短')+'\n角色原始提示：'+(r.prompt||r.systemPrompt||r.system_prompt||r.rolePrompt||'');}
 
 var PARTNER_STYLES={
  steady:{label:'稳健经营派',mark:'稳',desc:'重视现金流、库存和稳定出品。',line:'我们先把基础打稳，不急着一口气做大。'},
@@ -180,7 +180,7 @@ var PARTNER_STYLES={
  balanced:{label:'均衡经营派',mark:'衡',desc:'在现金、服务和增长之间寻找平衡。',line:'稳住当下，也给未来留一点空间，我们慢慢来。'}
 };
 function inferPartnerStyle(r){
- var text=[r&&r.description,r&&r.bio,r&&r.background,r&&r.personality,r&&r.character,r&&r.profile,r&&r.persona,r&&r.prompt,r&&r.systemPrompt,r&&r.system_prompt,r&&r.rolePrompt,r&&r.speechStyle].filter(Boolean).join(' ');
+ var text=[r&&r.description,r&&r.bio,r&&r.background,r&&r.personality,r&&r.character,r&&r.profile,r&&r.persona,r&&r.tone,r&&r.prompt,r&&r.systemPrompt,r&&r.system_prompt,r&&r.rolePrompt,r&&r.speechStyle].filter(Boolean).join(' ');
  var buckets=[
  {id:'steady',words:['稳重','稳健','谨慎','细心','认真','靠谱','有条理','理性','计划','冷静','沉稳','可靠','细致']},
  {id:'growth',words:['野心','进取','冒险','大胆','果断','竞争','强势','成长','挑战','事业心','不服输','胜负欲']},

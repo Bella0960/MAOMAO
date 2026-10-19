@@ -2864,7 +2864,7 @@
     'chat_auto_interact_' + roleId,
     '已开启，角色之间会自动互动', '开启后，角色之间会自动互动', '自动互动');
 
-  // ================= 手动生成动态抽屉（仅 UI 与数据收集，本轮不调用 API） =================
+  // ================= 手动生成动态抽屉（调用 AI API 按角色人设生成动态） =================
   var smOverlay = document.getElementById('smOverlay');
   var smRoleList = document.getElementById('smRoleList');
   var smGenerateBtn = document.getElementById('smGenerateBtn');
@@ -3029,20 +3029,132 @@
       });
     }
 
-    // 开始生成：本轮仅收集并 Toast 展示结果，不调用 API
-    smGenerateBtn.addEventListener('click', function () {
+    // 开始生成：调用 AI API 为选中角色生成动态，按人设输出
+    smGenerateBtn.addEventListener('click', async function () {
       if (!smSelectedIds.length) {
         showToast('请先选择角色');
         return;
       }
-      var pool = readCharacterPool();
-      var names = [];
-      for (var i = 0; i < pool.length; i++) {
-        var rid = String(pool[i].id != null ? pool[i].id : i);
-        if (smSelectedIds.indexOf(rid) !== -1) names.push(pool[i].name || '角色');
+      var config = getAiConfig();
+      var apiKey = (config.apiKey || '').trim();
+      var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+      var apiModel = (config.model || 'gpt-3.5-turbo').trim();
+      if (!apiKey) {
+        showToast('请先到设置页配置 API Key');
+        return;
       }
-      showToast('已选择 ' + names.length + ' 个角色（' + names.join('、') + '），每人 ' + smSelectedCount + ' 篇', 3000);
-      closeSmSheet();
+
+      var pool = readCharacterPool();
+      var selectedRoles = pool.filter(function (r) {
+        var rid = String(r.id != null ? r.id : pool.indexOf(r));
+        return smSelectedIds.indexOf(rid) !== -1;
+      });
+      if (!selectedRoles.length) {
+        showToast('未找到选中的角色');
+        return;
+      }
+
+      var originalText = smGenerateBtn.textContent;
+      smGenerateBtn.disabled = true;
+      smGenerateBtn.textContent = '生成中...';
+
+      var totalGenerated = 0;
+      var now = Date.now();
+
+      for (var ri = 0; ri < selectedRoles.length; ri++) {
+        var role = selectedRoles[ri];
+        var roleName = role.name || '角色';
+        var persona = (role.persona || role.prompt || '一个善解人意的AI角色').trim();
+        var tone = (role.tone || '').trim();
+
+        var systemPrompt = '你是' + roleName + '。角色设定：' + persona +
+          (tone ? '。说话语气：' + tone : '') +
+          '。现在要以第一人称发布社交空间动态（朋友圈风格）。';
+
+        var userPrompt = '请结合你的人设，生成 ' + smSelectedCount + ' 条此刻想发的生活动态。' +
+          '要求：每条 50 字以内，口语化、自然真实，不要使用表情符号，不要加引号。' +
+          '每条动态之间用 ||| 分隔，只输出动态正文本身，不要编号、不要解释、不要出现"动态："前缀。';
+
+        try {
+          var controller = new AbortController();
+          var timer = setTimeout(function () { controller.abort(); }, 20000);
+          var resp = await fetch(baseUrl + '/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + apiKey
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              model: apiModel,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+              ],
+              temperature: config.temperature != null ? config.temperature : 0.8,
+              stream: false
+            })
+          });
+          clearTimeout(timer);
+
+          if (!resp.ok) {
+            showToast(roleName + ' 生成失败（HTTP ' + resp.status + '）');
+            continue;
+          }
+          var data = await resp.json();
+          var text = (((data || {}).choices || [])[0] || {}).message
+            ? (data.choices[0].message.content || '') : '';
+          text = String(text || '').trim();
+          if (!text) continue;
+
+          var lines = text.split('|||').map(function (s) {
+            return s.replace(/^["""'`]+|["""'`]+$/g, '').replace(/^\d+[.、\s]+/, '').trim();
+          }).filter(function (s) { return s.length > 0 && s.length <= 200; });
+
+          if (!lines.length) continue;
+
+          var moments = [];
+          try {
+            moments = JSON.parse(localStorage.getItem('moments') || '[]');
+          } catch (e) { moments = []; }
+
+          lines.forEach(function (content, idx) {
+            moments.unshift({
+              id: 'm_' + (now + ri * 1000 + idx) + '_' + Math.floor(Math.random() * 1000),
+              authorId: role.id || '',
+              author: roleName,
+              avatar: role.avatar || '',
+              content: content.slice(0, 200),
+              image: '',
+              time: now - idx * 60000 - ri * 300000,
+              likes: 0,
+              liked: false,
+              comments: 0,
+              commentList: [],
+              byAI: true
+            });
+          });
+
+          try {
+            localStorage.setItem('moments', JSON.stringify(moments));
+          } catch (e) {}
+
+          totalGenerated += lines.length;
+        } catch (e) {
+          var em = (e && e.name === 'AbortError') ? '请求超时' : ('生成失败：' + (e && e.message || ''));
+          showToast(roleName + ' ' + em);
+        }
+      }
+
+      smGenerateBtn.disabled = false;
+      smGenerateBtn.textContent = originalText;
+
+      if (totalGenerated > 0) {
+        showToast('已为 ' + selectedRoles.length + ' 个角色生成 ' + totalGenerated + ' 条动态', 2500);
+        closeSmSheet();
+      } else {
+        showToast('未能生成动态，请检查 API 配置');
+      }
     });
   }
 

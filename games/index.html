@@ -356,7 +356,7 @@ function characterTraits(){
     '角色名称：'+roleName(r),
     '角色简介：'+(r.description||r.bio||r.background||'未提供'),
     '性格设定：'+(r.personality||r.character||r.profile||r.persona||'根据角色原有风格自然表达'),
-    '说话习惯：'+(r.speechStyle||r.speech||r.style||'自然简短'),
+    '说话习惯：'+(r.tone||r.speechStyle||r.speech||r.style||'自然简短'),
     '原始人设：'+(r.prompt||r.systemPrompt||r.system_prompt||r.rolePrompt||'')
   ].join('\n');
 }
