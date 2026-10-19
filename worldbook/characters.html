@@ -507,6 +507,164 @@
         .recovery-action:active { transform:scale(.99); }
         @media (prefers-reduced-motion: reduce) { .portrait-studio, .recovery-dialog { animation:none; } }
 
+
+        /* PERSONA ARCHIVE — editorial poster layout */
+        #listView .header {
+            padding: calc(58px + env(safe-area-inset-top, 0px)) 24px 8px;
+            align-items:center;
+        }
+        #listView .header-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .18em;
+            text-transform: uppercase; margin-left: 13px; color:#777;
+        }
+        #listView .back-circle {
+            width:32px;height:32px;border-radius:0;background:transparent;
+            border:1px solid #D9D9D5;font-size:22px;
+        }
+        #listView .btn-header {
+            border-radius:0; padding:10px 12px; letter-spacing:.02em;
+            background:#171717; min-height:36px;
+        }
+        .archive-intro {
+            padding: 18px 24px 24px;
+            display:grid; grid-template-columns:minmax(0,1fr) auto;
+            align-items:end; column-gap:10px; row-gap:14px;
+        }
+        .archive-kicker {
+            grid-column:1/-1; display:flex; align-items:center; gap:9px;
+            color:#858580; font-size:9px; letter-spacing:.17em; text-transform:uppercase;
+        }
+        .archive-kicker:before { content:""; width:22px; height:1px; background:#777; }
+        .archive-headline {
+            font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+            font-size:clamp(44px, 14vw, 62px); font-weight:400; letter-spacing:-.075em;
+            line-height:.86; color:#171717; max-width:260px;
+        }
+        .archive-headline span { display:block; font-style:italic; font-weight:400; }
+        .archive-count { align-self:end; text-align:right; padding-bottom:3px; }
+        .archive-count strong { display:block; font:400 32px/1 Georgia,serif; letter-spacing:-.06em; }
+        .archive-count span { display:block; margin-top:6px; color:#888; font-size:9px; letter-spacing:.12em; }
+        .archive-description {
+            grid-column:1/-1; display:flex; justify-content:space-between; align-items:end;
+            gap:16px; padding-top:12px; border-top:1px solid #D8D8D3;
+            color:#777; font-size:11px; line-height:1.7;
+        }
+        .archive-description strong { color:#222; font-weight:500; }
+        .archive-description .archive-index { flex-shrink:0; font:italic 16px Georgia,serif; color:#999; }
+        .role-list {
+            padding:0 24px 32px !important; gap:0;
+            background:#fff;
+        }
+        .role-slim-bar {
+            position:relative; border-radius:0; background:#fff !important;
+            border-top:1px solid #D9D9D4; padding:18px 0;
+            display:grid; grid-template-columns: minmax(100px, 36%) minmax(0,1fr);
+            align-items:stretch; gap:16px; min-height:154px;
+            transition:background .25s ease, padding .25s ease;
+        }
+        .role-slim-bar:last-child { border-bottom:1px solid #D9D9D4; }
+        .role-slim-bar:active { transform:none; background:#F7F7F4 !important; }
+        .role-slim-bar.active-role { background:#fff !important; }
+        .bar-left { display:contents; }
+        .slim-avatar {
+            grid-column:1; grid-row:1 / span 3;
+            width:100%; height:142px; border-radius:0; object-fit:cover;
+            background:#ECECE8; border:0; align-self:start;
+            filter:none;
+        }
+        .slim-meta {
+            grid-column:2; grid-row:1; min-width:0; align-self:start;
+            gap:9px; overflow:visible; padding-top:3px;
+        }
+        .slim-name-row { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+        .slim-name {
+            font-family:Georgia,"Noto Serif SC",serif; font-size:23px;
+            font-weight:400; letter-spacing:-.055em; white-space:normal;
+            line-height:1.12; overflow:visible; text-overflow:clip;
+        }
+        .slim-tag {
+            background:transparent; border-radius:0; border:0; border-left:1px solid #888;
+            padding:1px 0 1px 7px; color:#777; font-size:9px; letter-spacing:.08em;
+        }
+        .slim-desc {
+            white-space:normal; overflow:hidden; display:-webkit-box;
+            -webkit-line-clamp:4; -webkit-box-orient:vertical;
+            font-size:11px; line-height:1.65; color:#777;
+        }
+        .bar-right {
+            grid-column:2; grid-row:2; justify-content:flex-start; align-self:end;
+            border-top:1px solid #E7E7E2; padding-top:9px; gap:15px;
+            font-size:10px; letter-spacing:.04em;
+        }
+        .bar-right .act-opt { padding:2px 0; color:#444; font-size:10px; }
+        .bar-right .act-opt.del { color:#999; }
+        .role-slim-bar:after {
+            content:""; position:absolute; left:0; bottom:-1px; width:0; height:1px;
+            background:#222; transition:width .25s ease;
+        }
+        .role-slim-bar:active:after { width:100%; }
+        .empty-tip {
+            text-align:left; color:#777; font-family:Georgia,serif; font-size:18px;
+            padding:28px 0; border-top:1px solid #D9D9D4; line-height:1.6;
+        }
+        /* Editor retains all existing fields while using editorial hierarchy */
+        #editorView .header {
+            padding:calc(58px + env(safe-area-inset-top, 0px)) 24px 16px;
+            border-bottom:1px solid #E5E5E0;
+        }
+        #editorView .header-title {
+            font-family:Georgia,"Noto Serif SC",serif; font-size:25px;
+            font-weight:400; letter-spacing:-.045em;
+        }
+        .editor-container {
+            padding:0 24px 28px; gap:0;
+        }
+        .avatar-section {
+            align-items:flex-start; padding:25px 0 27px; border-bottom:1px solid #D9D9D4;
+            margin-bottom:24px; position:relative;
+        }
+        .avatar-section:before {
+            content:"PORTRAIT / 01"; display:block; color:#888; font-size:9px;
+            letter-spacing:.16em; margin-bottom:16px;
+        }
+        .avatar-bubble-wrapper { width:104px; height:124px; }
+        .editor-avatar { width:104px; height:124px; border-radius:0; background-size:cover; }
+        .avatar-badge-btn { width:25px;height:25px;border-radius:0;right:-8px;bottom:-7px;box-shadow:none;border-color:#D5D5D0; }
+        .editor-field-group {
+            padding:19px 0 21px; border-bottom:1px solid #E3E3DE; gap:10px;
+        }
+        .field-label {
+            font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+            padding:0; color:#858580;
+        }
+        .form-input {
+            height:auto; min-height:48px; border-radius:0; padding:10px 0;
+            background:transparent; border:0; border-bottom:1px solid #D9D9D4;
+            font-family:Georgia,"Noto Serif SC",serif; font-size:20px; font-weight:400;
+        }
+        .form-input:focus { background:transparent; box-shadow:none; border-bottom-color:#222; }
+        .form-textarea {
+            border-radius:0; background:#F7F7F4; padding:14px;
+            font-size:13px; line-height:1.8; min-height:140px;
+        }
+        .form-textarea.tone { min-height:110px; }
+        .form-textarea:focus { background:#F4F4F0; box-shadow:inset 0 0 0 1px #D5D5D0; }
+        .wb-bind-list { border-radius:0; gap:0; }
+        .wb-bind-item {
+            border-radius:0; background:transparent; border-bottom:1px solid #E5E5E0;
+            margin:0; padding:0 2px; min-height:48px;
+        }
+        .wb-bind-item.is-checked { background:#F4F4F1; }
+        .btn-save-fixed { border-radius:0; margin-top:20px; min-height:52px; }
+        .save-status { margin-top:14px; }
+        @media (max-width:360px) {
+            .archive-intro { padding-left:19px; padding-right:19px; }
+            .role-list { padding-left:19px !important; padding-right:19px !important; }
+            .role-slim-bar { grid-template-columns:minmax(88px,34%) minmax(0,1fr); gap:12px; }
+            .slim-avatar { height:128px; }
+            .slim-name { font-size:20px; }
+        }
+
     </style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
@@ -518,9 +676,18 @@
         <div class="view-section" id="listView">
             <header class="header">
                 <a class="back-circle" href="../index.html" aria-label="返回主屏幕">‹</a>
-                <h1 class="header-title">Contacts</h1>
+                <h1 class="header-title">PERSONA ARCHIVE</h1>
                 <button class="btn-header" id="btnAddRole" type="button"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>添加</span></button>
             </header>
+            <section class="archive-intro" aria-label="角色档案标题">
+                <div class="archive-kicker">A collection of personalities</div>
+                <h2 class="archive-headline">Persona <span>Archive.</span></h2>
+                <div class="archive-count"><strong id="archiveRoleCount">00</strong><span>CHARACTERS</span></div>
+                <div class="archive-description">
+                    <span><strong>角色档案 / PERSONA INDEX</strong><br>每一个角色，都是独立的故事与声音。</span>
+                    <span class="archive-index">No. 01—</span>
+                </div>
+            </section>
             <main class="role-list" id="roleListContainer"></main>
         </div>
 
