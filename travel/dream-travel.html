@@ -240,6 +240,39 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 .note-actions button:first-child{padding-left:0}
 .note-actions button+button{border-left:1px solid #E2E2E2}
 .note-actions button:active{color:#171717}
+/* ===== 极简杂志风互动海报组件（月光海 · SILENT SEA） ===== */
+.mag-poster-container{padding:20px;perspective:1000px;display:flex;justify-content:center}
+.mag-poster-card{width:100%;max-width:340px;background:#ffffff;border:1px solid #e5e5e5;padding:20px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.05);transition:transform 0.15s cubic-bezier(0.2,0,0.2,1),box-shadow 0.3s ease;transform-style:preserve-3d;cursor:pointer;overflow:hidden}
+.mag-poster-glare{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(255,255,255,0.4) 0%,rgba(255,255,255,0) 60%);pointer-events:none;z-index:5}
+.mag-poster-header,.mag-poster-footer{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:10px;color:#888888;letter-spacing:1px;text-transform:uppercase}
+.mag-poster-header{margin-bottom:15px}
+.mag-poster-footer{margin-top:15px;border-top:1px solid #f0f0f0;padding-top:10px}
+.mag-poster-media{position:relative;width:100%;height:220px;overflow:hidden;background:#111;border:1px solid #111}
+.poster-img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%);transition:filter 0.6s ease,transform 0.6s ease}
+.mag-poster-card:hover .poster-img{filter:grayscale(80%) contrast(105%);transform:scale(1.03)}
+.poster-stamp{position:absolute;top:15px;right:15px;border:1px dashed rgba(255,255,255,0.7);color:#fff;padding:4px 8px;font-size:11px;border-radius:50%;letter-spacing:1px;backdrop-filter:blur(2px)}
+.mag-poster-body{margin-top:15px}
+.poster-title{font-family:'Times New Roman',serif;font-size:22px;font-weight:400;letter-spacing:2px;color:#111;margin:0 0 4px 0}
+.poster-subtitle{font-size:12px;color:#666;margin:0 0 15px 0}
+.poster-interactive-note{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px dashed #e0e0e0}
+.note-line{width:12px;height:1px;background:#111}
+.note-text{font-size:11px;color:#333;letter-spacing:0.5px}
+.mag-modal-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;z-index:1000}
+.mag-modal-overlay.active{opacity:1;pointer-events:auto}
+.mag-modal-card{width:85%;max-width:320px;background:#fff;padding:25px;border:1px solid #111;position:relative;transform:translateY(20px) scale(0.95);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)}
+.mag-modal-overlay.active .mag-modal-card{transform:translateY(0) scale(1)}
+.modal-close-btn{position:absolute;top:10px;right:15px;background:none;border:none;font-size:20px;cursor:pointer;color:#888}
+.modal-tag{font-size:9px;color:#999;font-family:monospace}
+.modal-header h3{font-size:16px;margin:5px 0 15px 0;font-family:serif}
+.modal-body p{font-size:13px;color:#444;line-height:1.6;margin-bottom:20px}
+.audio-wave-box{display:flex;align-items:center;gap:4px;background:#f9f9f9;padding:10px 12px;border-radius:4px}
+.wave-bar{width:2px;height:12px;background:#111;animation:wave 1.2s infinite ease-in-out}
+.wave-bar:nth-child(2){animation-delay:0.2s}
+.wave-bar:nth-child(3){animation-delay:0.4s}
+.wave-bar:nth-child(4){animation-delay:0.1s}
+.wave-bar:nth-child(5){animation-delay:0.3s}
+@keyframes wave{0%,100%{height:4px}50%{height:16px}}
+.audio-time{font-size:10px;color:#888;margin-left:auto;font-family:monospace}
 </style>
 </head>
 <body style="overflow: hidden;">
@@ -291,6 +324,27 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
     </section>
   </div>
   <div class="ticket-modal" id="ticketModal" role="dialog" aria-modal="true" aria-label="旅行票根"><div class="vt" id="vtCard"></div></div>
+  <!-- 杂志海报：折叠式批注浮层 -->
+  <div class="mag-modal-overlay" id="posterModal">
+    <div class="mag-modal-card">
+      <button class="modal-close-btn" id="closeModalBtn">×</button>
+      <div class="modal-header">
+        <span class="modal-tag">SECRET NOTE / 001</span>
+        <h3>潮汐手札记录</h3>
+      </div>
+      <div class="modal-body">
+        <p>“这里没有白昼。海面收集了许多无人认领的月光，偶尔也会把远方寄来的梦推上岸。”</p>
+        <div class="audio-wave-box">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <span class="audio-time">0:15 / 潮汐白噪音</span>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite">已从收藏中移除</div>
 </div>
 <style>
@@ -403,15 +457,33 @@ var newNote=$('emptyNewNote');if(newNote)newNote.addEventListener('click',functi
 scroller.scrollTop=0;
 }
 function setView(v){view=v;render()}
+// 极简杂志风互动海报组件（月光海 · SILENT SEA）
+var MAG_POSTER_HTML='<div class="mag-poster-container" id="magPoster"><div class="mag-poster-card"><div class="mag-poster-glare"></div><div class="mag-poster-header"><span class="poster-tag">POSTER / 001</span><span class="poster-date">2026.10.20</span></div><div class="mag-poster-media"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&amp;w=800" alt="月光海" class="poster-img" /><div class="poster-stamp">已抵达</div></div><div class="mag-poster-body"><h2 class="poster-title">SILENT SEA</h2><p class="poster-subtitle">月光海 · 潮汐会替你保管秘密</p><div class="poster-interactive-note" id="posterNoteBtn"><span class="note-line"></span><span class="note-text">✦ 点击解锁隐藏批注 &amp; 氛围音效</span></div></div><div class="mag-poster-footer"><span>TOUCH DREAM RAILWAYS</span><span>FIG. 001</span></div></div></div>';
 function openDetail(id){
 var p=findPlace(id);activePlaceId=p.id;
-$('detailScroll').innerHTML='<div class="detail-scene">'+artHTML(p,true)+'</div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / '+p.code+' · '+esc(p.category.toUpperCase())+'</div><h1 class="detail-title">'+esc(p.name)+'</h1><div class="detail-subtitle">'+esc(p.tagline)+'<br>'+esc(p.desc)+'</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>'+esc(p.duration)+'</strong></div><div class="metric"><span>適合時刻</span><strong>'+esc(p.season)+'</strong></div><div class="metric"><span>夢境方向</span><strong>'+esc(p.distance)+'</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">'+esc(p.story)+'</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>'+esc(p.route)+'</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>'+esc(p.gift)+'。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div><div class="detail-foot-actions"><button class="text-action" id="detailVisited">'+iconSvg('check')+'<span>'+(has(data.visited,p.id)?'已经来过了':'我来过这里')+'</span></button><button class="text-action" id="detailCopy">'+iconSvg('copy')+'<span>复制这段幻想</span></button></div></div>';
+$('detailScroll').innerHTML='<div class="detail-scene">'+artHTML(p,true)+'</div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / '+p.code+' · '+esc(p.category.toUpperCase())+'</div><h1 class="detail-title">'+esc(p.name)+'</h1><div class="detail-subtitle">'+esc(p.tagline)+'<br>'+esc(p.desc)+'</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>'+esc(p.duration)+'</strong></div><div class="metric"><span>適合時刻</span><strong>'+esc(p.season)+'</strong></div><div class="metric"><span>夢境方向</span><strong>'+esc(p.distance)+'</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">'+esc(p.story)+'</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>'+esc(p.route)+'</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>'+esc(p.gift)+'。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div>'+(p.id==='moon-sea'?MAG_POSTER_HTML:'')+'<div class="detail-foot-actions"><button class="text-action" id="detailVisited">'+iconSvg('check')+'<span>'+(has(data.visited,p.id)?'已经来过了':'我来过这里')+'</span></button><button class="text-action" id="detailCopy">'+iconSvg('copy')+'<span>复制这段幻想</span></button></div></div>';
 $('detailOverlay').classList.add('show');document.body.style.overflow='hidden';
 $('closeDetail').addEventListener('click',closeDetail);
 $('detailFavorite').textContent=has(data.favorites,p.id)?'★':'☆';
 $('detailPlan').onclick=function(){openBooking(p.id)};
 $('detailVisited').addEventListener('click',function(){markVisited(p.id)});
 $('detailCopy').addEventListener('click',function(){copyPlaceText(p)});
+initMagPoster();
+}
+// 杂志风互动海报：3D 触控视差 + 批注弹窗
+function initMagPoster(){
+var poster=$('magPoster');if(!poster)return;
+var card=poster.querySelector('.mag-poster-card');
+var noteBtn=$('posterNoteBtn');
+var modal=$('posterModal');
+poster.addEventListener('mousemove',function(e){
+var rect=poster.getBoundingClientRect();
+var x=e.clientX-rect.left-rect.width/2;
+var y=e.clientY-rect.top-rect.height/2;
+card.style.transform='rotateX('+(-y/rect.height*12)+'deg) rotateY('+(x/rect.width*12)+'deg)';
+});
+poster.addEventListener('mouseleave',function(){card.style.transform='rotateX(0deg) rotateY(0deg)'});
+if(noteBtn&&modal)noteBtn.addEventListener('click',function(e){e.stopPropagation();modal.classList.add('active');if(navigator.vibrate)navigator.vibrate(15)});
 }
 function closeDetail(){$('detailOverlay').classList.remove('show');document.body.style.overflow=''}
 function toggleFavorite(id){
@@ -637,6 +709,13 @@ $('closeNote').addEventListener('click',closeNote);$('cancelNote').addEventListe
 $('noteOverlay').addEventListener('click',function(e){if(e.target===$('noteOverlay'))closeNote()});
 $('saveNote').addEventListener('click',saveNote);
 $('deleteNote').addEventListener('click',function(){if(editingNoteId)deleteNote(editingNoteId);closeNote()});
+// 杂志海报批注弹窗：关闭交互（静态浮层，只需绑定一次）
+var posterModal=$('posterModal');
+if(posterModal){
+var closeModalBtn=$('closeModalBtn');
+if(closeModalBtn)closeModalBtn.addEventListener('click',function(){posterModal.classList.remove('active')});
+posterModal.addEventListener('click',function(e){if(e.target===posterModal)posterModal.classList.remove('active')});
+}
 function updateTime(){var d=new Date();$('statusTime').textContent=d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false})}
 updateTime();setInterval(updateTime,30000);render();
 })();
