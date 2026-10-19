@@ -665,6 +665,46 @@
             .slim-name { font-size:20px; }
         }
 
+    
+        /* Fine-tuning pass: neutral grayscale + tighter editorial rhythm */
+        #listView .header { padding-top:calc(34px + env(safe-area-inset-top, 0px)); padding-bottom:4px; }
+        .archive-intro { padding-top:12px; padding-bottom:17px; row-gap:9px; }
+        .archive-kicker { color:#777777; }
+        .archive-kicker:before { background:#777777; }
+        .archive-headline { line-height:.9; }
+        .archive-count strong { color:#1A1A1A; }
+        .archive-description { padding-top:8px; line-height:1.5; gap:10px; }
+        .role-list { padding-bottom:20px !important; }
+        .role-slim-bar { padding:12px 0; min-height:0; gap:13px; border-color:#D8D8D8; }
+        .slim-avatar { height:124px; background:#EEEEEE; }
+        .slim-meta { gap:6px; padding-top:1px; }
+        .slim-name-row { gap:5px; }
+        .slim-name { font-size:21px; }
+        .slim-desc { line-height:1.5; -webkit-line-clamp:3; }
+        .bar-right { padding-top:6px; }
+        #editorView .header { padding-top:calc(34px + env(safe-area-inset-top, 0px)); padding-bottom:12px; }
+        .avatar-section { padding:18px 0 19px; margin-bottom:12px; }
+        .avatar-section:before { margin-bottom:10px; }
+        .editor-field-group { padding:13px 0 14px; gap:7px; }
+        .form-input { min-height:42px; padding:7px 0; }
+        .form-textarea { min-height:120px; padding:12px; line-height:1.65; background:#F5F5F5; }
+        .form-textarea.tone { min-height:92px; }
+        .btn-save-fixed { margin-top:14px; min-height:48px; }
+        .save-status { margin-top:9px; }
+        .portrait-studio { background:#F7F7F7; }
+        .studio-canvas-wrap { padding:12px 0; }
+        #portraitCropCanvas { background:#E8E8E8; border-color:#D6D6D6; }
+        .studio-adjust { border-color:#D6D6D6; }
+        .recovery-dialog-backdrop { background:rgba(0,0,0,.2); }
+        .recovery-dialog { background:#FAFAFA; border-color:#DDDDDD; }
+        .recovery-action { border-color:#D5D5D5; }
+        @media (max-width:360px) {
+            .archive-intro { padding-top:10px; padding-bottom:14px; }
+            .role-slim-bar { gap:10px; padding:10px 0; }
+            .slim-avatar { height:112px; }
+            .slim-name { font-size:19px; }
+        }
+
     </style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
