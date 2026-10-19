@@ -6,7 +6,43 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>触梦旅行 · 小手机</title>
-<script src="../shared/js/native-feel.js"></script>
+<script src="../shared/js/native-feel.js"></script><style>html {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 1;
+}
+@keyframes nfPushIn { from { opacity: 0; transform: translateX(22px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes nfPopIn  { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
+@keyframes nfTabIn  { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+html.nf-enter {
+    animation-duration: 0.28s;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    animation-fill-mode: backwards;
+    will-change: transform, opacity;
+}
+html.nf-enter-push { animation-name: nfPushIn; }
+html.nf-enter-pop  { animation-name: nfPopIn; }
+html.nf-enter-tab  { animation-name: nfTabIn; }
+html.nf-hide { opacity: 0; transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+    html.nf-enter { animation: none !important; }
+    html { transition: none !important; }
+}
+* { -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior-y: none; }
+[class*="scroll"], .chat-stage { overscroll-behavior-y: none; }
+input, textarea, select, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+}
+a, button, [role="button"] { touch-action: manipulation; }
+a:active, button:active, [role="button"]:active { transform: scale(0.97); }</style>
 <style>
 :root{color-scheme:light;--ink:#171717;--text:#4c4c4c;--muted:#929292;--line:#e8e8e8;--paper:#fff;--soft:#f5f5f5;--shadow:0 14px 42px rgba(0,0,0,.08)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -240,23 +276,24 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 .note-actions button:first-child{padding-left:0}
 .note-actions button+button{border-left:1px solid #E2E2E2}
 .note-actions button:active{color:#171717}
-/* ===== 极简杂志风互动海报组件（月光海 · SILENT SEA） ===== */
-.mag-poster-container{padding:20px;perspective:1000px;display:flex;justify-content:center}
-.mag-poster-card{width:100%;max-width:340px;background:#ffffff;border:1px solid #e5e5e5;padding:20px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.05);transition:transform 0.15s cubic-bezier(0.2,0,0.2,1),box-shadow 0.3s ease;transform-style:preserve-3d;cursor:pointer;overflow:hidden}
-.mag-poster-glare{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(255,255,255,0.4) 0%,rgba(255,255,255,0) 60%);pointer-events:none;z-index:5}
-.mag-poster-header,.mag-poster-footer{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:10px;color:#888888;letter-spacing:1px;text-transform:uppercase}
-.mag-poster-header{margin-bottom:15px}
-.mag-poster-footer{margin-top:15px;border-top:1px solid #f0f0f0;padding-top:10px}
-.mag-poster-media{position:relative;width:100%;height:220px;overflow:hidden;background:#111;border:1px solid #111}
-.poster-img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%);transition:filter 0.6s ease,transform 0.6s ease}
-.mag-poster-card:hover .poster-img{filter:grayscale(80%) contrast(105%);transform:scale(1.03)}
-.poster-stamp{position:absolute;top:15px;right:15px;border:1px dashed rgba(255,255,255,0.7);color:#fff;padding:4px 8px;font-size:11px;border-radius:50%;letter-spacing:1px;backdrop-filter:blur(2px)}
-.mag-poster-body{margin-top:15px}
-.poster-title{font-family:'Times New Roman',serif;font-size:22px;font-weight:400;letter-spacing:2px;color:#111;margin:0 0 4px 0}
-.poster-subtitle{font-size:12px;color:#666;margin:0 0 15px 0}
-.poster-interactive-note{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px dashed #e0e0e0}
-.note-line{width:12px;height:1px;background:#111}
-.note-text{font-size:11px;color:#333;letter-spacing:0.5px}
+/* ===== 极简杂志风互动海报：重构版（月光海 · SILENT SEA） ===== */
+/* 纯净杂志排版：去掉了所有厚重外框与阴影，回归纸面质感 */
+.editorial-poster{width:100%;max-width:330px;margin:0 auto;background:#ffffff;padding:24px 20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;box-sizing:border-box;position:relative;transition:transform 0.2s ease}
+.poster-meta-top,.poster-meta-bottom{display:flex;justify-content:space-between;font-family:'Courier New',Courier,monospace;font-size:9px;color:#999999;letter-spacing:1.5px;text-transform:uppercase}
+.poster-meta-top{margin-bottom:14px}
+.poster-meta-bottom{margin-top:18px;padding-top:12px;border-top:0.5px solid #eaeaea}
+.poster-visual{position:relative;width:100%;height:200px;background:#f4f4f4;overflow:hidden}
+.poster-visual img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%);transition:filter 0.5s ease,transform 0.5s ease}
+.editorial-poster:hover .poster-visual img{filter:grayscale(85%) contrast(105%);transform:scale(1.02)}
+.poster-badge-clean{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.85);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:3px 8px;font-size:9px;font-family:monospace;color:#111;letter-spacing:1px}
+.poster-content{margin-top:16px}
+.sub-tag{font-size:9px;font-family:monospace;color:#888;letter-spacing:1px;display:block;margin-bottom:4px}
+.poster-titles h2{font-family:'Times New Roman',Times,serif;font-size:20px;font-weight:400;letter-spacing:2.5px;color:#111;margin:0 0 4px 0}
+.poster-titles .desc{font-size:11px;color:#666;margin:0 0 16px 0;line-height:1.5}
+.poster-action-trigger{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:0.5px dashed #dddddd;cursor:pointer}
+.line-dot{width:16px;height:1px;background:#111;transition:width 0.3s ease}
+.poster-action-trigger:hover .line-dot{width:24px}
+.poster-action-trigger span{font-size:10px;color:#333;letter-spacing:0.5px}
 .mag-modal-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;z-index:1000}
 .mag-modal-overlay.active{opacity:1;pointer-events:auto}
 .mag-modal-card{width:85%;max-width:320px;background:#fff;padding:25px;border:1px solid #111;position:relative;transform:translateY(20px) scale(0.95);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)}
@@ -275,30 +312,30 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 .audio-time{font-size:10px;color:#888;margin-left:auto;font-family:monospace}
 </style>
 </head>
-<body style="overflow: hidden;">
+<body>
 <div class="phone-shell">
-  <div class="statusbar"><span id="statusTime">19:49</span></div>
+  <div class="statusbar"><span id="statusTime">21:58</span></div>
   <header class="topbar">
     <div class="top-left"><button class="icon-button" id="backHome" aria-label="返回桌面"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path><path d="M9 12h11"></path></svg></button><div><div class="wordmark">TOUCH DREAM / TRAVEL</div><div class="submark">远方，也可以是一场梦</div></div></div>
-    <div class="top-actions"><button class="icon-button" id="randomBtn" aria-label="随机探索" title="随机探索"><svg viewBox="0 0 24 24"><path d="M3 7h3c5 0 7 10 12 10h3M17 13l4 4-4 4M3 17h3c2 0 3.5-2 5-4M17 3l4 4-4 4M14 7h4"></path></svg></button><button class="icon-button" id="moreBtn" aria-label="更多选项" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button></div>
+    <div class="top-actions"><button class="icon-button" id="moreBtn" aria-label="更多选项" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button></div>
   </header>
-  <main class="scroller" id="scroller"><div id="mainView"><section class="page-hero"><div class="eyebrow">YOUR FICTIONAL ITINERARY</div><h1>旅程档案<span style="font-weight:320;color:#aaa">。</span></h1><p>每一张票根，都是你与另一个世界约定好的见面。</p></section><div class="progress-strip"><div class="progress-copy"><div class="label">DREAM PASSPORT</div><strong>已收集 1 枚旅行纪念</strong><div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div></div><div class="progress-number">01<span style="font-size:10px;color:#aaa"> / 6</span></div></div><div class="section-head"><h2>即将出发</h2><span class="section-meta">1 TICKETS</span></div><div class="ticket-list"><article class="ticket" data-ticket="t_mvdpcyhl_1huj" role="button" tabindex="0" aria-label="查看旅行票根"><span class="tk-teeth tk-teeth-t" aria-hidden="true"></span><span class="tk-teeth tk-teeth-b" aria-hidden="true"></span><div class="tk-main"><div class="tk-scene"><div class="art-scene scene-hotel"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="hotel-windows"></span><span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / 004</span><span class="scene-caption">时针背面</span></div></div><div class="tk-body"><div class="tk-route"><div><span class="tk-k">起点 FROM</span><span class="tk-v tk-v-name">此处人间</span></div><span class="tk-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span><div style="text-align:right"><span class="tk-k">抵达 TO</span><span class="tk-v tk-v-name">时间旅馆</span></div></div><div class="tk-row"><span class="tk-k">出发日期 DATE</span><span class="tk-v">2026.10.19</span><span class="tk-cd">距出发 1 天</span></div><div class="tk-foot"><span class="tk-barcode" aria-hidden="true"></span><span class="tk-code">TD-IZM88S</span></div></div></div><aside class="tk-stub"><div class="tk-stub-head">存根<span>STUB</span></div><div class="tk-stub-status">待出发</div><div class="tk-stub-hint">点击查看</div></aside></article></div><div class="section-head" style="margin-top:25px"><h2>已经抵达</h2><span class="section-meta">2 ARRIVED</span></div><div class="ticket-list"><article class="ticket is-arrived" data-ticket="t_mvdkxgd4_ywus" role="button" tabindex="0" aria-label="查看旅行票根"><span class="tk-teeth tk-teeth-t" aria-hidden="true"></span><span class="tk-teeth tk-teeth-b" aria-hidden="true"></span><div class="tk-main"><div class="tk-scene"><div class="art-scene scene-moon"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="terrain"></span><span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / 001</span><span class="scene-caption">梦境东岸</span></div></div><div class="tk-body"><div class="tk-route"><div><span class="tk-k">起点 FROM</span><span class="tk-v tk-v-name">此处人间</span></div><span class="tk-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span><div style="text-align:right"><span class="tk-k">抵达 TO</span><span class="tk-v tk-v-name">月光海</span></div></div><div class="tk-row"><span class="tk-k">出发日期 DATE</span><span class="tk-v">2026.10.19</span></div><div class="tk-foot"><span class="tk-barcode" aria-hidden="true"></span><span class="tk-code">TD-ZVKE75</span></div></div><div class="tk-stamp" aria-hidden="true"><b>已抵达</b><i>2026.10.19</i></div></div></article><article class="ticket is-arrived" data-ticket="t_mvdo2isr_7kn6" role="button" tabindex="0" aria-label="查看旅行票根"><span class="tk-teeth tk-teeth-t" aria-hidden="true"></span><span class="tk-teeth tk-teeth-b" aria-hidden="true"></span><div class="tk-main"><div class="tk-scene"><div class="art-scene scene-moon"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="terrain"></span><span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / 001</span><span class="scene-caption">梦境东岸</span></div></div><div class="tk-body"><div class="tk-route"><div><span class="tk-k">起点 FROM</span><span class="tk-v tk-v-name">此处人间</span></div><span class="tk-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span><div style="text-align:right"><span class="tk-k">抵达 TO</span><span class="tk-v tk-v-name">月光海</span></div></div><div class="tk-row"><span class="tk-k">出发日期 DATE</span><span class="tk-v">2026.10.19</span></div><div class="tk-foot"><span class="tk-barcode" aria-hidden="true"></span><span class="tk-code">TD-ORQ8KQ</span></div></div><div class="tk-stamp" aria-hidden="true"><b>已抵达</b><i>2026.10.19</i></div></div></article></div></div></main>
+  <main class="scroller" id="scroller"><div id="mainView"><section class="page-hero"><div class="eyebrow">COLLECT LITTLE IMPOSSIBILITIES</div><h1>梦境收藏<span style="font-weight:320;color:#aaa">。</span></h1><p>世界走过你，也在你身上留下一点回声。</p></section><section class="collection-section"><div class="collection-head"><h2>收藏的目的地</h2><span>0 SAVED</span></div><div class="empty-state"><div class="empty-mark">☆</div><h3>把想去的地方先收起来</h3><p>打开一个地点，在详情页把它收进收藏。</p><button class="light-button" data-goto="explore">发现一个地方</button></div></section><section class="collection-section"><div class="collection-head"><h2>护照印记</h2><span>0 / 6 WORLDS</span></div><div class="empty-state"><div class="empty-mark">01 / 06</div><h3>你的护照还很新</h3><p>完成一次幻想旅程，就会得到一枚属于这个世界的印记。</p></div></section><section class="collection-section"><div class="collection-head"><h2>旅行纪念品</h2><span>0 COLLECTED</span></div><div class="empty-state"><div class="empty-mark">◇</div><h3>还没捡到纪念品</h3><p>每次确认抵达，都会收下这个世界的一份小礼物。</p></div></section></div></main>
   <nav class="bottom-nav" aria-label="触梦旅行导航">
     <button class="tab" data-view="explore"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="m15.8 8.2-2.2 5.4-5.4 2.2 2.2-5.4z"></path></svg><span>探索</span></button>
-    <button class="tab active" data-view="trips"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2"></rect><path d="M8 6V4h8v2M3 11h18M8 11v3M16 11v3"></path></svg><span>行程</span></button>
+    <button class="tab" data-view="trips"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2"></rect><path d="M8 6V4h8v2M3 11h18M8 11v3M16 11v3"></path></svg><span>行程</span></button>
     <button class="tab-create" id="newNoteBtn" aria-label="写旅行手札" title="写旅行手札"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></button>
-    <button class="tab" data-view="collection"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"></path></svg><span>收藏</span></button>
+    <button class="tab active" data-view="collection"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"></path></svg><span>收藏</span></button>
     <button class="tab" data-view="notes"><svg viewBox="0 0 24 24"><path d="M5 3.5h14a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V5A1.5 1.5 0 0 1 5 3.5Z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg><span>手札</span></button>
   </nav>
 
   <section class="detail-overlay" id="detailOverlay" aria-label="目的地详情">
-    <div class="detail-scroll" id="detailScroll"><div class="detail-scene"><div class="art-scene scene-moon"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="terrain"></span><span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / 001</span><span class="scene-caption">梦境东岸</span></div></div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg></button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / 001 · 静谧海域</div><h1 class="detail-title">月光海</h1><div class="detail-subtitle">潮汐会替你保管秘密。<br>一片只在午夜涨潮的银色海湾。</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>一晚</strong></div><div class="metric"><span>適合時刻</span><strong>月圆之夜</strong></div><div class="metric"><span>夢境方向</span><strong>梦境东岸</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">这里没有白昼。海面收集了许多无人认领的月光，偶尔也会把远方寄来的梦推上岸。\n\n当地人说，只要在潮水退去时把一个秘密写在纸上，第二天醒来，你就会记得它真正的名字。</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>沿着没有路牌的海岸向北走，在第三盏熄灭的灯之后下坡。若听见远处有钟声，不必寻找钟楼，那是海正在换气。</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>月汐玻璃片。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div><div class="detail-foot-actions"><button class="text-action" id="detailVisited"><svg viewBox="0 0 24 24"><path d="m5 13 4 4 10-10"></path></svg><span>我来过这里</span></button><button class="text-action" id="detailCopy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"></path></svg><span>复制这段幻想</span></button></div></div></div>
+    <div class="detail-scroll" id="detailScroll"><div class="detail-scene"><div class="art-scene scene-moon"><span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="terrain"></span><span class="art-grain" aria-hidden="true"></span><span class="art-frame" aria-hidden="true"></span><span class="art-code">DREAM / 001</span><span class="scene-caption">梦境东岸</span></div></div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg></button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / 001 · 静谧海域</div><h1 class="detail-title">月光海</h1><div class="detail-subtitle">潮汐会替你保管秘密。<br>一片只在午夜涨潮的银色海湾。</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>一晚</strong></div><div class="metric"><span>適合時刻</span><strong>月圆之夜</strong></div><div class="metric"><span>夢境方向</span><strong>梦境东岸</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">这里没有白昼。海面收集了许多无人认领的月光，偶尔也会把远方寄来的梦推上岸。\n\n当地人说，只要在潮水退去时把一个秘密写在纸上，第二天醒来，你就会记得它真正的名字。</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>沿着没有路牌的海岸向北走，在第三盏熄灭的灯之后下坡。若听见远处有钟声，不必寻找钟楼，那是海正在换气。</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>月汐玻璃片。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div><div class="mag-poster-container" id="magPoster"><div class="mag-poster-card"><div class="mag-poster-glare"></div><div class="mag-poster-header"><span class="poster-tag">POSTER / 001</span><span class="poster-date">2026.10.20</span></div><div class="mag-poster-media"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&amp;w=800" alt="月光海" class="poster-img"><div class="poster-stamp">已抵达</div></div><div class="mag-poster-body"><h2 class="poster-title">SILENT SEA</h2><p class="poster-subtitle">月光海 · 潮汐会替你保管秘密</p><div class="poster-interactive-note" id="posterNoteBtn"><span class="note-line"></span><span class="note-text">✦ 点击解锁隐藏批注 &amp; 氛围音效</span></div></div><div class="mag-poster-footer"><span>TOUCH DREAM RAILWAYS</span><span>FIG. 001</span></div></div></div><div class="detail-foot-actions"><button class="text-action" id="detailVisited"><svg viewBox="0 0 24 24"><path d="m5 13 4 4 10-10"></path></svg><span>我来过这里</span></button><button class="text-action" id="detailCopy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"></path></svg><span>复制这段幻想</span></button></div></div></div>
     <div class="detail-actions"><button class="light-button" id="detailFavorite" aria-label="收藏目的地">☆</button><button class="dark-button" id="detailPlan">预订一段幻想旅程 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button></div>
   </section>
 
   <div class="overlay" id="bookingOverlay" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
     <section class="sheet"><div class="grabber"></div><div class="sheet-head"><div><div class="sheet-title" id="bookingTitle">预订一段幻想旅程</div><div class="sheet-sub">A FICTIONAL JOURNEY · NO REAL BOOKING</div></div><button class="plain-close" id="closeBooking">关闭</button></div>
-      <div id="bookingPlaceName" style="font-size:12px;font-weight:650;margin-bottom:3px"></div><div style="font-size:9px;color:#999;line-height:1.7">这是一张虚构世界的旅行票根，不涉及现实交通、酒店或付款。</div>
+      <div id="bookingPlaceName" style="font-size:12px;font-weight:650;margin-bottom:3px">月光海 · 潮汐会替你保管秘密。</div><div style="font-size:9px;color:#999;line-height:1.7">这是一张虚构世界的旅行票根，不涉及现实交通、酒店或付款。</div>
       <label class="field-label" for="bookingDate">想从哪一天出发？</label><input class="field-input" type="date" id="bookingDate">
       <label class="field-label" for="bookingMemo">这次想带走什么心情？（选填）</label><input class="field-input" id="bookingMemo" maxlength="90" placeholder="例如：去一个没有闹钟的地方">
       <div class="sheet-actions"><button class="light-button" id="cancelBooking">再想一想</button><button class="dark-button" id="confirmBooking">生成我的旅行票根</button></div>
@@ -345,7 +382,7 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
       </div>
     </div>
   </div>
-  <div class="toast" id="toast" role="status" aria-live="polite">已从收藏中移除</div>
+  <div class="toast" id="toast" role="status" aria-live="polite">旅行票根已生成 · 这是一次幻想旅程</div>
 </div>
 <style>
 .menu-row{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 11px;text-align:left;background:transparent;border:0;border-radius:10px;color:#333;font-size:11px}.menu-row:active{background:#f4f4f4}.menu-row strong{font-size:11px;font-weight:650}.menu-row small{display:block;font-size:9px;color:#aaa;margin-top:5px}.menu-row>span:last-child{font-size:17px;color:#888}
@@ -457,8 +494,8 @@ var newNote=$('emptyNewNote');if(newNote)newNote.addEventListener('click',functi
 scroller.scrollTop=0;
 }
 function setView(v){view=v;render()}
-// 极简杂志风互动海报组件（月光海 · SILENT SEA）
-var MAG_POSTER_HTML='<div class="mag-poster-container" id="magPoster"><div class="mag-poster-card"><div class="mag-poster-glare"></div><div class="mag-poster-header"><span class="poster-tag">POSTER / 001</span><span class="poster-date">2026.10.20</span></div><div class="mag-poster-media"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&amp;w=800" alt="月光海" class="poster-img" /><div class="poster-stamp">已抵达</div></div><div class="mag-poster-body"><h2 class="poster-title">SILENT SEA</h2><p class="poster-subtitle">月光海 · 潮汐会替你保管秘密</p><div class="poster-interactive-note" id="posterNoteBtn"><span class="note-line"></span><span class="note-text">✦ 点击解锁隐藏批注 &amp; 氛围音效</span></div></div><div class="mag-poster-footer"><span>TOUCH DREAM RAILWAYS</span><span>FIG. 001</span></div></div></div>';
+// 极简杂志风互动海报：重构版（月光海 · SILENT SEA）
+var MAG_POSTER_HTML='<div class="editorial-poster" id="magPoster"><div class="poster-meta-top"><span>POSTER / 001</span><span>2026.10.20</span></div><div class="poster-visual"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&amp;w=800" alt="月光海" /><div class="poster-badge-clean">ARCHIVE 01</div></div><div class="poster-content"><div class="poster-titles"><span class="sub-tag">SELECTED VIEW</span><h2>SILENT SEA</h2><p class="desc">月光海 · 潮汐会替你保管秘密。</p></div><div class="poster-action-trigger" id="posterNoteBtn"><div class="line-dot"></div><span>点击展开手札与白噪音</span></div></div><div class="poster-meta-bottom"><span>TOUCH DREAM</span><span>FIG. 001</span></div></div>';
 function openDetail(id){
 var p=findPlace(id);activePlaceId=p.id;
 $('detailScroll').innerHTML='<div class="detail-scene">'+artHTML(p,true)+'</div><div class="detail-head"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div><div class="detail-content"><div class="detail-kicker">DESTINATION / '+p.code+' · '+esc(p.category.toUpperCase())+'</div><h1 class="detail-title">'+esc(p.name)+'</h1><div class="detail-subtitle">'+esc(p.tagline)+'<br>'+esc(p.desc)+'</div><div class="detail-metrics"><div class="metric"><span>建議停留</span><strong>'+esc(p.duration)+'</strong></div><div class="metric"><span>適合時刻</span><strong>'+esc(p.season)+'</strong></div><div class="metric"><span>夢境方向</span><strong>'+esc(p.distance)+'</strong></div></div><h2 class="story-title">这里的故事 / A SMALL LEGEND</h2><p class="story-text">'+esc(p.story)+'</p><div class="route-box"><div class="route-label">A WAY TO ARRIVE · 虚构路线</div><p>'+esc(p.route)+'</p></div><div class="route-box"><div class="route-label">A LITTLE SOUVENIR · 可能带走的纪念</div><p>'+esc(p.gift)+'。确认抵达后，这件小小纪念就会收入你的梦境护照。</p></div>'+(p.id==='moon-sea'?MAG_POSTER_HTML:'')+'<div class="detail-foot-actions"><button class="text-action" id="detailVisited">'+iconSvg('check')+'<span>'+(has(data.visited,p.id)?'已经来过了':'我来过这里')+'</span></button><button class="text-action" id="detailCopy">'+iconSvg('copy')+'<span>复制这段幻想</span></button></div></div>';
@@ -470,19 +507,20 @@ $('detailVisited').addEventListener('click',function(){markVisited(p.id)});
 $('detailCopy').addEventListener('click',function(){copyPlaceText(p)});
 initMagPoster();
 }
-// 杂志风互动海报：3D 触控视差 + 批注弹窗
+// 杂志风互动海报：轻柔 3D 视差 + 批注弹窗
 function initMagPoster(){
 var poster=$('magPoster');if(!poster)return;
-var card=poster.querySelector('.mag-poster-card');
 var noteBtn=$('posterNoteBtn');
 var modal=$('posterModal');
+var rect=null;
+poster.addEventListener('mouseenter',function(){rect=poster.getBoundingClientRect()});
 poster.addEventListener('mousemove',function(e){
-var rect=poster.getBoundingClientRect();
+if(!rect)rect=poster.getBoundingClientRect();
 var x=e.clientX-rect.left-rect.width/2;
 var y=e.clientY-rect.top-rect.height/2;
-card.style.transform='rotateX('+(-y/rect.height*12)+'deg) rotateY('+(x/rect.width*12)+'deg)';
+poster.style.transform='perspective(900px) rotateX('+(-y/rect.height*5)+'deg) rotateY('+(x/rect.width*5)+'deg)';
 });
-poster.addEventListener('mouseleave',function(){card.style.transform='rotateX(0deg) rotateY(0deg)'});
+poster.addEventListener('mouseleave',function(){rect=null;poster.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg)'});
 if(noteBtn&&modal)noteBtn.addEventListener('click',function(e){e.stopPropagation();modal.classList.add('active');if(navigator.vibrate)navigator.vibrate(15)});
 }
 function closeDetail(){$('detailOverlay').classList.remove('show');document.body.style.overflow=''}
@@ -693,7 +731,7 @@ tmol.addEventListener('pointercancel',endVtDrag);
 document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.view)})});
 $('backHome').addEventListener('click',function(){location.href='../index.html'});
 document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('#closeDetail');if(t)closeDetail()});
-$('randomBtn').addEventListener('click',function(){var pool=destinations.filter(function(p){return !has(data.visited,p.id)});if(!pool.length){toast('所有世界都已抵达 · 你已走完这片梦境');return}var p=pool[Math.floor(Math.random()*pool.length)];openDetail(p.id)});
+var randomBtn=$('randomBtn');if(randomBtn)randomBtn.addEventListener('click',function(){var pool=destinations.filter(function(p){return !has(data.visited,p.id)});if(!pool.length){toast('所有世界都已抵达 · 你已走完这片梦境');return}var p=pool[Math.floor(Math.random()*pool.length)];openDetail(p.id)});
 $('moreBtn').addEventListener('click',function(){$('menuOverlay').classList.add('show')});
 $('closeMenu').addEventListener('click',function(){$('menuOverlay').classList.remove('show')});
 $('menuOverlay').addEventListener('click',function(e){if(e.target===$('menuOverlay'))$('menuOverlay').classList.remove('show')});
