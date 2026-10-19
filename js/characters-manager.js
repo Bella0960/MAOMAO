@@ -49,8 +49,18 @@ const AVATAR_COLORS = [
 ];
 
 let selectedColor = AVATAR_COLORS[0];
-let avatarDataUrl = ''; // 头像 base64（空串表示无图）
+let avatarDataUrl = ''; // 当前待保存头像
 let selectedWorldBookIds = []; // 当前编辑会话中勾选的世界书 ID
+let currentDraftKey = '';
+let editorOriginalState = null;
+let pendingDraftRecovery = null;
+let cropSourceImage = null;
+let cropBaseScale = 1;
+let cropZoom = 1;
+let cropOffsetX = 0;
+let cropOffsetY = 0;
+let cropPointer = null;
+let saveStatusTimer = null;
 
 // 读取世界书列表（phone_worldbooks），只读不写，异常/脏数据一律兜底为空数组
 function loadWorldBooks() {
@@ -134,8 +144,10 @@ function loadRoles() {
 function saveRoles(roles) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(roles));
+        return true;
     } catch (e) {
         console.error('保存角色数据异常:', e);
+        return false;
     }
 }
 
@@ -193,31 +205,95 @@ function handleRoleCardClick(event, roleId) {
 
 // ====== 头像上传与 Canvas 压缩 ======
 function handleAvatarUpload(e) {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
+    e.target.value = '';
+    if (!/^image\//i.test(file.type || '')) {
+        setSaveStatus('这不是可识别的图片文件，请重新选择。', 'error');
+        return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+        setSaveStatus('图片超过 12MB，请选择较小的图片。', 'error');
+        return;
+    }
     const reader = new FileReader();
+    reader.onerror = function() {
+        setSaveStatus('图片读取失败，请重试。', 'error');
+    };
     reader.onload = function(ev) {
         const img = new Image();
+        img.onerror = function() {
+            setSaveStatus('图片无法读取，请换一张照片。', 'error');
+        };
         img.onload = function() {
-            // Canvas 200x200 居中裁剪 (cover)
-            const canvas = document.createElement('canvas');
-            canvas.width = 200;
-            canvas.height = 200;
-            const ctx = canvas.getContext('2d');
-            const scale = Math.max(200 / img.width, 200 / img.height);
-            const w = img.width * scale;
-            const h = img.height * scale;
-            const dx = (200 - w) / 2;
-            const dy = (200 - h) / 2;
-            ctx.drawImage(img, dx, dy, w, h);
-            avatarDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            updateAvatarPreview();
+            cropSourceImage = img;
+            cropZoom = 1;
+            cropOffsetX = 0;
+            cropOffsetY = 0;
+            cropBaseScale = Math.max(260 / img.naturalWidth, 260 / img.naturalHeight);
+            const zoom = document.getElementById('portraitZoom');
+            if (zoom) zoom.value = '100';
+            updateCropZoomLabel();
+            drawPortraitCrop();
+            const studio = document.getElementById('portraitStudio');
+            if (studio) studio.classList.remove('hidden');
         };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
-    // 清空 input 允许重复选择同一文件
-    e.target.value = '';
+}
+
+function updateCropZoomLabel() {
+    const output = document.getElementById('portraitZoomValue');
+    if (output) output.textContent = Math.round(cropZoom * 100) + '%';
+}
+
+function drawPortraitCrop() {
+    const canvas = document.getElementById('portraitCropCanvas');
+    if (!canvas || !cropSourceImage) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const logicalSize = 300;
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    ctx.clearRect(0, 0, logicalSize, logicalSize);
+    ctx.fillStyle = '#E7E6E2';
+    ctx.fillRect(0, 0, logicalSize, logicalSize);
+    const scale = cropBaseScale * cropZoom * (logicalSize / 260);
+    const width = cropSourceImage.naturalWidth * scale;
+    const height = cropSourceImage.naturalHeight * scale;
+    ctx.drawImage(cropSourceImage, (logicalSize - width) / 2 + cropOffsetX * (logicalSize / 260),
+        (logicalSize - height) / 2 + cropOffsetY * (logicalSize / 260), width, height);
+}
+
+function confirmPortraitCrop() {
+    const canvas = document.getElementById('portraitCropCanvas');
+    if (!canvas || !cropSourceImage) return;
+    try {
+        const output = document.createElement('canvas');
+        output.width = 200;
+        output.height = 200;
+        const ctx = output.getContext('2d');
+        if (!ctx) throw new Error('canvas unavailable');
+        ctx.drawImage(canvas, 0, 0, 600, 600, 0, 0, 200, 200);
+        avatarDataUrl = output.toDataURL('image/jpeg', 0.88);
+        updateAvatarPreview();
+        const studio = document.getElementById('portraitStudio');
+        if (studio) studio.classList.add('hidden');
+        cropSourceImage = null;
+        persistEditorDraft();
+        setSaveStatus('头像已加入待保存资料', 'info');
+    } catch (err) {
+        console.error('头像裁切失败:', err);
+        setSaveStatus('头像处理失败，原头像未更改。请重试。', 'error');
+    }
+}
+
+function cancelPortraitCrop() {
+    const studio = document.getElementById('portraitStudio');
+    if (studio) studio.classList.add('hidden');
+    cropSourceImage = null;
+    const input = document.getElementById('avatarFileInput');
+    if (input) input.value = '';
 }
 
 function updateAvatarPreview() {
@@ -262,7 +338,10 @@ function openAddRole() {
     avatarDataUrl = '';
     updateAvatarPreview();
     renderWorldBookBinder([]);   // 新角色默认不绑定任何世界书
+    currentDraftKey = getDraftKey('');
+    editorOriginalState = captureEditorState();
     showView('editor');
+    offerDraftRecovery();
 }
 
 // 打开编辑旧角色
@@ -281,10 +360,13 @@ function openEditRole(id) {
     updateAvatarPreview();
     // 回填已绑定的世界书：老角色无该字段时按空数组处理；已被删除的书因不在列表中不会被勾选
     renderWorldBookBinder(Array.isArray(target.worldBookIds) ? target.worldBookIds : []);
+    currentDraftKey = getDraftKey(target.id);
+    editorOriginalState = captureEditorState();
     showView('editor');
+    offerDraftRecovery();
 }
 
-// 保存角色
+// 保存角色：仅在本地存储确认成功后显示成功状态，并留在当前编辑页
 function handleSaveRole() {
     const roleId = document.getElementById('editRoleId').value.trim();
     const nameVal = document.getElementById('editRoleName').value.trim();
@@ -292,52 +374,59 @@ function handleSaveRole() {
     const toneVal = document.getElementById('editRoleTone').value;
 
     if (!nameVal) {
-        alert('请输入角色名称！');
+        setSaveStatus('请先填写角色名称。', 'error');
         document.getElementById('editRoleName').focus();
         return;
     }
 
     const roles = loadRoles();
+    let savedRoleId = roleId;
 
     if (roleId) {
-        // 编辑：保持 ID 不变
-        const target = roles.find(r => r.id === roleId);
-        if (target) {
-            target.name = nameVal;
-            target.persona = personaVal;
-            target.tone = toneVal;
-            if (avatarDataUrl) {
-                target.avatar = avatarDataUrl;
-            } else {
-                target.avatar = '';
-            }
-            target.avatarBg = selectedColor;
-            target.worldBookIds = selectedWorldBookIds.slice();
+        const target = roles.find(r => String(r.id) === String(roleId));
+        if (!target) {
+            setSaveStatus('找不到当前角色，未保存任何修改。', 'error');
+            return;
         }
+        target.name = nameVal;
+        target.persona = personaVal;
+        target.tone = toneVal;
+        target.avatar = avatarDataUrl || '';
+        target.avatarBg = selectedColor;
+        target.worldBookIds = selectedWorldBookIds.slice();
     } else {
-        // 新增
-        const newRole = {
-            id: 'role_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        savedRoleId = 'role_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        roles.unshift({
+            id: savedRoleId,
             name: nameVal,
             avatar: avatarDataUrl || '',
             avatarBg: selectedColor,
             persona: personaVal,
             tone: toneVal,
             worldBookIds: selectedWorldBookIds.slice()
-        };
-        roles.unshift(newRole);
+        });
     }
 
-    saveRoles(roles);
-
-    // 尊重来源：from=contacts 时，保存后直接回通讯录（省一次点击）
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('from') === 'contacts') {
-        window.location.href = '/chat/contacts.html';
+    if (!saveRoles(roles)) {
+        setSaveStatus('保存失败：浏览器可能没有可用存储空间。修改仍保留，请重试。', 'error');
+        persistEditorDraft(true);
         return;
     }
-    showView('list');
+
+    const oldDraftKey = currentDraftKey;
+    document.getElementById('editRoleId').value = savedRoleId;
+    document.getElementById('editorTitle').textContent = 'Edit Character';
+    currentDraftKey = getDraftKey(savedRoleId);
+    if (oldDraftKey && oldDraftKey !== currentDraftKey) {
+        try { localStorage.removeItem(oldDraftKey); } catch (e) {}
+    }
+    if (currentDraftKey) {
+        try { localStorage.removeItem(currentDraftKey); } catch (e) {}
+    }
+    editorOriginalState = captureEditorState();
+    setSaveStatus('已保存', 'success');
 }
+
 
 // 删除角色
 function handleDeleteRole(id) {
@@ -359,19 +448,187 @@ function handleDeleteRole(id) {
     renderRoleList();
 }
 
-// ====== 绑定事件 ======
-document.getElementById('btnAddRole').addEventListener('click', openAddRole);
-document.getElementById('btnCancelEdit').addEventListener('click', () => showView('list'));
-document.getElementById('btnSaveRole').addEventListener('click', handleSaveRole);
-document.getElementById('editRoleName').addEventListener('input', function() {
-    if (!avatarDataUrl) updateAvatarPreview();
-});
+// ====== 草稿、保存反馈与编辑状态 ======
+function getDraftKey(roleId) {
+    return 'maomao_character_draft_v1:' + (roleId ? String(roleId) : 'new');
+}
 
-// 头像点击触发文件选择
+function captureEditorState() {
+    return {
+        roleId: document.getElementById('editRoleId').value.trim(),
+        name: document.getElementById('editRoleName').value,
+        persona: document.getElementById('editRolePersona').value,
+        tone: document.getElementById('editRoleTone').value,
+        avatar: avatarDataUrl || '',
+        avatarBg: selectedColor,
+        worldBookIds: selectedWorldBookIds.slice()
+    };
+}
+
+function editorStatesEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function setSaveStatus(message, state) {
+    const el = document.getElementById('saveStatus');
+    if (!el) return;
+    if (saveStatusTimer) clearTimeout(saveStatusTimer);
+    el.textContent = message || '';
+    el.dataset.state = state || 'info';
+    el.style.opacity = message ? '1' : '0';
+    if (state === 'success' || (state === 'info' && message !== '未保存')) {
+        saveStatusTimer = setTimeout(() => {
+            if (el.textContent === message) {
+                el.style.opacity = '0';
+                setTimeout(() => { if (el.style.opacity === '0') el.textContent = ''; }, 280);
+            }
+        }, 2200);
+    }
+}
+
+function persistEditorDraft(force) {
+    if (!currentDraftKey) return;
+    const state = captureEditorState();
+    if (!force && editorOriginalState && editorStatesEqual(state, editorOriginalState)) {
+        try { localStorage.removeItem(currentDraftKey); } catch (e) {}
+        return;
+    }
+    const draft = { version: 1, savedAt: Date.now(), state: state };
+    try {
+        localStorage.setItem(currentDraftKey, JSON.stringify(draft));
+    } catch (e) {
+        console.warn('角色草稿暂存失败:', e);
+        setSaveStatus('草稿暂存失败，请尽快手动保存。', 'error');
+    }
+}
+
+function applyEditorState(state) {
+    if (!state || typeof state !== 'object') return;
+    document.getElementById('editRoleName').value = state.name || '';
+    document.getElementById('editRolePersona').value = state.persona || '';
+    document.getElementById('editRoleTone').value = state.tone || '';
+    avatarDataUrl = state.avatar || '';
+    selectedColor = state.avatarBg || AVATAR_COLORS[0];
+    selectedWorldBookIds = Array.isArray(state.worldBookIds) ? state.worldBookIds.map(String) : [];
+    updateAvatarPreview();
+    renderWorldBookBinder(selectedWorldBookIds);
+}
+
+function offerDraftRecovery() {
+    if (!currentDraftKey) return false;
+    let draft = null;
+    try {
+        const raw = localStorage.getItem(currentDraftKey);
+        if (raw) draft = JSON.parse(raw);
+    } catch (e) {
+        console.warn('读取角色草稿失败:', e);
+        try { localStorage.removeItem(currentDraftKey); } catch (_) {}
+    }
+    if (!draft || draft.version !== 1 || !draft.state) return false;
+    const base = editorOriginalState || captureEditorState();
+    if (editorStatesEqual(draft.state, base)) {
+        try { localStorage.removeItem(currentDraftKey); } catch (e) {}
+        return false;
+    }
+    pendingDraftRecovery = { draft: draft, base: base };
+    const dialog = document.getElementById('recoveryDialog');
+    const copy = document.getElementById('recoveryCopy');
+    if (copy) {
+        const parts = [];
+        if (draft.state.name !== base.name || draft.state.persona !== base.persona || draft.state.tone !== base.tone) parts.push('文字资料');
+        if ((draft.state.avatar || '') !== (base.avatar || '')) parts.push('待确认头像');
+        if (JSON.stringify(draft.state.worldBookIds || []) !== JSON.stringify(base.worldBookIds || [])) parts.push('世界书绑定');
+        copy.textContent = '检测到上次未正式保存的' + (parts.length ? parts.join('、') : '角色资料') + '。是否恢复这份草稿？';
+    }
+    if (dialog) dialog.classList.remove('hidden');
+    return true;
+}
+
+function closeRecoveryDialog() {
+    const dialog = document.getElementById('recoveryDialog');
+    if (dialog) dialog.classList.add('hidden');
+    pendingDraftRecovery = null;
+}
+
+function recoverPendingDraft() {
+    if (!pendingDraftRecovery) return;
+    applyEditorState(pendingDraftRecovery.draft.state);
+    closeRecoveryDialog();
+    persistEditorDraft(true);
+    setSaveStatus('草稿已恢复，保存后才会正式生效。', 'info');
+}
+
+function discardPendingDraft() {
+    if (!currentDraftKey) return;
+    try { localStorage.removeItem(currentDraftKey); } catch (e) {}
+    if (pendingDraftRecovery) applyEditorState(pendingDraftRecovery.base);
+    closeRecoveryDialog();
+    setSaveStatus('', 'info');
+}
+
+function handleCancelEdit() {
+    const current = captureEditorState();
+    const dirty = editorOriginalState && !editorStatesEqual(current, editorOriginalState);
+    if (dirty) {
+        const shouldDiscard = confirm('当前有尚未保存的修改。放弃本次全部修改并返回角色列表吗？');
+        if (!shouldDiscard) return;
+    }
+    if (currentDraftKey) {
+        try { localStorage.removeItem(currentDraftKey); } catch (e) {}
+    }
+    closeRecoveryDialog();
+    showView('list');
+}
+
+document.getElementById('btnAddRole').addEventListener('click', openAddRole);
+document.getElementById('btnCancelEdit').addEventListener('click', handleCancelEdit);
+document.getElementById('btnSaveRole').addEventListener('click', handleSaveRole);
+['editRoleName', 'editRolePersona', 'editRoleTone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function() {
+        if (!avatarDataUrl) updateAvatarPreview();
+        setSaveStatus('未保存', 'info');
+        persistEditorDraft();
+    });
+});
+document.getElementById('worldBookBindList').addEventListener('click', function() {
+    persistEditorDraft();
+    setSaveStatus('未保存', 'info');
+});
 document.getElementById('avatarBubbleWrapper').addEventListener('click', function() {
     document.getElementById('avatarFileInput').click();
 });
 document.getElementById('avatarFileInput').addEventListener('change', handleAvatarUpload);
+document.getElementById('portraitZoom').addEventListener('input', function() {
+    cropZoom = Number(this.value) / 100;
+    updateCropZoomLabel();
+    drawPortraitCrop();
+});
+document.getElementById('btnCancelPortrait').addEventListener('click', cancelPortraitCrop);
+document.getElementById('btnConfirmPortrait').addEventListener('click', confirmPortraitCrop);
+document.getElementById('btnRecoverDraft').addEventListener('click', recoverPendingDraft);
+document.getElementById('btnDiscardDraft').addEventListener('click', discardPendingDraft);
+
+const cropCanvas = document.getElementById('portraitCropCanvas');
+if (cropCanvas) {
+    cropCanvas.addEventListener('pointerdown', function(e) {
+        if (!cropSourceImage) return;
+        cropPointer = { x: e.clientX, y: e.clientY };
+        if (cropCanvas.setPointerCapture) cropCanvas.setPointerCapture(e.pointerId);
+    });
+    cropCanvas.addEventListener('pointermove', function(e) {
+        if (!cropPointer) return;
+        cropOffsetX += e.clientX - cropPointer.x;
+        cropOffsetY += e.clientY - cropPointer.y;
+        cropPointer = { x: e.clientX, y: e.clientY };
+        drawPortraitCrop();
+    });
+    const stopCropDrag = () => { cropPointer = null; };
+    cropCanvas.addEventListener('pointerup', stopCropDrag);
+    cropCanvas.addEventListener('pointercancel', stopCropDrag);
+    cropCanvas.addEventListener('lostpointercapture', stopCropDrag);
+}
 
 // 页面初始化
 renderRoleList();
