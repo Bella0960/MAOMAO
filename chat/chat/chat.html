@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>聊天 · 小手机</title>
+<script src="../../shared/js/font-loader.js"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #D6D6D6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
+    color: #111111;
+    user-select: none;
+  }
+
+  /* ===== 手机壳容器（与 chat-detail.html / chat-settings.html 等页面保持一致） ===== */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    min-height: 0;
+    background-color: #F4F4F6;
+    border-radius: 45px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 项目统一状态栏：封面顶部为深色渐变，文字用白色保证可读 */
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* 主舞台滚动区（底部 110px 避让 nav.js 悬浮导航） */
+  .main-stage {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 44px 0 110px 0;
+    position: relative;
+    isolation: isolate;
+    scrollbar-width: none;
+  }
+  .main-stage::-webkit-scrollbar { display: none; }
+
+  #coverInput, #avatarInput { display: none; }
+
+  /* 封面作为整块主页的底图：从顶部一直铺到内容区底部（左右留 12px 内缩） */
+  .cover-gradient-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, #343434 0%, #777777 38%, #B8B8B8 65%, #E8E8E8 88%, #F5F5F5 100%);
+    border-radius: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* 只有顶部封面区域响应点击上传，透明卡片区域不抢交互 */
+  .cover-click-area {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 135px;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  /* 轻薄遮罩只负责柔化封面 */
+  .cover-gradient-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 48%, rgba(255, 255, 255, 0.08) 100%);
+    pointer-events: none;
+  }
+
+  /* 占住封面顶部高度，让下方白卡片按原布局排列 */
+  .cover-spacer {
+    height: 135px;
+    flex: 0 0 135px;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* 白色卡片上方保持白，向下渐隐透出封面 */
+  .white-profile-stage {
+    width: 100%;
+    margin: 0;
+    background: linear-gradient(180deg,
+      #FFFFFF 0%,
+      rgba(255, 255, 255, 1) 15%,
+      rgba(255, 255, 255, 0.96) 30%,
+      rgba(255, 255, 255, 0.85) 48%,
+      rgba(255, 255, 255, 0.6) 68%,
+      rgba(255, 255, 255, 0.3) 85%,
+      rgba(255, 255, 255, 0.1) 100%);
+    border-radius: 0;
+    margin-top: -26px;
+    position: relative;
+    z-index: 10;
+    padding: 30px 10px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    box-shadow: none;
+  }
+
+  /* 嵌在拱形凸起处的圆头像 */
+  .arch-avatar-bridge {
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 52px;
+    height: 52px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .avatar-circle {
+    width: 44px;
+    height: 44px;
+    background: #EAEAEA;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #E0E0E0;
+    overflow: hidden;
+  }
+  .avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .user-id-text {
+    font-size: 0.813rem;
+    font-weight: 800;
+    color: #111111;
+    cursor: pointer;
+    margin-bottom: 12px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 消息列表与音乐舱：毛玻璃卡片流 */
+  .tier4-floating-stream {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* 独立毛玻璃音乐舱 */
+  .floating-music-card {
+    background: rgba(245, 245, 245, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 8px 12px;
+    border: 1px solid rgba(225, 225, 225, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .music-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .vinyl-disc {
+    width: 20px;
+    height: 20px;
+    background: #111111;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .vinyl-disc.playing { animation: rotateDisc 6s linear infinite; }
+
+  @keyframes rotateDisc {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* 返回箭头内嵌在黑胶碟片中心：白色细箭头，碟片转动时反向自转保持朝左 */
+  .chat-home-back {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .vinyl-disc.playing .chat-home-back {
+    animation: rotateDisc 6s linear infinite reverse;
+  }
+  .chat-home-back:active { opacity: 0.45; }
+  .chat-home-back svg {
+    width: 10px;
+    height: 10px;
+    stroke: rgba(255, 255, 255, 0.95);
+    display: block;
+  }
+  /* 隐形扩大触摸区：视觉仍是 20px 碟片，实际可点 44px */
+  .chat-home-back::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .sound-wave {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 9px;
+  }
+  .wave-bar {
+    width: 2px;
+    height: 3px;
+    background: #333333;
+    border-radius: 1px;
+  }
+  .sound-wave.playing .wave-bar:nth-child(1) { animation: jump 0.6s infinite alternate; }
+  .sound-wave.playing .wave-bar:nth-child(2) { animation: jump 0.8s infinite alternate 0.2s; }
+  .sound-wave.playing .wave-bar:nth-child(3) { animation: jump 0.5s infinite alternate 0.4s; }
+
+  @keyframes jump {
+    0% { height: 3px; }
+    100% { height: 9px; }
+  }
+
+  .music-titles {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .m-title {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #111111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: text;
+  }
+  .m-title-edit {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #111111;
+    background: #F0F0F2;
+    border: none;
+    border-radius: 8px;
+    padding: 3px 8px;
+    outline: none;
+    width: 170px;
+    font-family: inherit;
+    transition: background .2s ease;
+  }
+  .m-title-edit:focus {
+    background: #FFFFFF;
+    box-shadow: inset 0 0 0 1px #E5E5EA;
+  }
+  .m-sub { font-size: 0.5rem; color: #777777; font-family: monospace; }
+
+  .music-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .play-toggle-btn {
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* 音乐卡片内的群聊入口（与旁边图标一致） */
+  .group-entry-btn {
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    outline: none;
+    transition: transform .2s ease;
+  }
+  .group-entry-btn:active {
+    transform: scale(0.92);
+  }
+  .group-entry-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: #333333;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* 创建群聊弹窗 */
+  .group-modal-backdrop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .group-modal-backdrop.show { display: flex; }
+  .group-modal-box {
+    width: 100%;
+    max-width: 260px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 16px 16px 14px;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .group-modal-title {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111111;
+    text-align: center;
+  }
+  .group-modal-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: none;
+    background: #F8F8FA;
+    font-size: 0.875rem;
+    color: #111111;
+    outline: none;
+    font-family: inherit;
+    transition: background .2s ease;
+  }
+  .group-modal-input:focus {
+    background: #FFFFFF;
+    box-shadow: inset 0 0 0 1px #E5E5EA;
+  }
+  .group-modal-label {
+    font-size: 0.688rem;
+    font-weight: 500;
+    color: #999999;
+    letter-spacing: 0.02em;
+  }
+  .group-modal-members {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 140px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .group-modal-members::-webkit-scrollbar { display: none; }
+  .group-member-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: #F8F8FA;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .group-member-item:active { background: #EEEEF0; }
+  .group-member-item.is-selected { background: #F0F0F2; }
+  .group-member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #EEEEF0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .group-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .group-member-avatar svg {
+    width: 14px;
+    height: 14px;
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+  .group-member-name {
+    flex: 1;
+    font-size: 0.813rem;
+    color: #111111;
+  }
+  .group-member-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid #E5E5EA;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
+  }
+  .group-member-item.is-selected .group-member-check {
+    background: #111111;
+    border-color: #111111;
+  }
+  .group-member-check svg {
+    width: 10px;
+    height: 10px;
+    stroke: #FFFFFF;
+    stroke-width: 2.5;
+    fill: none;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .group-member-item.is-selected .group-member-check svg { opacity: 1; }
+  .group-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .group-modal-btn {
+    flex: 1;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .group-modal-btn:active { opacity: 0.85; transform: scale(0.98); }
+  .gm-cancel { background: #F0F0F2; color: #666666; }
+  .gm-create { background: #111111; color: #FFFFFF; }
+
+  /* 聊天卡流容器（动态渲染） */
+  #chatListContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* 独立毛玻璃消息卡片 */
+  .chat-slim-card {
+    background: rgba(245, 245, 245, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 8px 10px;
+    border: 1px solid rgba(225, 225, 225, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+  }
+  .chat-slim-card:active {
+    transform: scale(0.985);
+    background: rgba(235, 235, 235, 0.9);
+  }
+
+  .chat-avatar {
+    width: 32px;
+    height: 32px;
+    background: #E0E0E0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 群聊头像：成员小网格 */
+  .chat-avatar.group-avatar {
+    flex-wrap: wrap;
+    padding: 1px;
+    gap: 1px;
+  }
+  /* 自定义群头像：单张图，覆盖四宫格规则，正常裁圆 */
+  .chat-avatar.group-avatar.group-avatar-custom {
+    flex-wrap: nowrap;
+    padding: 0;
+    gap: 0;
+  }
+  .chat-avatar.group-avatar.group-avatar-custom img {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    object-fit: cover;
+  }
+  .chat-avatar.group-avatar img,
+  .chat-avatar.group-avatar svg {
+    width: 50%;
+    height: 50%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: 0.5px;
+    object-fit: cover;
+  }
+  .chat-avatar.group-avatar svg {
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+
+  .chat-meta {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .chat-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-name {
+    font-size: 0.719rem;
+    font-weight: 700;
+    color: #111111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chat-time {
+    font-size: 0.531rem;
+    color: #888888;
+    font-family: monospace;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .chat-last-msg {
+    font-size: 0.594rem;
+    color: #666666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .empty-tip {
+    text-align: center;
+    color: #999999;
+    font-size: 0.688rem;
+    padding: 24px 0;
+  }
+
+  /* 修改昵称底部抽屉 */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .profile-drawer {
+    width: 80%;
+    max-width: 320px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 18px 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: popIn 0.22s ease-out;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .drawer-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-title { font-size: 0.938rem; font-weight: 800; color: #111111; }
+  .drawer-close {
+    color: #888888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { font-size: 0.563rem; font-weight: 700; color: #888888; font-family: monospace; }
+  .field-input-box {
+    background: #F4F4F4;
+    border-radius: 12px;
+    padding: 8px 10px;
+  }
+  .field-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.688rem;
+    color: #222222;
+    width: 100%;
+    font-family: inherit;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .save-btn {
+    background: #111111;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 10px;
+    border-radius: 14px;
+    font-size: 0.688rem;
+    font-weight: 700;
+    margin-top: 6px;
+    cursor: pointer;
+  }
+  .save-btn:active { opacity: 0.85; }
+
+  /* ===== 手机全屏强制直角去外壳（不依赖外部 mobile-fit.css，避免缓存不生效） ===== */
+  @media (max-width: 480px) {
+    html, body {
+      background: #FFFFFF !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      min-height: 100vh !important;
+      align-items: stretch !important;
+      overflow: hidden !important;
+    }
+    .phone-mockup {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+  }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+    <!-- 项目统一状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <!-- 主舞台 -->
+    <div class="main-stage">
+
+      <!-- 封面底图（默认深到浅灰渐变，上传后铺满） -->
+      <div class="cover-gradient-banner" id="coverBox"></div>
+      <div class="cover-click-area" id="coverClickArea" aria-label="更换封面"></div>
+      <input type="file" id="coverInput" accept="image/*">
+      <div class="cover-spacer" aria-hidden="true"></div>
+
+      <!-- 白色拱形卡片：上方纯白，向下渐隐透出封面 -->
+      <div class="white-profile-stage">
+        <div class="arch-avatar-bridge" id="avatarBridge" title="点击上传头像">
+          <div class="avatar-circle" id="avatarBox"></div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*">
+
+        <div class="user-id-text" id="userHandle">@未设置</div>
+
+        <div class="tier4-floating-stream">
+
+          <!-- 独立毛玻璃音乐舱 -->
+          <div class="floating-music-card">
+            <div class="music-left">
+              <div class="vinyl-disc playing" id="vinylDisc">
+                <div class="chat-home-back" id="chatHomeBack" role="button" aria-label="返回主页">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </div>
+              </div>
+              <div class="music-titles">
+                <span class="m-title" id="musicTitle">誓言是一场有时差的雨</span>
+                <span class="m-sub">NOW PLAYING // 02:45</span>
+              </div>
+            </div>
+
+            <div class="music-right">
+              <button class="group-entry-btn" id="groupEntryBtn" type="button" aria-label="创建群聊">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="sound-wave playing" id="soundWave">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+              </div>
+              <div class="play-toggle-btn" id="playToggleBtn">
+                <svg id="playIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 动态聊天列表 -->
+          <div id="chatListContainer"></div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 修改昵称抽屉 -->
+    <div class="modal-overlay" id="profileModal">
+      <div class="profile-drawer">
+        <div class="drawer-title-row">
+          <span class="drawer-title">修改昵称</span>
+          <span class="drawer-close" id="drawerClose">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </span>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">NICKNAME</span>
+          <div class="field-input-box">
+            <input type="text" class="field-input" id="inputHandle" maxlength="20" placeholder="输入昵称">
+          </div>
+        </div>
+
+        <div class="save-btn" id="saveProfileBtn">保存</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script>
+    /* ===== 返回主页 ===== */
+    document.getElementById('chatHomeBack').addEventListener('click', function () {
+      window.location.href = '../../index.html';
+    });
+  </script>
+  <script>
+    /* ================= 数据键名（与项目现有逻辑一致） ================= */
+    var PROFILE_KEY = 'myProfile';
+    var CHARACTERS_KEY = 'ai_custom_characters';
+    var HIDDEN_CHATS_KEY = 'hidden_chat_dialog_ids';
+    var MUSIC_KEY = 'home_music_state';
+    var DEFAULT_MUSIC_TITLE = '誓言是一场有时差的雨';
+
+    /* 默认灰色细线 SVG 小人（纯内联，无 Emoji） */
+    var USER_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    var USER_SVG_SMALL = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+
+    var _storage = window.PhoneStorage;
+
+    function loadProfile() {
+      if (_storage) { var p = _storage.getMyProfile(); return p && typeof p === 'object' ? p : {}; }
+      try {
+        var raw = localStorage.getItem(PROFILE_KEY);
+        if (raw) { var obj = JSON.parse(raw); if (obj && typeof obj === 'object') return obj; }
+      } catch (e) {}
+      return {};
+    }
+
+    /* 昵称：nickname 为主，name 仅作旧数据兜底显示；保存一律写 nickname，不改数据结构 */
+    function getNickname(profile) {
+      return (profile.nickname || profile.name || '').trim();
+    }
+
+    /* 合并写回 myProfile，保留签名/人设等其他字段 */
+    function mergeProfile(patch) {
+      var data = loadProfile();
+      Object.keys(patch).forEach(function (k) { data[k] = patch[k]; });
+      try {
+        if (_storage) { _storage.saveMyProfile(data); return true; }
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+      } catch (err) {
+        alert('存储空间不足，请压缩图片');
+        return false;
+      }
+      return true;
+    }
+
+    /* ================= 图片 Canvas 压缩（最长边 400，质量 0.7） ================= */
+    // mode='cover'：居中正方形裁剪（头像）；mode='contain'：等比缩放（封面）
+    function compressImage(file, size, mode, cb) {
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var w = img.width, h = img.height;
+
+            if (mode === 'cover') {
+              var side = Math.min(w, h);
+              canvas.width = size;
+              canvas.height = size;
+              ctx.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size);
+            } else {
+              var scale = Math.min(1, size / w, size / h);
+              canvas.width = Math.max(1, Math.round(w * scale));
+              canvas.height = Math.max(1, Math.round(h * scale));
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+            cb(canvas.toDataURL('image/jpeg', 0.88));
+          } catch (err) {
+            alert('图片处理失败，请更换图片重试');
+            cb('');
+          }
+        };
+        img.onerror = function () {
+          alert('图片读取失败，请检查文件格式');
+          cb('');
+        };
+        img.src = ev.target.result;
+      };
+      reader.onerror = function () { cb(''); };
+      reader.readAsDataURL(file);
+    }
+
+    /* ================= 资料卡渲染 ================= */
+    function renderProfile() {
+      var profile = loadProfile();
+
+      var coverBox = document.getElementById('coverBox');
+      if (profile.cover) {
+        coverBox.style.backgroundImage = "url('" + profile.cover + "')";
+      } else {
+        coverBox.style.backgroundImage = '';
+      }
+
+      var avatarBox = document.getElementById('avatarBox');
+      if (profile.avatar) {
+        avatarBox.style.backgroundImage = "url('" + profile.avatar + "')";
+        avatarBox.innerHTML = '';
+      } else {
+        avatarBox.style.backgroundImage = '';
+        avatarBox.innerHTML = USER_SVG;
+      }
+
+      var name = getNickname(profile);
+      document.getElementById('userHandle').textContent = name ? '@' + name : '@未设置';
+    }
+
+    /* ================= 上传绑定 ================= */
+    document.getElementById('coverClickArea').addEventListener('click', function () {
+      document.getElementById('coverInput').click();
+    });
+    document.getElementById('avatarBridge').addEventListener('click', function () {
+      document.getElementById('avatarInput').click();
+    });
+
+    document.getElementById('coverInput').addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      compressImage(file, 1080, 'contain', function (dataUrl) {
+        if (dataUrl && mergeProfile({ cover: dataUrl })) renderProfile();
+      });
+      e.target.value = '';
+    });
+
+    document.getElementById('avatarInput').addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      compressImage(file, 400, 'cover', function (dataUrl) {
+        if (dataUrl && mergeProfile({ avatar: dataUrl })) renderProfile();
+      });
+      e.target.value = '';
+    });
+
+    /* ================= 昵称抽屉 ================= */
+    function openNameModal() {
+      var profile = loadProfile();
+      document.getElementById('inputHandle').value = getNickname(profile);
+      document.getElementById('profileModal').classList.add('active');
+    }
+    function closeNameModal() {
+      document.getElementById('profileModal').classList.remove('active');
+    }
+
+    document.getElementById('userHandle').addEventListener('click', openNameModal);
+    document.getElementById('drawerClose').addEventListener('click', closeNameModal);
+    document.getElementById('profileModal').addEventListener('click', function (e) {
+      if (e.target === this) closeNameModal();
+    });
+    document.getElementById('saveProfileBtn').addEventListener('click', function () {
+      var val = document.getElementById('inputHandle').value.trim();
+      if (!val) {
+        alert('昵称不能为空');
+        return;
+      }
+      if (mergeProfile({ nickname: val })) {
+        closeNameModal();
+        renderProfile();
+      }
+    });
+
+    /* ================= 音乐播放器（状态持久化） ================= */
+    var ICON_PAUSE = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+    var ICON_PLAY = '<polygon points="6 4 20 12 6 20 6 4"></polygon>';
+
+    function loadMusicState() {
+      try {
+        var raw = localStorage.getItem(MUSIC_KEY);
+        if (raw) {
+          var obj = JSON.parse(raw);
+          if (obj && typeof obj === 'object') return obj;
+        }
+      } catch (e) {}
+      return { playing: true, title: DEFAULT_MUSIC_TITLE };
+    }
+
+    function applyMusicState(state) {
+      var disc = document.getElementById('vinylDisc');
+      var wave = document.getElementById('soundWave');
+      var icon = document.getElementById('playIcon');
+      var titleEl = document.getElementById('musicTitle');
+
+      disc.classList.toggle('playing', !!state.playing);
+      wave.classList.toggle('playing', !!state.playing);
+      icon.innerHTML = state.playing ? ICON_PAUSE : ICON_PLAY;
+      titleEl.textContent = state.title || DEFAULT_MUSIC_TITLE;
+    }
+
+    var musicState = loadMusicState();
+
+    document.getElementById('playToggleBtn').addEventListener('click', function () {
+      musicState.playing = !musicState.playing;
+      applyMusicState(musicState);
+      try {
+        localStorage.setItem(MUSIC_KEY, JSON.stringify(musicState));
+      } catch (e) {}
+    });
+
+    /* ================= 音乐文案可编辑 ================= */
+    function startEditMusicTitle() {
+      var titleEl = document.getElementById('musicTitle');
+      if (!titleEl || titleEl.parentNode.querySelector('.m-title-edit')) return;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.maxLength = 24;
+      input.value = musicState.title || DEFAULT_MUSIC_TITLE;
+      input.className = 'm-title-edit';
+      titleEl.style.display = 'none';
+      titleEl.parentNode.insertBefore(input, titleEl);
+      input.focus();
+      input.select();
+
+      var done = false;
+      function finish() {
+        if (done || !input.parentNode) return;
+        done = true;
+        var val = input.value.trim();
+        if (val) {
+          musicState.title = val;
+          titleEl.textContent = val;
+          try { localStorage.setItem(MUSIC_KEY, JSON.stringify(musicState)); } catch (e) {}
+          showToast('文案已更新');
+        }
+        input.remove();
+        titleEl.style.display = '';
+      }
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); finish(); }
+        if (e.key === 'Escape') {
+          input.remove();
+          titleEl.style.display = '';
+        }
+      });
+      input.addEventListener('blur', finish);
+    }
+
+    document.getElementById('musicTitle').addEventListener('click', startEditMusicTitle);
+
+    /* ================= 聊天列表动态渲染 ================= */
+    function loadCharacters() {
+      try {
+        var raw = localStorage.getItem(CHARACTERS_KEY);
+        if (raw) {
+          var arr = JSON.parse(raw);
+          if (Array.isArray(arr)) return arr;
+        }
+      } catch (e) {}
+      return [];
+    }
+
+    function getHiddenChatIds() {
+      try {
+        var raw = localStorage.getItem(HIDDEN_CHATS_KEY);
+        if (raw) {
+          var arr = JSON.parse(raw);
+          if (Array.isArray(arr)) return arr;
+        }
+      } catch (e) {}
+      return [];
+    }
+
+    function loadGroups() {
+      try {
+        var raw = localStorage.getItem('phone_groups');
+        var arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
+    }
+
+    /* 轻提示（本页自用，样式与其他页面一致） */
+    function showToast(msg) {
+      var t = document.getElementById('pageToast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'pageToast';
+        t.style.cssText = 'position:absolute;bottom:110px;left:50%;transform:translate(-50%,8px);padding:8px 16px;background:#111111;color:#FFFFFF;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:700;white-space:nowrap;';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = '1';
+      t.style.transform = 'translate(-50%,0)';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(function () {
+        t.style.opacity = '0';
+        t.style.transform = 'translate(-50%,8px)';
+      }, 1800);
+    }
+
+    function getLastMessage(roleId, fallbackName) {
+      try {
+        var raw = localStorage.getItem('chat_history_' + roleId);
+        if (raw) {
+          var arr = JSON.parse(raw);
+          if (Array.isArray(arr) && arr.length > 0) {
+            var last = arr[arr.length - 1];
+            if (last) {
+              if (last.text) return last.text;
+              // 无文本的特殊消息：按类型显示占位，避免显示兜底问候语
+              var placeholders = {
+                'redpacket': '[红包]',
+                'transfer': '[转账]',
+                'location': '[位置]',
+                'anniversary': '[纪念日]',
+                'todo': '[共享待办]',
+                'moment': '[特别时刻]',
+                'gift': '[礼物]'
+              };
+              if (placeholders[last.type]) return placeholders[last.type];
+              if (last.type === 'call') {
+                return last.call && last.call.type === 'video' ? '[视频通话]' : '[语音通话]';
+              }
+            }
+          }
+        }
+      } catch (e) {}
+      return '你好，我是' + fallbackName + '！';
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    function renderChatList() {
+      var container = document.getElementById('chatListContainer');
+      var hiddenStr = getHiddenChatIds().map(String);
+      var roles = loadCharacters().filter(function (r) {
+        return r && r.id != null && hiddenStr.indexOf(String(r.id)) === -1;
+      });
+
+      // 置顶排序：chat_pin_<roleId> === 'true' 的排最前；组内保持原有顺序（稳定分区，不用 sort）
+      var pinnedRoles = roles.filter(function (r) {
+        return localStorage.getItem('chat_pin_' + r.id) === 'true';
+      });
+      var otherRoles = roles.filter(function (r) {
+        return localStorage.getItem('chat_pin_' + r.id) !== 'true';
+      });
+      roles = pinnedRoles.concat(otherRoles);
+
+      // 群聊（放最前面，像微信一样群聊在消息列表里）
+      var groups = loadGroups();
+
+      if (roles.length === 0 && groups.length === 0) {
+        container.innerHTML = '<div class="empty-tip">暂无聊天消息</div>';
+        return;
+      }
+
+      function groupAvatarHTML(g) {
+        // 自定义群头像优先（与 chat-settings.html 的 renderGroupAvatar 保持一致）
+        if (g && g.avatar) {
+          return '<img src="' + g.avatar + '" alt="">';
+        }
+        var members = g.members || [];
+        if (members.length === 0) {
+          return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        }
+        return members.slice(0, 4).map(function(m) {
+          return m.avatar
+            ? '<img src="' + m.avatar + '" alt="">'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        }).join('');
+      }
+
+      var groupsHTML = groups.map(function (g) {
+        var gid = g.id;
+        var displayName = g.name || '群聊';
+        try {
+          var alias = localStorage.getItem('chat_group_alias_' + gid);
+          if (alias) displayName = alias;
+        } catch (e) {}
+        var isCustomAv = !!(g && g.avatar);
+        return '' +
+          '<div class="chat-slim-card chat-group-card" data-gid="' + escapeHtml(gid) + '">' +
+            '<div class="chat-avatar group-avatar' + (isCustomAv ? ' group-avatar-custom' : '') + '">' + groupAvatarHTML(g) + '</div>' +
+            '<div class="chat-meta">' +
+              '<div class="chat-title-row">' +
+                '<span class="chat-name">' + escapeHtml(displayName) + '</span>' +
+                '<span class="chat-time">Just now</span>' +
+              '</div>' +
+              '<div class="chat-last-msg">' + escapeHtml((g.members || []).map(function(m) { return m.name; }).join('、')) + '</div>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+
+      var rolesHTML = roles.map(function (role) {
+        var name = role.name || '角色';
+        var avatarInner = role.avatar
+          ? '<img src="' + role.avatar + '" alt="">'
+          : USER_SVG_SMALL;
+        var lastMsg = getLastMessage(role.id, name);
+
+        return '' +
+          '<div class="chat-slim-card" data-id="' + escapeHtml(role.id) + '">' +
+            '<div class="chat-avatar">' + avatarInner + '</div>' +
+            '<div class="chat-meta">' +
+              '<div class="chat-title-row">' +
+                '<span class="chat-name">' + escapeHtml(name) + '</span>' +
+                '<span class="chat-time">Just now</span>' +
+              '</div>' +
+              '<div class="chat-last-msg">' + escapeHtml(lastMsg) + '</div>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+
+      container.innerHTML = groupsHTML + rolesHTML;
+
+      /* 群聊点击：进入群聊聊天界面（复用 chat-detail 群聊模式） */
+      container.querySelectorAll('.chat-group-card').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var gid = item.getAttribute('data-gid');
+          if (gid) {
+            window.location.href = 'chat-detail.html?id=' + encodeURIComponent(gid);
+          }
+        });
+      });
+
+      /* 原有跳转逻辑：带 roleId 进入聊天详情页 */
+      container.querySelectorAll('.chat-slim-card:not(.chat-group-card)').forEach(function (item) {
+        item.addEventListener('click', function () {
+          var roleId = item.getAttribute('data-id');
+          if (roleId) {
+            window.location.href = 'chat-detail.html?id=' + encodeURIComponent(roleId);
+          }
+        });
+      });
+    }
+
+    /* ================= 初始化 ================= */
+    renderProfile();
+    applyMusicState(musicState);
+    renderChatList();
+  </script>
+<script src="../../shared/js/statusbar-control.js"></script>
+
+  <!-- 创建群聊弹窗 -->
+  <div class="group-modal-backdrop" id="groupModalBackdrop">
+    <div class="group-modal-box">
+      <div class="group-modal-title">创建群聊</div>
+      <input class="group-modal-input" id="groupNameInput" type="text" placeholder="群聊名称" maxlength="20">
+      <div class="group-modal-label">选择成员</div>
+      <div class="group-modal-members" id="groupMembersList"></div>
+      <div class="group-modal-actions">
+        <button class="group-modal-btn gm-cancel" type="button" id="groupModalCancel">取消</button>
+        <button class="group-modal-btn gm-create" type="button" id="groupModalCreate">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 创建群聊弹窗逻辑 */
+    (function() {
+      var backdrop = document.getElementById('groupModalBackdrop');
+      var nameInput = document.getElementById('groupNameInput');
+      var membersList = document.getElementById('groupMembersList');
+      var selected = {};
+
+      function loadCharacters() {
+        try {
+          var raw = localStorage.getItem('ai_custom_characters');
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+
+      function renderMembers() {
+        var roles = loadCharacters();
+        if (!roles.length) {
+          membersList.innerHTML = '<div style="text-align:center;color:#999;font-size:13px;padding:14px 0;">暂无角色，先去通讯录添加</div>';
+          return;
+        }
+        membersList.innerHTML = roles.map(function(r) {
+          var id = String(r.id);
+          var av = r.avatar
+            ? '<img src="' + r.avatar + '" alt="">'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+          return '<div class="group-member-item" data-id="' + id + '">' +
+            '<div class="group-member-avatar">' + av + '</div>' +
+            '<div class="group-member-name">' + (r.name || '未命名') + '</div>' +
+            '<div class="group-member-check"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+            '</div>';
+        }).join('');
+        membersList.querySelectorAll('.group-member-item').forEach(function(item) {
+          item.addEventListener('click', function() {
+            var id = item.dataset.id;
+            if (selected[id]) { delete selected[id]; item.classList.remove('is-selected'); }
+            else { selected[id] = true; item.classList.add('is-selected'); }
+          });
+        });
+      }
+
+      function openModal() {
+        selected = {};
+        if (nameInput) nameInput.value = '';
+        renderMembers();
+        backdrop.classList.add('show');
+        setTimeout(function(){ if (nameInput) nameInput.focus(); }, 60);
+      }
+
+      function closeModal() {
+        backdrop.classList.remove('show');
+      }
+
+      document.getElementById('groupEntryBtn').addEventListener('click', openModal);
+      document.getElementById('groupModalCancel').addEventListener('click', closeModal);
+      backdrop.addEventListener('click', function(e) {
+        if (e.target === backdrop) closeModal();
+      });
+
+      document.getElementById('groupModalCreate').addEventListener('click', function() {
+        var name = nameInput ? nameInput.value.trim() : '';
+        if (!name) {
+          nameInput.focus();
+          nameInput.style.boxShadow = 'inset 0 0 0 1.5px #999';
+          setTimeout(function(){ nameInput.style.boxShadow = ''; }, 800);
+          return;
+        }
+        var roles = loadCharacters();
+        var memberIds = Object.keys(selected);
+        var members = roles.filter(function(r) { return memberIds.indexOf(String(r.id)) !== -1; });
+        var groups = [];
+        try {
+          var raw = localStorage.getItem('phone_groups');
+          if (raw) groups = JSON.parse(raw);
+          if (!Array.isArray(groups)) groups = [];
+        } catch(e) {}
+        groups.push({
+          id: 'g' + Date.now(),
+          name: name,
+          members: members.map(function(m) { return { id: String(m.id), name: m.name, avatar: m.avatar || '' }; }),
+          createdAt: Date.now()
+        });
+        localStorage.setItem('phone_groups', JSON.stringify(groups));
+        closeModal();
+        renderChatList();  // 群聊直接进入消息列表，不跳转
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>正则过滤</title>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/statusbar-control.js"></script>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+        background-color: #E5E5E5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
+        color: #111111;
+        user-select: none;
+    }
+    .phone-mockup {
+        position: relative;
+        width: min(390px, calc(100vw - 24px));
+        height: min(844px, calc(100vh - 24px));
+        background-color: #F7F7F9;
+        border-radius: 45px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+    }
+    .status-bar {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        padding: 14px 28px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #000;
+        z-index: 50;
+        pointer-events: none;
+    }
+    .topbar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 14px 22px;
+        background: transparent;
+        flex-shrink: 0;
+    }
+    .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #111111;
+        flex-shrink: 0;
+    }
+    .back-btn:active { background: rgba(0,0,0,0.06); }
+    .page-title {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: #111111;
+        line-height: 1;
+    }
+    .refresh-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #666666;
+        flex-shrink: 0;
+    }
+    .refresh-btn:active { background: rgba(0,0,0,0.06); }
+
+    .content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 16px 140px 16px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .group-title {
+        font-size: 0.688rem;
+        font-weight: 600;
+        color: #999999;
+        letter-spacing: 1px;
+        padding: 14px 6px 8px 6px;
+    }
+    .card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .rule-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 0.5px solid #E5E5EA;
+    }
+    .rule-row:last-child { border-bottom: none; }
+    .rule-info { flex: 1; min-width: 0; }
+    .rule-name {
+        font-size: 0.875rem;
+        color: #111111;
+        line-height: 1.3;
+        margin-bottom: 3px;
+    }
+    .rule-pattern {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.688rem;
+        color: #999999;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* 极简 ON/OFF 按钮 */
+    .onoff {
+        flex-shrink: 0;
+        min-width: 48px;
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 13px;
+        border: none;
+        font-size: 0.688rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .onoff.on { background: #111111; color: #FFFFFF; }
+    .onoff.off { background: #E5E5EA; color: #999999; }
+
+    .empty {
+        text-align: center;
+        color: #B0B0B5;
+        font-size: 0.813rem;
+        padding: 60px 20px;
+    }
+
+    /* 右下角圆形加号 */
+    .add-fab {
+        position: absolute;
+        right: 20px;
+        bottom: 24px;
+        z-index: 10;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #111111;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.16);
+    }
+    .add-fab:active { transform: scale(0.94); }
+
+    /* 底部弹窗 */
+    .sheet-mask {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.25);
+        z-index: 20;
+        display: none;
+        align-items: flex-end;
+    }
+    .sheet-mask.show { display: flex; }
+    .sheet {
+        width: 100%;
+        background: #FFFFFF;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+        animation: up 0.25s ease;
+    }
+    @keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .sheet-title {
+        font-size: 1.063rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+    .field { margin-bottom: 12px; }
+    .field label {
+        display: block;
+        font-size: 0.688rem;
+        color: #999999;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .field input {
+        width: 100%;
+        border: 0.5px solid #E5E5EA;
+        background: #F7F7F9;
+        border-radius: 10px;
+        padding: 11px 12px;
+        font-size: 0.875rem;
+        font-family: inherit;
+        color: #111111;
+        outline: none;
+    }
+    .field input:focus { border-color: #111111; }
+    .field input::placeholder { color: #B0B0B5; }
+    .sheet-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    .btn-cancel, .btn-save {
+        flex: 1;
+        border: none;
+        border-radius: 12px;
+        padding: 13px;
+        font-size: 0.938rem;
+        font-family: inherit;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    .btn-cancel { background: #F2F2F7; color: #666666; }
+    .btn-save { background: #111111; color: #FFFFFF; }
+</style>
+</head>
+<body>
+<div class="phone-mockup">
+    <div class="status-bar" id="statusBar"></div>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="back-btn" onclick="location.href='../../settings/settings.html'" aria-label="返回">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="page-title">正则设置</div>
+        </div>
+        <button class="refresh-btn" onclick="render()" aria-label="刷新">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+    </div>
+
+    <div class="content">
+        <div class="card" id="ruleList"></div>
+        <div class="empty" id="emptyTip" style="display:none;">暂无规则，点击右下角新增</div>
+    </div>
+
+    <button class="add-fab" onclick="openSheet()" aria-label="新增规则">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+
+    <div class="sheet-mask" id="sheetMask" onclick="if(event.target===this)closeSheet()">
+        <div class="sheet">
+            <div class="sheet-title">新增正则规则</div>
+            <div class="field">
+                <label>规则名称</label>
+                <input id="fName" type="text" placeholder="例：去除多余语气词">
+            </div>
+            <div class="field">
+                <label>正则表达式</label>
+                <input id="fPattern" type="text" placeholder="例：啊{2,}|哦{2,}">
+            </div>
+            <div class="field">
+                <label>替换为（留空 = 直接删除）</label>
+                <input id="fReplace" type="text" placeholder="留空即删除匹配内容">
+            </div>
+            <div class="sheet-actions">
+                <button class="btn-cancel" onclick="closeSheet()">取消</button>
+                <button class="btn-save" onclick="saveRule()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var DEFAULT_RULES = [
+        {
+            id: "r_builtin_codeblock",
+            name: "代码块提取",
+            pattern: "^```(?:json)?\\s*([\\s\\S]*?)\\s*```$",
+            replacement: "$1",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_jsonwrap",
+            name: "JSON 数组包裹",
+            pattern: "^(\\{[\\s\\S]*\\})$",
+            replacement: "$1",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_missingcomma",
+            name: "缺少逗号修复",
+            pattern: "\\}\\s*\\{",
+            replacement: "},{",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_trailingcomma",
+            name: "尾随逗号修复",
+            pattern: ",\\s*([\\]\\}])",
+            replacement: "$1",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_xml",
+            name: "XML 标签提取",
+            pattern: "<output>(.*?)</output>",
+            replacement: "$1",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_id",
+            name: "ID 格式校验",
+            pattern: "^\\d{4}$",
+            replacement: "$1",
+            enabled: true,
+            builtin: true
+        },
+        {
+            id: "r_builtin_space",
+            name: "去空格",
+            pattern: "\\s+",
+            replacement: "",
+            enabled: false,
+            builtin: true
+        }
+    ];
+
+    function loadRules() {
+        try {
+            // 版本标记：旧版规则（动作描写/烂俗比喻/爹味）自动重置为新格式规则
+            var LS_VER = 'regex_rules_v2';
+            var raw = localStorage.getItem('regex_rules');
+            if (!raw) {
+                localStorage.setItem('regex_rules', JSON.stringify(DEFAULT_RULES));
+                localStorage.setItem(LS_VER, '1');
+                return DEFAULT_RULES.slice();
+            }
+            var arr = JSON.parse(raw);
+            if (!Array.isArray(arr)) return DEFAULT_RULES.slice();
+            // 检测是否为旧版规则（包含"去除动作"等旧名称）
+            var isOld = arr.some(function (r) {
+                return r.name && (r.name.indexOf('去除动作') !== -1 || r.name.indexOf('烂俗') !== -1 || r.name.indexOf('爹味') !== -1 || r.name.indexOf('管家婆') !== -1);
+            });
+            if (isOld || !localStorage.getItem(LS_VER)) {
+                localStorage.setItem('regex_rules', JSON.stringify(DEFAULT_RULES));
+                localStorage.setItem(LS_VER, '1');
+                return DEFAULT_RULES.slice();
+            }
+            return arr;
+        } catch (e) {
+            return DEFAULT_RULES.slice();
+        }
+    }
+    function saveRules(arr) {
+        localStorage.setItem('regex_rules', JSON.stringify(arr));
+    }
+
+    function render() {
+        var rules = loadRules();
+        var list = document.getElementById('ruleList');
+        var empty = document.getElementById('emptyTip');
+        list.innerHTML = '';
+        if (rules.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        rules.forEach(function (r, idx) {
+            var row = document.createElement('div');
+            row.className = 'rule-row';
+            var info = document.createElement('div');
+            info.className = 'rule-info';
+            var nm = document.createElement('div');
+            nm.className = 'rule-name';
+            nm.textContent = r.name;
+            var pt = document.createElement('div');
+            pt.className = 'rule-pattern';
+            pt.textContent = '正则: ' + r.pattern;
+            info.appendChild(nm);
+            info.appendChild(pt);
+
+            var btn = document.createElement('button');
+            btn.className = 'onoff ' + (r.enabled ? 'on' : 'off');
+            btn.textContent = r.enabled ? 'ON' : 'OFF';
+            btn.onclick = function () {
+                rules[idx].enabled = !rules[idx].enabled;
+                saveRules(rules);
+                render();
+            };
+
+            row.appendChild(info);
+            row.appendChild(btn);
+            list.appendChild(row);
+        });
+    }
+
+    function openSheet() { document.getElementById('sheetMask').classList.add('show'); }
+    function closeSheet() {
+        document.getElementById('sheetMask').classList.remove('show');
+        document.getElementById('fName').value = '';
+        document.getElementById('fPattern').value = '';
+        document.getElementById('fReplace').value = '';
+    }
+    function saveRule() {
+        var name = document.getElementById('fName').value.trim();
+        var pattern = document.getElementById('fPattern').value.trim();
+        var replace = document.getElementById('fReplace').value;
+        if (!name || !pattern) { alert('请填写规则名称和正则表达式'); return; }
+        // 简单校验正则合法性
+        try { new RegExp(pattern, 'g'); } catch (e) { alert('正则表达式不合法：' + e.message); return; }
+        var rules = loadRules();
+        rules.push({
+            id: 'r_' + Date.now(),
+            name: name,
+            pattern: pattern,
+            replacement: replace,
+            enabled: true,
+            builtin: false
+        });
+        saveRules(rules);
+        closeSheet();
+        render();
+    }
+
+    render();
+</script>
+</body>
+</html>

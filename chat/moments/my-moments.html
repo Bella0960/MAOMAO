@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>我的主页 · 小手机</title>
+<script src="../../shared/js/font-loader.js"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+    user-select: none;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    min-height: 0;
+    background-color: #F8F8F8;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+  }
+
+  /* 主舞台容器（本页无底部悬浮导航，底部只需普通留白） */
+  .space-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 44px 8px 24px 8px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #F8F8F8;
+  }
+  .space-stage::-webkit-scrollbar { display: none; }
+
+  /* 通体连贯的大板块容器（无壁纸时用深灰渐变兜底，保证白字可见；清除边框/轮廓/阴影） */
+  .profile-main-container {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    background: #FFFFFF;
+    background-image: linear-gradient(180deg, #48484D 0%, #6E6E74 42%, #FFFFFF 100%);
+    border-radius: 28px;
+    overflow: hidden;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  /* 用户上传的壁纸图片（顶部清晰，向下渐变融入白色） */
+  .cover-bg-image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+    border: none !important;
+    outline: none !important;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%);
+    mask-image: linear-gradient(180deg, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%);
+  }
+
+  /* 整屏点击唤起相册（仅头部区域可见可点，内容内衬层在其之上） */
+  .cover-upload-label {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 5;
+    cursor: pointer;
+    display: block;
+  }
+
+  /* 左上角透明返回键 */
+  .cover-nav-btn {
+    position: relative;
+    z-index: 20;
+    width: 24px; height: 24px;
+    background: transparent;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+  }
+  .cover-nav-btn svg { width: 18px; height: 18px; stroke: #FFFFFF; stroke-width: 1.8; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7)); }
+
+  /* 个人信息区：左侧正方形头像 + 名字与签名 */
+  .profile-info-group {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    pointer-events: none;
+  }
+  .profile-avatar {
+    width: 58px; height: 58px;
+    background: #E5E5EA;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    border: 2px solid #FFFFFF;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .profile-avatar img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .profile-avatar svg { width: 28px; height: 28px; }
+
+  .profile-text-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .profile-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+  .profile-bio {
+    font-size: 0.688rem;
+    color: #F2F2F7;
+    line-height: 1.35;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* 内衬内容板块（极淡边框可无，去除厚重线条与轮廓） */
+  .inner-content-panel {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .inner-content-panel::-webkit-scrollbar { display: none; }
+
+  /* 我的动态卡片 */
+  .my-post {
+    background: #F7F7F9;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .my-post-text {
+    font-size: 0.813rem;
+    line-height: 1.55;
+    color: #333333;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .my-post-image {
+    width: 100%;
+    border-radius: 14px !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: block;
+  }
+  .my-post-time {
+    font-size: 0.625rem;
+    color: #999999;
+    font-family: monospace;
+  }
+  .my-post-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+  }
+  .my-post-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.625rem;
+    color: #666666;
+    background: none;
+    border: none;
+    padding: 2px 0;
+    margin: 0;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .my-post-stat svg { width: 13px; height: 13px; stroke: #666666; transition: transform 0.12s ease; }
+  /* 点赞态：实心黑色 */
+  .my-post-stat.is-liked { color: #111111; }
+  .my-post-stat.is-liked svg { stroke: #111111; fill: #111111; }
+  .my-post-stat.pop svg { transform: scale(0.9); }
+
+  /* 最近 2 条评论预览 */
+  .my-post-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+  .mpc-row {
+    font-size: 0.688rem;
+    line-height: 1.4;
+    color: #666666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mpc-row .mpc-name { color: #999999; font-weight: 600; margin-right: 3px; }
+
+  .my-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #999999;
+    padding: 40px 0;
+  }
+
+  /* ===== 评论抽屉 ===== */
+  .cm-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 600;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .cm-overlay.show { display: flex; }
+  .cm-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+  }
+  .cm-sheet {
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 10px 16px 22px;
+    animation: cmSlideUp 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    max-height: 72%;
+  }
+  @keyframes cmSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .cm-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: #E5E5EA;
+    margin: 0 auto 12px;
+    flex-shrink: 0;
+  }
+  .cm-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 14px;
+    min-height: 60px;
+  }
+  .cm-list::-webkit-scrollbar { display: none; }
+  .cm-empty {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #999999;
+    padding: 18px 0;
+  }
+  .cm-item { display: flex; gap: 8px; align-items: flex-start; }
+  .cm-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #F2F2F7;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cm-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cm-avatar svg { width: 15px; height: 15px; }
+  .cm-body { min-width: 0; }
+  .cm-head { font-size: 0.688rem; color: #999999; font-weight: 600; }
+  .cm-head span { font-weight: 400; color: #B0B0B5; font-size: 0.594rem; margin-left: 6px; font-family: monospace; }
+  .cm-text {
+    font-size: 0.813rem;
+    line-height: 1.5;
+    color: #333333;
+    margin-top: 2px;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .cm-input-row { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .cm-input {
+    flex: 1;
+    height: 40px;
+    border: none;
+    outline: none;
+    background: #F2F2F7;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333333;
+  }
+  .cm-input::placeholder { color: #B0B0B5; }
+  .cm-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #1C1C1E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: transform 0.1s ease;
+  }
+  .cm-send:active { transform: scale(0.94); }
+  .cm-send svg { width: 17px; height: 17px; stroke: #FFFFFF; }
+
+  /* 评论图片支持 */
+  .cm-extra-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #F2F2F7;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .cm-extra-btn svg { width: 18px; height: 18px; stroke: #666; }
+  .cm-image-thumb {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .cm-text-img {
+    margin-top: 4px;
+    max-width: 100%;
+    border-radius: 10px;
+    display: block;
+  }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <!-- 主舞台滚动区 -->
+    <div class="space-stage">
+
+      <div class="profile-main-container">
+
+        <!-- 壁纸层（有封面时显示） -->
+        <img id="coverImg" class="cover-bg-image" alt="个人主页壁纸">
+
+        <!-- 点击头部更换壁纸 -->
+        <label for="coverInput" class="cover-upload-label" title="点击更换壁纸"></label>
+        <input type="file" id="coverInput" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+
+        <!-- 返回朋友圈 -->
+        <button class="cover-nav-btn" type="button" aria-label="返回"
+          onclick="window.location.href='moments.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <!-- 个人信息 -->
+        <div class="profile-info-group">
+          <div class="profile-avatar" id="profileAvatar"></div>
+          <div class="profile-text-box">
+            <span class="profile-name" id="profileName">未设置昵称</span>
+            <span class="profile-bio" id="profileBio">这个人很懒，什么都没有留下</span>
+          </div>
+        </div>
+
+        <!-- 我的动态列表 -->
+        <div class="inner-content-panel" id="innerPanel"></div>
+
+      </div>
+
+    </div>
+
+    <!-- 评论抽屉 -->
+    <div class="cm-overlay" id="cmOverlay">
+      <div class="cm-backdrop" id="cmBackdrop"></div>
+      <div class="cm-sheet">
+        <div class="cm-handle"></div>
+        <div class="cm-list" id="cmList"></div>
+        <div class="cm-input-row">
+          <button class="cm-extra-btn" id="cmImgBtn" type="button" aria-label="添加图片">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </button>
+          <input type="file" id="cmImgInput" accept="image/*" style="display:none;">
+          <input class="cm-input" id="cmInput" type="text" maxlength="200" placeholder="写下你的评论…">
+          <button class="cm-send" id="cmSend" type="button" aria-label="发送评论">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var PROFILE_KEY = 'myProfile';
+    var MOMENTS_KEY = 'moments';
+
+    var AVATAR_FALLBACK_SVG =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+    var _storage = window.PhoneStorage;
+
+    function readProfile() {
+      if (_storage) {
+        var p = _storage.getMyProfile();
+        return p && typeof p === 'object' ? p : {};
+      }
+      try {
+        var raw = localStorage.getItem(PROFILE_KEY);
+        if (raw) {
+          var p = JSON.parse(raw);
+          if (p && typeof p === 'object') return p;
+        }
+      } catch (e) {}
+      return {};
+    }
+
+    function loadMoments() {
+      if (_storage) return _storage.getMoments();
+      try {
+        var raw = localStorage.getItem(MOMENTS_KEY);
+        if (raw) {
+          var list = JSON.parse(raw);
+          if (Array.isArray(list)) return list;
+        }
+      } catch (e) {}
+      return [];
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatTime(ts) {
+      var diff = Date.now() - ts;
+      if (isNaN(diff) || diff < 0) diff = 0;
+      var minute = 60 * 1000, hour = 60 * minute, day = 24 * hour;
+      if (diff < minute) return '刚刚';
+      if (diff < hour) return Math.floor(diff / minute) + '分钟前';
+      if (diff < day) return Math.floor(diff / hour) + '小时前';
+      if (diff < 7 * day) return Math.floor(diff / day) + '天前';
+      var d = new Date(ts);
+      return (d.getMonth() + 1) + '月' + d.getDate() + '日';
+    }
+
+    /* ===== 判定一条动态是否为当前用户本人所发 ===== */
+    function isMyPost(m, me) {
+      if (!m) return false;
+      if (m.authorId === 'me') return true;
+      if (me.id && m.authorId === me.id) return true;
+      // 兼容旧数据：无作者标记且非 AI 生成，按昵称 / “我” / 空名 认定
+      if (m.authorId == null && m.byAI !== true) {
+        if (!m.author || m.author === '我' || m.author === me.name) return true;
+      }
+      return false;
+    }
+
+    /* ===== 个人信息 + 封面回显 ===== */
+    function renderProfile() {
+      var p = readProfile();
+      var name = p.nickname || '未设置昵称';
+      var bio = p.sign || p.about || '这个人很懒，什么都没有留下';
+
+      document.getElementById('profileName').textContent = name;
+      var bioEl = document.getElementById('profileBio');
+      bioEl.textContent = bio;
+      bioEl.title = bio;
+
+      var avatarBox = document.getElementById('profileAvatar');
+      avatarBox.innerHTML = p.avatar
+        ? '<img src="' + p.avatar + '" alt="头像">'
+        : AVATAR_FALLBACK_SVG;
+      var avatarImg = avatarBox.querySelector('img');
+      if (avatarImg) {
+        avatarImg.addEventListener('error', function () {
+          avatarBox.innerHTML = AVATAR_FALLBACK_SVG;
+        });
+      }
+
+      var coverImg = document.getElementById('coverImg');
+      if (p.cover) {
+        coverImg.src = p.cover;
+        coverImg.style.display = 'block';
+      } else {
+        coverImg.removeAttribute('src');
+        coverImg.style.display = 'none';
+      }
+
+      return { id: p.id || '', name: name === '未设置昵称' ? '' : p.nickname || '' };
+    }
+
+    /* ===== 评论数据归一化：优先 comments（新），回退 commentList（朋友圈页旧结构） ===== */
+    function getComments(m) {
+      if (Array.isArray(m.comments)) {
+        return m.comments.map(function (c) {
+          return {
+            author: c.author || c.name || '匿名用户',
+            avatar: c.avatar || '',
+            text: c.text || '',
+            timestamp: c.timestamp || c.time || 0
+          };
+        });
+      }
+      if (Array.isArray(m.commentList)) {
+        return m.commentList.map(function (c) {
+          return { author: c.name || c.author || '匿名用户', avatar: '', text: c.text || '', timestamp: c.time || 0 };
+        });
+      }
+      return [];
+    }
+    function getLiked(m) {
+      // 以 moments.html 写入的 liked 为准确字段，isLiked 仅作兼容兜底
+      if (typeof m.liked === 'boolean') return m.liked;
+      return !!m.isLiked;
+    }
+
+    /* ===== 渲染我的动态 ===== */
+    var panel = document.getElementById('innerPanel');
+
+    function renderMyMoments(me) {
+      var list = loadMoments().filter(function (m) { return isMyPost(m, me); });
+
+      if (!list.length) {
+        panel.innerHTML = '<div class="my-empty">还没有发布过任何动态</div>';
+        return;
+      }
+
+      panel.innerHTML = list.map(function (m) {
+        var liked = getLiked(m);
+        var comments = getComments(m);
+        var preview = comments.length ? (
+          '<div class="my-post-comments">' +
+            comments.slice(-2).map(function (c) {
+              return '<div class="mpc-row"><span class="mpc-name">' + escapeHtml(c.author) + '：</span>' + escapeHtml(c.text) + '</div>';
+            }).join('') +
+          '</div>'
+        ) : '';
+        return '<div class="my-post" data-id="' + escapeHtml(m.id) + '">' +
+          (m.content ? '<div class="my-post-text">' + escapeHtml(m.content) + '</div>' : '') +
+          (m.image ? '<img class="my-post-image" src="' + m.image + '" alt="">' : '') +
+          preview +
+          '<div class="my-post-time">' + formatTime(m.time) + '</div>' +
+          '<div class="my-post-actions">' +
+            '<button type="button" class="my-post-stat js-like' + (liked ? ' is-liked' : '') + '" aria-label="点赞">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+              '<span>' + (m.likes || 0) + '</span>' +
+            '</button>' +
+            '<button type="button" class="my-post-stat js-comment" aria-label="评论">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
+              '<span>' + comments.length + '</span>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    /* ===== 定位动态并保存（双字段同步，兼容朋友圈页） ===== */
+    function findInList(list, id) {
+      for (var i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(id)) return list[i];
+      }
+      return null;
+    }
+    function saveMomentsSafe(list) {
+      if (_storage) { _storage.saveMoments(list); return true; }
+      try {
+        localStorage.setItem(MOMENTS_KEY, JSON.stringify(list));
+        return true;
+      } catch (err) {
+        alert('存储空间不足，请清理后重试');
+        return false;
+      }
+    }
+
+    /* ===== 点赞 / 评论入口（事件委托） ===== */
+    var currentMe = { id: '', name: '' };
+
+    panel.addEventListener('click', function (e) {
+      var likeBtn = e.target.closest('.js-like');
+      var commentBtn = e.target.closest('.js-comment');
+      if (!likeBtn && !commentBtn) return;
+      var card = e.target.closest('.my-post');
+      if (!card) return;
+      var id = card.getAttribute('data-id');
+      var list = loadMoments();
+      var post = findInList(list, id);
+      if (!post) return;
+
+      if (likeBtn) {
+        var wasLiked = getLiked(post);
+        var nextLiked = !wasLiked;
+        post.isLiked = nextLiked;   // 新字段
+        post.liked = nextLiked;     // 同步朋友圈页旧字段
+        post.likes = (post.likes || 0) + (nextLiked ? 1 : -1);
+        if (post.likes < 0) post.likes = 0;
+        if (!saveMomentsSafe(list)) return;
+        // 写通知（仅点赞时）
+        if (nextLiked) {
+          var profile = readProfile();
+          var notif = {
+            type: 'like',
+            actorId: 'me',
+            actorName: profile.nickname || '我',
+            actorAvatar: profile.avatar || '',
+            postId: post.id,
+            postContent: (post.content || '[图片动态]').slice(0, 40),
+            text: '赞了这条动态',
+            time: Date.now()
+          };
+          if (_storage) { _storage.pushMomentsNotification(notif); }
+          else {
+            try {
+              var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+              arr.unshift(notif);
+              while (arr.length > 100) arr.pop();
+              localStorage.setItem('moments_notifications', JSON.stringify(arr));
+            } catch (e) {}
+          }
+        }
+        // 微缩动画结束后重渲染
+        likeBtn.classList.add('pop');
+        setTimeout(function () { renderMyMoments(currentMe); }, 120);
+      } else {
+        openCommentDrawer(post);
+      }
+    });
+
+    /* ===== 评论抽屉 ===== */
+    var cmOverlay = document.getElementById('cmOverlay');
+    var cmListEl = document.getElementById('cmList');
+    var cmInput = document.getElementById('cmInput');
+    var cmActiveId = null;
+    var cmPendingImage = '';
+    var cmImgBtn = document.getElementById('cmImgBtn');
+    var cmImgInput = document.getElementById('cmImgInput');
+
+    function avatarBlock(avatar) {
+      if (avatar) {
+        return '<div class="cm-avatar"><img src="' + avatar + '" alt=""></div>';
+      }
+      return '<div class="cm-avatar">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+    }
+
+    function compressImage(file, cb) {
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var maxW = 600;
+            var scale = Math.min(1, maxW / img.width);
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            cb(canvas.toDataURL('image/jpeg', 0.7));
+          } catch (err) { alert('图片处理失败'); cb(''); }
+        };
+        img.onerror = function () { alert('图片读取失败'); cb(''); };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderCommentDrawer() {
+      var post = findInList(loadMoments(), cmActiveId);
+      if (!post) { closeCommentDrawer(); return; }
+      var comments = getComments(post);
+      if (!comments.length) {
+        cmListEl.innerHTML = '<div class="cm-empty">还没有评论，说点什么吧</div>';
+        return;
+      }
+      cmListEl.innerHTML = comments.map(function (c) {
+        var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+        var imgHTML = imgSrc ? '<img class="cm-text-img" src="' + imgSrc + '" alt="">' : '';
+        return '<div class="cm-item">' +
+          avatarBlock(c.avatar) +
+          '<div class="cm-body">' +
+            '<div class="cm-head">' + escapeHtml(c.author) +
+              (c.timestamp ? '<span>' + formatTime(c.timestamp) + '</span>' : '') +
+            '</div>' +
+            (c.text ? '<div class="cm-text">' + escapeHtml(c.text) + '</div>' : '') +
+            imgHTML +
+          '</div>' +
+        '</div>';
+      }).join('');
+      cmListEl.scrollTop = cmListEl.scrollHeight;
+    }
+
+    function resetCmInput() {
+      cmInput.value = '';
+      cmPendingImage = '';
+      if (cmImgInput) cmImgInput.value = '';
+      if (cmImgBtn) cmImgBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+    }
+
+    function openCommentDrawer(post) {
+      cmActiveId = post.id;
+      resetCmInput();
+      renderCommentDrawer();
+      cmOverlay.classList.add('show');
+      setTimeout(function () { cmInput.focus(); }, 260);
+    }
+    function closeCommentDrawer() {
+      cmOverlay.classList.remove('show');
+      cmActiveId = null;
+      resetCmInput();
+    }
+
+    document.getElementById('cmBackdrop').addEventListener('click', closeCommentDrawer);
+
+    // 评论图片选择
+    if (cmImgBtn) {
+      cmImgBtn.addEventListener('click', function () { cmImgInput.click(); });
+    }
+    if (cmImgInput) {
+      cmImgInput.addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        compressImage(file, function (dataUrl) {
+          if (!dataUrl) return;
+          cmPendingImage = dataUrl;
+          cmImgBtn.innerHTML = '<img class="cm-image-thumb" src="' + dataUrl + '" alt="预览">';
+        });
+      });
+    }
+
+    // 通知写入（与 moments.html 共用同一个 key）
+    function pushNotif(n) {
+      try {
+        var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+        arr.unshift(n);
+        while (arr.length > 100) arr.pop();
+        localStorage.setItem('moments_notifications', JSON.stringify(arr));
+      } catch (e) {}
+    }
+
+    function submitComment() {
+      var text = cmInput.value.trim();
+      if (!text && !cmPendingImage) return;
+      if (!cmActiveId) return;
+      var profile = readProfile();
+      var authorName = profile.nickname || '我';
+
+      var list = loadMoments();
+      var post = findInList(list, cmActiveId);
+      if (!post) { closeCommentDrawer(); return; }
+
+      var ts = Date.now();
+      var entry = { author: authorName, avatar: profile.avatar || '', text: text, image: cmPendingImage, timestamp: ts, time: ts };
+
+      // 新结构 comments
+      if (!Array.isArray(post.comments)) post.comments = [];
+      post.comments.push(entry);
+
+      // 同步朋友圈页旧结构 commentList，保证两页数据一致
+      if (!Array.isArray(post.commentList)) post.commentList = [];
+      post.commentList.push({ name: authorName, author: authorName, avatar: profile.avatar || '', text: text, image: cmPendingImage, time: ts, timestamp: ts });
+
+      if (!saveMomentsSafe(list)) return;
+      resetCmInput();
+      closeCommentDrawer();
+      renderMyMoments(currentMe);
+
+      // 写通知
+      var postContent = (post.content || '[图片动态]').slice(0, 40);
+      pushNotif({
+        type: 'comment',
+        actorId: 'me',
+        actorName: authorName,
+        actorAvatar: profile.avatar || '',
+        postId: post.id,
+        postContent: postContent,
+        text: (text ? '评论了' : '发图评论了') + '这条动态' + (text ? '：' + text.slice(0, 30) : ''),
+        time: ts
+      });
+    }
+    document.getElementById('cmSend').addEventListener('click', submitComment);
+    cmInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') submitComment();
+    });
+
+    /* ===== 壁纸上传：FileReader + Canvas（最大宽 600 等比，JPEG 0.7） ===== */
+    function compressCover(file, cb) {
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var maxW = 600;
+            var scale = Math.min(1, maxW / img.width);
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            cb(canvas.toDataURL('image/jpeg', 0.7));
+          } catch (err) {
+            alert('图片处理失败，请更换图片重试');
+            cb('');
+          }
+        };
+        img.onerror = function () {
+          alert('图片读取失败，请检查文件格式');
+          cb('');
+        };
+        img.src = ev.target.result;
+      };
+      reader.onerror = function () {
+        alert('图片读取失败，请检查文件格式');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('coverInput').addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      compressCover(file, function (dataUrl) {
+        if (!dataUrl) return;
+        try {
+          var p = readProfile();   // 读-改-写，保留其他字段
+          p.cover = dataUrl;
+          try {
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+          } catch (err) {
+            if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+              alert('存储空间不足，请压缩图片');
+            } else {
+              alert('保存失败，请更换图片重试');
+            }
+            return;
+          }
+          var me = renderProfile();
+          currentMe = me;
+          renderMyMoments(me);
+        } catch (err) {
+          alert('保存失败，请更换图片重试');
+        }
+      });
+    });
+
+    currentMe = renderProfile();
+    renderMyMoments(currentMe);
+  </script>
+<script src="../../shared/js/statusbar-control.js"></script>
+</body>
+</html>

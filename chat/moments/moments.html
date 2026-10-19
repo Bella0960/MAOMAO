@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="zh"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空间 · 小手机</title>
+    <script src="../../shared/js/font-loader.js"></script><style>:root { --base-font-size: 14px; }html { font-size: calc(var(--base-font-size, 14px) / 14 * 16); }</style>
+    <script src="../../shared/js/native-feel.js"></script><script src="../../shared/js/phone/phone_storage.js"></script><script src="../../shared/js/phone/phone_api.js"></script><script src="../../shared/js/phone/phone_context.js"></script><script src="../../shared/js/phone/phone_apps.js"></script><script src="../../shared/js/phone/phone_engine.js"></script><script src="../../shared/js/phone/phone_ui.js"></script><style>html {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    transition: opacity 0.15s ease;
+    opacity: 1;
+}
+* { -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior-y: none; }
+[class*="scroll"], .chat-stage { overscroll-behavior-y: none; }
+input, textarea, select, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+}
+html.nf-boot, html.nf-hide { opacity: 0 !important; }
+a, button, [role="button"] { touch-action: manipulation; }
+a:active, button:active, [role="button"]:active { transform: scale(0.97); }</style>
+    <style>
+        /* 全局重置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 手机外壳 */
+        .phone-mockup {
+            position: relative;
+            width: min(390px, calc(100vw - 24px));
+            height: min(844px, calc(100vh - 24px));
+            min-height: 0;
+            background-color: #F7F7F9;
+            border-radius: 45px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            border: 8px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 14px 28px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #000;
+            z-index: 50;
+        }
+
+        /* ===== 主舞台滚动区（剥离模板外壳后的 space-stage） ===== */
+        .space-stage {
+            flex: 1;
+            overflow-y: auto;
+            padding: 48px 16px 100px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scrollbar-width: none;
+            background: #F7F7F9;
+        }
+        .space-stage::-webkit-scrollbar { display: none; }
+
+        /* ===== 封面板块 ===== */
+        .cover-block {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #EBEBEF 0%, #DEDEE3 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.04);
+            flex-shrink: 0;
+        }
+        .cover-nav-btn {
+            position: absolute;
+            top: 14px;
+            left: 16px;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .cover-nav-btn svg { width: 18px; height: 18px; stroke: #111; stroke-width: 1.5; }
+        .cover-add-btn {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .cover-add-btn svg { width: 20px; height: 20px; stroke: #111; stroke-width: 1.5; }
+
+        /* 整机刷新按钮 */
+        .cover-refresh-btn {
+            position: absolute;
+            top: 14px;
+            right: 48px;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.7;
+            transition: opacity 0.15s;
+        }
+        .cover-refresh-btn:hover { opacity: 1; }
+        .cover-refresh-btn svg { width: 18px; height: 18px; stroke: #111; stroke-width: 1.5; }
+        .cover-refresh-btn.spinning svg { animation: cover-spin 0.9s linear infinite; }
+        @keyframes cover-spin { to { transform: rotate(360deg); } }
+
+        /* 角色选择条（封面底部） */
+        .cover-role-bar {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #666;
+            z-index: 10;
+        }
+        .cover-role-bar select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            background: rgba(255,255,255,0.7);
+            padding: 3px 18px 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #333;
+            cursor: pointer;
+            font-family: inherit;
+            /* 下拉箭头 */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+        }
+
+        /* 封面头像：有图显图，无图浅灰圆角方块 + 细线条 SVG 占位 */
+        .cover-avatar-left {
+            width: 58px;
+            height: 58px;
+            background: #E5E5EA;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            border: 2px solid #FFFFFF;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .cover-avatar-left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cover-avatar-left svg { width: 28px; height: 28px; }
+
+        /* ===== 动态大面板（即原列表容器 #momentsList，事件委托仍挂在此节点） ===== */
+        .moments-main-panel {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            flex-shrink: 0;
+        }
+
+        /* 动态条目 */
+        .post-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .post-item:first-child { padding-top: 0; }
+        .post-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+        /* 左侧头像（复用 avatarHTML 输出的 .moment-avatar 钩子） */
+        .post-item .moment-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #E5E5EA;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .post-item .moment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .post-item .moment-avatar svg { width: 19px; height: 19px; }
+
+        /* 右侧内容 */
+        .post-content-box {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .post-name { font-size: 0.781rem; font-weight: 700; color: #111; }
+        .post-time { font-size: 0.625rem; color: #999; font-family: monospace; }
+        .post-text {
+            font-size: 0.813rem;
+            line-height: 1.5;
+            color: #333;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .post-image {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* 点赞 / 评论 */
+        .post-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 14px;
+            margin-top: 4px;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0;
+            margin: 0;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: 0.656rem;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.15s ease, transform 0.1s ease;
+        }
+        .action-btn:active { transform: scale(0.92); }
+        .action-btn svg { width: 13px; height: 13px; stroke: #666; }
+        /* 已赞：纯黑填充，遵守黑白灰规范（逻辑仍由原 liked 字段驱动） */
+        .action-btn.liked { color: #111111; }
+        .action-btn.liked svg { stroke: #111111; fill: #111111; }
+
+        .empty-tip {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #999999;
+            padding: 30px 0;
+        }
+
+        /* ===== 条目内评论区 ===== */
+        .post-comments {
+            margin-top: 2px;
+            background-color: #F7F7F9;
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .comment-row {
+            font-size: 0.688rem;
+            line-height: 1.45;
+            color: #333;
+            word-break: break-word;
+        }
+        .comment-row .comment-name { color: #999; font-weight: 600; margin-right: 4px; }
+        .comment-row .comment-time { color: #B0B0B5; font-size: 0.594rem; margin-left: 6px; font-family: monospace; }
+
+        /* ===== 封面 AI 隐形入口（细线条四角星，右下角半透明白圆） ===== */
+        .cover-ai-btn {
+            position: absolute;
+            right: 16px;
+            bottom: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+        .cover-ai-btn:active { transform: scale(0.92); }
+        .cover-ai-btn:disabled { opacity: 0.45; cursor: default; }
+        .cover-ai-btn svg { width: 15px; height: 15px; stroke: #333; }
+
+        /* ===== 评论抽屉 ===== */
+        .comment-sheet {
+            position: relative;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 16px 16px 0 0;
+            padding: 18px 16px 20px;
+            animation: slideUp 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            max-height: 75%;
+        }
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 14px;
+            min-height: 60px;
+        }
+        .comment-list::-webkit-scrollbar { display: none; }
+        .comment-list .comment-empty {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #999;
+            padding: 18px 0;
+        }
+        .comment-list-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .comment-list-item .cli-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #D1D1D6;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .comment-list-item .cli-body { min-width: 0; }
+        .comment-list-item .cli-head {
+            font-size: 0.688rem;
+            color: #999;
+            font-weight: 600;
+        }
+        .comment-list-item .cli-head span {
+            font-weight: 400;
+            color: #B0B0B5;
+            font-size: 0.594rem;
+            margin-left: 6px;
+            font-family: monospace;
+        }
+        .comment-list-item .cli-text {
+            font-size: 0.813rem;
+            line-height: 1.5;
+            color: #333;
+            margin-top: 2px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .comment-input-row {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .comment-input {
+            flex: 1;
+            height: 40px;
+            border: none;
+            outline: none;
+            background-color: #F2F2F7;
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: #333;
+        }
+        .comment-input::placeholder { color: #B0B0B5; }
+        .comment-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background-color: #1C1C1E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+        .comment-send:active { transform: scale(0.94); }
+        .comment-send:disabled { background-color: #8E8E93; }
+        .comment-send svg { width: 17px; height: 17px; stroke: #fff; }
+
+        /* ===== 评论抽屉 ===== */
+        .comment-input-row {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        .comment-extra-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: #F2F2F7;
+            border: none;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .comment-extra-btn svg { width: 18px; height: 18px; stroke: #666; }
+        .comment-image-thumb {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .cli-image {
+            margin-top: 4px;
+            max-width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+        .comment-row .cr-image {
+            margin-top: 4px;
+            max-width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* Toast */
+        .moments-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 700;
+            background: rgba(28,28,30,0.9);
+            color: #FFFFFF;
+            font-size: 0.813rem;
+            padding: 12px 20px;
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .moments-toast.show { opacity: 1; }
+    </style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+<style>.floating-nav {
+    position: absolute;
+    bottom: 20px;
+    left: 0 !important;
+    right: 0 !important;
+    width: fit-content !important;
+    max-width: calc(100% - 32px);
+    margin: 0 auto !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px 6px 12px !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    z-index: 500;
+}
+.nav-tab {
+    flex: 0 0 auto !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px !important;
+    padding: 4px 6px !important;
+    border-radius: 999px;
+    color: #777777;
+    text-decoration: none;
+    font-size: 8px !important;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s ease;
+    /* 手机端触摸优化：去掉点按灰光斑、禁止长按选中/呼出菜单、消除双击缩放延迟 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+/* 图标背后的小圆底（仅选中时显示极淡浅灰圆，不使用大黑块） */
+.nav-ico {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center bottom;
+    /* 松开手指：420ms 带过冲的回弹曲线，Q弹感来源 */
+    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+.nav-ico svg { width: 14px !important; height: 14px !important; display: block; stroke-width: 1.5 !important; }
+/* 选中态：图标轻微浮起放大 + 文字加粗变黑 */
+.nav-tab.active { color: #111111; font-weight: 700; }
+.nav-tab.active .nav-ico { background: rgba(0, 0, 0, 0.06); transform: translateY(-1px) scale(1.06); }
+/* 点按态：必须写在 .active 之后（两者优先级相同，靠书写顺序覆盖）。按下快速响应、不带过冲 */
+.nav-tab:active .nav-ico,
+.nav-tab.is-pressing .nav-ico {
+    transform: translateY(-5px) scale(1.12);
+    transition: transform 110ms ease-out, background 0.2s ease;
+}
+.nav-badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 12px);
+    width: 6px;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 50%;
+}</style></head>
+<body>
+
+    <div class="phone-mockup">
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>4:41</span>
+        </div>
+
+        <!-- 主舞台：封面 + 动态面板 -->
+        <div class="space-stage">
+
+            <!-- 封面板块 -->
+            <div class="cover-block">
+                <div class="cover-nav-btn" aria-label="返回" onclick="location.href='../../index.html'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+                </div>
+                <div class="cover-add-btn" id="btnAdd" aria-label="发表动态" onclick="location.href='../../forum/post-create.html'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <div class="cover-refresh-btn" id="btnRefreshAll" aria-label="整机刷新" title="整机刷新：AI 一次性生成朋友圈 + 钱包">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+                </div>
+                <div class="cover-role-bar">
+                    <span>角色：</span>
+                    <select id="roleSelect"></select>
+                </div>
+                <div class="cover-avatar-left" id="coverAvatar"><svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                <!-- 隐形入口：让随机角色由 AI 生成一条动态 -->
+                <button class="cover-ai-btn" id="btnAiPost" type="button" aria-label="让 TA 发动态" title="让 TA 发动态">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M19 14l.7 1.8L21.5 16.5l-1.8.7L19 19l-.7-1.8-1.8-.7 1.8-.7z"></path></svg>
+                </button>
+            </div>
+
+            <!-- 动态面板（原 #momentsList 节点保留，事件委托不受 innerHTML 重建影响） -->
+            <main class="moments-main-panel" id="momentsList"><div class="empty-tip">还没有动态，快发一条吧</div></main>
+
+        </div>
+
+        <!-- 封面/头像上传（保留给 cover-block 用） -->
+        <input type="file" id="coverInput" accept="image/*" style="display:none;">
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+
+        <!-- Toast -->
+        <div class="moments-toast" id="momentsToast"></div>
+
+        <!-- 评论抽屉 -->
+        <div class="post-overlay" id="commentOverlay" style="position: absolute; inset: 0; z-index: 600; display: none; align-items: flex-end; justify-content: center;">
+            <div class="post-backdrop" id="commentBackdrop" style="position: absolute; inset: 0; background: rgba(0,0,0,0.3);"></div>
+            <div class="comment-sheet">
+                <h3 class="post-title" id="commentTitle">评论</h3>
+                <div class="comment-list" id="commentList"></div>
+                <div class="comment-input-row">
+                    <button class="comment-extra-btn" id="commentImgBtn" type="button" aria-label="添加图片">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    </button>
+                    <input type="file" id="commentImgInput" accept="image/*" style="display:none;">
+                    <input class="comment-input" id="commentInput" type="text" maxlength="200" placeholder="写下你的评论…">
+                    <button class="comment-send" id="btnSendComment" type="button" aria-label="发送评论">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航由 nav.js 动态注入 -->
+
+    </div>
+
+    <script src="../../shared/js/nav.js"></script>
+    <script>
+        /* ================= 数据层 ================= */
+        var MOMENTS_KEY = 'moments';
+        var _storage = window.PhoneStorage;
+
+        function loadMoments() {
+            var list = _storage ? _storage.getMoments() : [];
+            if (!list.length) return [];
+            // 清理脏数据
+            var cleaned = [];
+            var changed = false;
+            for (var i = 0; i < list.length; i++) {
+                var item = list[i];
+                if (!item || typeof item !== 'object' || Array.isArray(item)) { changed = true; continue; }
+                var id = String(item.id || '');
+                if (id.indexOf('m_seed_') === 0 || id.indexOf('m_test_') === 0) { changed = true; continue; }
+                if (typeof item.content === 'string' && item.content.indexOf('用户动态：') !== -1) { changed = true; continue; }
+                if (typeof item.imageData === 'string' && item.imageData.indexOf('data:image/svg') === 0) { item.imageData = ''; changed = true; }
+                if (typeof item.image === 'string' && item.image.indexOf('data:image/svg') === 0) { item.image = ''; changed = true; }
+                cleaned.push(item);
+            }
+            if (changed) saveMoments(cleaned);
+            return cleaned;
+        }
+
+        function saveMoments(list) {
+            if (_storage) { _storage.saveMoments(list); return; }
+            localStorage.setItem(MOMENTS_KEY, JSON.stringify(list));
+        }
+
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /* ================= 工具 ================= */
+        // 头像：有图显图，无图灰色 SVG 小人（禁止文字/Emoji）
+        var AVATAR_FALLBACK_SVG =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        function avatarHTML(avatar) {
+            if (avatar) {
+                return '<div class="moment-avatar"><img src="' + avatar + '" alt="" onerror="window.__momentAvatarFallback && window.__momentAvatarFallback(this)"></div>';
+            }
+            return '<div class="moment-avatar">' + AVATAR_FALLBACK_SVG + '</div>';
+        }
+        // 图片地址失效时自动换回灰色 SVG，绝不白屏
+        window.__momentAvatarFallback = function (img) {
+            try {
+                var box = img.parentNode;
+                if (box) box.innerHTML = AVATAR_FALLBACK_SVG;
+            } catch (e) {}
+        };
+
+        // 当前用户信息（委托 PhoneStorage）
+        function getMyInfo() {
+            if (_storage) {
+                var p = _storage.getMyProfile();
+                if (p) return { id: p.id || 'me', name: p.nickname || '我', avatar: p.avatar || '' };
+            }
+            return { id: 'me', name: '我', avatar: '' };
+        }
+
+        // AI 角色列表 — 委托 PhoneStorage
+        function getCharacterList() {
+            return _storage ? _storage.getCharacters() : [];
+        }
+
+        // 解析一条动态的真实发布者（用户本人 / AI 角色 / 兜底）
+        function resolvePoster(m) {
+            try {
+                var me = getMyInfo();
+
+                // 1) 用户本人：显式标记，或旧帖按当前昵称匹配，或无类型标记的历史用户帖
+                var isMe = m.authorId === 'me' ||
+                    (m.authorId == null && m.byAI !== true && (!m.author || m.author === me.name || m.author === '我'));
+                if (isMe) {
+                    return { name: me.name || m.author || '我', avatar: me.avatar || m.avatar || '' };
+                }
+
+                // 2) AI 角色：先按 id 查，再按名字兜底匹配
+                var characters = getCharacterList();
+                var role = null;
+                if (m.authorId != null && m.authorId !== 'me') {
+                    for (var i = 0; i < characters.length; i++) {
+                        if (String(characters[i].id) === String(m.authorId)) { role = characters[i]; break; }
+                    }
+                }
+                if (!role && m.author) {
+                    for (var j = 0; j < characters.length; j++) {
+                        if (characters[j].name && characters[j].name === m.author) { role = characters[j]; break; }
+                    }
+                }
+                if (role) {
+                    return { name: role.name || '', avatar: role.avatar || '' };
+                }
+            } catch (e) {}
+
+            // 3) 兜底：帖子自身快照（名字最终由渲染层兜底为「未知用户」）→ 空头像触发灰色 SVG
+            return { name: (m && m.author) || '', avatar: (m && m.avatar) || '' };
+        }
+
+        // 相对时间（评论等使用）
+        function formatTime(ts) {
+            var diff = Date.now() - ts;
+            if (diff < 0) diff = 0;
+            var minute = 60 * 1000;
+            var hour = 60 * minute;
+            var day = 24 * hour;
+            if (diff < minute) return '刚刚';
+            if (diff < hour) return Math.floor(diff / minute) + '分钟前';
+            if (diff < day) return Math.floor(diff / hour) + '小时前';
+            if (diff < 7 * day) return Math.floor(diff / day) + '天前';
+            var d = new Date(ts);
+            return (d.getMonth() + 1) + '月' + d.getDate() + '日';
+        }
+
+        // 动态时间：绝对时间「月-日 时:分」（如 10-12 15:30）；时间缺失/非法返回空串，绝不出现 NaN
+        function formatPostTime(ts) {
+            var d = new Date(ts);
+            if (isNaN(d.getTime())) return '';
+            var month = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            var hour = String(d.getHours()).padStart(2, '0');
+            var minute = String(d.getMinutes()).padStart(2, '0');
+            return month + '-' + day + ' ' + hour + ':' + minute;
+        }
+
+        /* ================= 列表渲染 ================= */
+        var listEl = document.getElementById('momentsList');
+
+        function renderMoments() {
+            var allList = loadMoments();
+            var me = getMyInfo();
+            // 按可见权限过滤：自己的动态始终可见
+            var list = allList.filter(function (m) {
+                var isMine = m.authorId === me.id || m.authorId === 'me' || m.author === me.name || m.byAI === true;
+                if (isMine) return true; // 自己发的 / AI 角色发的（已在朋友圈里）都显示
+                var v = m.visibility || 'public';
+                if (v === 'public') return true;
+                if (v === 'friends') return true; // 简化：目前所有 AI 角色都是朋友
+                if (v === 'private') return false; // 别人的仅自己动态不显示
+                if (v === 'custom') {
+                    var visibleTo = m.visibleTo || [];
+                    return visibleTo.indexOf(me.id) !== -1 || visibleTo.indexOf('me') !== -1;
+                }
+                return true;
+            });
+            if (!list.length) {
+                listEl.innerHTML = '<div class="empty-tip">还没有动态，快发一条吧</div>';
+                return;
+            }
+            listEl.innerHTML = list.map(function (m) {
+                var heartFill = m.liked ? ' liked' : '';
+                var poster = resolvePoster(m);
+                // 严格兜底：任何字段缺失都不报错、不白屏
+                var posterName = poster.name || m.authorName || m.name || m.author || '未知用户';
+                var posterAvatar = poster.avatar || m.authorAvatar || m.avatar || '';
+                // 正文：去掉测试前缀；[图片：xxx] → [配图：xxx]
+                var textContent = String(m.content == null ? '' : m.content)
+                    .replace(/用户动态：/g, '')
+                    .replace(/\[图片：/g, '[配图：');
+                // 只渲染真实位图（jpeg/png/webp/gif）；SVG 等假图一律不渲染，也不留空占位
+                var rawImage = m.image || m.imageData || '';
+                var imageSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(rawImage) ? rawImage : '';
+                var commentItems = Array.isArray(m.commentList) ? m.commentList : [];
+                var rawComments = m.comments;
+                var commentCount = commentItems.length || (Array.isArray(rawComments) ? rawComments.length : (rawComments || 0));
+                var commentsHTML = commentItems.length ? (
+                    '<div class="post-comments">' +
+                        commentItems.map(function (c) {
+                            var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+                            var imgHTML = imgSrc ? '<img class="cr-image" src="' + imgSrc + '" alt="">' : '';
+                            return '<div class="comment-row">' +
+                                '<span class="comment-name">' + escapeHtml(c.name || c.author || '匿名用户') + '：</span>' +
+                                escapeHtml(c.text || '') +
+                                imgHTML +
+                                (c.time || c.timestamp ? '<span class="comment-time">' + formatTime(c.time || c.timestamp) + '</span>' : '') +
+                            '</div>';
+                        }).join('') +
+                    '</div>'
+                ) : '';
+                // 可见权限 & @好友 标记（小字提示）
+                var metaBadges = '';
+                var permLabel = { public: '公开', friends: '好友可见', private: '仅自己', custom: '部分可见' }[m.visibility || 'public'];
+                if (permLabel && permLabel !== '公开') {
+                    metaBadges += '<span style="font-size:0.594rem;color:#999;margin-top:2px;">🔒 ' + permLabel + '</span>';
+                }
+                if (m.mentions && m.mentions.length) {
+                    var characters = getCharacterList();
+                    var mentionNames = [];
+                    m.mentions.forEach(function (mid) {
+                        for (var k = 0; k < characters.length; k++) {
+                            if (String(characters[k].id) === String(mid)) { mentionNames.push(characters[k].name); break; }
+                        }
+                    });
+                    if (mentionNames.length) {
+                        metaBadges += '<span style="font-size:0.594rem;color:#666;margin-top:2px;"> · @' + mentionNames.join(' @') + '</span>';
+                    }
+                }
+                return '' +
+                    '<article class="moment-card post-item" data-id="' + escapeHtml(m.id) + '">' +
+                        avatarHTML(posterAvatar) +
+                        '<div class="post-content-box">' +
+                            '<div class="post-header">' +
+                                '<span class="post-name">' + escapeHtml(posterName) + '</span>' +
+                                '<span class="post-time">' + formatPostTime(m.time != null ? m.time : m.timestamp) + '</span>' +
+                            '</div>' +
+                            '<div class="post-text">' + escapeHtml(textContent) + '</div>' +
+                            (imageSrc ? '<img class="post-image" src="' + imageSrc + '" alt="">' : '') +
+                            commentsHTML +
+                            metaBadges +
+                            '<div class="post-actions">' +
+                                '<button class="action-btn like-btn' + heartFill + '" type="button">' +
+                                    '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+                                    '<span>' + (m.likes || 0) + '</span>' +
+                                '</button>' +
+                                '<button class="action-btn comment-btn" type="button">' +
+                                    '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
+                                    '<span>' + commentCount + '</span>' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</article>';
+            }).join('');
+        }
+
+        /* ================= 评论抽屉 ================= */
+        var commentOverlay = document.getElementById('commentOverlay');
+        var commentListEl = document.getElementById('commentList');
+        var commentTitleEl = document.getElementById('commentTitle');
+        var commentInput = document.getElementById('commentInput');
+        var commentPostId = null;
+        var pendingCommentImage = '';
+        var commentImgBtn = document.getElementById('commentImgBtn');
+        var commentImgInput = document.getElementById('commentImgInput');
+
+        function findPost(list, id) {
+            for (var i = 0; i < list.length; i++) {
+                if (String(list[i].id) === String(id)) return list[i];
+            }
+            return null;
+        }
+
+        function getMyName() {
+            try {
+                var raw = localStorage.getItem('myProfile');
+                if (raw) {
+                    var p = JSON.parse(raw) || {};
+                    if (p.nickname) return p.nickname;
+                }
+            } catch (e) {}
+            return '我';
+        }
+
+        function renderCommentDrawer() {
+            var list = loadMoments();
+            var post = findPost(list, commentPostId);
+            if (!post) { closeCommentDrawer(); return; }
+            commentTitleEl.textContent = '评论 · ' + (post.author || '匿名用户');
+            var items = Array.isArray(post.commentList) ? post.commentList : [];
+            if (!items.length) {
+                commentListEl.innerHTML = '<div class="comment-empty">还没有评论，说点什么吧</div>';
+                return;
+            }
+            commentListEl.innerHTML = items.map(function (c) {
+                var imgSrc = /^data:image\/(jpeg|png|webp|gif)[;,]/i.test(c.image || '') ? (c.image || '') : '';
+                var imgHTML = imgSrc ? '<img class="cli-image" src="' + imgSrc + '" alt="">' : '';
+                return '<div class="comment-list-item">' +
+                    '<div class="cli-dot"></div>' +
+                    '<div class="cli-body">' +
+                        '<div class="cli-head">' + escapeHtml(c.name || c.author || '匿名用户') +
+                            (c.time || c.timestamp ? '<span>' + formatTime(c.time || c.timestamp) + '</span>' : '') +
+                        '</div>' +
+                        (c.text ? '<div class="cli-text">' + escapeHtml(c.text || '') + '</div>' : '') +
+                        imgHTML +
+                    '</div>' +
+                '</div>';
+            }).join('');
+            commentListEl.scrollTop = commentListEl.scrollHeight;
+        }
+
+        function resetCommentInput() {
+            commentInput.value = '';
+            pendingCommentImage = '';
+            commentImgInput.value = '';
+            // 恢复按钮为默认图标
+            commentImgBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+        }
+
+        function openCommentDrawer(id) {
+            commentPostId = id;
+            resetCommentInput();
+            renderCommentDrawer();
+            commentOverlay.style.display = 'flex';
+            setTimeout(function () { commentInput && commentInput.focus(); }, 260);
+        }
+        function closeCommentDrawer() {
+            commentOverlay.style.display = 'none';
+            commentPostId = null;
+            resetCommentInput();
+        }
+
+        if (document.getElementById('commentBackdrop')) {
+            document.getElementById('commentBackdrop').addEventListener('click', closeCommentDrawer);
+        }
+
+        // 评论图片选择
+        if (commentImgBtn) {
+            commentImgBtn.addEventListener('click', function () { commentImgInput.click(); });
+        }
+        if (commentImgInput) {
+            commentImgInput.addEventListener('change', function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                compressImage(file, function (dataUrl) {
+                    if (!dataUrl) return;
+                    pendingCommentImage = dataUrl;
+                    commentImgBtn.innerHTML = '<img class="comment-image-thumb" src="' + dataUrl + '" alt="预览">';
+                });
+            });
+        }
+
+        function submitComment() {
+            var text = commentInput.value.trim();
+            if (!text && !pendingCommentImage) return;
+            if (!commentPostId) return;
+
+            var list = loadMoments();
+            var post = findPost(list, commentPostId);
+            if (!post) { closeCommentDrawer(); return; }
+
+            var me = getMyInfo();
+            var meName = me.name || '我';
+            var myAvatar = me.avatar || '';
+
+            var commentEntry = {
+                name: meName,
+                author: meName,
+                avatar: myAvatar,
+                text: text,
+                image: pendingCommentImage,
+                time: Date.now(),
+                timestamp: Date.now()
+            };
+            if (!Array.isArray(post.commentList)) post.commentList = [];
+            if (!Array.isArray(post.comments)) post.comments = [];
+            post.commentList.push(commentEntry);
+            post.comments.push(commentEntry);
+            post.commentsCount = (post.commentList || []).length;
+            saveMoments(list);
+            resetCommentInput();
+            renderMoments();
+            renderCommentDrawer();
+
+            // 写通知
+            var postContent = (post.content || '[图片动态]').slice(0, 40);
+            pushNotification({
+                type: 'comment',
+                actorId: me.id || 'me',
+                actorName: meName,
+                actorAvatar: myAvatar,
+                postId: post.id,
+                postContent: postContent,
+                text: (text ? '评论了' : '发图评论了') + '这条动态' + (text ? '：' + text.slice(0, 30) : ''),
+                time: Date.now()
+            });
+        }
+        var btnSend = document.getElementById('btnSendComment');
+        if (btnSend) btnSend.addEventListener('click', submitComment);
+        if (commentInput) commentInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') submitComment();
+        });
+
+        /* ================= AI 发动态（隐形入口） ================= */
+        var aiBtn = document.getElementById('btnAiPost');
+
+        function loadCharacters() {
+            try {
+                var raw = localStorage.getItem('ai_custom_characters');
+                if (raw) {
+                    var arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) return arr;
+                }
+            } catch (e) {}
+            return [];
+        }
+        function getApiConfig() {
+            return _storage ? _storage.getApiConfig() : {};
+        }
+
+        // API 调用记录 — 委托 PhoneStorage
+        function logApiCall(model, status, startTime, errorMsg) {
+            if (!_storage) return;
+            _storage.pushApiLog({
+                id: Date.now().toString(36) + Math.floor(Math.random() * 1000),
+                time: Date.now(),
+                model: model || 'unknown',
+                status: status,
+                duration: Date.now() - startTime,
+                errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : ''
+            });
+        }
+
+        if (aiBtn) aiBtn.addEventListener('click', function () {
+            var characters = loadCharacters();
+            if (!characters.length) {
+                showToast('还没有角色，先去联系人添加一个吧');
+                return;
+            }
+            var config = getApiConfig();
+            var apiKey = (config.apiKey || '').trim();
+            if (!apiKey) {
+                showToast('请先到设置页配置 API Key');
+                return;
+            }
+            var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+            var model = (config.model || 'gpt-3.5-turbo').trim();
+
+            var role = characters[Math.floor(Math.random() * characters.length)];
+            var persona = (role.persona || role.prompt || '一个善解人意的AI角色').trim();
+            var tone = (role.tone || '').trim();
+
+            var systemPrompt = '你是' + (role.name || '一个角色') + '。角色设定：' + persona +
+                (tone ? '。说话语气：' + tone : '') +
+                '。现在要以第一人称发布一条社交空间动态。';
+            var userPrompt = '请结合你的人设，写一条此刻想发的生活动态（朋友圈风格）。' +
+                '要求：只输出动态正文本身，50个字以内，一句话，口语化、自然真实；' +
+                '不要使用任何表情符号，不要加引号或括号，不要解释，不要出现“动态：”之类的前缀。' +
+                '如果你想发一张图片，请直接在正文里用文字描述这张图片（比如：今天阳光很好，桌上摆着一杯热气腾腾的咖啡），不要输出图片代码。';
+
+            aiBtn.disabled = true;
+            showToast((role.name || 'TA') + ' 正在构思…');
+
+            var momentApiStart = Date.now();
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+
+            fetch(baseUrl + '/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                signal: controller.signal,
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ],
+                    temperature: config.temperature != null ? config.temperature : 0.8,
+                    stream: false
+                })
+            }).then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (t) {
+                        var detail = t;
+                        try { detail = (JSON.parse(t).error || {}).message || t; } catch (e) {}
+                        throw new Error('HTTP ' + response.status + '：' + (detail || response.statusText));
+                    });
+                }
+                return response.json();
+            }).then(function (data) {
+                var text = (((data || {}).choices || [])[0] || {}).message
+                    ? data.choices[0].message.content : '';
+                text = String(text || '').replace(/^["“”]+|["“”]+$/g, '').replace(/^动态[:：]\s*/, '').trim();
+                if (!text) throw new Error('返回内容为空');
+                if (text.length > 200) text = text.slice(0, 200);
+
+                var post = {
+                    id: 'm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                    authorId: role.id || '',
+                    author: role.name || '匿名用户',
+                    avatar: role.avatar || '',
+                    content: text,
+                    image: '',
+                    time: Date.now(),
+                    likes: 0,
+                    liked: false,
+                    comments: 0,
+                    commentList: [],
+                    byAI: true
+                };
+                var list = loadMoments();
+                list.unshift(post);
+                saveMoments(list);
+                renderMoments();
+                logApiCall(model, 'success', momentApiStart);
+                showToast((role.name || 'TA') + ' 发布了新动态');
+            }).catch(function (err) {
+                var msg = (err && err.name === 'AbortError') ? '请求超时，请稍后再试' : ('生成失败：' + (err && err.message ? err.message : '未知错误'));
+                showToast(msg);
+                logApiCall(model, 'error', momentApiStart, (err && err.message) ? err.message : '未知错误');
+            }).finally(function () {
+                clearTimeout(timeoutId);
+                aiBtn.disabled = false;
+            });
+        });
+
+        /* ================= 图片压缩（评论/封面/头像共用） ================= */
+        function compressImage(file, cb) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                    try {
+                        var maxW = 600;
+                        var scale = Math.min(1, maxW / img.width);
+                        var canvas = document.createElement('canvas');
+                        canvas.width = Math.round(img.width * scale);
+                        canvas.height = Math.round(img.height * scale);
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        cb(canvas.toDataURL('image/jpeg', 0.7));
+                    } catch (err) {
+                        alert('图片处理失败，请更换图片重试');
+                        cb('');
+                    }
+                };
+                img.onerror = function () {
+                    alert('图片读取失败，请检查文件格式');
+                    cb('');
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* ================= 通知系统 ================= */
+        function pushNotification(n) {
+            if (_storage) { _storage.pushMomentsNotification(n); return; }
+            try {
+                var arr = JSON.parse(localStorage.getItem('moments_notifications') || '[]');
+                arr.unshift(n);
+                while (arr.length > 100) arr.pop();
+                localStorage.setItem('moments_notifications', JSON.stringify(arr));
+            } catch (e) {}
+        }
+
+        /* ================= @好友触发 AI 回复 ================= */
+        function triggerMentionsReply(post) {
+            var characters = getCharacterList();
+            if (!characters.length) return;
+            var config = getApiConfig();
+            var apiKey = (config.apiKey || '').trim();
+            if (!apiKey) { showToast('未配置 API Key，@好友无法自动回复'); return; }
+
+            var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+            var model = (config.model || 'gpt-3.5-turbo').trim();
+            var content = post.content || '[图片动态]';
+            var mentionIds = post.mentions || [];
+
+            // 对每个被 @ 的角色分别发起 AI 回复
+            mentionIds.forEach(function (cid) {
+                var role = null;
+                for (var i = 0; i < characters.length; i++) {
+                    if (String(characters[i].id) === String(cid)) { role = characters[i]; break; }
+                }
+                if (!role) return;
+
+                var persona = (role.persona || role.prompt || '一个善解人意的AI角色').trim();
+                var tone = (role.tone || '').trim();
+                var systemPrompt = '你是' + (role.name || '一个角色') + '。角色设定：' + persona +
+                    (tone ? '。说话语气：' + tone : '') +
+                    '。现在有人在社交空间动态里 @ 了你，你需要以第一人称在那条动态下面评论回复。';
+                var userPrompt = '动态内容：' + content +
+                    '\n请写一条你对这条动态的评论回复，口语化、自然真实，20~50 字。' +
+                    '只输出评论正文本身，不要加引号或解释。';
+
+                var start = Date.now();
+                var controller = new AbortController();
+                var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+
+                fetch(baseUrl + '/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey
+                    },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        temperature: config.temperature != null ? config.temperature : 0.8,
+                        stream: false
+                    })
+                }).then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                }).then(function (data) {
+                    var text = (((data || {}).choices || [])[0] || {}).message
+                        ? data.choices[0].message.content : '';
+                    text = String(text || '').replace(/^["""]+|["""]+$/g, '').replace(/^评论[:：]\s*/, '').trim();
+                    if (!text) throw new Error('返回为空');
+                    if (text.length > 120) text = text.slice(0, 120);
+
+                    // 把 AI 角色评论加到这条动态下
+                    var list = loadMoments();
+                    var target = null;
+                    for (var j = 0; j < list.length; j++) {
+                        if (String(list[j].id) === String(post.id)) { target = list[j]; break; }
+                    }
+                    if (!target) return;
+                    if (!Array.isArray(target.commentList)) target.commentList = [];
+                    if (!Array.isArray(target.comments)) target.comments = [];
+                    var commentEntry = {
+                        name: role.name || '匿名',
+                        author: role.name || '匿名',
+                        avatar: role.avatar || '',
+                        text: text,
+                        time: Date.now(),
+                        timestamp: Date.now(),
+                        byAI: true
+                    };
+                    target.commentList.push(commentEntry);
+                    target.comments.push(commentEntry);
+                    target.commentsCount = (target.commentList || []).length;
+                    try { saveMoments(list); } catch (e) {}
+
+                    // 通知：TA 回复了你的动态
+                    pushNotification({
+                        type: 'mention_reply',
+                        actorId: String(role.id || ''),
+                        actorName: role.name || 'AI角色',
+                        actorAvatar: role.avatar || '',
+                        postId: post.id,
+                        postContent: content,
+                        text: '回复了你的动态：' + text.slice(0, 40),
+                        time: Date.now()
+                    });
+
+                    renderMoments();
+                    logApiCall(model, 'success', start);
+                }).catch(function (err) {
+                    logApiCall(model, 'error', start, (err && err.message) ? err.message : '');
+                }).finally(function () {
+                    clearTimeout(timeoutId);
+                });
+            });
+        }
+
+        /* ================= 点赞 / 评论 事件委托（扩展通知） ================= */
+        if (listEl) listEl.addEventListener('click', function (e) {
+            var likeBtn = e.target.closest('.like-btn');
+            var commentBtn = e.target.closest('.comment-btn');
+            if (!likeBtn && !commentBtn) return;
+
+            var card = e.target.closest('.moment-card');
+            var id = card.getAttribute('data-id');
+            var list = loadMoments();
+            var post = null;
+            for (var i = 0; i < list.length; i++) {
+                if (String(list[i].id) === String(id)) { post = list[i]; break; }
+            }
+            if (!post) return;
+
+            if (likeBtn) {
+                var wasLiked = !!post.liked;
+                post.liked = !wasLiked;
+                post.likes = (post.likes || 0) + (post.liked ? 1 : -1);
+                if (post.likes < 0) post.likes = 0;
+                saveMoments(list);
+                renderMoments();
+                // 通知
+                if (post.liked) {
+                    var me = getMyInfo();
+                    pushNotification({
+                        type: 'like',
+                        actorId: me.id,
+                        actorName: me.name,
+                        actorAvatar: me.avatar,
+                        postId: post.id,
+                        postContent: (post.content || '[图片动态]').slice(0, 40),
+                        text: '赞了这条动态',
+                        time: Date.now()
+                    });
+                }
+            } else {
+                openCommentDrawer(id);
+            }
+        });
+        var toastEl = document.getElementById('momentsToast');
+        var toastTimer = null;
+        function showToast(text) {
+            if (!toastEl) return;
+            toastEl.textContent = text;
+            toastEl.classList.add('show');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1500);
+        }
+
+        /* ================= 封面 / 头像：回显 + 点击上传（读写 myProfile，不改排版样式） ================= */
+        (function () {
+            var PROFILE_KEY = 'myProfile';
+            var coverBlock = document.querySelector('.cover-block');
+            var avatarBox = document.getElementById('coverAvatar');
+            var coverInput = document.getElementById('coverInput');
+            var avatarInput = document.getElementById('avatarInput');
+            if (!coverBlock || !avatarBox || !coverInput || !avatarInput) return;
+
+            function readProfile() {
+                try {
+                    var raw = localStorage.getItem(PROFILE_KEY);
+                    if (raw) {
+                        var p = JSON.parse(raw);
+                        if (p && typeof p === 'object') return p;
+                    }
+                } catch (e) {}
+                return {};
+            }
+
+            // 回显：封面用内联 background-image（无图清空内联样式，恢复 CSS 默认渐变）；头像用 img（无图恢复细线条 SVG）
+            function applyProfilePreview() {
+                var p = readProfile();
+                if (p.cover) {
+                    coverBlock.style.backgroundImage = 'url("' + p.cover + '")';
+                    coverBlock.style.backgroundSize = 'cover';
+                    coverBlock.style.backgroundPosition = 'center';
+                    coverBlock.style.backgroundRepeat = 'no-repeat';
+                } else {
+                    coverBlock.style.backgroundImage = '';
+                    coverBlock.style.backgroundSize = '';
+                    coverBlock.style.backgroundPosition = '';
+                    coverBlock.style.backgroundRepeat = '';
+                }
+                if (p.avatar) {
+                    avatarBox.innerHTML = '<img src="' + p.avatar + '" alt="">';
+                } else {
+                    avatarBox.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+                }
+            }
+
+            // 合并写回，绝不覆盖 nickname/sign/about 等其他字段
+            function saveProfileField(field, dataUrl) {
+                try {
+                    var p = readProfile();
+                    p[field] = dataUrl;
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+                    return true;
+                } catch (err) {
+                    if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+                        alert('存储空间不足，请压缩图片');
+                    } else {
+                        alert('保存失败，请更换图片重试');
+                    }
+                    return false;
+                }
+            }
+
+            // 通用压缩：mode='cover' 封面最大宽 600 等比缩放；mode='avatar' 200x200 居中裁剪
+            function compressImage(file, mode, cb) {
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        try {
+                            var canvas = document.createElement('canvas');
+                            var ctx = canvas.getContext('2d');
+                            if (mode === 'avatar') {
+                                var size = 200;
+                                canvas.width = size;
+                                canvas.height = size;
+                                var side = Math.min(img.width, img.height);
+                                var sx = (img.width - side) / 2;
+                                var sy = (img.height - side) / 2;
+                                ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+                            } else {
+                                var maxW = 600;
+                                var scale = Math.min(1, maxW / img.width);
+                                canvas.width = Math.round(img.width * scale);
+                                canvas.height = Math.round(img.height * scale);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            }
+                            cb(canvas.toDataURL('image/jpeg', 0.7));
+                        } catch (err) {
+                            alert('图片处理失败，请更换图片重试');
+                            cb('');
+                        }
+                    };
+                    img.onerror = function () {
+                        alert('图片读取失败，请检查文件格式');
+                        cb('');
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.onerror = function () {
+                    alert('图片读取失败，请检查文件格式');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function bindFileChange(input, mode, field) {
+                input.addEventListener('change', function (e) {
+                    var file = e.target.files && e.target.files[0];
+                    input.value = ''; // 先重置，保证重选同一张图也能触发 change
+                    if (!file) return;
+                    compressImage(file, mode, function (dataUrl) {
+                        if (!dataUrl) return;
+                        if (saveProfileField(field, dataUrl)) applyProfilePreview();
+                    });
+                });
+            }
+
+            // 点击绑定：点封面空白换封面，点头像只换头像；内部按钮阻止冒泡避免误触
+            coverBlock.addEventListener('click', function () { coverInput.click(); });
+            avatarBox.addEventListener('click', function (e) {
+                e.stopPropagation();
+                avatarInput.click();
+            });
+            var navBtn = coverBlock.querySelector('.cover-nav-btn');
+            if (navBtn) navBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var addBtn = document.getElementById('btnAdd');
+            if (addBtn) addBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var aiBtn = document.getElementById('btnAiPost');
+            if (aiBtn) aiBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var refreshBtn = document.getElementById('btnRefreshAll');
+            if (refreshBtn) refreshBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+            var roleSel = document.getElementById('roleSelect');
+            if (roleSel) roleSel.addEventListener('click', function (e) { e.stopPropagation(); });
+
+            bindFileChange(coverInput, 'cover', 'cover');
+            bindFileChange(avatarInput, 'avatar', 'avatar');
+
+            applyProfilePreview();
+        })();
+
+        renderMoments();
+
+        /* ================= 整机刷新（PhoneEngine） ================= */
+        (function initRefreshAll() {
+            var S = window.PhoneStorage;
+            var E = window.PhoneEngine;
+            var UI = window.PhoneUI;
+
+            if (!S || !E || !UI) return; // 公共模块没加载就跳过
+
+            var roleSelect = document.getElementById('roleSelect');
+            var refreshBtn = document.getElementById('btnRefreshAll');
+
+            // 1. 填充角色下拉
+            var chars = S.getCharacters();
+            if (roleSelect && chars.length) {
+                var html = '';
+                for (var i = 0; i < chars.length; i++) {
+                    var c = chars[i];
+                    html += '<option value="' + c.id + '">' + (c.name || '角色' + (i + 1)) + '</option>';
+                }
+                roleSelect.innerHTML = html;
+                // 默认选中 currentContact 或第一个
+                var saved = E.getCurrentContactId();
+                if (saved) roleSelect.value = saved;
+                E.setCurrentContact(roleSelect.value);
+            }
+
+            // 2. 角色切换 → 保存
+            if (roleSelect) {
+                roleSelect.addEventListener('change', function () {
+                    E.setCurrentContact(roleSelect.value);
+                });
+            }
+
+            // 3. 整机刷新按钮
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    if (!roleSelect) { UI.showToast('请先添加 AI 角色'); return; }
+                    var contactId = roleSelect.value;
+                    if (!contactId) { UI.showToast('请先选择角色'); return; }
+
+                    // 检查 API key
+                    var cfg = S.getApiConfig();
+                    if (!cfg.apiKey) {
+                        UI.confirm({
+                            title: '还没配置 API Key',
+                            message: '请到 设置 → API 设置 里填入 API Key 后再试。',
+                            okText: '知道了',
+                            cancelText: null
+                        });
+                        return;
+                    }
+
+                    // 开始刷新
+                    refreshBtn.classList.add('spinning');
+                    UI.showLoading('AI 正在生成整机数据...');
+
+                    E.refreshAll({ contactId: contactId }).then(function (result) {
+                        if (!result || !result.ok) {
+                            throw new Error((result && result.error) || 'AI 返回空结果');
+                        }
+                        // 存入各 App
+                        var applied = E.applyBundle(result.data);
+                        var okCount = 0;
+                        for (var k in applied) { if (applied[k]) okCount++; }
+
+                        UI.hideLoading();
+                        refreshBtn.classList.remove('spinning');
+
+                        // 刷新页面数据
+                        renderMoments();
+
+                        UI.showToast('整机刷新完成 ✅ 成功 ' + okCount + ' 个 App');
+                    }).catch(function (err) {
+                        UI.hideLoading();
+                        refreshBtn.classList.remove('spinning');
+                        UI.showToast('刷新失败：' + (err && err.message ? err.message.slice(0, 60) : String(err)));
+                    });
+                });
+            }
+        })();
+    </script>
+<script src="../../shared/js/statusbar-control.js"></script>
+
+
+</body></html>

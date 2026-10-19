@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings · 设置</title>
-    <script src="../js/font-loader.js"></script>
-    <script src="../js/native-feel.js"></script>
-    <script src="../js/phone/phone_storage.js"></script>
-    <script src="../js/statusbar-control.js"></script>
-    <link rel="stylesheet" href="../css/settings.css">
+    <script src="../shared/js/font-loader.js"></script>
+    <script src="../shared/js/native-feel.js"></script>
+    <script src="../shared/js/phone/phone_storage.js"></script>
+    <script src="../shared/js/statusbar-control.js"></script>
+    <link rel="stylesheet" href="css/settings.css">
     <script>
     (function () {
         try {
@@ -18,7 +18,7 @@
         } catch (e) {}
     })();
     </script>
-<link rel="stylesheet" href="../css/mobile-fit.css">
+<link rel="stylesheet" href="../shared/css/mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
@@ -90,7 +90,7 @@
                     <div class="menu-title"><span class="t-cn">外观美化</span><span class="t-en">Beauty CSS</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='../chat/bubble-theme.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../chat/chat/bubble-theme.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
                     <div class="menu-title"><span class="t-cn">气泡设置</span><span class="t-en">Bubble</span></div>
                     <div class="menu-arrow">›</div>
@@ -105,7 +105,7 @@
                     <div class="menu-title"><span class="t-cn">音效设置</span><span class="t-en">Sound</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='../worldbook/regex-settings.html?v=20261013new'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../worldbook/settings/regex-settings.html?v=20261013new'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></div>
                     <div class="menu-title"><span class="t-cn">正则过滤</span><span class="t-en">Regex</span></div>
                     <div class="menu-arrow">›</div>
@@ -144,7 +144,7 @@
             <!-- 协议分组 -->
             <div class="group-title">PROTOCOL</div>
             <section class="card">
-                <div class="menu-row" onclick="window.location.href='../worldbook/rp-protocol.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../worldbook/settings/rp-protocol.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></div>
                     <div class="menu-title"><span class="t-cn">角色扮演协议</span><span class="t-en">Protocol</span></div>
                     <div class="menu-arrow">›</div>
@@ -263,7 +263,7 @@
 
         <div class="toast-msg" id="toastMsg">已保存设置</div>
     </div>
-    <script src="../js/settings.js"></script>
+    <script src="js/settings.js"></script>
     <script>
     // 设置页用户卡片 + 深色模式开关
     (function () {

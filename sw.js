@@ -1,7 +1,7 @@
 /* 小手机 PWA Service Worker
  * 页面与静态资源均采用缓存优先+后台更新，断网/慢网时秒开。
  */
-const CACHE_NAME = 'phone-app-pwa-v22';
+const CACHE_NAME = 'phone-app-pwa-v24';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,20 +10,20 @@ const APP_SHELL = [
   './diary/diary.html',
   './travel/dream-travel.html',
   './manifest.json',
-  './css/styles.css',
-  './css/settings.css',
-  './css/mobile-fit.css',
-  './js/font-loader.js',
-  './js/native-feel.js',
-  './js/phone/phone_storage.js',
-  './js/phone/phone_api.js',
-  './js/script.js',
-  './js/statusbar-control.js',
-  './js/nav.js',
-  './js/sound-system.js',
-  './js/memory.js',
-  './js/mask.js',
-  './js/settings.js',
+  './desktop/css/styles.css',
+  './settings/css/settings.css',
+  './shared/css/mobile-fit.css',
+  './shared/js/font-loader.js',
+  './shared/js/native-feel.js',
+  './shared/js/phone/phone_storage.js',
+  './shared/js/phone/phone_api.js',
+  './desktop/js/script.js',
+  './shared/js/statusbar-control.js',
+  './shared/js/nav.js',
+  './shared/js/sound-system.js',
+  './shared/js/memory.js',
+  './shared/js/mask.js',
+  './settings/js/settings.js',
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];

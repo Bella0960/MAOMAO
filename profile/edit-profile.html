@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑资料 · 小手机</title>
-    <script src="../js/font-loader.js"></script>
-    <script src="../js/native-feel.js"></script>
-    <script src="../js/phone/phone_storage.js"></script>
-    <script src="../js/mask.js"></script>
+    <script src="../shared/js/font-loader.js"></script>
+    <script src="../shared/js/native-feel.js"></script>
+    <script src="../shared/js/phone/phone_storage.js"></script>
+    <script src="../shared/js/mask.js"></script>
     <style>
         /* 全局重置 */
         * {
@@ -257,7 +257,7 @@
             cursor: default;
         }
     </style>
-<link rel="stylesheet" href="../css/mobile-fit.css">
+<link rel="stylesheet" href="../shared/css/mobile-fit.css">
 </head>
 <body>
 
@@ -348,7 +348,7 @@
             </form>
 
             <!-- 当前设定（身份面具）入口 -->
-            <div class="mask-entry" id="maskEntry" role="button" tabindex="0" onclick="window.location.href='../worldbook/mask.html'">
+            <div class="mask-entry" id="maskEntry" role="button" tabindex="0" onclick="window.location.href='../worldbook/mask/mask.html'">
                 <span class="mask-entry-label">当前设定</span>
                 <span class="mask-entry-value" id="maskEntryValue">日常小桃</span>
                 <span class="mask-entry-arrow">›</span>
@@ -533,6 +533,6 @@
             }, 350);
         });
     </script>
-<script src="../js/statusbar-control.js"></script>
+<script src="../shared/js/statusbar-control.js"></script>
 </body>
 </html>
