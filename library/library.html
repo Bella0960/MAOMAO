@@ -41,7 +41,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .view{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;background:var(--paper);
   transition:opacity .34s cubic-bezier(.32,.72,0,1),transform .34s cubic-bezier(.32,.72,0,1),visibility .34s;will-change:opacity,transform}
 .view.above-tabbar{inset:0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0}
-.view.reader{z-index:30}
+.view.reader{z-index:30;background:var(--reader-bg,#fff)}
 .view.is-hidden{opacity:0;pointer-events:none;transform:translateX(26px);visibility:hidden}
 
 /* ===== 顶部细黑线 + 页眉（起始页） ===== */
@@ -129,32 +129,65 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .tab-item.is-active{color:var(--ink)}
 
 /* ===== 阅读器：左右滑动翻页（scroll-snap） ===== */
-.reader-head{position:relative;flex:0 0 auto;display:flex;align-items:center;padding:15px 22px 12px;border-bottom:1px solid var(--line)}
-.head-back{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;color:var(--ink)}
+.reader-head{position:relative;flex:0 0 auto;display:flex;align-items:center;padding:15px 22px 12px;border-bottom:1px solid var(--reader-line,#d8d8d8)}
+.head-back{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;color:var(--reader-ink,#171717)}
 .head-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 .reader-title{position:absolute;left:50%;transform:translateX(-50%);max-width:60%;margin:0;text-align:center;
-  font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.02em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.02em;color:var(--reader-ink,#171717);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .reader-body{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;
-  -webkit-overflow-scrolling:touch;background:var(--reader-bg,#fff);transition:background .3s ease;scrollbar-width:none}
+  -webkit-overflow-scrolling:touch;background:var(--reader-bg,#fff);color:var(--reader-ink,#171717);
+  filter:brightness(var(--reader-bright,1));transition:background .3s ease;scrollbar-width:none}
 .chapter-page{flex:0 0 100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;overflow-x:hidden;padding:26px 26px 88px}
 .reader-content{max-width:330px;margin:0 auto}
-.reader-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.reader-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--reader-ink,#8c8c8c);opacity:.55;text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--reader-line,#d8d8d8)}
 .reader-chapter{margin:30px 0 24px}
-.chapter-no{font-size:8px;letter-spacing:.28em;color:#8c8c8c}
+.chapter-no{font-size:8px;letter-spacing:.28em;color:var(--reader-ink,#8c8c8c);opacity:.5}
 .chapter-title{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.08;letter-spacing:-.04em;margin:9px 0 0}
 .reader-content p{font-family:var(--serif);font-size:var(--reader-fs,15px);line-height:1.8;color:var(--reader-ink,#2c2c2c);margin:0 0 1.5em;text-indent:2em;text-align:justify}
-.reader-divider{width:26px;height:1px;background:var(--ink);opacity:.5;margin:34px auto}
-.reader-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:13px;border-top:1px solid var(--line)}
+.reader-divider{width:26px;height:1px;background:var(--reader-ink,#171717);opacity:.5;margin:34px auto}
+.reader-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:13px;border-top:1px solid var(--reader-line,#d8d8d8)}
 .reader-foot .foot-num{font-size:18px}
 
-/* 阅读器底部控制栏：点击正文滑出 */
-.reader-controls{position:absolute;left:0;right:0;bottom:0;z-index:35;display:flex;background:#fff;border-top:1px solid var(--ink);
-  padding-bottom:env(safe-area-inset-bottom);transform:translateY(101%);visibility:hidden;
+/* ===== 阅读器底部：悬浮药丸气泡（毛玻璃） ===== */
+.reader-controls{position:absolute;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));z-index:36;
+  width:min(300px,calc(100% - 52px));display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid rgba(23,23,23,.08);border-radius:999px;
+  transform:translate(-50%,150%);opacity:0;visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),opacity .34s ease,visibility .34s}
+.reader-controls.is-open{transform:translate(-50%,0);opacity:1;visibility:visible}
+.ctrl{display:inline-flex;align-items:center;justify-content:center;width:36px;height:34px;color:#3a3a3a;
+  border-radius:999px;transition:background .2s ease,opacity .2s ease}
+.ctrl svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.ctrl:active{background:rgba(23,23,23,.06)}
+.ctrl.is-off{opacity:.26}
+.ctrl-page{flex:0 0 auto;min-width:46px;text-align:center;font-size:10px;letter-spacing:.12em;color:#5a5a5a;
+  font-variant-numeric:tabular-nums}
+
+/* ===== 阅读设置面板（从底部滑出，顶部 24px 大圆角） ===== */
+.read-settings{position:absolute;left:0;right:0;bottom:0;z-index:46;background:#fff;border-radius:24px 24px 0 0;
+  padding:14px 24px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(101%);visibility:hidden;
   transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
-.reader-controls.is-open{transform:translateY(0);visibility:visible}
-.ctrl{flex:1;padding:16px 0;text-align:center;font-size:10px;letter-spacing:.2em;color:#444;border-left:1px solid var(--line)}
-.ctrl:first-child{border-left:0}
-.ctrl.is-off{color:#c8c8c8;pointer-events:none}
+.read-settings.is-open{transform:translateY(0);visibility:visible}
+.rs-row{display:flex;align-items:center;gap:16px;padding:17px 0;border-bottom:1px solid #efefef}
+.rs-row:last-child{border-bottom:0}
+.rs-label{flex:0 0 40px;font-size:12px;letter-spacing:.1em;color:#555}
+.rs-range{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:2px;background:#dcdcdc;border-radius:2px;outline:none}
+.rs-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#171717;border:0;cursor:pointer}
+.rs-range::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#171717;border:0;cursor:pointer}
+.rs-fs{display:flex;align-items:center;gap:4px;margin-left:auto}
+.rs-step{font-family:var(--serif);font-size:14px;letter-spacing:.03em;color:#171717;padding:5px 10px}
+.rs-step:active{opacity:.5}
+.rs-step.is-off{opacity:.24;pointer-events:none}
+.rs-fs-value{min-width:30px;text-align:center;font-size:14px;color:#171717;font-variant-numeric:tabular-nums}
+.rs-themes{display:flex;align-items:center;gap:16px;margin-left:auto}
+.rs-theme{width:22px;height:22px;padding:0;border-radius:50%;border:1px solid rgba(23,23,23,.12)}
+.rs-theme[data-bg="0"]{background:#fff}
+.rs-theme[data-bg="1"]{background:#ececec}
+.rs-theme[data-bg="2"]{background:#f6f1e7}
+.rs-theme[data-bg="3"]{background:#000;border-color:rgba(23,23,23,.45)}
+.rs-theme.is-current{outline:1px solid #171717;outline-offset:2px}
 
 /* 遮罩 + 底部面板（目录 / 弹窗） */
 .sheet-backdrop{position:absolute;inset:0;z-index:40;background:rgba(20,20,20,.22);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease,visibility .3s}
@@ -186,7 +219,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 
 /* ===== 动效 / 可访问性 ===== */
 @media(prefers-reduced-motion:reduce){
-  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.dialog,.sheet-backdrop{transition:none!important}
+  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.dialog,.read-settings,.sheet-backdrop{transition:none!important}
   .view.is-hidden{transform:none!important}
 }
 </style>
@@ -365,11 +398,21 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     <main class="reader-body" id="readerBody"><!-- 每章一页，由 JS 渲染 --></main>
   </section>
 
-  <!-- 控制栏 / 目录面板 / 弹窗 -->
+  <!-- 控制栏（悬浮药丸气泡） / 目录面板 / 阅读设置 / 弹窗 -->
   <div class="reader-controls" id="readerControls">
-    <button class="ctrl" type="button" id="ctrlToc">目录</button>
-    <button class="ctrl" type="button" id="ctrlPrev">上一章</button>
-    <button class="ctrl" type="button" id="ctrlNext">下一章</button>
+    <button class="ctrl" type="button" id="ctrlToc" aria-label="目录" title="目录">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button class="ctrl" type="button" id="ctrlPrev" aria-label="上一章" title="上一章">
+      <svg viewBox="0 0 24 24"><path d="m14.5 5.5-6.5 6.5 6.5 6.5"/></svg>
+    </button>
+    <span class="ctrl-page" id="ctrlPage">01/03</span>
+    <button class="ctrl" type="button" id="ctrlNext" aria-label="下一章" title="下一章">
+      <svg viewBox="0 0 24 24"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></svg>
+    </button>
+    <button class="ctrl" type="button" id="ctrlSet" aria-label="阅读设置" title="阅读设置">
+      <svg viewBox="0 0 24 24"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.2"/><circle cx="8" cy="16" r="2.2"/></svg>
+    </button>
   </div>
   <div class="sheet-backdrop" id="sheetBackdrop"></div>
   <div class="toc-sheet" id="tocSheet" aria-label="目录">
@@ -383,6 +426,31 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     <div class="dialog-title" id="dialogTitle">标题</div>
     <div class="dialog-body" id="dialogBody">内容</div>
     <button class="text-action" type="button" id="dialogOk">知道了</button>
+  </div>
+
+  <!-- 阅读设置面板 -->
+  <div class="read-settings" id="readSettings" role="dialog" aria-modal="true" aria-label="阅读设置">
+    <div class="rs-row">
+      <span class="rs-label">亮度</span>
+      <input class="rs-range" type="range" id="rsBrightness" min="40" max="140" step="1" value="100" aria-label="亮度">
+    </div>
+    <div class="rs-row">
+      <span class="rs-label">字号</span>
+      <span class="rs-fs">
+        <button class="rs-step" type="button" id="rsFsDown" aria-label="减小字号">A-</button>
+        <span class="rs-fs-value" id="rsFsValue">16</span>
+        <button class="rs-step" type="button" id="rsFsUp" aria-label="增大字号">A+</button>
+      </span>
+    </div>
+    <div class="rs-row">
+      <span class="rs-label">背景</span>
+      <span class="rs-themes">
+        <button class="rs-theme is-current" type="button" data-bg="0" aria-label="纯白日间"></button>
+        <button class="rs-theme" type="button" data-bg="1" aria-label="浅灰护眼"></button>
+        <button class="rs-theme" type="button" data-bg="2" aria-label="米黄纸张"></button>
+        <button class="rs-theme" type="button" data-bg="3" aria-label="纯黑夜间"></button>
+      </span>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -449,11 +517,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 
   /* ===== 设置项（内存态） ===== */
   var BG_TONES = [
-    { name: '白纸', bg: '#ffffff', ink: '#2c2c2c' },
-    { name: '米色', bg: '#f6f1e7', ink: '#39342b' },
-    { name: '灰调', bg: '#ececec', ink: '#2c2c2c' }
+    { name: '纯白日间', bg: '#ffffff', ink: '#2c2c2c', line: '#d8d8d8' },
+    { name: '浅灰护眼', bg: '#ececec', ink: '#2c2c2c', line: '#d0d0d0' },
+    { name: '米黄纸张', bg: '#f6f1e7', ink: '#39342b', line: '#e2d9c6' },
+    { name: '纯黑夜间', bg: '#000000', ink: '#e8e8e8', line: '#2a2a2a' }
   ];
-  var settings = { bg: 0, fs: 15 };
+  var settings = { bg: 0, fs: 16, bright: 1 };
 
   /* ===== DOM ===== */
   var phone = document.getElementById('phone');
@@ -462,6 +531,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   var readerBody = document.getElementById('readerBody');
   var readerTitle = document.getElementById('readerTitle');
   var readerControls = document.getElementById('readerControls');
+  var ctrlPage = document.getElementById('ctrlPage');
+  var readSettings = document.getElementById('readSettings');
+  var rsBrightness = document.getElementById('rsBrightness');
+  var rsFsValue = document.getElementById('rsFsValue');
+  var rsThemeBtns = document.querySelectorAll('.rs-theme');
+  var rsFsDown = document.getElementById('rsFsDown');
+  var rsFsUp = document.getElementById('rsFsUp');
   var tocSheet = document.getElementById('tocSheet');
   var tocList = document.getElementById('tocList');
   var tocCount = document.getElementById('tocCount');
@@ -555,6 +631,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     var total = state.book.chapters.length;
     document.getElementById('ctrlPrev').classList.toggle('is-off', state.ch <= 0);
     document.getElementById('ctrlNext').classList.toggle('is-off', state.ch >= total - 1);
+    ctrlPage.textContent = pad2(state.ch + 1) + '/' + pad2(total);
     Array.prototype.forEach.call(tocList.children, function (el, i) {
       el.classList.toggle('is-current', i === state.ch);
     });
@@ -590,17 +667,27 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   function closeSheets() {
     tocSheet.classList.remove('is-open');
     dialog.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
     sheetBackdrop.classList.remove('is-open');
   }
   function openToc() {
     toggleControls(false);
     dialog.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
     tocSheet.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
+  }
+  function openReadSettings() {
+    toggleControls(false);
+    tocSheet.classList.remove('is-open');
+    dialog.classList.remove('is-open');
+    readSettings.classList.add('is-open');
     sheetBackdrop.classList.add('is-open');
   }
   function openDialog(title, body) {
     toggleControls(false);
     tocSheet.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
     document.getElementById('dialogTitle').textContent = title;
     document.getElementById('dialogBody').textContent = body;
     dialog.classList.add('is-open');
@@ -661,12 +748,23 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     var tone = BG_TONES[settings.bg];
     readerView.style.setProperty('--reader-bg', tone.bg);
     readerView.style.setProperty('--reader-ink', tone.ink);
+    readerView.style.setProperty('--reader-line', tone.line);
     readerView.style.setProperty('--reader-fs', settings.fs + 'px');
+    readerView.style.setProperty('--reader-bright', settings.bright);
+    /* 设置页同步 */
     document.getElementById('bgSwatch').style.background = tone.bg;
     document.getElementById('bgValue').textContent = tone.name;
     document.getElementById('fsValue').textContent = settings.fs;
-    document.getElementById('fsDown').classList.toggle('is-off', settings.fs <= 12);
-    document.getElementById('fsUp').classList.toggle('is-off', settings.fs >= 20);
+    document.getElementById('fsDown').classList.toggle('is-off', settings.fs <= 14);
+    document.getElementById('fsUp').classList.toggle('is-off', settings.fs >= 22);
+    /* 阅读设置面板同步 */
+    rsBrightness.value = Math.round(settings.bright * 100);
+    rsFsValue.textContent = settings.fs;
+    rsFsDown.classList.toggle('is-off', settings.fs <= 14);
+    rsFsUp.classList.toggle('is-off', settings.fs >= 22);
+    Array.prototype.forEach.call(rsThemeBtns, function (el) {
+      el.classList.toggle('is-current', parseInt(el.dataset.bg, 10) === settings.bg);
+    });
   }
 
   /* ===== 事件绑定 ===== */
@@ -683,9 +781,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     if (book) go('read-' + book.id);
   });
 
-  /* 阅读器：点击正文切换控制栏 */
+  /* 阅读器：点击正文切换气泡控制栏 */
   readerBody.addEventListener('click', function () {
-    if (tocSheet.classList.contains('is-open')) return;
+    if (tocSheet.classList.contains('is-open') || readSettings.classList.contains('is-open')) return;
     toggleControls();
   });
 
@@ -709,6 +807,25 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   document.getElementById('ctrlToc').addEventListener('click', openToc);
   document.getElementById('ctrlPrev').addEventListener('click', function () { goChapter(state.ch - 1); });
   document.getElementById('ctrlNext').addEventListener('click', function () { goChapter(state.ch + 1); });
+  document.getElementById('ctrlSet').addEventListener('click', openReadSettings);
+
+  /* 阅读设置：亮度 / 字号 / 背景（全部真实生效） */
+  rsBrightness.addEventListener('input', function () {
+    settings.bright = parseInt(rsBrightness.value, 10) / 100;
+    readerView.style.setProperty('--reader-bright', settings.bright);
+  });
+  rsFsDown.addEventListener('click', function () {
+    if (settings.fs > 14) { settings.fs -= 1; applySettings(); }
+  });
+  rsFsUp.addEventListener('click', function () {
+    if (settings.fs < 22) { settings.fs += 1; applySettings(); }
+  });
+  Array.prototype.forEach.call(rsThemeBtns, function (el) {
+    el.addEventListener('click', function () {
+      settings.bg = parseInt(el.dataset.bg, 10);
+      applySettings();
+    });
+  });
 
   tocList.addEventListener('click', function (e) {
     var item = e.target.closest('.toc-item');
@@ -731,10 +848,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     applySettings();
   });
   document.getElementById('fsDown').addEventListener('click', function () {
-    if (settings.fs > 12) { settings.fs -= 1; applySettings(); }
+    if (settings.fs > 14) { settings.fs -= 1; applySettings(); }
   });
   document.getElementById('fsUp').addEventListener('click', function () {
-    if (settings.fs < 20) { settings.fs += 1; applySettings(); }
+    if (settings.fs < 22) { settings.fs += 1; applySettings(); }
   });
   document.getElementById('clearRow').addEventListener('click', function () {
     var hasLocal = books.some(function (b) { return b.isLocal; });
