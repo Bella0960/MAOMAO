@@ -423,10 +423,10 @@ function savePreset(){
 
 async function copyRef(){
   function extractCss(html){
-    return Array.from(html.matchAll(/<style\\b[^>]*>([\\s\\S]*?)<\\/style>/gi))
+    return Array.from(html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi))
       .map(function(match){ return match[1].trim(); })
       .filter(Boolean)
-      .join('\\n\\n');
+      .join('\n\n');
   }
   try {
     var responses = await Promise.all([
@@ -438,8 +438,8 @@ async function copyRef(){
     var listCss = extractCss(html[0]);
     var detailCss = extractCss(html[1]);
     if (!listCss && !detailCss) throw new Error('empty source CSS');
-    var text = '/* MAOMAO 原代码 CSS：聊天列表 */\\n' + listCss +
-      '\\n\\n/* MAOMAO 原代码 CSS：聊天详情 */\\n' + detailCss;
+    var text = '/* MAOMAO 原代码 CSS：聊天列表 */\n' + listCss +
+      '\n\n/* MAOMAO 原代码 CSS：聊天详情 */\n' + detailCss;
     function fallbackCopy(){
       var ta = document.createElement('textarea');
       ta.value = text;
