@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>私人藏书室 · MAOMAO</title>
+<script src="../js/native-feel.js"></script>
+<style>
+/* ===== 杂志编辑风格规范：衬线体、细线、大量留白、无阴影圆角 ===== */
+:root{
+  --paper:#ffffff;
+  --ink:#171717;
+  --muted:#8a8a8a;
+  --soft:#f1f1f1;
+  --line:#dcdcdc;
+  --serif:Georgia,"Songti SC","Noto Serif CJK SC","Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent}
+button:focus-visible{outline:2px solid #555;outline-offset:3px}
+
+/* ===== 红线：隐藏所有滚动条 ===== */
+::-webkit-scrollbar{display:none;width:0;height:0}
+*{scrollbar-width:none;-ms-overflow-style:none}
+
+/* ===== 整体容器 ===== */
+.phone-mockup{position:relative;width:min(410px,calc(100vw - 24px));height:min(890px,calc(100dvh - 24px));min-height:620px;margin:12px auto;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+@media(max-width:500px){
+  html,body{background:#fff}
+  .phone-mockup{width:100%;height:100dvh;min-height:0;margin:0;border:0;box-shadow:none}
+}
+
+/* ===== 视图切换：平滑淡入淡出 + 轻微位移 ===== */
+.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper);transition:opacity .32s cubic-bezier(.32,.72,0,1),transform .32s cubic-bezier(.32,.72,0,1);will-change:opacity,transform}
+.view.is-hidden{opacity:0;pointer-events:none;transform:translateX(24px)}
+.view#shelfView.is-hidden{transform:translateX(-24px)}
+
+/* ===== 书架视图 ===== */
+.shelf-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 22px 6px}
+.back-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--ink);transition:background .18s,transform .18s}
+.back-btn:active{background:var(--soft);transform:scale(.94)}
+.back-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.head-spacer{width:36px}
+
+.shelf-title-block{flex:1;text-align:center;padding:18px 0 22px}
+.shelf-title{font-family:var(--serif);font-weight:500;font-size:clamp(30px,8.5vw,40px);line-height:1.06;letter-spacing:.04em;margin:0;color:var(--ink)}
+.shelf-sub{display:block;margin-top:9px;font-size:9px;letter-spacing:.32em;color:var(--muted);text-transform:uppercase}
+
+.shelf-grid-wrap{flex:1;min-height:0;overflow:auto;padding:0 22px 8px;scrollbar-width:none}
+.shelf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px}
+
+/* 书籍卡片：浅灰封面 + 1px 细灰边框，绝对无阴影无圆角 */
+.book-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0;min-width:0}
+.book-cover{width:100%;aspect-ratio:3/4;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s}
+.book-card:active .book-cover{background:#e8e8e8;border-color:#c8c8c8}
+.book-cover-mark{font-family:var(--serif);font-size:22px;color:#c4c4c4;letter-spacing:.05em}
+.book-meta{margin-top:10px;line-height:1.4;max-width:100%}
+.book-name{display:block;font-family:var(--serif);font-size:12px;color:var(--ink);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.book-author{display:block;font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 书架底部：两个极简细线框按钮 */
+.shelf-foot{flex:0 0 auto;display:flex;gap:11px;padding:16px 22px calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.shelf-btn{flex:1;height:42px;border:1px solid var(--line);background:transparent;font-size:12px;letter-spacing:.08em;color:var(--ink);display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s,transform .15s}
+.shelf-btn:active{background:var(--soft);border-color:#c8c8c8;transform:scale(.98)}
+
+/* ===== 阅读器视图 ===== */
+.reader-head{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 20px 10px;border-bottom:1px solid var(--line)}
+.reader-title{flex:1;min-width:0;font-family:var(--serif);font-size:16px;font-weight:500;letter-spacing:.02em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0}
+
+.reader-body{flex:1;min-height:0;overflow:auto;padding:30px 26px 60px;scrollbar-width:none}
+.reader-content{font-family:var(--serif);font-size:16px;line-height:1.8;color:#2a2a2a;max-width:340px;margin:0 auto}
+.reader-content p{margin:0 0 1.4em;text-indent:2em;text-align:justify}
+.reader-content p:first-child{text-indent:2em}
+.reader-content .chapter{font-family:var(--serif);font-size:13px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;text-indent:0;text-align:center;margin:0 0 26px}
+.reader-divider{width:24px;height:1px;background:var(--line);margin:30px auto}
+
+/* 减弱动态效果 */
+@media(prefers-reduced-motion:reduce){
+  .view{transition:none!important}
+  .view.is-hidden{opacity:0;transform:none!important}
+}
+</style>
+</head>
+<body>
+<div class="phone-mockup">
+
+  <!-- ===== 书架视图 ===== -->
+  <section class="view" id="shelfView" aria-label="私人藏书室">
+    <header class="shelf-head">
+      <button class="back-btn" id="backHome" aria-label="返回桌面" title="返回桌面">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
+      </button>
+      <span class="head-spacer" aria-hidden="true"></span>
+    </header>
+
+    <div class="shelf-title-block">
+      <h1 class="shelf-title">私人藏书室</h1>
+      <span class="shelf-sub">MY LIBRARY</span>
+    </div>
+
+    <div class="shelf-grid-wrap">
+      <div class="shelf-grid" id="shelfGrid">
+        <!-- 书籍由 JS 渲染 -->
+      </div>
+    </div>
+
+    <footer class="shelf-foot">
+      <button class="shelf-btn" type="button" id="importBtn">导入本地书籍</button>
+      <button class="shelf-btn" type="button" id="writeBtn">让 TA 写一本</button>
+    </footer>
+  </section>
+
+  <!-- ===== 阅读器视图 ===== -->
+  <section class="view is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
+    <header class="reader-head">
+      <button class="back-btn" id="backToShelf" aria-label="返回书架" title="返回书架">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
+      </button>
+      <h2 class="reader-title" id="readerTitle">书名</h2>
+    </header>
+    <main class="reader-body">
+      <article class="reader-content" id="readerContent">
+        <!-- 正文由 JS 渲染 -->
+      </article>
+    </main>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 假数据：3 本书 ===== */
+  var books = [
+    {
+      id: 'b1',
+      name: '月光与回声',
+      author: '林远舟',
+      mark: '月',
+      content: [
+        '第一章',
+        '夜色把整座城市收进一只旧木匣，街灯像被遗忘的纽扣，一颗一颗亮在潮湿的空气里。她推开窗，风带着远处江水的气息，轻轻擦过耳侧。',
+        '很多年以后，她仍然记得那个夜晚的温度。不是因为发生了什么惊天动地的事，而是因为那是她第一次意识到，原来告别可以安静得像一片叶子落在水面。',
+        '楼下的便利店还开着，日光灯把门口一小块地方照得发白。她忽然很想下去走一走，不为买什么，只是想让脚底碰到真实的地面。',
+        '第二天清晨，她在枕边发现一张纸条，上面只有一行字：我把回声寄给你了。字是他的笔迹，瘦而长，像他说话时总带着的那点犹豫。'
+      ]
+    },
+    {
+      id: 'b2',
+      name: '纸鹤集',
+      author: '苏微',
+      mark: '鹤',
+      content: [
+        '序',
+        '小时候她以为，只要把愿望写在纸上，再折成一只鹤，愿望就会顺着风飞走，飞到某个能听见它的地方。',
+        '长大以后她才明白，纸鹤飞不远，它们大多落在屋顶、树梢，或者某条无人经过的小巷里。但写愿望的那个瞬间，是真的。',
+        '她把这些年折过的鹤都收在一只玻璃瓶里。搬家的时候瓶子碎了，纸鹤散落一地，像一场迟来的雪。她蹲下来一只一只捡，忽然觉得自己好像也被重新拼凑了一遍。',
+        '如果你也有一只纸鹤，请别急着放飞它。先把它握在手心一会儿，让它知道你是认真的。'
+      ]
+    },
+    {
+      id: 'b3',
+      name: '海边的旧信',
+      author: '陈屿',
+      mark: '海',
+      content: [
+        '第一封信',
+        '潮水退去的时候，沙滩上会留下一些奇怪的东西。半只贝壳，一段绳子，有时候是一封信。',
+        '他捡到那封信的时候，信纸已经被海水泡得发软，字迹模糊得像一场没做完的梦。但他还是看出来了，那是一封写给某个名字的信，开头写着：见字如面。',
+        '他把信带回家，夹在一本旧书里。后来他搬了很多次家，丢了很多东西，但那封信一直都在。他不知道写信的人是谁，也不知道收信的人有没有等到它。',
+        '只是偶尔，在下雨的傍晚，他会把信拿出来看一眼。那些洇开的字，像海面上最后一点光。'
+      ]
+    }
+  ];
+
+  /* ===== 渲染书架 ===== */
+  var grid = document.getElementById('shelfGrid');
+  grid.innerHTML = books.map(function (b) {
+    return '<button class="book-card" type="button" data-book-id="' + b.id + '" aria-label="打开 ' + b.name + '">' +
+      '<div class="book-cover"><span class="book-cover-mark">' + b.mark + '</span></div>' +
+      '<div class="book-meta">' +
+        '<span class="book-name">' + b.name + '</span>' +
+        '<span class="book-author">' + b.author + '</span>' +
+      '</div>' +
+    '</button>';
+  }).join('');
+
+  /* ===== 视图切换 ===== */
+  var shelfView = document.getElementById('shelfView');
+  var readerView = document.getElementById('readerView');
+  var readerTitle = document.getElementById('readerTitle');
+  var readerContent = document.getElementById('readerContent');
+
+  function openReader(book) {
+    readerTitle.textContent = book.name;
+    var html = '';
+    book.content.forEach(function (line, i) {
+      if (i === 0) {
+        html += '<div class="chapter">' + line + '</div>';
+      } else {
+        html += '<p>' + line + '</p>';
+      }
+    });
+    readerContent.innerHTML = html;
+
+    shelfView.classList.add('is-hidden');
+    shelfView.setAttribute('aria-hidden', 'true');
+    readerView.classList.remove('is-hidden');
+    readerView.setAttribute('aria-hidden', 'false');
+    readerView.querySelector('.reader-body').scrollTop = 0;
+  }
+
+  function closeReader() {
+    readerView.classList.add('is-hidden');
+    readerView.setAttribute('aria-hidden', 'true');
+    shelfView.classList.remove('is-hidden');
+    shelfView.setAttribute('aria-hidden', 'false');
+  }
+
+  /* ===== 事件绑定 ===== */
+  grid.addEventListener('click', function (e) {
+    var card = e.target.closest('.book-card');
+    if (!card) return;
+    var id = card.dataset.bookId;
+    var book = books.filter(function (b) { return b.id === id; })[0];
+    if (book) openReader(book);
+  });
+
+  document.getElementById('backToShelf').addEventListener('click', closeReader);
+  document.getElementById('backHome').addEventListener('click', function () {
+    location.href = '../index.html';
+  });
+
+  /* 底部按钮：仅占位提示，不做真实逻辑 */
+  document.getElementById('importBtn').addEventListener('click', function () {
+    // 后续接入：读取本地 txt/epub 文件
+  });
+  document.getElementById('writeBtn').addEventListener('click', function () {
+    // 后续接入：调用 AI 生成新书
+  });
+})();
+</script>
+</body>
+</html>
