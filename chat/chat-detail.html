@@ -1331,6 +1331,165 @@
                 box-shadow: none;
             }
         }
+
+        /* ===== iOS-inspired floating glass utility panel ===== */
+        .plus-panel-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 300;
+            display: none;
+            align-items: initial;
+            pointer-events: none;
+        }
+        .plus-panel-overlay.active { display: block; }
+        .plus-panel-backdrop {
+            position: absolute;
+            inset: 0;
+            pointer-events: auto;
+            background: rgba(20,20,25,.08);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity .22s ease, background .22s ease;
+        }
+        .plus-panel-overlay.active .plus-panel-backdrop {
+            opacity: 1;
+            background: rgba(20,20,25,.13);
+        }
+        .plus-panel-sheet {
+            position: absolute;
+            left: auto;
+            right: 12px;
+            bottom: 76px;
+            width: min(328px, calc(100% - 24px));
+            max-height: min(68vh, 570px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            box-sizing: border-box;
+            padding: 17px 15px 16px;
+            border-radius: 27px;
+            border: 1px solid rgba(255,255,255,.82);
+            background: linear-gradient(145deg, rgba(255,255,255,.91), rgba(242,242,247,.84));
+            backdrop-filter: saturate(180%) blur(34px);
+            -webkit-backdrop-filter: saturate(180%) blur(34px);
+            box-shadow: 0 18px 54px rgba(18,18,28,.18), inset 0 1px 0 rgba(255,255,255,.95);
+            transform: translateY(12px) scale(.965);
+            transform-origin: bottom right;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .26s cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+            scrollbar-width: none;
+        }
+        .plus-panel-sheet::-webkit-scrollbar { display: none; }
+        .plus-panel-overlay.active .plus-panel-sheet {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .plus-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 1px 15px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid rgba(40,40,48,.08);
+        }
+        .plus-panel-heading {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            min-width: 0;
+        }
+        .plus-panel-kicker {
+            color: #85858E;
+            font-size: 9px;
+            font-weight: 650;
+            letter-spacing: 1.45px;
+            line-height: 1.2;
+        }
+        .plus-panel-title {
+            color: #19191E;
+            font-size: 18px;
+            font-weight: 650;
+            letter-spacing: -.45px;
+            line-height: 1.2;
+        }
+        .plus-panel-close {
+            display: grid;
+            place-items: center;
+            flex: 0 0 30px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid rgba(35,35,42,.06);
+            border-radius: 50%;
+            color: #56565F;
+            background: rgba(255,255,255,.72);
+            box-shadow: 0 2px 8px rgba(20,20,30,.04);
+            cursor: pointer;
+        }
+        .plus-panel-close:active { transform: scale(.92); }
+        .plus-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 8px;
+        }
+        .plus-item {
+            min-width: 0;
+            min-height: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 10px 3px 9px;
+            border: 1px solid rgba(255,255,255,.78);
+            border-radius: 17px;
+            background: linear-gradient(145deg, rgba(255,255,255,.76), rgba(246,246,249,.55));
+            box-shadow: 0 2px 7px rgba(25,25,35,.035), inset 0 1px 0 rgba(255,255,255,.95);
+            color: #303038;
+            transition: transform .16s ease, background .16s ease, border-color .16s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .plus-item:active {
+            transform: scale(.95);
+            background: rgba(226,226,234,.72);
+            border-color: rgba(160,160,172,.28);
+        }
+        .plus-icon-circle {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            border: 1px solid rgba(30,30,38,.055);
+            background: linear-gradient(145deg, #FFFFFF, #EDEDF2);
+            box-shadow: 0 3px 9px rgba(25,25,35,.055), inset 0 1px 0 rgba(255,255,255,.95);
+            color: #292930;
+        }
+        .plus-icon-circle svg { width: 19px; height: 19px; }
+        .plus-label {
+            display: block;
+            max-width: 100%;
+            color: #50505A;
+            font-size: 11px;
+            font-weight: 520;
+            letter-spacing: .05px;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+        }
+        @media (max-width: 380px) {
+            .plus-panel-sheet { right: 10px; bottom: 72px; width: calc(100% - 20px); padding: 15px 12px 13px; }
+            .plus-grid { gap: 7px; }
+            .plus-item { min-height: 80px; }
+            .plus-icon-circle { width: 35px; height: 35px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .plus-panel-backdrop, .plus-panel-sheet, .plus-item { transition: none !important; }
+        }
 </style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
@@ -1399,7 +1558,15 @@
         <div class="plus-panel-overlay" id="plusPanelOverlay">
             <div class="plus-panel-backdrop" id="plusPanelBackdrop"></div>
             <div class="plus-panel-sheet">
-                <div class="plus-panel-handle"></div>
+                <div class="plus-panel-head">
+                    <div class="plus-panel-heading">
+                        <span class="plus-panel-kicker">MAOMAO · CHAT TOOLS</span>
+                        <span class="plus-panel-title">快捷功能</span>
+                    </div>
+                    <button class="plus-panel-close" type="button" aria-label="关闭菜单" onclick="window.closePlusPanel && window.closePlusPanel()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg>
+                    </button>
+                </div>
                 <div class="plus-grid">
                     <button class="plus-item" data-feat="sticker" type="button">
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg></span>
