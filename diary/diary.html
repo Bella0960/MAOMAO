@@ -201,6 +201,37 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .calendar-actions button:active{transform:scale(.9);background:#f0f0f0}
 .date-cell{transition:background .2s,color .2s,transform .2s var(--ease-apple)}
 .date-cell:active{transform:scale(.9)}
+/* ===== 全屏编辑器 ===== */
+.editor-full{display:flex;flex-direction:column;min-height:100%;background:var(--soft)}
+.ef-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--paper);border-bottom:1px solid var(--line);flex-shrink:0;position:sticky;top:0;z-index:10}
+.ef-back{border:0;background:transparent;color:var(--text);font-size:13px;padding:6px 10px;border-radius:8px}
+.ef-back:active{background:var(--soft)}
+.ef-title{font-size:15px;font-weight:650;color:var(--ink)}
+.ef-save{border:0;background:var(--accent);color:var(--accent-ink);padding:7px 18px;border-radius:9px;font-size:13px;font-weight:600}
+.ef-save:active{transform:scale(.95)}
+.ef-body{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px}
+.ef-canvas-wrap{background:var(--paper);border-radius:14px;padding:12px;border:1px solid var(--line)}
+.ef-canvas{position:relative;width:100%;height:260px;border-radius:10px;overflow:hidden;border:1px dashed var(--line)}
+.ef-canvas-tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ct-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--soft);color:var(--text);padding:7px 12px;border-radius:9px;font-size:12px}
+.ct-btn:active{background:var(--soft2)}
+.ct-btn:disabled{opacity:.4}
+/* 拼贴项 */
+.collage-item{position:absolute;cursor:grab;user-select:none;touch-action:none}
+.collage-item:active{cursor:grabbing}
+.collage-item img{width:100%;height:auto;display:block;pointer-events:none;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.collage-del{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:#ff4d4f;color:#fff;font-size:13px;line-height:18px;text-align:center;cursor:pointer;border:2px solid #fff}
+.collage-resize{position:absolute;bottom:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:nwse-resize}
+.collage-rotate{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;background:#1890ff;color:#fff;font-size:11px;line-height:16px;text-align:center;cursor:grab;border:2px solid #fff}
+.collage-rotate:before{content:"↻"}
+.ef-fields{display:flex;flex-direction:column;gap:12px}
+.ef-row{display:flex;flex-direction:column;gap:6px}
+.ef-row .field-label{font-size:11px;color:var(--muted)}
+.ef-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ef-col{display:flex;flex-direction:column;gap:6px}
+@media(max-width:500px){.ef-meta{grid-template-columns:1fr}}
+/* 拼贴预览 */
+.collage-preview img{border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .tab-btn{transition:color .2s,transform .2s var(--ease-apple)}
 .tab-btn:active{transform:scale(.92)}
 .tab-add{transition:transform .25s var(--ease-apple),box-shadow .2s}
@@ -257,66 +288,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     <button class="tab-btn" data-view="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>关于</span></button>
   </nav>
 
-  <div class="editor-backdrop" id="editorBackdrop" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
-    <section class="editor-sheet">
-      <div class="sheet-grabber"></div>
-      <div class="editor-header"><div><div class="editor-heading" id="editorHeading">写下一页</div><div class="editor-sub">A MOMENT, KEPT FOR YOURSELF</div></div><button class="sheet-link" id="closeEditor">关闭</button></div>
-      <label class="field-label" for="entryDate">日期</label><input class="editor-date" id="entryDate" type="date">
-      <label class="field-label">日记类型</label><div class="type-choices" id="typeChoices">
-        <button type="button" class="type-choice active" data-type="normal"><span class="tc-icon">📝</span>普通</button>
-        <button type="button" class="type-choice" data-type="quote"><span class="tc-icon">💌</span>摘抄</button>
-        <button type="button" class="type-choice" data-type="meal"><span class="tc-icon">🍜</span>饮食</button>
-        <button type="button" class="type-choice" data-type="todo"><span class="tc-icon">✅</span>待办</button>
-      </div>
-      <label class="field-label" for="entryTitle">标题 · 可留空</label><input class="editor-title" id="entryTitle" maxlength="80" placeholder="给今天一个名字">
-      <label class="field-label" for="entryContent" id="contentLabel">今天发生了什么？</label><textarea class="editor-content" id="entryContent" maxlength="12000" placeholder="不需要把每一天都写得很完整。&#10;&#10;你可以从任何一个小片段开始……"></textarea>
-      <div class="editor-meta">
-        <div><label class="field-label">此刻心情</label><div class="mood-choices" id="moodChoices">
-          <button type="button" class="mood-choice active" data-mood="平静">平静</button><button type="button" class="mood-choice" data-mood="开心">开心</button><button type="button" class="mood-choice" data-mood="疲惫">疲惫</button><button type="button" class="mood-choice" data-mood="低落">低落</button><button type="button" class="mood-choice" data-mood="期待">期待</button>
-        </div></div>
-        <div><label class="field-label" for="entryTags">标签 · 用逗号分开</label><input class="tag-input" id="entryTags" maxlength="120" placeholder="生活, 灵感, 旅行"></div>
-      </div>
-      <div class="photo-tools"><label class="photo-pick" for="entryPhoto"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>添加照片（最多4张）</label><input type="file" id="entryPhoto" accept="image/*" hidden><span style="font-size:9px;color:#aaa">照片会压缩后保存在本机</span></div>
-      <div class="editor-photos" id="editorPhotos"></div>
-      <div class="collapse-section" id="collapseDecor">
-        <div class="collapse-head" id="decorToggle"><span>🎨 装饰与氛围</span><span id="decorArrow">▾</span></div>
-        <div class="collapse-body">
-          <label class="field-label">天气</label><div class="weather-row" id="weatherChoices">
-            <button type="button" class="weather-btn" data-weather="">—</button>
-            <button type="button" class="weather-btn" data-weather="☀️">☀️</button>
-            <button type="button" class="weather-btn" data-weather="⛅">⛅</button>
-            <button type="button" class="weather-btn" data-weather="🌧️">🌧️</button>
-            <button type="button" class="weather-btn" data-weather="❄️">❄️</button>
-            <button type="button" class="weather-btn" data-weather="🌙">🌙</button>
-          </div>
-          <label class="field-label" for="entryLocation">地点</label><input class="tag-input" id="entryLocation" maxlength="40" placeholder="在哪里写下的？">
-          <label class="field-label">贴纸装饰（可选多个）</label><div class="sticker-picker" id="stickerPicker">
-            <button type="button" class="sticker-btn" data-sticker="🌸">🌸</button>
-            <button type="button" class="sticker-btn" data-sticker="⭐">⭐</button>
-            <button type="button" class="sticker-btn" data-sticker="🍀">🍀</button>
-            <button type="button" class="sticker-btn" data-sticker="☕">☕</button>
-            <button type="button" class="sticker-btn" data-sticker="🌙">🌙</button>
-            <button type="button" class="sticker-btn" data-sticker="🎀">🎀</button>
-            <button type="button" class="sticker-btn" data-sticker="🍂">🍂</button>
-            <button type="button" class="sticker-btn" data-sticker="💫">💫</button>
-            <button type="button" class="sticker-btn" data-sticker="🐱">🐱</button>
-            <button type="button" class="sticker-btn" data-sticker="🌷">🌷</button>
-            <button type="button" class="sticker-btn" data-sticker="📌">📌</button>
-            <button type="button" class="sticker-btn" data-sticker="🎵">🎵</button>
-          </div>
-          <label class="field-label" style="margin-top:13px">纸张底色</label><div class="paper-picker" id="paperPicker">
-            <button type="button" class="paper-swatch p-default active" data-paper="default" title="默认"></button>
-            <button type="button" class="paper-swatch p-yellow" data-paper="yellow" title="暖黄"></button>
-            <button type="button" class="paper-swatch p-pink" data-paper="pink" title="樱花粉"></button>
-            <button type="button" class="paper-swatch p-blue" data-paper="blue" title="天蓝"></button>
-            <button type="button" class="paper-swatch p-green" data-paper="green" title="薄荷绿"></button>
-            <button type="button" class="paper-swatch p-lined" data-paper="lined" title="横线纸"></button>
-          </div>
-        </div>
-      </div>
-      <div class="editor-footer"><button type="button" class="delete-entry" id="deleteEntry" hidden>删除这篇</button><button type="button" class="btn-secondary" id="cancelEditor">取消</button><button type="button" class="btn-primary" id="saveEntry">保存日记</button></div>
-    </section>
-  </div>
+  <input type="file" id="entryPhoto" accept="image/*" hidden>
   <div class="menu-backdrop" id="menuBackdrop" role="dialog" aria-modal="true">
     <section class="menu-sheet">
       <div class="menu-head"><span>日记空间</span><button class="sheet-link" id="closeMenu">关闭</button></div>
@@ -339,6 +311,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   var editId=null, activePhotos=[], calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1), selectedCalendarDate=todayKey();
   var cardAnimQueued=true;
   var selectedType='normal', selectedWeather='', selectedLocation='', selectedStickers=[], selectedPaper='default';
+  var selectedEditorDate='';
+  // 拼贴状态
+  var collageItems=[]; // {id, src, x, y, w, rot}
+  var draggingItem=null, dragMode=null, dragStartX=0, dragStartY=0, dragOrig=null;
   var prompts=[
     '今天有没有一个很小的瞬间，让你觉得生活还不错？',
     '如果把今天拍成一张照片，你会留下哪个画面？',
@@ -350,7 +326,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   ];
   var promptIndex=Math.floor(Date.now()/86400000)%prompts.length;
   var root=document.getElementById('viewRoot'), scroll=document.getElementById('appScroll');
-  var editor=document.getElementById('editorBackdrop'), menu=document.getElementById('menuBackdrop');
+  var menu=document.getElementById('menuBackdrop');
   var $=function(id){return document.getElementById(id)};
   function loadEntries(){
     try{var v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(!Array.isArray(v))return [];return v.filter(function(x){return x&&x.id&&x.date}).map(function(x){
@@ -414,10 +390,26 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     return '<svg viewBox="0 0 24 24">'+(paths[name]||'')+'</svg>';
   }
   var TYPE_LABELS={normal:'日记',quote:'摘抄',meal:'饮食',todo:'待办'};
-  var TYPE_ICONS={normal:'📝',quote:'💌',meal:'🍜',todo:'✅'};
+  var TYPE_ICONS={normal:'',quote:'',meal:'',todo:''};
   function renderPhotos(photos){
     if(!photos||!photos.length)return '';
-    var list=photos.slice(0,4);
+    var list=photos.slice(0,6);
+    var hasPos=list.some(function(p){return p&&typeof p==='object'&&p.src});
+    if(hasPos){
+      // 拼贴预览：按位置渲染
+      var maxW=0,maxH=0;
+      list.forEach(function(p){if(p&&typeof p==='object'){maxW=Math.max(maxW,(p.x||0)+(p.w||100));maxH=Math.max(maxH,(p.y||0)+(p.w||100))}});
+      var scale=maxW>0?Math.min(1,300/maxW):1;
+      var html='<div class="collage-preview" style="position:relative;width:100%;height:'+(maxH*scale+10)+'px">';
+      list.forEach(function(p){
+        if(p&&typeof p==='object'&&p.src){
+          html+='<img src="'+esc(p.src)+'" style="position:absolute;left:'+((p.x||0)*scale)+'px;top:'+((p.y||0)*scale)+'px;width:'+((p.w||100)*scale)+'px;transform:rotate('+(p.rot||0)+'deg)" alt="日记照片" loading="lazy">';
+        }
+      });
+      html+='</div>';
+      return html;
+    }
+    // 旧格式：字符串数组，网格展示
     var count=list.length;
     var html='<div class="photo-grid count-'+count+'">';
     list.forEach(function(src){
@@ -452,7 +444,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     if(e.weather||e.location){
       metaRow='<div class="entry-meta-row">';
       if(e.weather)metaRow+='<span>'+esc(e.weather)+'</span>';
-      if(e.location)metaRow+='<span>📍 '+esc(e.location)+'</span>';
+      if(e.location)metaRow+='<span>'+esc(e.location)+'</span>';
       metaRow+='</div>';
     }
     var body='';
@@ -474,7 +466,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
       body+
       renderPhotos(e.photos)+
       metaRow+
-      '<div class="entry-bottom"><div class="entry-tags">'+tags+'</div><div class="entry-actions"><button class="mini-action" data-export-img="'+esc(e.id)+'" aria-label="导出为图片" title="导出为图片">🖼️</button><button class="mini-action '+(e.favorite?'active':'')+'" data-favorite="'+esc(e.id)+'" aria-label="'+(e.favorite?'取消收藏':'收藏')+'" title="收藏">'+(e.favorite?'★':'☆')+'</button></div></div></article>';
+      '<div class="entry-bottom"><div class="entry-tags">'+tags+'</div><div class="entry-actions"><button class="mini-action" data-export-img="'+esc(e.id)+'" aria-label="导出为图片" title="导出为图片"><svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button></div></div></article>';
   }
   function renderCards(list,emptyTitle,emptyText){
     if(!list.length)return '<div class="empty-state"><div class="empty-mark">01 / —</div><h3>'+esc(emptyTitle)+'</h3><p>'+esc(emptyText)+'</p><button class="text-btn" data-create="1">写下第一篇</button></div>';
@@ -528,7 +520,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   }
   function render(){
     document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view===currentView)});
-    root.innerHTML=currentView==='calendar'?renderCalendar():currentView==='favorites'?renderFavorites():currentView==='about'?renderAbout():renderHome();
+    root.innerHTML=currentView==='calendar'?renderCalendar():currentView==='favorites'?renderFavorites():currentView==='about'?renderAbout():currentView==='editor'?renderEditor():renderHome();
     if(cardAnimQueued){
       root.classList.remove('anim');
       void root.offsetWidth;
@@ -550,39 +542,125 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
       $('nextMonth').addEventListener('click',function(){calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);render()});
       $('todayMonth').addEventListener('click',function(){calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedCalendarDate=todayKey();render()});
     }
+    if(currentView==='editor'){
+      bindEditorEvents();
+    }
     var aboutExport=$('aboutExport');if(aboutExport)aboutExport.addEventListener('click',exportBackup);
     var aboutImport=$('aboutImport');if(aboutImport)aboutImport.addEventListener('click',function(){$('importFile').click()});
     scroll.scrollTop=0;
+  }
+  function bindEditorEvents(){
+    var saveBtn=$('saveEntry');if(saveBtn)saveBtn.addEventListener('click',saveEntry);
+    var cancelBtn=$('cancelEditor');if(cancelBtn)cancelBtn.addEventListener('click',closeEditor);
+    var delBtn=$('deleteEntry');if(delBtn)delBtn.addEventListener('click',deleteCurrent);
+    var addPhoto=$('addPhotoBtn');if(addPhoto)addPhoto.addEventListener('click',function(){var inp=$('entryPhoto');if(inp)inp.click()});
+    var clearCol=$('clearCollageBtn');if(clearCol)clearCol.addEventListener('click',function(){collageItems=[];renderCollage()});
+    var mc=$('moodChoices');if(mc)mc.addEventListener('click',function(e){var b=e.target.closest('[data-mood]');if(!b)return;selectedMood=b.dataset.mood;document.querySelectorAll('.mood-choice').forEach(function(x){x.classList.toggle('active',x===b)})});
+    var tc=$('typeChoices');if(tc)tc.addEventListener('click',function(e){var b=e.target.closest('[data-type]');if(!b)return;selectedType=b.dataset.type;document.querySelectorAll('.type-choice').forEach(function(x){x.classList.toggle('active',x===b)});updateContentLabel()});
+    var wc=$('weatherChoices');if(wc)wc.addEventListener('click',function(e){var b=e.target.closest('[data-weather]');if(!b)return;selectedWeather=b.dataset.weather;document.querySelectorAll('.weather-btn').forEach(function(x){x.classList.toggle('active',x===b)})});
+    var sp=$('stickerPicker');if(sp)sp.addEventListener('click',function(e){var b=e.target.closest('[data-sticker]');if(!b)return;var s=b.dataset.sticker;var idx=selectedStickers.indexOf(s);if(idx>=0){selectedStickers.splice(idx,1);b.classList.remove('active')}else{if(selectedStickers.length>=3){showToast('最多选3个贴纸');return}selectedStickers.push(s);b.classList.add('active')}});
+    var pp=$('paperPicker');if(pp)pp.addEventListener('click',function(e){var b=e.target.closest('[data-paper]');if(!b)return;selectedPaper=b.dataset.paper;document.querySelectorAll('.paper-swatch').forEach(function(x){x.classList.toggle('active',x===b)});var canvas=$('efCanvas');if(canvas)canvas.style.background=PAPER_CSS[selectedPaper]||PAPER_CSS.default});
+    // 拼贴拖拽
+    bindCollage();
+  }
+  function bindCollage(){
+    var canvas=$('efCanvas');
+    if(!canvas)return;
+    canvas.querySelectorAll('.collage-item').forEach(function(item){
+      var cid=item.dataset.cid;
+      item.addEventListener('mousedown',startDrag);
+      item.addEventListener('touchstart',startDrag,{passive:false});
+    });
+  }
+  function getPoint(e){
+    if(e.touches&&e.touches.length)return {x:e.touches[0].clientX,y:e.touches[0].clientY};
+    if(e.changedTouches&&e.changedTouches.length)return {x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+    return {x:e.clientX,y:e.clientY};
+  }
+  function startDrag(e){
+    var item=e.currentTarget;
+    var cid=item.dataset.cid;
+    var it=collageItems.find(function(x){return x.id===cid});
+    if(!it)return;
+    var target=e.target;
+    if(target.classList.contains('collage-del')){
+      e.preventDefault();
+      collageItems=collageItems.filter(function(x){return x.id!==cid});
+      renderCollage();
+      return;
+    }
+    e.preventDefault();
+    var p=getPoint(e);
+    draggingItem=it;
+    dragOrig={x:it.x,y:it.y,w:it.w,rot:it.rot};
+    dragStartX=p.x;dragStartY=p.y;
+    if(target.classList.contains('collage-rotate')){
+      dragMode='rotate';
+    }else if(target.classList.contains('collage-resize')){
+      dragMode='resize';
+    }else{
+      dragMode='move';
+    }
+    document.addEventListener('mousemove',onDrag);
+    document.addEventListener('mouseup',endDrag);
+    document.addEventListener('touchmove',onDrag,{passive:false});
+    document.addEventListener('touchend',endDrag);
+  }
+  function onDrag(e){
+    if(!draggingItem)return;
+    e.preventDefault();
+    var p=getPoint(e);
+    var dx=p.x-dragStartX,dy=p.y-dragStartY;
+    if(dragMode==='move'){
+      draggingItem.x=Math.max(0,dragOrig.x+dx);
+      draggingItem.y=Math.max(0,dragOrig.y+dy);
+    }else if(dragMode==='resize'){
+      draggingItem.w=Math.max(40,dragOrig.w+dx);
+    }else if(dragMode==='rotate'){
+      draggingItem.rot=dragOrig.rot+dx*0.5;
+    }
+    var el=document.querySelector('.collage-item[data-cid="'+draggingItem.id+'"]');
+    if(el){
+      el.style.left=draggingItem.x+'px';
+      el.style.top=draggingItem.y+'px';
+      el.style.width=draggingItem.w+'px';
+      el.style.transform='rotate('+draggingItem.rot+'deg)';
+    }
+  }
+  function endDrag(){
+    draggingItem=null;
+    document.removeEventListener('mousemove',onDrag);
+    document.removeEventListener('mouseup',endDrag);
+    document.removeEventListener('touchmove',onDrag);
+    document.removeEventListener('touchend',endDrag);
   }
   function openEditor(id,date){
     editId=id||null;
     var entry=id?entries.find(function(e){return e.id===id}):null;
     selectedMood=entry?(entry.mood||'平静'):'平静';
-    activePhotos=entry?(Array.isArray(entry.photos)?entry.photos.slice():(entry.photo?[entry.photo]:[])):[];
     selectedType=entry?(entry.type||'normal'):'normal';
     selectedWeather=entry?(entry.weather||''):'';
     selectedLocation=entry?(entry.location||''):'';
     selectedStickers=entry?(entry.stickers||[]).slice():[];
     selectedPaper=entry?(entry.paper||'default'):'default';
-    $('editorHeading').textContent=entry?'编辑这篇日记':'写下一页';
-    $('entryDate').value=entry?entry.date:(date||todayKey());
-    $('entryTitle').value=entry?(entry.title||''):'';
-    $('entryContent').value=entry?(entry.content||''):'';
-    $('entryTags').value=entry?(entry.tags||[]).join(', '):'';
-    $('entryLocation').value=selectedLocation;
-    document.querySelectorAll('.mood-choice').forEach(function(b){b.classList.toggle('active',b.dataset.mood===selectedMood)});
-    document.querySelectorAll('.type-choice').forEach(function(b){b.classList.toggle('active',b.dataset.type===selectedType)});
-    document.querySelectorAll('.weather-btn').forEach(function(b){b.classList.toggle('active',b.dataset.weather===selectedWeather)});
-    document.querySelectorAll('.sticker-btn').forEach(function(b){b.classList.toggle('active',selectedStickers.indexOf(b.dataset.sticker)!==-1)});
-    document.querySelectorAll('.paper-swatch').forEach(function(b){b.classList.toggle('active',b.dataset.paper===selectedPaper)});
-    updateContentLabel();
-    $('deleteEntry').hidden=!entry;
-    renderEditorPhotos();
-    $('entryPhoto').value='';
-    editor.classList.add('show');
-    document.body.style.overflow='hidden';
-    setTimeout(function(){$('entryTitle').focus({preventScroll:true})},150);
+    selectedEditorDate=date||'';
+    // 迁移旧的 photos（字符串数组）到拼贴 items（对象数组）
+    var ph=entry?entry.photos:[];
+    collageItems=[];
+    if(Array.isArray(ph)){
+      ph.forEach(function(p,i){
+        if(typeof p==='string'){
+          collageItems.push({id:'c_'+Date.now()+'_'+i,src:p,x:30+i*15,y:30+i*15,w:140,rot:0});
+        }else if(p&&typeof p==='object'){
+          collageItems.push({id:p.id||('c_'+Date.now()+'_'+i),src:p.src,x:p.x||30,y:p.y||30,w:p.w||140,rot:p.rot||0});
+        }
+      });
+    }
+    currentView='editor';
+    render();
+    var titleEl=$('entryTitle');if(titleEl)setTimeout(function(){titleEl.focus({preventScroll:true})},100);
   }
+  function closeEditor(){currentView='home';editId=null;render()}
   function updateContentLabel(){
     var label=$('contentLabel');
     if(!label)return;
@@ -591,20 +669,84 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     else if(selectedType==='todo'){label.textContent='待办清单（每行一项）';$('entryContent').placeholder='- 买咖啡豆\n- 练琴\n- 健身房';$('entryTitle').placeholder='今日待办'}
     else{label.textContent='今天发生了什么？';$('entryContent').placeholder='不需要把每一天都写得很完整。\n\n你可以从任何一个小片段开始……';$('entryTitle').placeholder='给今天一个名字'}
   }
-  function renderEditorPhotos(){
-    var wrap=$('editorPhotos');
-    if(!wrap)return;
-    if(!activePhotos.length){wrap.innerHTML='';return}
-    wrap.innerHTML=activePhotos.map(function(src,i){
-      return '<div class="editor-photo-item"><img src="'+esc(src)+'" alt="预览"><button type="button" class="pg-remove" data-remove-photo="'+i+'" aria-label="移除">×</button></div>';
+  // 纸张底色（编辑器画布用）
+  var PAPER_CSS={
+    default:'#fdfcf7',
+    yellow:'linear-gradient(135deg,#fffbea,#fff3d6)',
+    pink:'linear-gradient(135deg,#fff5f7,#ffe8ed)',
+    blue:'linear-gradient(135deg,#f0f7ff,#e0eefc)',
+    green:'linear-gradient(135deg,#f3faf0,#e6f5df)',
+    lined:'repeating-linear-gradient(0deg,transparent 0,transparent 26px,rgba(0,0,0,.04) 27px),linear-gradient(135deg,#fdfcf7,#f6f4ec)'
+  };
+  // 贴纸（不用 emoji，用文字符号）
+  var STICKERS=['✿','★','♪','❀','✦','✓','◈','♡','☘','✿'];
+  var STICKER_NAMES=['花','星','音符','花','星','勾','菱形','心','叶','花'];
+  function renderEditor(){
+    var entry=editId?entries.find(function(e){return e.id===editId}):null;
+    var dateVal=entry?entry.date:(selectedEditorDate||todayKey());
+    var title=entry?(entry.title||''):'';
+    var content=entry?(entry.content||''):'';
+    var tags=entry?(entry.tags||[]).join(', '):'';
+    var types=['normal','quote','meal','todo'];
+    var typeHtml=types.map(function(t){
+      return '<button type="button" class="type-choice '+(selectedType===t?'active':'')+'" data-type="'+t+'">'+TYPE_LABELS[t]+'</button>';
     }).join('');
+    var moods=['平静','开心','疲惫','低落','期待'];
+    var moodHtml=moods.map(function(m){return '<button type="button" class="mood-choice '+(selectedMood===m?'active':'')+'" data-mood="'+m+'">'+m+'</button>'}).join('');
+    var weathers=[{v:'',n:'无'},{v:'晴',n:'晴'},{v:'阴',n:'阴'},{v:'雨',n:'雨'},{v:'雪',n:'雪'},{v:'夜',n:'夜'}];
+    var weatherHtml=weathers.map(function(w){return '<button type="button" class="weather-btn '+(selectedWeather===w.v?'active':'')+'" data-weather="'+esc(w.v)+'">'+w.n+'</button>'}).join('');
+    var paperHtml=['default','yellow','pink','blue','green','lined'].map(function(p){
+      return '<button type="button" class="paper-swatch p-'+p+' '+(selectedPaper===p?'active':'')+'" data-paper="'+p+'" title="'+p+'"></button>';
+    }).join('');
+    var stickerHtml=STICKERS.map(function(s,i){
+      return '<button type="button" class="sticker-btn '+(selectedStickers.indexOf(s)!==-1?'active':'')+'" data-sticker="'+s+'" title="'+STICKER_NAMES[i]+'">'+s+'</button>';
+    }).join('');
+    var paperBg=PAPER_CSS[selectedPaper]||PAPER_CSS.default;
+    var collageHtml=collageItems.map(function(it){
+      return '<div class="collage-item" data-cid="'+it.id+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.w+'px;transform:rotate('+it.rot+'deg)">'+
+        '<img src="'+esc(it.src)+'" alt="">'+
+        '<div class="collage-del" data-del-cid="'+it.id+'">×</div>'+
+        '<div class="collage-resize" data-resize-cid="'+it.id+'"></div>'+
+        '<div class="collage-rotate" data-rot-cid="'+it.id+'"></div>'+
+        '</div>';
+    }).join('');
+    return '<div class="editor-full">'+
+      '<div class="ef-head">'+
+        '<button class="ef-back" id="cancelEditor">返回</button>'+
+        '<div class="ef-title">'+(entry?'编辑日记':'写下一页')+'</div>'+
+        '<button class="ef-save" id="saveEntry">保存</button>'+
+      '</div>'+
+      '<div class="ef-body">'+
+        '<div class="ef-canvas-wrap">'+
+          '<div class="ef-canvas" id="efCanvas" style="background:'+paperBg+'">'+collageHtml+'</div>'+
+          '<div class="ef-canvas-tools">'+
+            '<button class="ct-btn" id="addPhotoBtn"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>添加图片</button>'+
+            '<button class="ct-btn" id="clearCollageBtn" '+(collageItems.length?'':'disabled')+'>清空画布</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="ef-fields">'+
+          '<div class="ef-row"><label class="field-label">日期</label><input class="editor-date" id="entryDate" type="date" value="'+esc(dateVal)+'"></div>'+
+          '<div class="ef-row"><label class="field-label">类型</label><div class="type-choices" id="typeChoices">'+typeHtml+'</div></div>'+
+          '<div class="ef-row"><label class="field-label" for="entryTitle">标题（可留空）</label><input class="editor-title" id="entryTitle" maxlength="80" value="'+esc(title)+'" placeholder="给今天一个名字"></div>'+
+          '<div class="ef-row"><label class="field-label" for="entryContent" id="contentLabel">今天发生了什么？</label><textarea class="editor-content" id="entryContent" maxlength="12000" placeholder="从一个小片段开始……">'+esc(content)+'</textarea></div>'+
+          '<div class="ef-meta">'+
+            '<div class="ef-col"><label class="field-label">心情</label><div class="mood-choices" id="moodChoices">'+moodHtml+'</div></div>'+
+            '<div class="ef-col"><label class="field-label" for="entryTags">标签（逗号分开）</label><input class="tag-input" id="entryTags" maxlength="120" value="'+esc(tags)+'" placeholder="生活, 灵感"></div>'+
+          '</div>'+
+          '<div class="ef-row"><label class="field-label">天气</label><div class="weather-row" id="weatherChoices">'+weatherHtml+'</div></div>'+
+          '<div class="ef-row"><label class="field-label" for="entryLocation">地点</label><input class="tag-input" id="entryLocation" maxlength="40" value="'+esc(selectedLocation)+'" placeholder="在哪里写下的？"></div>'+
+          '<div class="ef-row"><label class="field-label">装饰贴纸</label><div class="sticker-picker" id="stickerPicker">'+stickerHtml+'</div></div>'+
+          '<div class="ef-row"><label class="field-label">纸张底色</label><div class="paper-picker" id="paperPicker">'+paperHtml+'</div></div>'+
+          (entry?'<div class="ef-row"><button class="delete-entry" id="deleteEntry">删除这篇日记</button></div>':'')+
+        '</div>'+
+      '</div>'+
+      '</div>';
   }
-  function closeEditor(){editor.classList.remove('show');document.body.style.overflow=''}
   function saveEntry(){
     var date=$('entryDate').value||todayKey();
     var title=$('entryTitle').value.trim();
     var content=$('entryContent').value.trim();
-    if(!title&&!content&&!activePhotos.length){showToast('先写下一点内容吧');$('entryContent').focus();return}
+    if(!title&&!content&&!collageItems.length){showToast('先写下一点内容吧');$('entryContent').focus();return}
     var old=editId?entries.find(function(e){return e.id===editId}):null;
     var record=old||{id:'d_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8),createdAt:new Date().toISOString(),favorite:false};
     record.date=date;record.title=title;record.content=content;record.mood=selectedMood;
@@ -614,11 +756,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     record.stickers=selectedStickers.slice();
     record.paper=selectedPaper;
     record.tags=$('entryTags').value.split(/[,，、]/).map(function(t){return t.trim().replace(/^#+/,'')}).filter(Boolean).slice(0,12);
-    record.photos=activePhotos.slice();
+    record.photos=collageItems.map(function(it){return {id:it.id,src:it.src,x:it.x,y:it.y,w:it.w,rot:it.rot}});
     record.updatedAt=new Date().toISOString();
     if(!old)entries.push(record);
     if(!persist()){if(!old)entries.pop();return}
-    currentView='home';moodFilter='全部';query='';closeEditor();render();showToast(old?'日记已更新':'已保存到你的日记'); 
+    editId=null;currentView='home';moodFilter='全部';query='';render();showToast(old?'日记已更新':'已保存到你的日记'); 
   }
   function deleteCurrent(){
     if(!editId)return;
@@ -633,7 +775,6 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   }
   function processImage(file){
     if(!file){showToast('未选择文件');return}
-    if(activePhotos.length>=4){showToast('最多添加4张照片');return}
     if(!file.type||file.type.indexOf('image/')!==0){showToast('请选择图片文件');return}
     if(file.size>15*1024*1024){showToast('图片太大，请选15MB以内的');return}
     var reader=new FileReader();
@@ -653,16 +794,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
           ctx.drawImage(img,0,0,w,h);
           var data=canvas.toDataURL('image/jpeg',.72);
           if(!data||data.length<100)throw new Error('canvas empty');
-          activePhotos.push(data);
-          renderEditorPhotos();
-          showToast('已添加第 '+activePhotos.length+' 张照片');
+          addCollageItem(data);
         }catch(err){
-          // 降级：直接用原始 base64，不压缩
-          try{
-            activePhotos.push(raw);
-            renderEditorPhotos();
-            showToast('照片已添加（原图）');
-          }catch(e2){showToast('图片处理失败，请换一张')}
+          try{addCollageItem(raw)}catch(e2){showToast('图片处理失败，请换一张')}
         }
       };
       img.onerror=function(){showToast('图片读取失败，请换一张试试')};
@@ -670,6 +804,35 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     };
     reader.onerror=function(){showToast('图片读取失败')};
     try{reader.readAsDataURL(file)}catch(e){showToast('无法读取该图片')}
+  }
+  function addCollageItem(src){
+    var canvas=$('efCanvas');
+    var cw=canvas?canvas.clientWidth:300;
+    var n=collageItems.length;
+    collageItems.push({
+      id:'c_'+Date.now()+'_'+n,
+      src:src,
+      x:20+n*18,
+      y:20+n*18,
+      w:140,
+      rot:0
+    });
+    renderCollage();
+    showToast('图片已添加到画布，可拖动调整');
+  }
+  function renderCollage(){
+    var canvas=$('efCanvas');
+    if(!canvas)return;
+    canvas.innerHTML=collageItems.map(function(it){
+      return '<div class="collage-item" data-cid="'+it.id+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.w+'px;transform:rotate('+it.rot+'deg)">'+
+        '<img src="'+esc(it.src)+'" alt="">'+
+        '<div class="collage-del" data-del-cid="'+it.id+'">×</div>'+
+        '<div class="collage-resize" data-resize-cid="'+it.id+'"></div>'+
+        '<div class="collage-rotate" data-rot-cid="'+it.id+'"></div>'+
+        '</div>';
+    }).join('');
+    var clearBtn=$('clearCollageBtn');
+    if(clearBtn)clearBtn.disabled=!collageItems.length;
   }
   function exportBackup(){
     var data={app:'MAOMAO Journal',version:1,exportedAt:new Date().toISOString(),entries:entries};
@@ -702,10 +865,23 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     }else{
       body='<p class="exp-body">'+esc(text||'这一天，留下一点空白。')+'</p>';
     }
-    var photos=(e.photos||[]).slice(0,4);
+    var photos=(e.photos||[]).slice(0,6);
     var photoHTML='';
     if(photos.length){
-      photoHTML='<div class="exp-photos c'+photos.length+'">'+photos.map(function(src){return '<div class="exp-ph"><img src="'+esc(src)+'"></div>'}).join('')+'</div>';
+      var hasPos=photos.some(function(p){return p&&typeof p==='object'&&p.src});
+      if(hasPos){
+        var maxW=0,maxH=0;
+        photos.forEach(function(p){if(p&&typeof p==='object'){maxW=Math.max(maxW,(p.x||0)+(p.w||140));maxH=Math.max(maxH,(p.y||0)+(p.w||140))}});
+        photoHTML='<div class="exp-collage" style="position:relative;width:'+maxW+'px;height:'+maxH+'px;margin-bottom:16px">'+
+          photos.map(function(p){
+            if(p&&typeof p==='object'&&p.src){
+              return '<img src="'+esc(p.src)+'" style="position:absolute;left:'+(p.x||0)+'px;top:'+(p.y||0)+'px;width:'+(p.w||140)+'px;transform:rotate('+(p.rot||0)+'deg)" alt="">';
+            }
+            return '';
+          }).join('')+'</div>';
+      }else{
+        photoHTML='<div class="exp-photos c'+photos.length+'">'+photos.map(function(src){return '<div class="exp-ph"><img src="'+esc(src)+'"></div>'}).join('')+'</div>';
+      }
     }
     var tags=(e.tags||[]).slice(0,6).map(function(t){return '<span>#'+esc(t)+'</span>'}).join('');
     var bg=PAPER_BG[e.paper]||PAPER_BG.default;
@@ -808,8 +984,6 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
     if(createDate){openEditor(null,createDate.dataset.createDate);return}
     var date=e.target.closest('[data-date]');
     if(date){selectedCalendarDate=date.dataset.date;var dt=new Date(selectedCalendarDate+'T12:00:00');calendarMonth=new Date(dt.getFullYear(),dt.getMonth(),1);render();return}
-    var fav=e.target.closest('[data-favorite]');
-    if(fav){e.stopPropagation();toggleFavorite(fav.dataset.favorite);return}
     var exp=e.target.closest('[data-export-img]');
     if(exp){e.stopPropagation();exportEntryAsImage(exp.dataset.exportImg);return}
     var edit=e.target.closest('[data-edit]');
@@ -826,16 +1000,6 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   $('exportBtn').addEventListener('click',exportBackup);$('importBtn').addEventListener('click',function(){$('importFile').click()});
   $('importFile').addEventListener('change',function(){importBackup(this.files&&this.files[0]);this.value=''});
   $('clearSearchBtn').addEventListener('click',function(){query='';moodFilter='全部';currentView='home';closeMenu();render();showToast('已清除筛选')});
-  $('closeEditor').addEventListener('click',closeEditor);$('cancelEditor').addEventListener('click',closeEditor);
-  editor.addEventListener('click',function(e){if(e.target===editor)closeEditor()});
-  $('saveEntry').addEventListener('click',saveEntry);$('deleteEntry').addEventListener('click',deleteCurrent);
-  $('moodChoices').addEventListener('click',function(e){var b=e.target.closest('[data-mood]');if(!b)return;selectedMood=b.dataset.mood;document.querySelectorAll('.mood-choice').forEach(function(x){x.classList.toggle('active',x===b)})});
-  $('typeChoices').addEventListener('click',function(e){var b=e.target.closest('[data-type]');if(!b)return;selectedType=b.dataset.type;document.querySelectorAll('.type-choice').forEach(function(x){x.classList.toggle('active',x===b)});updateContentLabel()});
-  $('weatherChoices').addEventListener('click',function(e){var b=e.target.closest('[data-weather]');if(!b)return;selectedWeather=b.dataset.weather;document.querySelectorAll('.weather-btn').forEach(function(x){x.classList.toggle('active',x===b)})});
-  $('stickerPicker').addEventListener('click',function(e){var b=e.target.closest('[data-sticker]');if(!b)return;var s=b.dataset.sticker;var idx=selectedStickers.indexOf(s);if(idx>=0){selectedStickers.splice(idx,1);b.classList.remove('active')}else{if(selectedStickers.length>=3){showToast('最多选3个贴纸');return}selectedStickers.push(s);b.classList.add('active')}});
-  $('paperPicker').addEventListener('click',function(e){var b=e.target.closest('[data-paper]');if(!b)return;selectedPaper=b.dataset.paper;document.querySelectorAll('.paper-swatch').forEach(function(x){x.classList.toggle('active',x===b)})});
-  $('decorToggle').addEventListener('click',function(){$('collapseDecor').classList.toggle('open');var arr=$('decorArrow');if(arr)arr.textContent=$('collapseDecor').classList.contains('open')?'▴':'▾'});
-  $('editorPhotos').addEventListener('click',function(e){var b=e.target.closest('[data-remove-photo]');if(!b)return;var i=parseInt(b.dataset.removePhoto,10);activePhotos.splice(i,1);renderEditorPhotos()});
   $('entryPhoto').addEventListener('change',function(){processImage(this.files&&this.files[0]);this.value=''});
   $('aboutExport')&&$('aboutExport').addEventListener('click',exportBackup);
   $('aboutImport')&&$('aboutImport').addEventListener('click',function(){$('importFile').click()});
