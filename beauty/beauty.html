@@ -196,7 +196,7 @@
         <button class="circle-btn" onclick="document.getElementById('importFile').click()" title="导入CSS文件">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </button>
-        <button class="copy-btn" onclick="copyRef()">复制当前 CSS</button>
+        <button class="copy-btn" onclick="copyRef()">复制聊天全局 CSS</button>
       </div>
       <input type="file" id="importFile" accept=".css,.txt" style="display:none;">
       <div class="preset-list" id="presetList"></div>
@@ -432,7 +432,7 @@ function copyRef(){
     return;
   }
   var text = current.css;
-  function copied(){ showToast('已复制当前 CSS'); }
+  function copied(){ showToast('已复制聊天全局 CSS'); }
   function fallbackCopy(){
     var ta = document.createElement('textarea');
     ta.value = text;
