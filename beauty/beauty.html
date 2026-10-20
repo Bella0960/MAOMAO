@@ -227,7 +227,12 @@ var LIST_KEY = 'beauty_presets';
 var ACTIVE_KEY = 'beauty_active';
 var editingIndex = -1;
 
-function getPresets(){ try { return JSON.parse(localStorage.getItem(LIST_KEY)||'[]'); } catch(e){ return []; } }
+function getPresets(){
+  try {
+    var value = JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
+    return Array.isArray(value) ? value.filter(function(p){ return p && typeof p === 'object'; }) : [];
+  } catch(e){ return []; }
+}
 function setPresets(p){ localStorage.setItem(LIST_KEY, JSON.stringify(p)); }
 function getActive(){ try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); } catch(e){ return {}; } }
 function setActive(o){ localStorage.setItem(ACTIVE_KEY, JSON.stringify(o)); }
@@ -264,10 +269,10 @@ function setCurrentTarget(t){
 function targetLabel(t){
   if (t === 'all') return '聊天全局';
   try {
-    var roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]');
-    var r = roles.find(function(x){ return x.id === t; });
-    return r ? r.name : '';
-  } catch(e){ return ''; }
+    var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
+    var r = Array.isArray(roles) && roles.find(function(x){ return x.id === t; });
+    return r ? r.name : '角色已不存在';
+  } catch(e){ return '角色已不存在'; }
 }
 
 function renderList(){
@@ -290,16 +295,24 @@ function renderList(){
     '</div>';
   }).join('');
 }
-function esc(s){ return String(s).replace(/</g,'&lt;'); }
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 function usePreset(i){
   var list = getPresets();
   var p = list[i];
   if (!p) return;
   var active = getActive();
-  active[p.target] = p.name;
-  setActive(active);
-  showToast('已启用 · 聊天列表与聊天页面下次打开时生效');
+  if (active[p.target] === p.name) {
+    delete active[p.target];
+    setActive(active);
+    showToast('已停用这个美化预设');
+  } else {
+    active[p.target] = p.name;
+    setActive(active);
+    showToast('已启用 · 聊天列表与聊天页面下次打开时生效');
+  }
   renderList();
 }
 function delPreset(e, i){
@@ -345,24 +358,63 @@ function goBack(){
   if (document.getElementById('editView').classList.contains('show')) showList();
   else history.back();
 }
+function validatePresetCSS(css){
+  if (!css || !css.trim()) return 'CSS 内容是空的，先粘贴或导入样式。';
+  var stack = [], quote = '', escaped = false, comment = false;
+  for (var i = 0; i < css.length; i++) {
+    var ch = css[i], next = css[i + 1];
+    if (comment) {
+      if (ch === '*' && next === '/') { comment = false; i++; }
+      continue;
+    }
+    if (quote) {
+      if (escaped) { escaped = false; continue; }
+      if (ch === '\\\\') { escaped = true; continue; }
+      if (ch === quote) quote = '';
+      continue;
+    }
+    if (ch === '/' && next === '*') { comment = true; i++; continue; }
+    if (ch === '"' || ch === "'") { quote = ch; continue; }
+    if (ch === '{' || ch === '(' || ch === '[') stack.push({ch:ch, index:i});
+    if (ch === '}' || ch === ')' || ch === ']') {
+      var top = stack.pop();
+      var expected = ch === '}' ? '{' : ch === ')' ? '(' : '[';
+      if (!top || top.ch !== expected) return 'CSS 括号不匹配，请检查第 ' + (i + 1) + ' 个字符附近。';
+    }
+  }
+  if (comment) return 'CSS 注释没有结束，请补上 */。';
+  if (quote) return 'CSS 字符串没有闭合，请检查引号。';
+  if (stack.length) return 'CSS 括号没有闭合，请检查第 ' + (stack[stack.length - 1].index + 1) + ' 个字符附近。';
+  return '';
+}
 function savePreset(){
   var name = document.getElementById('presetName').value.trim();
   var css = document.getElementById('presetCss').value;
   var target = getCurrentTarget();
-  if (!name) { showToast('起个名字'); return; }
+  if (!name) { showToast('请先填写预设名称'); return; }
+  var cssError = validatePresetCSS(css);
+  if (cssError) { showToast(cssError); return; }
+
   var list = getPresets();
   var previous = editingIndex >= 0 ? list[editingIndex] : null;
+  var duplicate = list.some(function(p, index){
+    return index !== editingIndex && p.target === target && p.name.trim() === name;
+  });
+  if (duplicate) { showToast('这个作用范围里已有同名预设，请换个名字'); return; }
+
+  if (editingIndex >= 0 && !previous) { showToast('预设不存在，已取消保存'); showList(); return; }
   if (editingIndex >= 0) list[editingIndex] = { name: name, css: css, target: target };
   else list.push({ name: name, css: css, target: target });
   setPresets(list);
-  // 保存不等于启用。已启用的预设重命名时同步状态；改作用范围时清除旧范围的启用记录。
+
+  // 仅当原预设已启用时才同步改名；改作用范围则解除旧范围启用状态。
   var active = getActive();
   if (previous && active[previous.target] === previous.name) {
     if (previous.target === target) active[target] = name;
     else delete active[previous.target];
     setActive(active);
   }
-  showToast('已保存预设');
+  showToast('已保存预设 · 保存不会自动启用');
   setTimeout(function(){ showList(); }, 350);
 }
 
