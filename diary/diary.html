@@ -146,6 +146,48 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 @media(min-width:501px){.phone-mockup{height:min(890px,calc(100vh - 28px))}.app-scroll{padding-bottom:26px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.entries.anim .entry-card{animation-delay:0s!important}}
 </style>
+
+<style id="maomao-editorial-controls">
+
+/* MAOMAO editorial controls — typography, fine rules, quiet interaction */
+:root{--ink:#171717;--text:#444;--muted:#888;--line:#dedede;--paper:#fff;--soft:#f7f7f7;--soft2:#f1f1f1}
+button{transition:color .22s,background-color .22s,border-color .22s,transform .22s}
+.round-btn{border:0;border-bottom:1px solid #c9c9c9;border-radius:0;background:transparent;box-shadow:none;width:32px;height:32px}
+.round-btn:active{background:transparent;transform:translateY(1px);border-color:#171717}
+.hero h1{font-family:var(--serif,Georgia,"Times New Roman",serif);font-weight:400;letter-spacing:-.075em}
+.eyebrow,.section-meta,.stat-label,.prompt-copy .label{letter-spacing:.16em}
+.stats-row{gap:16px}
+.stat{border-radius:0;background:transparent;border-top:1px solid var(--line);padding:12px 2px 10px;min-height:70px}
+.prompt{border:0;border-left:1px solid #bcbcbc;border-radius:0;box-shadow:none;background:transparent;padding:9px 0 9px 13px}
+.search-wrap{background:transparent;border:0;border-bottom:1px solid #d7d7d7;border-radius:0;padding:0 2px}
+.search-wrap:focus-within{border-color:#171717;background:transparent}
+.filter-row{gap:15px}
+.filter-chip{border:0;border-radius:0;background:transparent;padding:7px 1px 8px;color:#888;position:relative}
+.filter-chip:after{content:"";position:absolute;left:0;bottom:2px;width:0;height:1px;background:#171717;transition:width .22s}
+.filter-chip.active{background:transparent;border-color:transparent;color:#171717}
+.filter-chip.active:after,.filter-chip:hover:after{width:100%}
+.entries{gap:0}
+.entry-card{border:0;border-top:1px solid var(--line);border-radius:0;padding:17px 2px 15px;background:transparent;box-shadow:none}
+.entry-card:active{transform:none;background:#fafafa}
+.entry-mood{border:0;border-bottom:1px solid #d7d7d7;border-radius:0;padding:4px 1px}
+.entry-photo{border-radius:1px;filter:none}
+.entry-bottom{border-top:1px solid #e5e5e5}
+.tiny-tag{border-radius:0;background:#f3f3f3}
+.text-btn,.prompt-refresh,.sheet-link,.mini-action{position:relative;border-radius:0;text-decoration:none;padding-left:0;padding-right:0}
+.text-btn:after,.prompt-refresh:after,.sheet-link:after,.mini-action:after{content:"";position:absolute;left:0;bottom:1px;width:20px;height:1px;background:#b8b8b8;transition:width .22s,background .22s}
+.text-btn:hover:after,.prompt-refresh:hover:after,.sheet-link:hover:after,.mini-action:hover:after{width:100%;background:#171717}
+.empty-state{border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.calendar-actions button{border:0;border-bottom:1px solid #bdbdbd;border-radius:0;background:transparent}
+.date-cell{border-radius:0}
+.date-cell.selected{background:#171717}
+.tab-add{width:40px;height:40px;border:0;border-bottom:1px solid #171717;border-radius:0;background:transparent;color:#171717;box-shadow:none;margin-top:-8px}
+.tab-add:active{transform:translateY(1px);box-shadow:none;background:transparent}
+.editor-sheet{border-radius:0;border-top:1px solid #171717;box-shadow:0 -10px 30px rgba(0,0,0,.08)}
+.editor-title{font-family:var(--serif,Georgia,"Times New Roman",serif);font-weight:400}
+.mood-choice{border-radius:0}
+@media(hover:hover){.entry-card:hover{background:#fafafa}.round-btn:hover{color:#000;border-color:#171717}}
+
+</style>
 </head>
 <body>
 <div class="phone-mockup">
