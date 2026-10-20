@@ -1701,15 +1701,15 @@
 
         <!-- 底部输入区：轻量文字输入 + 更多功能 -->
         <form class="input-dock" id="chat-form" action="javascript:void(0);">
-            <div class="input-capsule">
-                <textarea class="real-input" id="chat-input" rows="1" placeholder="发送消息…" autocomplete="off" enterkeyhint="send"></textarea>
-                <button class="send-icon-btn" type="submit" aria-label="发送">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
-            </div>
             <button class="plus-action-btn" type="button" id="plus-action-btn" aria-label="更多功能">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
+            <div class="input-capsule">
+                <textarea class="real-input" id="chat-input" rows="1" placeholder="发送消息…" autocomplete="off" enterkeyhint="send"></textarea>
+                <button class="send-icon-btn" type="submit" aria-label="发送">
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6c-2.2-2.2-5.7-2.2-7.9 0L12 5.5l-.9-.9c-2.2-2.2-5.7-2.2-7.9 0s-2.2 5.7 0 7.9L12 21l8.8-8.5c2.2-2.2 2.2-5.7 0-7.9Z"/></svg>
+                </button>
+            </div>
         </form>
 
         <!-- 消息多选底部栏 -->
@@ -4674,5 +4674,87 @@
   setTimeout(checkAutoSummary, 1500);
 })();
 </script>
+
+<style id="maomao-chatgpt-inspired-composer">
+/* MAOMAO composer: airy translucent capsule, editorial black-and-white */
+.input-dock {
+  display:flex !important; align-items:flex-end !important; gap:7px !important;
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
+  background:rgba(248,248,250,.58) !important;
+  border-top:1px solid rgba(30,30,35,.055) !important;
+  backdrop-filter:blur(22px) saturate(120%) !important;
+  -webkit-backdrop-filter:blur(22px) saturate(120%) !important;
+}
+.input-capsule {
+  order:2 !important; flex:1 1 auto !important; min-width:0 !important;
+  min-height:43px !important; padding:6px 7px 6px 15px !important;
+  gap:8px !important; border-radius:999px !important;
+  background:rgba(255,255,255,.48) !important;
+  border:1px solid rgba(25,25,30,.12) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 2px 9px rgba(20,20,25,.025) !important;
+  backdrop-filter:blur(24px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(125%) !important;
+  transition:background .18s ease,border-color .18s ease !important;
+}
+.input-capsule:focus-within {
+  background:rgba(255,255,255,.66) !important;
+  border-color:rgba(25,25,30,.2) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.7) !important;
+}
+.real-input {
+  font-size:14px !important; line-height:1.45 !important;
+  min-height:25px !important; max-height:88px !important;
+  padding:3px 0 !important; color:#19191d !important;
+}
+.real-input::placeholder { color:rgba(40,40,46,.42) !important; }
+.send-icon-btn {
+  order:2 !important; width:31px !important;height:31px !important;
+  min-width:31px !important; border-radius:50% !important;
+  color:#17171b !important; background:transparent !important;
+  border:0 !important; box-shadow:none !important;
+  opacity:.95 !important; padding:0 !important;
+}
+.send-icon-btn svg { width:21px !important;height:21px !important; }
+.send-icon-btn.disabled { opacity:.42 !important; }
+.send-icon-btn:active { transform:scale(.9) !important; }
+.plus-action-btn {
+  order:1 !important; flex:0 0 27px !important;
+  width:27px !important;height:27px !important;
+  margin:0 0 8px 0 !important; padding:0 !important;
+  color:#111 !important; background:transparent !important;
+  border:0 !important; opacity:.92 !important;
+}
+.plus-action-btn svg { width:16px !important;height:16px !important; }
+.plus-action-btn:active { transform:scale(.9) !important; }
+.plus-panel-overlay { z-index:320 !important; }
+.plus-panel-backdrop { background:rgba(20,20,24,.025) !important; }
+.plus-panel-sheet {
+  left:12px !important; right:auto !important; bottom:74px !important;
+  width:min(226px,calc(100% - 24px)) !important;
+  max-height:min(54vh,390px) !important;
+  padding:11px 11px 9px !important;
+  border-radius:4px 13px 4px 13px !important;
+  background:rgba(235,235,239,.42) !important;
+  border:1px solid rgba(255,255,255,.38) !important;
+  border-top-color:rgba(255,255,255,.62) !important;
+  backdrop-filter:blur(28px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(125%) !important;
+  box-shadow:0 8px 26px rgba(15,15,20,.065),inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+.plus-panel-head { margin-bottom:8px !important;padding-bottom:8px !important; }
+.plus-panel-title { font-size:17px !important; }
+.plus-panel-kicker { font-size:7px !important;letter-spacing:1.25px !important; }
+.plus-panel-close { transform:scale(.88); }
+.plus-grid { gap:8px 5px !important; }
+.plus-item { min-height:52px !important; gap:5px !important;padding:3px 2px !important; }
+.plus-icon-circle { width:25px !important;height:25px !important;border-radius:8px !important; }
+.plus-icon-circle svg { width:15px !important;height:15px !important; }
+.plus-label { font-size:9px !important; }
+@media(max-width:380px) {
+ .input-dock { gap:5px !important;padding-left:10px !important;padding-right:10px !important; }
+ .input-capsule { min-height:41px !important;padding-left:13px !important; }
+ .plus-panel-sheet { left:10px !important;bottom:70px !important;width:min(218px,calc(100% - 20px)) !important; }
+}
+</style>
+
 </body>
 </html>
