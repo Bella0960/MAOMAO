@@ -8,7 +8,7 @@
 <script src="../js/native-feel.js"></script>
 <style>
 /* ============================================================
-   MAOMAO — Editorial Library
+   MAOMAO — Editorial Reading App
    风格规范：超大衬线标题 / 眉题 kicker / 侧栏编号 / 细线上下框
    / 渐变灰度图版 / 斜体衬线文字按钮 / 极小节距标注 / 大量留白
    红线：无 Emoji、隐藏滚动条、封面无阴影无圆角
@@ -19,6 +19,7 @@
   --muted:#777;
   --soft:#bdbdbd;
   --line:#d8d8d8;
+  --tabbar-h:58px;
   --serif:"Bodoni MT","Didot","Times New Roman","Songti SC","Noto Serif CJK SC","STSong",serif;
   --sans:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
 }
@@ -31,17 +32,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 *{scrollbar-width:none;-ms-overflow-style:none}
 
 /* ===== 手机外框 ===== */
-.phone-mockup{position:relative;width:min(410px,calc(100vw - 24px));height:min(890px,calc(100dvh - 24px));min-height:620px;margin:12px auto;background:#fff;overflow:hidden}
+.phone-mockup{position:relative;width:min(410px,calc(100vw - 24px));height:min(890px,calc(100dvh - 24px));min-height:620px;margin:12px auto;background:#fff;overflow:hidden;overflow:clip}
 @media(max-width:500px){
   html,body{background:#fff}
   .phone-mockup{width:100%;height:100dvh;min-height:0;margin:0}
 }
 
 /* ===== 视图容器 + 平滑切换 ===== */
-.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper);
-  transition:opacity .34s cubic-bezier(.32,.72,0,1),transform .34s cubic-bezier(.32,.72,0,1);will-change:opacity,transform}
-.view.is-hidden{opacity:0;pointer-events:none;transform:translateX(26px)}
-#shelfView.is-hidden{transform:translateX(-26px)}
+.view{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;background:var(--paper);
+  transition:opacity .34s cubic-bezier(.32,.72,0,1),transform .34s cubic-bezier(.32,.72,0,1),visibility .34s;will-change:opacity,transform}
+.view.above-tabbar{inset:0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0}
+.view.reader{z-index:30}
+.view.is-hidden{opacity:0;pointer-events:none;transform:translateX(26px);visibility:hidden}
 
 /* ===== 顶部细黑线 + 页眉 ===== */
 .topline{flex:0 0 auto;height:1px;background:var(--ink);margin:0 22px}
@@ -96,51 +98,147 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .foot-copy{font-size:8px;letter-spacing:.14em;color:#777;line-height:1.9;text-transform:uppercase}
 .foot-num{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
 
-/* ===== 底部操作区：斜体衬线文字按钮 ===== */
-.shelf-foot{flex:0 0 auto;padding:16px 22px calc(16px + env(safe-area-inset-bottom))}
+/* ===== 书架底部操作区：斜体衬线文字按钮 + 注脚 ===== */
+.shelf-actions{padding:24px 0 30px}
 .action-row{display:flex;align-items:center;gap:26px}
 .text-action{position:relative;padding:4px 0 9px;font-family:var(--serif);font-size:16px;font-style:italic;letter-spacing:.02em;color:var(--ink)}
 .text-action:after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;transform:scaleX(.55);transform-origin:left;transition:transform .28s ease}
 .text-action:active:after{transform:scaleX(1)}
 .text-action.subtle{color:#666}
-.bottom-note{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);margin-top:16px;padding-top:13px;font-size:8px;letter-spacing:.16em;color:#8c8c8c;text-transform:uppercase}
+.bottom-note{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);margin-top:18px;padding-top:13px;font-size:8px;letter-spacing:.16em;color:#8c8c8c;text-transform:uppercase}
 
-/* ===== 轻提示（黑白灰，无圆角） ===== */
-.toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:20;
-  background:var(--ink);color:#fff;padding:10px 16px;font-size:11px;letter-spacing:.05em;white-space:nowrap;
-  transition:opacity .24s ease,transform .24s ease}
-.toast.show{opacity:1;transform:translate(-50%,0)}
+/* ===== 设置列表：细线行，无圆角无阴影 ===== */
+.set-block{padding:22px 0 4px}
+.set-list{border-top:1px solid var(--line)}
+.set-row{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);text-align:left}
+.set-label{display:block;font-size:11px;letter-spacing:.06em;color:var(--ink)}
+.set-sub{display:block;font-size:7px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:5px}
+.set-right{display:inline-flex;align-items:center;gap:10px}
+.set-value{font-size:10px;letter-spacing:.1em;color:#555}
+.swatch{width:20px;height:20px;border:1px solid var(--line);background:#fff}
+.step{width:26px;height:26px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink)}
+.step:active{background:#f2f2f2}
+.step.is-off{color:#c8c8c8}
+
+/* ===== 底部状态栏导航 ===== */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 0 8px;color:#b5b5b5;transition:color .22s ease}
+.tab-item svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.tab-label{font-size:9px;letter-spacing:.14em}
+.tab-item.is-active{color:var(--ink)}
 
 /* ===== 阅读器视图 ===== */
-.reader-head{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:15px 22px 12px;border-bottom:1px solid var(--line)}
-.reader-title{flex:1;min-width:0;font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:.02em;color:var(--ink);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reader-body{flex:1;min-height:0;overflow:auto;padding:26px 26px 72px;scrollbar-width:none}
+.reader-head{position:relative;flex:0 0 auto;display:flex;align-items:center;padding:15px 22px 12px;border-bottom:1px solid var(--line)}
+.head-back{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;color:var(--ink)}
+.head-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.reader-title{position:absolute;left:50%;transform:translateX(-50%);max-width:60%;margin:0;text-align:center;
+  font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.02em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reader-body{flex:1;min-height:0;overflow:auto;padding:26px 26px 88px;scrollbar-width:none;background:var(--reader-bg,#fff);transition:background .3s ease}
 .reader-content{max-width:330px;margin:0 auto}
 .reader-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .reader-chapter{margin:30px 0 24px}
-.chapter-no{font-size:8px;letter-spacing:.28em;color:#8c8c8c;text-transform:uppercase}
+.chapter-no{font-size:8px;letter-spacing:.28em;color:#8c8c8c}
 .chapter-title{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.08;letter-spacing:-.04em;margin:9px 0 0}
-.reader-content p{font-family:var(--serif);font-size:15px;line-height:1.8;color:#2c2c2c;margin:0 0 1.5em;text-indent:2em;text-align:justify}
+.reader-content p{font-family:var(--serif);font-size:var(--reader-fs,15px);line-height:1.8;color:var(--reader-ink,#2c2c2c);margin:0 0 1.5em;text-indent:2em;text-align:justify}
 .reader-divider{width:26px;height:1px;background:var(--ink);opacity:.5;margin:34px auto}
 .reader-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:13px;border-top:1px solid var(--line)}
 .reader-foot .foot-num{font-size:18px}
 
+/* 阅读器底部控制栏：点击屏幕中间滑出 */
+.reader-controls{position:absolute;left:0;right:0;bottom:0;z-index:35;display:flex;background:#fff;border-top:1px solid var(--ink);
+  padding-bottom:env(safe-area-inset-bottom);transform:translateY(101%);visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.reader-controls.is-open{transform:translateY(0);visibility:visible}
+.ctrl{flex:1;padding:16px 0;text-align:center;font-size:10px;letter-spacing:.2em;color:#444;border-left:1px solid var(--line)}
+.ctrl:first-child{border-left:0}
+.ctrl.is-off{color:#c8c8c8;pointer-events:none}
+
+/* 遮罩 + 目录面板（从底部滑出） */
+.sheet-backdrop{position:absolute;inset:0;z-index:40;background:rgba(20,20,20,.22);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease,visibility .3s}
+.sheet-backdrop.is-open{opacity:1;pointer-events:auto;visibility:visible}
+.toc-sheet{position:absolute;left:0;right:0;bottom:0;z-index:45;display:flex;flex-direction:column;max-height:66%;background:#fff;border-top:1px solid var(--ink);
+  transform:translateY(101%);visibility:hidden;transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.toc-sheet.is-open{transform:translateY(0);visibility:visible}
+.toc-head{flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:16px 22px 12px;border-bottom:1px solid var(--line);
+  font-size:9px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+.toc-list{flex:1;min-height:0;overflow:auto;padding:4px 22px calc(20px + env(safe-area-inset-bottom))}
+.toc-item{display:flex;width:100%;align-items:baseline;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);text-align:left}
+.toc-no{min-width:22px;font-family:var(--serif);font-size:11px;letter-spacing:.04em;color:#9a9a9a}
+.toc-name{font-family:var(--serif);font-size:13px;color:#666}
+.toc-item.is-current .toc-no,.toc-item.is-current .toc-name{color:var(--ink)}
+.toc-item.is-current .toc-name{font-style:italic}
+
+/* ===== 轻提示（黑白灰，无圆角） ===== */
+.toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:60;
+  background:var(--ink);color:#fff;padding:10px 16px;font-size:11px;letter-spacing:.05em;white-space:nowrap;
+  transition:opacity .24s ease,transform .24s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
 /* ===== 动效 / 可访问性 ===== */
 @media(prefers-reduced-motion:reduce){
-  .view,.text-action:after,.back-line:after{transition:none!important}
+  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.sheet-backdrop{transition:none!important}
   .view.is-hidden{transform:none!important}
 }
 </style>
 </head>
 <body>
-<div class="phone-mockup">
+<div class="phone-mockup" id="phone">
 
-  <!-- ==================== 书架视图 ==================== -->
-  <section class="view" id="shelfView" aria-label="私人藏书室">
-
+  <!-- ==================== 页面 A：起始页 ==================== -->
+  <section class="view above-tabbar" id="homeView" aria-label="起始页">
     <div class="topline"></div>
     <header class="site-head">
-      <button class="back-line" id="backHome" aria-label="返回桌面" title="返回桌面">
+      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
+        <span style="font-size:11px">返回桌面</span>
+      </button>
+      <div class="head-brand">
+        <div class="wordmark">MAOMAO <span>/ READING</span></div>
+        <div class="head-note">Explore today</div>
+      </div>
+    </header>
+
+    <div class="scroll">
+      <section class="hero">
+        <div class="poster-meta">
+          <span>Explore / 001</span>
+          <span>Edition 2026</span>
+        </div>
+        <div class="kicker">Welcome back</div>
+        <div class="hero-row">
+          <div>
+            <h1 class="hero-title">安静地<em>读一会儿</em></h1>
+            <p class="cn-title">今天，从哪一页开始</p>
+            <p class="description">挑一本书，把这一小段时间留给自己。<br>字会替你记得，那些说不出口的停顿。</p>
+          </div>
+          <aside class="side-index">
+            <div class="index-no">01</div>
+            <div class="index-label" id="homeIndexLabel">TWO<br>PICKS<br>TODAY</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="shelf-block">
+        <div class="section-head">
+          <span class="section-title">今日推荐</span>
+          <span class="section-count" id="homeCount">02 Volumes</span>
+        </div>
+        <div class="shelf-grid" id="homeGrid"><!-- 推荐书籍由 JS 渲染 --></div>
+      </section>
+
+      <div class="poster-foot">
+        <div class="foot-copy">Start here<br>read a little</div>
+        <div class="foot-num">MM—00</div>
+      </div>
+      <div style="height:26px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 B：书架 ==================== -->
+  <section class="view above-tabbar is-hidden" id="shelfView" aria-label="私人藏书室" aria-hidden="true">
+    <div class="topline"></div>
+    <header class="site-head">
+      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
         <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
         <span style="font-size:11px">返回桌面</span>
       </button>
@@ -150,9 +248,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       </div>
     </header>
 
-    <div class="scroll" id="shelfScroll">
-
-      <!-- 海报式标题 -->
+    <div class="scroll">
       <section class="hero">
         <div class="poster-meta">
           <span>Collection / 001</span>
@@ -172,7 +268,6 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
         </div>
       </section>
 
-      <!-- 书架 -->
       <section class="shelf-block">
         <div class="section-head">
           <span class="section-title">架上藏书</span>
@@ -186,32 +281,114 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
         <div class="foot-num">MM—01</div>
       </div>
 
+      <!-- 操作区：放在列表最下方 -->
+      <div class="shelf-actions">
+        <div class="action-row">
+          <button class="text-action" type="button" id="importBtn">导入本地书籍</button>
+          <button class="text-action subtle" type="button" id="writeBtn">让 TA 写一本</button>
+        </div>
+        <div class="bottom-note">
+          <span>Maomao / Reading Room</span>
+          <span>Fine lines &amp; type</span>
+        </div>
+      </div>
     </div>
-
-    <footer class="shelf-foot">
-      <div class="action-row">
-        <button class="text-action" type="button" id="importBtn">导入本地书籍</button>
-        <button class="text-action subtle" type="button" id="writeBtn">让 TA 写一本</button>
-      </div>
-      <div class="bottom-note">
-        <span>Maomao / Reading Room</span>
-        <span>Fine lines &amp; type</span>
-      </div>
-    </footer>
 
     <!-- 隐藏的本地文件选择器：仅接受 .txt -->
     <input type="file" id="importFile" accept=".txt,text/plain" hidden>
   </section>
 
-  <!-- 轻提示 -->
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <!-- ==================== 阅读器视图 ==================== -->
-  <section class="view is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
-    <header class="reader-head">
-      <button class="back-line" id="backToShelf" aria-label="返回书架" title="返回书架">
+  <!-- ==================== 页面 C：设置 ==================== -->
+  <section class="view above-tabbar is-hidden" id="settingsView" aria-label="设置" aria-hidden="true">
+    <div class="topline"></div>
+    <header class="site-head">
+      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
         <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
-        <span style="font-size:11px">返回书架</span>
+        <span style="font-size:11px">返回桌面</span>
+      </button>
+      <div class="head-brand">
+        <div class="wordmark">MAOMAO <span>/ READING</span></div>
+        <div class="head-note">Preferences</div>
+      </div>
+    </header>
+
+    <div class="scroll">
+      <section class="hero">
+        <div class="poster-meta">
+          <span>Settings / 001</span>
+          <span>Preference</span>
+        </div>
+        <div class="kicker">Reading room</div>
+        <h1 class="hero-title">设置</h1>
+        <p class="cn-title">让阅读更合自己的眼睛</p>
+      </section>
+
+      <section class="set-block">
+        <div class="section-head">
+          <span class="section-title">阅读偏好</span>
+          <span class="section-count">03 Items</span>
+        </div>
+        <div class="set-list">
+          <button class="set-row" type="button" id="bgRow">
+            <span>
+              <span class="set-label">阅读背景颜色</span>
+              <span class="set-sub">Reading background</span>
+            </span>
+            <span class="set-right">
+              <span class="swatch" id="bgSwatch"></span>
+              <span class="set-value" id="bgValue">白纸</span>
+            </span>
+          </button>
+          <div class="set-row">
+            <span>
+              <span class="set-label">字体大小</span>
+              <span class="set-sub">Type size</span>
+            </span>
+            <span class="set-right">
+              <button class="step" type="button" id="fsDown" aria-label="减小字号">−</button>
+              <span class="set-value" id="fsValue">15</span>
+              <button class="step" type="button" id="fsUp" aria-label="增大字号">+</button>
+            </span>
+          </div>
+          <button class="set-row" type="button" id="clearRow">
+            <span>
+              <span class="set-label">清空本地书籍</span>
+              <span class="set-sub">Remove imported books</span>
+            </span>
+            <span class="set-value" id="clearValue">清空</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="poster-foot">
+        <div class="foot-copy">Maomao / Reading Room<br>keep it quiet</div>
+        <div class="foot-num">MM—02</div>
+      </div>
+      <div style="height:26px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 底部状态栏导航 ==================== -->
+  <nav class="tabbar" id="tabbar" aria-label="主导航">
+    <button class="tab-item" type="button" data-route="home" aria-label="起始页">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.4 8.6-2.1 4.7-4.7 2.1 2.1-4.7z"/></svg>
+      <span class="tab-label">起始页</span>
+    </button>
+    <button class="tab-item" type="button" data-route="shelf" aria-label="书架">
+      <svg viewBox="0 0 24 24"><path d="M12 7.2C10.9 6 9.3 5.4 7 5.4H4v12h3.6c1.9 0 3.3.6 4.4 1.8 1.1-1.2 2.5-1.8 4.4-1.8H20v-12h-3c-2.3 0-3.9.6-5 1.8Z"/><path d="M12 7.2v12"/></svg>
+      <span class="tab-label">书架</span>
+    </button>
+    <button class="tab-item" type="button" data-route="settings" aria-label="设置">
+      <svg viewBox="0 0 24 24"><path d="M4 7.5h16M4 12h16M4 16.5h16"/><circle cx="9" cy="7.5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="16.5" r="2"/></svg>
+      <span class="tab-label">设置</span>
+    </button>
+  </nav>
+
+  <!-- ==================== 阅读器（全屏） ==================== -->
+  <section class="view reader is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
+    <header class="reader-head">
+      <button class="head-back" id="readerBack" type="button" aria-label="返回书架" title="返回书架">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
       </button>
       <h2 class="reader-title" id="readerTitle">书名</h2>
     </header>
@@ -220,57 +397,129 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     </main>
   </section>
 
+  <!-- 控制栏 + 目录面板 -->
+  <div class="reader-controls" id="readerControls">
+    <button class="ctrl" type="button" id="ctrlToc">目录</button>
+    <button class="ctrl" type="button" id="ctrlPrev">上一章</button>
+    <button class="ctrl" type="button" id="ctrlNext">下一章</button>
+  </div>
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="toc-sheet" id="tocSheet" aria-label="目录">
+    <div class="toc-head">
+      <span>Contents / 目录</span>
+      <span id="tocCount">03</span>
+    </div>
+    <div class="toc-list" id="tocList"></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  /* ===== 假数据：3 本书 ===== */
+  /* ===== 书籍数据：每本含多章，章内含段落 ===== */
   var books = [
     {
-      id: 'b1', name: '月光与回声', author: '林远舟', chapter: '第一章',
-      content: [
-        '夜色把整座城市收进一只旧木匣，街灯像被遗忘的纽扣，一颗一颗亮在潮湿的空气里。她推开窗，风带着远处江水的气息，轻轻擦过耳侧。',
-        '很多年以后，她仍然记得那个夜晚的温度。不是因为发生了什么惊天动地的事，而是因为那是她第一次意识到，原来告别可以安静得像一片叶子落在水面。',
-        '楼下的便利店还开着，日光灯把门口一小块地方照得发白。她忽然很想下去走一走，不为买什么，只是想让脚底碰到真实的地面。',
-        '第二天清晨，她在枕边发现一张纸条，上面只有一行字：我把回声寄给你了。字是他的笔迹，瘦而长，像他说话时总带着的那点犹豫。'
+      id: 'b1', name: '月光与回声', author: '林远舟',
+      chapters: [
+        { label: '第一章', title: '夜色与纽扣', paras: [
+          '夜色把整座城市收进一只旧木匣，街灯像被遗忘的纽扣，一颗一颗亮在潮湿的空气里。她推开窗，风带着远处江水的气息，轻轻擦过耳侧。',
+          '很多年以后，她仍然记得那个夜晚的温度。不是因为发生了什么惊天动地的事，而是因为那是她第一次意识到，原来告别可以安静得像一片叶子落在水面。'
+        ]},
+        { label: '第二章', title: '便利店的灯', paras: [
+          '楼下的便利店还开着，日光灯把门口一小块地方照得发白。她忽然很想下去走一走，不为买什么，只是想让脚底碰到真实的地面。',
+          '收银台后面的年轻人正在看书，头也没抬。她买了一瓶水，站在门口慢慢喝完，忽然觉得这座城市也没有那么冷。'
+        ]},
+        { label: '第三章', title: '枕边的纸条', paras: [
+          '第二天清晨，她在枕边发现一张纸条，上面只有一行字：我把回声寄给你了。字是他的笔迹，瘦而长，像他说话时总带着的那点犹豫。',
+          '她把纸条折好，夹进一本没有读完的书里。窗外天色渐亮，远处的江面浮起一层薄雾，像一封还没有拆开的信。'
+        ]}
       ]
     },
     {
-      id: 'b2', name: '纸鹤集', author: '苏微', chapter: '序',
-      content: [
-        '小时候她以为，只要把愿望写在纸上，再折成一只鹤，愿望就会顺着风飞走，飞到某个能听见它的地方。',
-        '长大以后她才明白，纸鹤飞不远，它们大多落在屋顶、树梢，或者某条无人经过的小巷里。但写愿望的那个瞬间，是真的。',
-        '她把这些年折过的鹤都收在一只玻璃瓶里。搬家的时候瓶子碎了，纸鹤散落一地，像一场迟来的雪。她蹲下来一只一只捡，忽然觉得自己好像也被重新拼凑了一遍。',
-        '如果你也有一只纸鹤，请别急着放飞它。先把它握在手心一会儿，让它知道你是认真的。'
+      id: 'b2', name: '纸鹤集', author: '苏微',
+      chapters: [
+        { label: '序', title: '写在纸上', paras: [
+          '小时候她以为，只要把愿望写在纸上，再折成一只鹤，愿望就会顺着风飞走，飞到某个能听见它的地方。',
+          '长大以后她才明白，纸鹤飞不远，它们大多落在屋顶、树梢，或者某条无人经过的小巷里。但写愿望的那个瞬间，是真的。'
+        ]},
+        { label: '第一折', title: '玻璃瓶', paras: [
+          '她把这些年折过的鹤都收在一只玻璃瓶里，瓶口用棉线绕了三圈，像给愿望打了一个不紧不松的结。',
+          '她不常打开它，只是偶尔把瓶子举到光下看一看，看那些单薄的纸在瓶子里面，安安静静地叠着。'
+        ]},
+        { label: '第二折', title: '迟来的雪', paras: [
+          '搬家的时候瓶子碎了，纸鹤散落一地，像一场迟来的雪。她蹲下来一只一只捡，忽然觉得自己好像也被重新拼凑了一遍。',
+          '如果你也有一只纸鹤，请别急着放飞它。先把它握在手心一会儿，让它知道你是认真的。'
+        ]}
       ]
     },
     {
-      id: 'b3', name: '海边的旧信', author: '陈屿', chapter: '第一封信',
-      content: [
-        '潮水退去的时候，沙滩上会留下一些奇怪的东西。半只贝壳，一段绳子，有时候是一封信。',
-        '他捡到那封信的时候，信纸已经被海水泡得发软，字迹模糊得像一场没做完的梦。但他还是看出来了，那是一封写给某个名字的信，开头写着：见字如面。',
-        '他把信带回家，夹在一本旧书里。后来他搬了很多次家，丢了很多东西，但那封信一直都在。他不知道写信的人是谁，也不知道收信的人有没有等到它。',
-        '只是偶尔，在下雨的傍晚，他会把信拿出来看一眼。那些洇开的字，像海面上最后一点光。'
+      id: 'b3', name: '海边的旧信', author: '陈屿',
+      chapters: [
+        { label: '第一封信', title: '潮水退去', paras: [
+          '潮水退去的时候，沙滩上会留下一些奇怪的东西。半只贝壳，一段绳子，有时候是一封信。',
+          '他捡到那封信的时候，信纸已经被海水泡得发软，字迹模糊得像一场没做完的梦。但他还是看出来了，那是一封写给某个名字的信，开头写着：见字如面。'
+        ]},
+        { label: '第二封信', title: '洇开的字', paras: [
+          '他把信带回家，夹在一本旧书里。后来他搬了很多次家，丢了很多东西，但那封信一直都在。',
+          '只是偶尔，在下雨的傍晚，他会把信拿出来看一眼。那些洇开的字，像海面上最后一点光。'
+        ]}
       ]
     }
   ];
 
   var PLATE_LABELS = ['Plate 01 / Form', 'Plate 02 / Light', 'Plate 03 / Tide'];
+  var MAIN_ROUTES = ['home', 'shelf', 'settings'];
 
+  /* ===== 设置项（内存态） ===== */
+  var BG_TONES = [
+    { name: '白纸', bg: '#ffffff', ink: '#2c2c2c' },
+    { name: '米色', bg: '#f6f1e7', ink: '#39342b' },
+    { name: '灰调', bg: '#ececec', ink: '#2c2c2c' }
+  ];
+  var settings = { bg: 0, fs: 15 };
+
+  /* ===== DOM ===== */
+  var phone = document.getElementById('phone');
+  var tabbar = document.getElementById('tabbar');
+  var readerView = document.getElementById('readerView');
+  var readerBody = document.getElementById('readerBody');
+  var readerContent = document.getElementById('readerContent');
+  var readerTitle = document.getElementById('readerTitle');
+  var readerControls = document.getElementById('readerControls');
+  var tocSheet = document.getElementById('tocSheet');
+  var tocList = document.getElementById('tocList');
+  var tocCount = document.getElementById('tocCount');
+  var sheetBackdrop = document.getElementById('sheetBackdrop');
+  var toastEl = document.getElementById('toast');
+  var importInput = document.getElementById('importFile');
   var grid = document.getElementById('shelfGrid');
   var shelfCount = document.getElementById('shelfCount');
   var indexLabel = document.getElementById('indexLabel');
-  var toastEl = document.getElementById('toast');
-  var importInput = document.getElementById('importFile');
+  var homeGrid = document.getElementById('homeGrid');
+  var homeCount = document.getElementById('homeCount');
+  var homeIndexLabel = document.getElementById('homeIndexLabel');
 
-  /* 转义：避免文件内容里的尖括号等破坏结构 */
+  /* ===== 阅读状态 ===== */
+  var state = { book: null, ch: 0 };
+  var lastMain = 'home';
+
+  /* ===== 工具 ===== */
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function findBook(id) {
+    return books.filter(function (b) { return b.id === id; })[0];
+  }
+  function setHidden(el, hidden) {
+    el.classList.toggle('is-hidden', hidden);
+    el.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+  }
 
-  /* 轻提示 */
   var toastTimer = null;
   function showToast(msg) {
     toastEl.textContent = msg;
@@ -279,80 +528,218 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
   }
 
-  /* ===== 渲染书架图版（初始 / 导入后复用） ===== */
-  function renderShelf() {
-    grid.innerHTML = books.map(function (b, i) {
-      var no = String(i + 1).padStart(2, '0');
-      var label = PLATE_LABELS[i] || ('Plate ' + no + ' / Local');
-      return '<button class="book-card" type="button" data-book-id="' + esc(b.id) + '" aria-label="打开 ' + esc(b.name) + '">' +
-        '<div class="book-cover">' +
-          '<span class="plate-no">' + no + '</span>' +
-          '<span class="plate-label">' + esc(label) + '</span>' +
-        '</div>' +
-        '<div class="book-meta">' +
-          '<span class="book-name">' + esc(b.name) + '</span>' +
-          '<span class="book-author">' + esc(b.author) + '</span>' +
-        '</div>' +
-      '</button>';
-    }).join('');
+  /* ===== 书籍图版 ===== */
+  function cardHtml(b, i) {
+    var no = pad2(i + 1);
+    var label = PLATE_LABELS[i] || ('Plate ' + no + ' / Local');
+    return '<button class="book-card" type="button" data-book-id="' + esc(b.id) + '" aria-label="打开 ' + esc(b.name) + '">' +
+      '<div class="book-cover">' +
+        '<span class="plate-no">' + no + '</span>' +
+        '<span class="plate-label">' + esc(label) + '</span>' +
+      '</div>' +
+      '<div class="book-meta">' +
+        '<span class="book-name">' + esc(b.name) + '</span>' +
+        '<span class="book-author">' + esc(b.author) + '</span>' +
+      '</div>' +
+    '</button>';
+  }
 
-    var total = String(books.length).padStart(2, '0');
+  function renderShelf() {
+    grid.innerHTML = books.map(cardHtml).join('');
+    var total = pad2(books.length);
     shelfCount.textContent = total + ' Volumes';
     indexLabel.innerHTML = total + '<br>VOLUMES<br>ON SHELF';
   }
 
-  renderShelf();
+  function renderHome() {
+    var picks = books.slice(0, 2);
+    homeGrid.innerHTML = picks.map(cardHtml).join('');
+    homeCount.textContent = pad2(picks.length) + ' Volumes';
+    homeIndexLabel.innerHTML = (picks.length === 1 ? 'ONE' : 'TWO') + '<br>PICKS<br>TODAY';
+  }
 
-  /* ===== 视图切换 ===== */
-  var shelfView = document.getElementById('shelfView');
-  var readerView = document.getElementById('readerView');
-  var readerTitle = document.getElementById('readerTitle');
-  var readerContent = document.getElementById('readerContent');
-  var readerBody = document.getElementById('readerBody');
+  /* ===== 阅读器 ===== */
+  function renderChapter() {
+    var book = state.book;
+    var ch = book.chapters[state.ch];
+    var total = book.chapters.length;
 
-  function openReader(book) {
     readerTitle.textContent = book.name;
-
-    var paragraphs = book.content.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
     readerContent.innerHTML =
-      '<div class="reader-meta"><span>' + esc(book.meta || 'Chapter 001') + '</span><span>' + esc(book.author) + '</span></div>' +
+      '<div class="reader-meta"><span>' + esc(book.author) + '</span><span>' + pad2(state.ch + 1) + ' / ' + pad2(total) + '</span></div>' +
       '<div class="reader-chapter">' +
-        '<div class="chapter-no">' + esc(book.chapter) + '</div>' +
-        '<h3 class="chapter-title">' + esc(book.name) + '</h3>' +
+        '<div class="chapter-no">' + esc(ch.label) + '</div>' +
+        '<h3 class="chapter-title">' + esc(ch.title) + '</h3>' +
       '</div>' +
-      paragraphs +
+      ch.paras.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
       '<div class="reader-divider"></div>' +
       '<div class="reader-foot">' +
-        '<div class="foot-copy">Maomao / Reading<br>one quiet evening</div>' +
-        '<div class="foot-num">MM—01</div>' +
+        '<div class="foot-copy">' + esc(book.name) + '<br>' + pad2(state.ch + 1) + ' / ' + pad2(total) + '</div>' +
+        '<div class="foot-num">' + pad2(state.ch + 1) + '</div>' +
       '</div>';
 
-    shelfView.classList.add('is-hidden');
-    shelfView.setAttribute('aria-hidden', 'true');
-    readerView.classList.remove('is-hidden');
-    readerView.setAttribute('aria-hidden', 'false');
+    document.getElementById('ctrlPrev').classList.toggle('is-off', state.ch === 0);
+    document.getElementById('ctrlNext').classList.toggle('is-off', state.ch === total - 1);
     readerBody.scrollTop = 0;
   }
 
-  function closeReader() {
-    readerView.classList.add('is-hidden');
-    readerView.setAttribute('aria-hidden', 'true');
-    shelfView.classList.remove('is-hidden');
-    shelfView.setAttribute('aria-hidden', 'false');
+  function renderToc() {
+    var book = state.book;
+    tocCount.textContent = pad2(book.chapters.length);
+    tocList.innerHTML = book.chapters.map(function (c, i) {
+      return '<button class="toc-item' + (i === state.ch ? ' is-current' : '') + '" type="button" data-ch="' + i + '">' +
+        '<span class="toc-no">' + pad2(i + 1) + '</span>' +
+        '<span class="toc-name">' + esc(c.label) + ' · ' + esc(c.title) + '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function toggleControls(force) {
+    var open = (typeof force === 'boolean') ? force : !readerControls.classList.contains('is-open');
+    readerControls.classList.toggle('is-open', open);
+  }
+
+  function openToc() {
+    toggleControls(false);
+    tocSheet.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
+  }
+  function closeToc() {
+    tocSheet.classList.remove('is-open');
+    sheetBackdrop.classList.remove('is-open');
+  }
+
+  function hideAllMain() {
+    MAIN_ROUTES.forEach(function (r) { setHidden(document.getElementById(r + 'View'), true); });
+  }
+
+  function openReader(book) {
+    state.book = book;
+    state.ch = 0;
+    renderChapter();
+    renderToc();
+    toggleControls(false);
+    closeToc();
+    hideAllMain();
+    setHidden(readerView, false);
+    readerBody.scrollTop = 0;
+  }
+
+  /* ===== 路由（哈希） ===== */
+  function showMain(route) {
+    if (MAIN_ROUTES.indexOf(route) < 0) route = 'home';
+    lastMain = route;
+    MAIN_ROUTES.forEach(function (r) {
+      setHidden(document.getElementById(r + 'View'), r !== route);
+    });
+    Array.prototype.forEach.call(tabbar.querySelectorAll('.tab-item'), function (el) {
+      el.classList.toggle('is-active', el.dataset.route === route);
+    });
+  }
+
+  function applyRoute(route) {
+    if (!route) route = 'home';
+    if (route.indexOf('read-') === 0) {
+      var book = findBook(route.slice(5));
+      if (book) { openReader(book); return; }
+      route = lastMain;
+    }
+    setHidden(readerView, true);
+    toggleControls(false);
+    closeToc();
+    showMain(route);
+  }
+
+  function go(route) {
+    if (location.hash === '#' + route) { applyRoute(route); return; }
+    location.hash = route;
+  }
+
+  window.addEventListener('hashchange', function () {
+    applyRoute(location.hash.replace(/^#/, ''));
+  });
+
+  /* ===== 设置 ===== */
+  function applySettings() {
+    var tone = BG_TONES[settings.bg];
+    readerView.style.setProperty('--reader-bg', tone.bg);
+    readerView.style.setProperty('--reader-ink', tone.ink);
+    readerView.style.setProperty('--reader-fs', settings.fs + 'px');
+    document.getElementById('bgSwatch').style.background = tone.bg;
+    document.getElementById('bgValue').textContent = tone.name;
+    document.getElementById('fsValue').textContent = settings.fs;
+    document.getElementById('fsDown').classList.toggle('is-off', settings.fs <= 12);
+    document.getElementById('fsUp').classList.toggle('is-off', settings.fs >= 20);
   }
 
   /* ===== 事件绑定 ===== */
-  grid.addEventListener('click', function (e) {
-    var card = e.target.closest('.book-card');
-    if (!card) return;
-    var id = card.dataset.bookId;
-    var book = books.filter(function (b) { return b.id === id; })[0];
-    if (book) openReader(book);
+  /* Tab 切换 */
+  tabbar.addEventListener('click', function (e) {
+    var tab = e.target.closest('.tab-item');
+    if (tab) go(tab.dataset.route);
   });
 
-  document.getElementById('backToShelf').addEventListener('click', closeReader);
-  document.getElementById('backHome').addEventListener('click', function () {
-    location.href = '../index.html';
+  /* 书籍点击（书架 + 起始页推荐，统一委托） */
+  phone.addEventListener('click', function (e) {
+    var card = e.target.closest('.book-card');
+    if (!card) return;
+    var book = findBook(card.dataset.bookId);
+    if (book) go('read-' + book.id);
+  });
+
+  /* 阅读器：点击正文区切换控制栏 */
+  readerBody.addEventListener('click', function () {
+    if (tocSheet.classList.contains('is-open')) return;
+    toggleControls();
+  });
+
+  document.getElementById('readerBack').addEventListener('click', function () {
+    go(lastMain);
+  });
+
+  document.getElementById('ctrlToc').addEventListener('click', openToc);
+  document.getElementById('ctrlPrev').addEventListener('click', function () {
+    if (state.ch > 0) { state.ch -= 1; renderChapter(); renderToc(); }
+  });
+  document.getElementById('ctrlNext').addEventListener('click', function () {
+    if (state.ch < state.book.chapters.length - 1) { state.ch += 1; renderChapter(); renderToc(); }
+  });
+
+  /* 目录面板 */
+  tocList.addEventListener('click', function (e) {
+    var item = e.target.closest('.toc-item');
+    if (!item) return;
+    state.ch = parseInt(item.dataset.ch, 10);
+    renderChapter();
+    renderToc();
+    closeToc();
+    toggleControls(false);
+  });
+  sheetBackdrop.addEventListener('click', closeToc);
+
+  /* 返回桌面 */
+  Array.prototype.forEach.call(document.querySelectorAll('.js-to-desktop'), function (el) {
+    el.addEventListener('click', function () { location.href = '../index.html'; });
+  });
+
+  /* 设置项 */
+  document.getElementById('bgRow').addEventListener('click', function () {
+    settings.bg = (settings.bg + 1) % BG_TONES.length;
+    applySettings();
+  });
+  document.getElementById('fsDown').addEventListener('click', function () {
+    if (settings.fs > 12) { settings.fs -= 1; applySettings(); }
+  });
+  document.getElementById('fsUp').addEventListener('click', function () {
+    if (settings.fs < 20) { settings.fs += 1; applySettings(); }
+  });
+  document.getElementById('clearRow').addEventListener('click', function () {
+    var hasLocal = books.some(function (b) { return b.isLocal; });
+    if (!hasLocal) { showToast('没有本地书籍'); return; }
+    books = books.filter(function (b) { return !b.isLocal; });
+    renderShelf();
+    renderHome();
+    showToast('已清空本地书籍');
   });
 
   /* ===== 导入本地 .txt ===== */
@@ -389,12 +776,14 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
         id: 'local_' + Date.now(),
         name: name,
         author: '本地导入',
-        chapter: '本地文本',
-        meta: 'Imported text',
-        content: paragraphs
+        isLocal: true,
+        chapters: [
+          { label: '本地文本', title: name, paras: paragraphs }
+        ]
       });
 
       renderShelf();
+      renderHome();
       showToast('已导入《' + name + '》');
     };
 
@@ -406,6 +795,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   document.getElementById('writeBtn').addEventListener('click', function () {
     // 后续接入：调用 AI 生成新书
   });
+
+  /* ===== 启动 ===== */
+  renderShelf();
+  renderHome();
+  applySettings();
+  applyRoute(location.hash.replace(/^#/, '') || 'home');
 })();
 </script>
 </body>
