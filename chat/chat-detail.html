@@ -1282,6 +1282,55 @@
         }
         .plus-item { transition: transform .18s ease, opacity .18s ease; }
         .plus-item:active { transform: scale(.96); }
+
+        /* ===== 页面整体收束：去掉手机套壳感，聊天内容更轻 ===== */
+        body { background: #F7F7F8; }
+        .chat-header {
+            background: rgba(247,247,249,.94);
+            border-bottom-color: rgba(20,20,24,.055);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .chat-stage {
+            background: linear-gradient(180deg, #F7F7F8 0%, #F1F1F4 100%);
+            padding: 16px 14px;
+            gap: 13px;
+        }
+        .msg-avatar {
+            width: var(--avatar-size, 30px);
+            height: var(--avatar-size, 30px);
+            border: 1px solid rgba(255,255,255,.8);
+            box-shadow: none;
+        }
+        .msg-row.received .msg-bubble, .msg-row.left .msg-bubble {
+            border-radius: 15px 15px 15px 4px;
+            border: 1px solid rgba(20,20,24,.035);
+            box-shadow: none;
+        }
+        .msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {
+            border-radius: 15px 15px 4px 15px;
+            box-shadow: none;
+        }
+        .message-time {
+            background: transparent;
+            padding: 3px 8px;
+            letter-spacing: .2px;
+        }
+        @media (max-width: 600px) {
+            body {
+                min-height: 100dvh;
+                background: #F7F7F8;
+            }
+            .phone-mockup {
+                width: 100vw;
+                height: 100dvh;
+                min-height: 0;
+                max-height: none;
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
 </style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
