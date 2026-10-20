@@ -239,13 +239,6 @@
           <footer class="dock-wrapper">
             <div class="dock-bar" id="dockBar" aria-label="快捷应用栏">
 
-              <button class="dock-item app-tile" type="button" data-href="chat/call.html" data-drag="app_call" data-name="通话" title="通话">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                </span>
-                <span class="app-name">通话</span>
-                <span class="ds-del" title="移除">×</span>
-              </button>
 
               <button class="dock-item app-tile" type="button" data-href="chat/chat.html" data-drag="app_chat" data-name="聊天" title="聊天">
                 <span class="app-icon">
@@ -255,13 +248,6 @@
                 <span class="ds-del" title="移除">×</span>
               </button>
 
-              <button class="dock-item app-tile" type="button" data-href="chat/contacts.html" data-drag="app_contacts" data-name="通讯录" title="通讯录">
-                <span class="app-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </span>
-                <span class="app-name">通讯录</span>
-                <span class="ds-del" title="移除">×</span>
-              </button>
 
               <button class="dock-item app-tile" type="button" data-href="wallet/shop.html" data-drag="app_shop" data-name="商店" title="商店">
                 <span class="app-icon">
@@ -334,18 +320,18 @@
         return {
           pages: [
             [
-              'app_worldbook', 'app_memory', 'app_profile', 'app_moments',
+              'app_worldbook', 'app_memory',
               'app_forum', 'app_wallet', 'app_music', 'app_beauty',
-              'app_characters', 'app_settings', 'app_finance', 'app_footprint',
-              'app_mask', 'app_stickers', 'app_bubble', 'app_font'
+              'app_characters', 'app_settings', 'app_finance',
+              'app_font'
             ],
             [
-              'app_diary', 'app_dreamtravel', 'app_sound', 'app_callsettings', 'app_chatsettings', 'app_forumsettings',
-              'app_apilogs', 'app_regex', 'app_rp', 'app_shopadmin', 'app_cafe',
+              'app_diary', 'app_dreamtravel',
+              'app_shopadmin', 'app_cafe',
               'postcard', 'polaroid', 'dialog', 'music'
             ]
           ],
-          dock: ['app_call', 'app_chat', 'app_contacts', 'app_shop']
+          dock: ['app_chat', 'app_shop']
         };
       }
 
@@ -366,6 +352,23 @@
       }
 
       var currentLayout = loadLayout();
+
+      // 迁移旧桌面布局：通话/通讯录归入聊天应用，不再作为 Dock 独立应用。
+      // 仅过滤已经移除的入口 ID，保留其他应用和用户自定义排列，不清空整个布局。
+      (function migrateRemovedShortcuts() {
+        var valid = {};
+        document.querySelectorAll('[data-drag]').forEach(function (el) {
+          if (el.dataset.drag) valid[el.dataset.drag] = true;
+        });
+        currentLayout.pages = (currentLayout.pages || []).map(function (ids) {
+          return Array.isArray(ids) ? ids.filter(function (id) { return !!valid[id]; }) : [];
+        });
+        currentLayout.dock = (currentLayout.dock || []).filter(function (id) {
+          return !!valid[id] && id !== 'app_call' && id !== 'app_contacts';
+        });
+        // 若旧布局未把聊天/商店放在 Dock，保留用户选择；默认布局会提供这两个入口。
+        saveLayout(currentLayout);
+      })();
 
       // ===== 恢复布局到 DOM =====
       function restoreLayout() {
