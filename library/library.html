@@ -4,14 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>私人藏书室 · MAOMAO</title>
+<title>书架 · MAOMAO</title>
 <script src="../js/native-feel.js"></script>
 <style>
 /* ============================================================
    MAOMAO — Editorial Reading App
-   风格规范：超大衬线标题 / 眉题 kicker / 侧栏编号 / 细线上下框
-   / 渐变灰度图版 / 斜体衬线文字按钮 / 极小节距标注 / 大量留白
-   红线：无 Emoji、隐藏滚动条、封面无阴影无圆角
+   黑白灰 + 极简细线 + 衬线正文
+   红线：无 Emoji、隐藏滚动条、无阴影无圆角
    ============================================================ */
 :root{
   --paper:#ffffff;
@@ -45,7 +44,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .view.reader{z-index:30}
 .view.is-hidden{opacity:0;pointer-events:none;transform:translateX(26px);visibility:hidden}
 
-/* ===== 顶部细黑线 + 页眉 ===== */
+/* ===== 顶部细黑线 + 页眉（起始页） ===== */
 .topline{flex:0 0 auto;height:1px;background:var(--ink);margin:0 22px}
 .site-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px 12px}
 .back-line{position:relative;padding:3px 0 7px;display:inline-flex;align-items:center;gap:7px;color:var(--ink)}
@@ -57,10 +56,15 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .wordmark span{font-size:9px;letter-spacing:.12em;color:var(--muted);font-family:var(--sans)}
 .head-note{font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:6px}
 
+/* ===== 居中式页面标题（书架 / 设置） ===== */
+.page-head{flex:0 0 auto;padding:22px 22px 16px;text-align:center}
+.page-title{font-family:var(--serif);font-weight:400;font-size:24px;letter-spacing:.06em;margin:0;color:var(--ink)}
+.page-sub{font-size:8px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-top:9px}
+
 /* ===== 可滚动主体 ===== */
 .scroll{flex:1;min-height:0;overflow:auto;padding:0 22px;scrollbar-width:none}
 
-/* ===== 海报式标题区 ===== */
+/* ===== 起始页海报区 ===== */
 .hero{padding:18px 0 22px;border-bottom:1px solid var(--line)}
 .poster-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
 .kicker{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:#777;margin:26px 0 12px}
@@ -73,12 +77,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .index-no{font-family:var(--serif);font-size:34px;line-height:1;letter-spacing:-.03em}
 .index-label{font-size:8px;color:var(--muted);letter-spacing:.16em;margin-top:12px;line-height:1.9}
 
-/* ===== 书架区 ===== */
+/* ===== 书籍网格 ===== */
 .shelf-block{padding:22px 0 4px}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:18px}
 .section-title{font-family:var(--serif);font-size:16px;letter-spacing:.02em;font-weight:400}
 .section-count{font-size:8px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
-.shelf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px 14px}
+.shelf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 15px}
 
 /* 书籍图版：渐变灰度占位 + 1px 细边框，无阴影无圆角 */
 .book-card{display:block;padding:0;text-align:left;min-width:0}
@@ -93,19 +97,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .book-name{display:block;font-family:var(--serif);font-size:12px;letter-spacing:.01em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .book-author{display:block;font-size:8px;color:var(--muted);letter-spacing:.08em;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ===== 海报页脚（细线 + 期刊号） ===== */
+/* ===== 起始页页脚 ===== */
 .poster-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px;padding:13px 0 0;border-top:1px solid var(--line)}
 .foot-copy{font-size:8px;letter-spacing:.14em;color:#777;line-height:1.9;text-transform:uppercase}
 .foot-num{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
-
-/* ===== 书架底部操作区：斜体衬线文字按钮 + 注脚 ===== */
-.shelf-actions{padding:24px 0 30px}
-.action-row{display:flex;align-items:center;gap:26px}
-.text-action{position:relative;padding:4px 0 9px;font-family:var(--serif);font-size:16px;font-style:italic;letter-spacing:.02em;color:var(--ink)}
-.text-action:after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;transform:scaleX(.55);transform-origin:left;transition:transform .28s ease}
-.text-action:active:after{transform:scaleX(1)}
-.text-action.subtle{color:#666}
-.bottom-note{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);margin-top:18px;padding-top:13px;font-size:8px;letter-spacing:.16em;color:#8c8c8c;text-transform:uppercase}
 
 /* ===== 设置列表：细线行，无圆角无阴影 ===== */
 .set-block{padding:22px 0 4px}
@@ -113,12 +108,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .set-row{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);text-align:left}
 .set-label{display:block;font-size:11px;letter-spacing:.06em;color:var(--ink)}
 .set-sub{display:block;font-size:7px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:5px}
-.set-right{display:inline-flex;align-items:center;gap:10px}
+.set-right{display:inline-flex;align-items:center;gap:10px;flex:0 0 auto}
 .set-value{font-size:10px;letter-spacing:.1em;color:#555}
+.row-icon{width:13px;height:13px;flex:0 0 auto;stroke:#9a9a9a;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 .swatch{width:20px;height:20px;border:1px solid var(--line);background:#fff}
 .step{width:26px;height:26px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink)}
 .step:active{background:#f2f2f2}
 .step.is-off{color:#c8c8c8}
+
+/* ===== 斜体衬线文字按钮（弹窗用） ===== */
+.text-action{position:relative;padding:4px 0 9px;font-family:var(--serif);font-size:16px;font-style:italic;letter-spacing:.02em;color:var(--ink)}
+.text-action:after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;transform:scaleX(.55);transform-origin:left;transition:transform .28s ease}
+.text-action:active:after{transform:scaleX(1)}
 
 /* ===== 底部状态栏导航 ===== */
 .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
@@ -127,13 +128,15 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .tab-label{font-size:9px;letter-spacing:.14em}
 .tab-item.is-active{color:var(--ink)}
 
-/* ===== 阅读器视图 ===== */
+/* ===== 阅读器：左右滑动翻页（scroll-snap） ===== */
 .reader-head{position:relative;flex:0 0 auto;display:flex;align-items:center;padding:15px 22px 12px;border-bottom:1px solid var(--line)}
 .head-back{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;color:var(--ink)}
 .head-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 .reader-title{position:absolute;left:50%;transform:translateX(-50%);max-width:60%;margin:0;text-align:center;
   font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.02em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reader-body{flex:1;min-height:0;overflow:auto;padding:26px 26px 88px;scrollbar-width:none;background:var(--reader-bg,#fff);transition:background .3s ease}
+.reader-body{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;background:var(--reader-bg,#fff);transition:background .3s ease;scrollbar-width:none}
+.chapter-page{flex:0 0 100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;overflow-x:hidden;padding:26px 26px 88px}
 .reader-content{max-width:330px;margin:0 auto}
 .reader-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .reader-chapter{margin:30px 0 24px}
@@ -144,7 +147,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .reader-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:13px;border-top:1px solid var(--line)}
 .reader-foot .foot-num{font-size:18px}
 
-/* 阅读器底部控制栏：点击屏幕中间滑出 */
+/* 阅读器底部控制栏：点击正文滑出 */
 .reader-controls{position:absolute;left:0;right:0;bottom:0;z-index:35;display:flex;background:#fff;border-top:1px solid var(--ink);
   padding-bottom:env(safe-area-inset-bottom);transform:translateY(101%);visibility:hidden;
   transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
@@ -153,7 +156,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .ctrl:first-child{border-left:0}
 .ctrl.is-off{color:#c8c8c8;pointer-events:none}
 
-/* 遮罩 + 目录面板（从底部滑出） */
+/* 遮罩 + 底部面板（目录 / 弹窗） */
 .sheet-backdrop{position:absolute;inset:0;z-index:40;background:rgba(20,20,20,.22);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease,visibility .3s}
 .sheet-backdrop.is-open{opacity:1;pointer-events:auto;visibility:visible}
 .toc-sheet{position:absolute;left:0;right:0;bottom:0;z-index:45;display:flex;flex-direction:column;max-height:66%;background:#fff;border-top:1px solid var(--ink);
@@ -167,6 +170,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .toc-name{font-family:var(--serif);font-size:13px;color:#666}
 .toc-item.is-current .toc-no,.toc-item.is-current .toc-name{color:var(--ink)}
 .toc-item.is-current .toc-name{font-style:italic}
+.dialog{position:absolute;left:0;right:0;bottom:0;z-index:45;background:#fff;border-top:1px solid var(--ink);
+  padding:22px 22px calc(22px + env(safe-area-inset-bottom));transform:translateY(101%);visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.dialog.is-open{transform:translateY(0);visibility:visible}
+.dialog-title{font-family:var(--serif);font-weight:400;font-size:18px;letter-spacing:.02em}
+.dialog-body{font-size:10px;line-height:1.95;letter-spacing:.03em;color:#555;margin-top:10px}
+.dialog .text-action{margin-top:14px}
 
 /* ===== 轻提示（黑白灰，无圆角） ===== */
 .toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:60;
@@ -176,7 +186,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 
 /* ===== 动效 / 可访问性 ===== */
 @media(prefers-reduced-motion:reduce){
-  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.sheet-backdrop{transition:none!important}
+  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.dialog,.sheet-backdrop{transition:none!important}
   .view.is-hidden{transform:none!important}
 }
 </style>
@@ -234,99 +244,32 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     </div>
   </section>
 
-  <!-- ==================== 页面 B：书架 ==================== -->
-  <section class="view above-tabbar is-hidden" id="shelfView" aria-label="私人藏书室" aria-hidden="true">
+  <!-- ==================== 页面 B：书架（只留书） ==================== -->
+  <section class="view above-tabbar is-hidden" id="shelfView" aria-label="书架" aria-hidden="true">
     <div class="topline"></div>
-    <header class="site-head">
-      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
-        <span style="font-size:11px">返回桌面</span>
-      </button>
-      <div class="head-brand">
-        <div class="wordmark">MAOMAO <span>/ READING</span></div>
-        <div class="head-note">Private library</div>
-      </div>
+    <header class="page-head">
+      <h1 class="page-title">书架</h1>
+      <div class="page-sub">My Library</div>
     </header>
-
     <div class="scroll">
-      <section class="hero">
-        <div class="poster-meta">
-          <span>Collection / 001</span>
-          <span>Edition 2026</span>
-        </div>
-        <div class="kicker">My Library</div>
-        <div class="hero-row">
-          <div>
-            <h1 class="hero-title">私人<em>藏书室</em></h1>
-            <p class="cn-title">一个只属于自己的安静角落</p>
-            <p class="description">在这里收集纸页、光线与短暂的停顿。<br>让翻书的声音留在耳边，让故事慢慢发生。</p>
-          </div>
-          <aside class="side-index">
-            <div class="index-no">01</div>
-            <div class="index-label" id="indexLabel">THREE<br>VOLUMES<br>ON SHELF</div>
-          </aside>
-        </div>
-      </section>
-
-      <section class="shelf-block">
-        <div class="section-head">
-          <span class="section-title">架上藏书</span>
-          <span class="section-count" id="shelfCount">03 Volumes</span>
-        </div>
-        <div class="shelf-grid" id="shelfGrid"><!-- 书籍由 JS 渲染 --></div>
-      </section>
-
-      <div class="poster-foot">
-        <div class="foot-copy">A small collection<br>black / white / grey</div>
-        <div class="foot-num">MM—01</div>
-      </div>
-
-      <!-- 操作区：放在列表最下方 -->
-      <div class="shelf-actions">
-        <div class="action-row">
-          <button class="text-action" type="button" id="importBtn">导入本地书籍</button>
-          <button class="text-action subtle" type="button" id="writeBtn">让 TA 写一本</button>
-        </div>
-        <div class="bottom-note">
-          <span>Maomao / Reading Room</span>
-          <span>Fine lines &amp; type</span>
-        </div>
-      </div>
+      <div class="shelf-grid" id="shelfGrid"><!-- 书籍由 JS 渲染 --></div>
+      <div style="height:26px"></div>
     </div>
-
-    <!-- 隐藏的本地文件选择器：仅接受 .txt -->
-    <input type="file" id="importFile" accept=".txt,text/plain" hidden>
   </section>
 
   <!-- ==================== 页面 C：设置 ==================== -->
   <section class="view above-tabbar is-hidden" id="settingsView" aria-label="设置" aria-hidden="true">
     <div class="topline"></div>
-    <header class="site-head">
-      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
-        <span style="font-size:11px">返回桌面</span>
-      </button>
-      <div class="head-brand">
-        <div class="wordmark">MAOMAO <span>/ READING</span></div>
-        <div class="head-note">Preferences</div>
-      </div>
+    <header class="page-head">
+      <h1 class="page-title">设置</h1>
+      <div class="page-sub">Preferences</div>
     </header>
 
     <div class="scroll">
-      <section class="hero">
-        <div class="poster-meta">
-          <span>Settings / 001</span>
-          <span>Preference</span>
-        </div>
-        <div class="kicker">Reading room</div>
-        <h1 class="hero-title">设置</h1>
-        <p class="cn-title">让阅读更合自己的眼睛</p>
-      </section>
-
       <section class="set-block">
         <div class="section-head">
           <span class="section-title">阅读偏好</span>
-          <span class="section-count">03 Items</span>
+          <span class="section-count">02 Items</span>
         </div>
         <div class="set-list">
           <button class="set-row" type="button" id="bgRow">
@@ -350,12 +293,36 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
               <button class="step" type="button" id="fsUp" aria-label="增大字号">+</button>
             </span>
           </div>
+        </div>
+      </section>
+
+      <!-- 数据与操作：功能全部收纳在这里 -->
+      <section class="set-block">
+        <div class="section-head">
+          <span class="section-title">数据与操作</span>
+          <span class="section-count">03 Items</span>
+        </div>
+        <div class="set-list">
+          <button class="set-row" type="button" id="importRow">
+            <span>
+              <span class="set-label">导入本地书籍</span>
+              <span class="set-sub">Import local text</span>
+            </span>
+            <svg class="row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="set-row" type="button" id="writeRow">
+            <span>
+              <span class="set-label">让 TA 写一本</span>
+              <span class="set-sub">Ask TA to write one</span>
+            </span>
+            <svg class="row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
           <button class="set-row" type="button" id="clearRow">
             <span>
               <span class="set-label">清空本地书籍</span>
               <span class="set-sub">Remove imported books</span>
             </span>
-            <span class="set-value" id="clearValue">清空</span>
+            <span class="set-value">清空</span>
           </button>
         </div>
       </section>
@@ -366,6 +333,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       </div>
       <div style="height:26px"></div>
     </div>
+
+    <!-- 隐藏的本地文件选择器：仅接受 .txt -->
+    <input type="file" id="importFile" accept=".txt,text/plain" hidden>
   </section>
 
   <!-- ==================== 底部状态栏导航 ==================== -->
@@ -384,7 +354,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     </button>
   </nav>
 
-  <!-- ==================== 阅读器（全屏） ==================== -->
+  <!-- ==================== 阅读器（全屏，左右滑动翻页） ==================== -->
   <section class="view reader is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
     <header class="reader-head">
       <button class="head-back" id="readerBack" type="button" aria-label="返回书架" title="返回书架">
@@ -392,12 +362,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       </button>
       <h2 class="reader-title" id="readerTitle">书名</h2>
     </header>
-    <main class="reader-body" id="readerBody">
-      <article class="reader-content" id="readerContent"><!-- 正文由 JS 渲染 --></article>
-    </main>
+    <main class="reader-body" id="readerBody"><!-- 每章一页，由 JS 渲染 --></main>
   </section>
 
-  <!-- 控制栏 + 目录面板 -->
+  <!-- 控制栏 / 目录面板 / 弹窗 -->
   <div class="reader-controls" id="readerControls">
     <button class="ctrl" type="button" id="ctrlToc">目录</button>
     <button class="ctrl" type="button" id="ctrlPrev">上一章</button>
@@ -410,6 +378,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       <span id="tocCount">03</span>
     </div>
     <div class="toc-list" id="tocList"></div>
+  </div>
+  <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog-title" id="dialogTitle">标题</div>
+    <div class="dialog-body" id="dialogBody">内容</div>
+    <button class="text-action" type="button" id="dialogOk">知道了</button>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -487,18 +460,16 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   var tabbar = document.getElementById('tabbar');
   var readerView = document.getElementById('readerView');
   var readerBody = document.getElementById('readerBody');
-  var readerContent = document.getElementById('readerContent');
   var readerTitle = document.getElementById('readerTitle');
   var readerControls = document.getElementById('readerControls');
   var tocSheet = document.getElementById('tocSheet');
   var tocList = document.getElementById('tocList');
   var tocCount = document.getElementById('tocCount');
   var sheetBackdrop = document.getElementById('sheetBackdrop');
+  var dialog = document.getElementById('dialog');
   var toastEl = document.getElementById('toast');
   var importInput = document.getElementById('importFile');
   var grid = document.getElementById('shelfGrid');
-  var shelfCount = document.getElementById('shelfCount');
-  var indexLabel = document.getElementById('indexLabel');
   var homeGrid = document.getElementById('homeGrid');
   var homeCount = document.getElementById('homeCount');
   var homeIndexLabel = document.getElementById('homeIndexLabel');
@@ -512,9 +483,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
   function pad2(n) { return String(n).padStart(2, '0'); }
-  function findBook(id) {
-    return books.filter(function (b) { return b.id === id; })[0];
-  }
+  function findBook(id) { return books.filter(function (b) { return b.id === id; })[0]; }
   function setHidden(el, hidden) {
     el.classList.toggle('is-hidden', hidden);
     el.setAttribute('aria-hidden', hidden ? 'true' : 'false');
@@ -546,9 +515,6 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 
   function renderShelf() {
     grid.innerHTML = books.map(cardHtml).join('');
-    var total = pad2(books.length);
-    shelfCount.textContent = total + ' Volumes';
-    indexLabel.innerHTML = total + '<br>VOLUMES<br>ON SHELF';
   }
 
   function renderHome() {
@@ -558,15 +524,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     homeIndexLabel.innerHTML = (picks.length === 1 ? 'ONE' : 'TWO') + '<br>PICKS<br>TODAY';
   }
 
-  /* ===== 阅读器 ===== */
-  function renderChapter() {
-    var book = state.book;
-    var ch = book.chapters[state.ch];
+  /* ===== 阅读器：所有章节铺成横向页，靠 scroll-snap 翻页 ===== */
+  function pageHtml(book, ch, i) {
     var total = book.chapters.length;
-
-    readerTitle.textContent = book.name;
-    readerContent.innerHTML =
-      '<div class="reader-meta"><span>' + esc(book.author) + '</span><span>' + pad2(state.ch + 1) + ' / ' + pad2(total) + '</span></div>' +
+    var pos = pad2(i + 1) + ' / ' + pad2(total);
+    return '<div class="reader-meta"><span>' + esc(book.author) + '</span><span>' + pos + '</span></div>' +
       '<div class="reader-chapter">' +
         '<div class="chapter-no">' + esc(ch.label) + '</div>' +
         '<h3 class="chapter-title">' + esc(ch.title) + '</h3>' +
@@ -574,24 +536,50 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       ch.paras.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
       '<div class="reader-divider"></div>' +
       '<div class="reader-foot">' +
-        '<div class="foot-copy">' + esc(book.name) + '<br>' + pad2(state.ch + 1) + ' / ' + pad2(total) + '</div>' +
-        '<div class="foot-num">' + pad2(state.ch + 1) + '</div>' +
+        '<div class="foot-copy">' + esc(book.name) + '<br>' + pos + '</div>' +
+        '<div class="foot-num">' + pad2(i + 1) + '</div>' +
       '</div>';
+  }
 
-    document.getElementById('ctrlPrev').classList.toggle('is-off', state.ch === 0);
-    document.getElementById('ctrlNext').classList.toggle('is-off', state.ch === total - 1);
-    readerBody.scrollTop = 0;
+  function buildReader(book) {
+    readerTitle.textContent = book.name;
+    readerBody.innerHTML = book.chapters.map(function (ch, i) {
+      return '<section class="chapter-page" data-ch="' + i + '">' +
+        '<article class="reader-content">' + pageHtml(book, ch, i) + '</article>' +
+      '</section>';
+    }).join('');
+    readerBody.scrollLeft = 0;
+  }
+
+  function syncReaderUi() {
+    var total = state.book.chapters.length;
+    document.getElementById('ctrlPrev').classList.toggle('is-off', state.ch <= 0);
+    document.getElementById('ctrlNext').classList.toggle('is-off', state.ch >= total - 1);
+    Array.prototype.forEach.call(tocList.children, function (el, i) {
+      el.classList.toggle('is-current', i === state.ch);
+    });
+  }
+
+  function goChapter(i, instant) {
+    var total = state.book.chapters.length;
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    state.ch = i;
+    var left = i * readerBody.clientWidth;
+    if (instant) readerBody.scrollLeft = left;
+    else readerBody.scrollTo({ left: left, behavior: 'smooth' });
+    syncReaderUi();
   }
 
   function renderToc() {
-    var book = state.book;
-    tocCount.textContent = pad2(book.chapters.length);
-    tocList.innerHTML = book.chapters.map(function (c, i) {
-      return '<button class="toc-item' + (i === state.ch ? ' is-current' : '') + '" type="button" data-ch="' + i + '">' +
+    tocCount.textContent = pad2(state.book.chapters.length);
+    tocList.innerHTML = state.book.chapters.map(function (c, i) {
+      return '<button class="toc-item" type="button" data-ch="' + i + '">' +
         '<span class="toc-no">' + pad2(i + 1) + '</span>' +
         '<span class="toc-name">' + esc(c.label) + ' · ' + esc(c.title) + '</span>' +
       '</button>';
-    }).join('');
+    });
+    syncReaderUi();
   }
 
   function toggleControls(force) {
@@ -599,14 +587,24 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     readerControls.classList.toggle('is-open', open);
   }
 
+  function closeSheets() {
+    tocSheet.classList.remove('is-open');
+    dialog.classList.remove('is-open');
+    sheetBackdrop.classList.remove('is-open');
+  }
   function openToc() {
     toggleControls(false);
+    dialog.classList.remove('is-open');
     tocSheet.classList.add('is-open');
     sheetBackdrop.classList.add('is-open');
   }
-  function closeToc() {
+  function openDialog(title, body) {
+    toggleControls(false);
     tocSheet.classList.remove('is-open');
-    sheetBackdrop.classList.remove('is-open');
+    document.getElementById('dialogTitle').textContent = title;
+    document.getElementById('dialogBody').textContent = body;
+    dialog.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
   }
 
   function hideAllMain() {
@@ -616,13 +614,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   function openReader(book) {
     state.book = book;
     state.ch = 0;
-    renderChapter();
+    buildReader(book);
     renderToc();
     toggleControls(false);
-    closeToc();
+    closeSheets();
     hideAllMain();
     setHidden(readerView, false);
-    readerBody.scrollTop = 0;
   }
 
   /* ===== 路由（哈希） ===== */
@@ -646,7 +643,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     }
     setHidden(readerView, true);
     toggleControls(false);
-    closeToc();
+    closeSheets();
     showMain(route);
   }
 
@@ -673,7 +670,6 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   }
 
   /* ===== 事件绑定 ===== */
-  /* Tab 切换 */
   tabbar.addEventListener('click', function (e) {
     var tab = e.target.closest('.tab-item');
     if (tab) go(tab.dataset.route);
@@ -687,10 +683,23 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     if (book) go('read-' + book.id);
   });
 
-  /* 阅读器：点击正文区切换控制栏 */
+  /* 阅读器：点击正文切换控制栏 */
   readerBody.addEventListener('click', function () {
     if (tocSheet.classList.contains('is-open')) return;
     toggleControls();
+  });
+
+  /* 左右滑动翻页 → 与目录 / 上下章联动 */
+  readerBody.addEventListener('scroll', function () {
+    var w = readerBody.clientWidth;
+    if (!w) return;
+    var i = Math.round(readerBody.scrollLeft / w);
+    if (i !== state.ch) { state.ch = i; syncReaderUi(); }
+  }, { passive: true });
+
+  window.addEventListener('resize', function () {
+    if (!state.book) return;
+    readerBody.scrollLeft = state.ch * readerBody.clientWidth;
   });
 
   document.getElementById('readerBack').addEventListener('click', function () {
@@ -698,24 +707,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   });
 
   document.getElementById('ctrlToc').addEventListener('click', openToc);
-  document.getElementById('ctrlPrev').addEventListener('click', function () {
-    if (state.ch > 0) { state.ch -= 1; renderChapter(); renderToc(); }
-  });
-  document.getElementById('ctrlNext').addEventListener('click', function () {
-    if (state.ch < state.book.chapters.length - 1) { state.ch += 1; renderChapter(); renderToc(); }
-  });
+  document.getElementById('ctrlPrev').addEventListener('click', function () { goChapter(state.ch - 1); });
+  document.getElementById('ctrlNext').addEventListener('click', function () { goChapter(state.ch + 1); });
 
-  /* 目录面板 */
   tocList.addEventListener('click', function (e) {
     var item = e.target.closest('.toc-item');
     if (!item) return;
-    state.ch = parseInt(item.dataset.ch, 10);
-    renderChapter();
-    renderToc();
-    closeToc();
+    goChapter(parseInt(item.dataset.ch, 10));
+    closeSheets();
     toggleControls(false);
   });
-  sheetBackdrop.addEventListener('click', closeToc);
+  sheetBackdrop.addEventListener('click', closeSheets);
+  document.getElementById('dialogOk').addEventListener('click', closeSheets);
 
   /* 返回桌面 */
   Array.prototype.forEach.call(document.querySelectorAll('.js-to-desktop'), function (el) {
@@ -742,8 +745,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     showToast('已清空本地书籍');
   });
 
-  /* ===== 导入本地 .txt ===== */
-  document.getElementById('importBtn').addEventListener('click', function () {
+  /* ===== 数据与操作：导入本地 .txt ===== */
+  document.getElementById('importRow').addEventListener('click', function () {
     importInput.value = '';          // 允许重复选择同一个文件
     importInput.click();             // 触发隐藏的文件选择器
   });
@@ -792,8 +795,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     reader.readAsArrayBuffer(file);
   });
 
-  document.getElementById('writeBtn').addEventListener('click', function () {
-    // 后续接入：调用 AI 生成新书
+  /* 让 TA 写一本：先给一个极简弹窗占位 */
+  document.getElementById('writeRow').addEventListener('click', function () {
+    openDialog('让 TA 写一本', '这一步还没有接通。等它准备好，会在这里把写好的书放进你的书架。');
   });
 
   /* ===== 启动 ===== */
