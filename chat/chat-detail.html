@@ -1219,7 +1219,70 @@
             opacity: 0.6;
         }
 
-    </style>
+    
+        /* ===== 聊天输入区：轻薄、留白、编辑式排版 ===== */
+        .input-dock {
+            padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+            background: rgba(247,247,249,0.96);
+            border-top: 1px solid rgba(20,20,24,0.07);
+            gap: 12px;
+            align-items: center;
+        }
+        .input-capsule {
+            min-height: 40px;
+            padding: 2px 0 5px;
+            background: transparent;
+            border: 0;
+            border-bottom: 1px solid #D6D6DC;
+            border-radius: 0;
+            box-shadow: none;
+            gap: 10px;
+        }
+        .input-capsule:focus-within {
+            border-color: #777780;
+            box-shadow: none;
+            transform: none;
+        }
+        .real-input {
+            font-size: 14px;
+            line-height: 1.55;
+            padding: 7px 0 2px;
+            color: #202024;
+        }
+        .real-input::placeholder { color: #A2A2AA; }
+        .send-icon-btn {
+            width: 28px;
+            height: 30px;
+            color: #222226;
+            background: transparent;
+            border-radius: 0;
+            opacity: .92;
+        }
+        .send-icon-btn svg { width: 17px; height: 17px; }
+        .send-icon-btn:active { transform: scale(.92); opacity: .6; }
+        .plus-action-btn {
+            width: 30px;
+            height: 30px;
+            color: #29292E;
+            border-left: 1px solid #DCDCE1;
+            padding-left: 10px;
+            box-sizing: content-box;
+        }
+        .plus-action-btn svg { width: 19px; height: 19px; }
+        .plus-panel-sheet {
+            background: rgba(250,250,251,.98);
+            border-radius: 22px 22px 0 0;
+            border-top: 1px solid rgba(255,255,255,.9);
+            box-shadow: 0 -12px 40px rgba(0,0,0,.07);
+        }
+        .plus-icon-circle {
+            background: #F0F0F3;
+            border: 1px solid #E7E7EB;
+            box-shadow: none;
+        }
+        .plus-item { transition: transform .18s ease, opacity .18s ease; }
+        .plus-item:active { transform: scale(.96); }
+</style>
 <link rel="stylesheet" href="../css/mobile-fit.css">
 </head>
 <body>
@@ -1263,15 +1326,12 @@
             </div>
         </div>
 
-        <!-- 底部输入舱：表情按钮 + 胶囊输入框 + 加号 -->
+        <!-- 底部输入区：轻量文字输入 + 更多功能 -->
         <form class="input-dock" id="chat-form" action="javascript:void(0);">
-            <button class="sticker-open-btn" type="button" id="stickerOpenBtn" aria-label="表情包">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            </button>
             <div class="input-capsule">
-                <textarea class="real-input" id="chat-input" rows="1" placeholder="" autocomplete="off" enterkeyhint="send"></textarea>
+                <textarea class="real-input" id="chat-input" rows="1" placeholder="发送消息…" autocomplete="off" enterkeyhint="send"></textarea>
                 <button class="send-icon-btn" type="submit" aria-label="发送">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2"/></svg>
                 </button>
             </div>
             <button class="plus-action-btn" type="button" id="plus-action-btn" aria-label="更多功能">
@@ -1292,6 +1352,10 @@
             <div class="plus-panel-sheet">
                 <div class="plus-panel-handle"></div>
                 <div class="plus-grid">
+                    <button class="plus-item" data-feat="sticker" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg></span>
+                        <span class="plus-label">表情包</span>
+                    </button>
                     <button class="plus-item" data-feat="regenerate" type="button">
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
                         <span class="plus-label">重玩</span>
