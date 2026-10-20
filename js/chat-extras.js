@@ -543,6 +543,10 @@
       case 'voice-msg': featVoiceMsg(); break;
       case 'card': featCard(); break;
       case 'narration': featureAside(); break;
+      case 'sticker':
+        var stickerBtn = document.getElementById('stickerOpenBtn');
+        if (stickerBtn) stickerBtn.click();
+        break;
     }
   }
 
