@@ -4756,5 +4756,69 @@
 }
 </style>
 
+
+<style id="maomao-composer-position-correction">
+/* Correction: the plus floats ABOVE the composer, never inside the pill */
+.input-dock {
+  position:relative !important;
+  display:flex !important; flex-direction:row !important;
+  align-items:flex-end !important; gap:0 !important;
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
+  background:rgba(248,248,250,.34) !important;
+  border-top:0 !important;
+}
+.input-capsule {
+  order:1 !important; flex:1 1 100% !important; width:100% !important;
+  min-height:43px !important; box-sizing:border-box !important;
+  border-radius:9999px !important;
+  background:rgba(255,255,255,.38) !important;
+  border:1px solid rgba(35,35,40,.075) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.52) !important;
+  padding:5px 6px 5px 16px !important;
+}
+.input-capsule:focus-within {
+  background:rgba(255,255,255,.48) !important;
+  border-color:rgba(35,35,40,.12) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58) !important;
+}
+.send-icon-btn {
+  width:25px !important;height:25px !important;min-width:25px !important;
+  margin:0 1px 0 0 !important; flex:0 0 25px !important;
+}
+.send-icon-btn svg { width:16px !important;height:16px !important; }
+.plus-action-btn {
+  position:absolute !important;
+  left:15px !important; bottom:calc(100% + 4px) !important;
+  z-index:55 !important;
+  width:22px !important;height:22px !important;
+  min-width:22px !important; margin:0 !important;padding:0 !important;
+  display:flex !important;align-items:center !important;justify-content:center !important;
+  background:transparent !important;border:0 !important;
+  color:#111 !important;opacity:.9 !important;
+}
+.plus-action-btn svg { width:15px !important;height:15px !important; }
+.plus-panel-sheet {
+  left:10px !important; right:auto !important;
+  bottom:112px !important;
+  width:min(216px,calc(100% - 20px)) !important;
+  max-height:min(49vh,350px) !important;
+  padding:10px 10px 8px !important;
+  border-radius:4px 12px 4px 12px !important;
+}
+.plus-panel-head { margin-bottom:7px !important;padding-bottom:7px !important; }
+.plus-panel-title { font-size:16px !important; }
+.plus-grid { gap:6px 4px !important; }
+.plus-item { min-height:47px !important; gap:4px !important; }
+.plus-icon-circle { width:23px !important;height:23px !important; }
+.plus-icon-circle svg { width:14px !important;height:14px !important; }
+.plus-label { font-size:9px !important; }
+@media(max-width:380px) {
+  .input-dock { padding-left:10px !important;padding-right:10px !important; }
+  .input-capsule { min-height:41px !important;padding-left:14px !important; }
+  .plus-action-btn { left:13px !important;bottom:calc(100% + 3px) !important; }
+  .plus-panel-sheet { left:9px !important;bottom:108px !important;width:min(210px,calc(100% - 18px)) !important; }
+}
+</style>
+
 </body>
 </html>
