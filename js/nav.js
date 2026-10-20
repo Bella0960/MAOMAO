@@ -1,5 +1,8 @@
 /* 悬浮胶囊底部导航 - 自动注入 + 自动高亮 */
 (function () {
+    // 从当前脚本位置推导站点根目录，兼容 GitHub Pages 的 /MAOMAO/ 子路径。
+    var navScript = document.currentScript;
+    var appBase = navScript ? new URL('../', navScript.src).pathname : '/';
     // 不注入导航的页面（手机桌面、聊天详情、设置页、编辑资料、记忆空间、角色管理）
     var SKIP_PAGES = ['index.html', 'chat-detail.html', 'settings.html', 'edit-profile.html', 'memory.html', 'characters.html', 'games/games.html', 'cafe/cafe.html'];
     var path = location.pathname.toLowerCase();
@@ -12,35 +15,28 @@
         {
             key: 'chat',
             label: '聊天',
-            href: '/chat/chat.html',
+            href: appBase + 'chat/chat.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
             badge: true
         },
         {
-            key: 'games',
-            label: '游戏',
-            href: '/games/games.html',
-            svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3.2a2 2 0 0 1-3.3 1l-2.2-2H8.7l-2.2 2a2 2 0 0 1-3.3-1l-1-3.2A4 4 0 0 1 6 9z"/><path d="M7 12v4M5 14h4M16.5 13h.01M19 15h.01"/></svg>',
-            badge: false
-        },
-        {
             key: 'contacts',
             label: '联系人',
-            href: '/chat/contacts.html',
+            href: appBase + 'chat/contacts.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
             badge: false
         },
         {
             key: 'moments',
             label: '空间',
-            href: '/chat/moments.html',
+            href: appBase + 'chat/moments.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
             badge: false
         },
         {
             key: 'profile',
             label: '我的',
-            href: '/profile/profile.html',
+            href: appBase + 'profile/profile.html',
             svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
             badge: false
         }
@@ -133,7 +129,7 @@
     // 生成导航 HTML 并根据当前页面高亮
     var currentPage = location.pathname.split('/').pop().toLowerCase();
     var tabsHTML = TABS.map(function (t) {
-        var isActive = (t.key === 'games' ? location.pathname.toLowerCase().indexOf('/games/') !== -1 : currentPage.indexOf(t.key) !== -1);
+        var isActive = currentPage.indexOf(t.key) !== -1;
         return '<a class="nav-tab' + (isActive ? ' active' : '') + '" href="' + t.href + '">' +
             '<span class="nav-ico">' + t.svg + '</span>' +
             '<span>' + t.label + '</span>' +
