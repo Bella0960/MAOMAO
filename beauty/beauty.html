@@ -299,7 +299,7 @@ function usePreset(i){
   var active = getActive();
   active[p.target] = p.name;
   setActive(active);
-  showToast('已设为启用 · 下次打开聊天时生效');
+  showToast('已启用 · 聊天列表与聊天页面下次打开时生效');
   renderList();
 }
 function delPreset(e, i){
