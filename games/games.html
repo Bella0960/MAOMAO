@@ -175,6 +175,47 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.games-list{gap:8px}.game-row{padding:12px 11px 0}.game-name{font-size:17px}.game-desc{font-size:9px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
 
 </style>
+
+<style id="maomao-editorial-controls">
+
+/* MAOMAO editorial controls — game hall edition */
+:root{--ink:#171717;--text:#454545;--muted:#858585;--line:#dedede;--paper:#fff;--soft:#f5f5f5;--serif:Georgia,"Times New Roman","Songti SC",serif}
+button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
+.hero h1,.game-heading h2,.prompt-title,.event-title{font-family:var(--serif);font-weight:400;letter-spacing:-.055em}
+.hero h1{color:#171717}
+.back-text{position:relative;border:0;border-radius:0;background:transparent;padding:8px 0 9px}
+.back-text:after{content:"";position:absolute;left:0;bottom:2px;width:19px;height:1px;background:#b8b8b8;transition:width .22s,background .22s}
+.back-text:hover:after{width:100%;background:#171717}
+.primary-btn,.secondary-btn{position:relative;border-radius:0;box-shadow:none}
+.primary-btn{border-color:#171717;background:transparent;color:#171717}
+.primary-btn:active{background:#171717;color:#fff}
+.secondary-btn{border:0;border-bottom:1px solid #bdbdbd;background:transparent;padding-left:0;padding-right:0}
+.secondary-btn:active{background:transparent;color:#171717;border-color:#171717}
+.input-row .primary-btn{min-width:82px}
+.board-panel,.evidence,.suspect,.empty-state{border-radius:0;box-shadow:none}
+.board-panel{border-color:var(--line);background:#fff}
+.clue-box{background:#f6f6f6;border-left:1px solid #171717}
+.evidence{border-color:#dedede}
+.evidence.revealed{background:#f5f5f5;border-color:#bdbdbd}
+.suspect{border-color:#dedede}
+.suspect.correct{border-color:#171717;background:#f7f7f7}
+.tic-cell{border-radius:0;background:#f5f5f5}
+.tic-cell.winning{background:#eaeaea}
+.difficulty{gap:17px}
+.diff-btn{position:relative;padding:0 0 7px}
+.diff-btn.active{color:#171717}
+.diff-btn.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:#171717}
+.round-label{border:0;border-bottom:1px solid #c9c9c9;border-radius:0;padding:5px 0}
+.spotlight{border-radius:0;background:#171717;color:#f5f5f5}
+.spotlight-title{font-weight:400;letter-spacing:-.055em}
+.spotlight-cta{border-bottom:1px solid rgba(255,255,255,.55);padding-bottom:6px}
+.spotlight-cta span{transition:transform .2s}
+.spotlight:active .spotlight-cta span{transform:translateX(2px)}
+.spotlight-bottom{border-color:rgba(255,255,255,.2)}
+.role-quote{border-left:1px solid #171717}
+@media(hover:hover){.board-panel{transition:border-color .2s}.board-panel:hover{border-color:#bdbdbd}.evidence:hover,.suspect:hover{border-color:#999}}
+
+</style>
 </head>
 <body>
 <div class="shell">
