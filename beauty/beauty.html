@@ -492,6 +492,24 @@ function showToast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 1500);
 }
+
+function ensureWechatPreset(){
+  var list = getPresets();
+  var name = '微信清爽版';
+  var existing = list.find(function(p){ return p && p.target === 'all' && p.name === name; });
+  if (!existing) {
+    list.push({ name: name, target: 'all', css: "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.chat-footer, .input-toolbar { background: #F7F7F7 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n", builtIn: true });
+    setPresets(list);
+  }
+  // 不覆盖用户已经启用的聊天全局预设；若当前没有全局预设，则启用这套示例方便直接预览。
+  var active = getActive();
+  if (!active.all) {
+    active.all = name;
+    setActive(active);
+  }
+}
+
+ensureWechatPreset();
 loadRoleOptions();
 renderList();
 
