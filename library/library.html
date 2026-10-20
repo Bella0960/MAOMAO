@@ -105,6 +105,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 .text-action.subtle{color:#666}
 .bottom-note{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);margin-top:16px;padding-top:13px;font-size:8px;letter-spacing:.16em;color:#8c8c8c;text-transform:uppercase}
 
+/* ===== 轻提示（黑白灰，无圆角） ===== */
+.toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:20;
+  background:var(--ink);color:#fff;padding:10px 16px;font-size:11px;letter-spacing:.05em;white-space:nowrap;
+  transition:opacity .24s ease,transform .24s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
 /* ===== 阅读器视图 ===== */
 .reader-head{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:15px 22px 12px;border-bottom:1px solid var(--line)}
 .reader-title{flex:1;min-width:0;font-family:var(--serif);font-weight:400;font-size:17px;letter-spacing:.02em;color:var(--ink);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -161,7 +167,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
           </div>
           <aside class="side-index">
             <div class="index-no">01</div>
-            <div class="index-label">THREE<br>VOLUMES<br>ON SHELF</div>
+            <div class="index-label" id="indexLabel">THREE<br>VOLUMES<br>ON SHELF</div>
           </aside>
         </div>
       </section>
@@ -170,7 +176,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
       <section class="shelf-block">
         <div class="section-head">
           <span class="section-title">架上藏书</span>
-          <span class="section-count">03 Volumes</span>
+          <span class="section-count" id="shelfCount">03 Volumes</span>
         </div>
         <div class="shelf-grid" id="shelfGrid"><!-- 书籍由 JS 渲染 --></div>
       </section>
@@ -192,7 +198,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
         <span>Fine lines &amp; type</span>
       </div>
     </footer>
+
+    <!-- 隐藏的本地文件选择器：仅接受 .txt -->
+    <input type="file" id="importFile" accept=".txt,text/plain" hidden>
   </section>
+
+  <!-- 轻提示 -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- ==================== 阅读器视图 ==================== -->
   <section class="view is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
@@ -247,21 +259,49 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
 
   var PLATE_LABELS = ['Plate 01 / Form', 'Plate 02 / Light', 'Plate 03 / Tide'];
 
-  /* ===== 渲染书架图版 ===== */
   var grid = document.getElementById('shelfGrid');
-  grid.innerHTML = books.map(function (b, i) {
-    var no = String(i + 1).padStart(2, '0');
-    return '<button class="book-card" type="button" data-book-id="' + b.id + '" aria-label="打开 ' + b.name + '">' +
-      '<div class="book-cover">' +
-        '<span class="plate-no">' + no + '</span>' +
-        '<span class="plate-label">' + PLATE_LABELS[i] + '</span>' +
-      '</div>' +
-      '<div class="book-meta">' +
-        '<span class="book-name">' + b.name + '</span>' +
-        '<span class="book-author">' + b.author + '</span>' +
-      '</div>' +
-    '</button>';
-  }).join('');
+  var shelfCount = document.getElementById('shelfCount');
+  var indexLabel = document.getElementById('indexLabel');
+  var toastEl = document.getElementById('toast');
+  var importInput = document.getElementById('importFile');
+
+  /* 转义：避免文件内容里的尖括号等破坏结构 */
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* 轻提示 */
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
+  }
+
+  /* ===== 渲染书架图版（初始 / 导入后复用） ===== */
+  function renderShelf() {
+    grid.innerHTML = books.map(function (b, i) {
+      var no = String(i + 1).padStart(2, '0');
+      var label = PLATE_LABELS[i] || ('Plate ' + no + ' / Local');
+      return '<button class="book-card" type="button" data-book-id="' + esc(b.id) + '" aria-label="打开 ' + esc(b.name) + '">' +
+        '<div class="book-cover">' +
+          '<span class="plate-no">' + no + '</span>' +
+          '<span class="plate-label">' + esc(label) + '</span>' +
+        '</div>' +
+        '<div class="book-meta">' +
+          '<span class="book-name">' + esc(b.name) + '</span>' +
+          '<span class="book-author">' + esc(b.author) + '</span>' +
+        '</div>' +
+      '</button>';
+    }).join('');
+
+    var total = String(books.length).padStart(2, '0');
+    shelfCount.textContent = total + ' Volumes';
+    indexLabel.innerHTML = total + '<br>VOLUMES<br>ON SHELF';
+  }
+
+  renderShelf();
 
   /* ===== 视图切换 ===== */
   var shelfView = document.getElementById('shelfView');
@@ -273,12 +313,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
   function openReader(book) {
     readerTitle.textContent = book.name;
 
-    var paragraphs = book.content.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+    var paragraphs = book.content.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
     readerContent.innerHTML =
-      '<div class="reader-meta"><span>Chapter 001</span><span>' + book.author + '</span></div>' +
+      '<div class="reader-meta"><span>' + esc(book.meta || 'Chapter 001') + '</span><span>' + esc(book.author) + '</span></div>' +
       '<div class="reader-chapter">' +
-        '<div class="chapter-no">' + book.chapter + '</div>' +
-        '<h3 class="chapter-title">' + book.name + '</h3>' +
+        '<div class="chapter-no">' + esc(book.chapter) + '</div>' +
+        '<h3 class="chapter-title">' + esc(book.name) + '</h3>' +
       '</div>' +
       paragraphs +
       '<div class="reader-divider"></div>' +
@@ -315,10 +355,54 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent
     location.href = '../index.html';
   });
 
-  /* 底部按钮：仅占位，不做真实逻辑 */
+  /* ===== 导入本地 .txt ===== */
   document.getElementById('importBtn').addEventListener('click', function () {
-    // 后续接入：读取本地 txt / epub 文件
+    importInput.value = '';          // 允许重复选择同一个文件
+    importInput.click();             // 触发隐藏的文件选择器
   });
+
+  importInput.addEventListener('change', function () {
+    var file = importInput.files && importInput.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+
+    reader.onload = function () {
+      var buf = reader.result;
+      var text = new TextDecoder('utf-8').decode(buf);
+      /* 中文 txt 常见 GBK 编码，出现替换字符时回退解码 */
+      if (text.indexOf('\uFFFD') !== -1) {
+        try { text = new TextDecoder('gbk').decode(buf); } catch (e) { /* 保持 utf-8 */ }
+      }
+
+      var paragraphs = text.replace(/\r\n?/g, '\n').split('\n')
+        .map(function (l) { return l.trim(); })
+        .filter(function (l) { return l.length > 0; });
+
+      if (paragraphs.length === 0) {
+        showToast('文件内容为空');
+        return;
+      }
+
+      var name = file.name.replace(/\.txt$/i, '').trim() || '未命名';
+      books.push({
+        id: 'local_' + Date.now(),
+        name: name,
+        author: '本地导入',
+        chapter: '本地文本',
+        meta: 'Imported text',
+        content: paragraphs
+      });
+
+      renderShelf();
+      showToast('已导入《' + name + '》');
+    };
+
+    reader.onerror = function () { showToast('文件读取失败'); };
+
+    reader.readAsArrayBuffer(file);
+  });
+
   document.getElementById('writeBtn').addEventListener('click', function () {
     // 后续接入：调用 AI 生成新书
   });
