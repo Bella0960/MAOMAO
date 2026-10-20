@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAOMAO — Editorial Poster Study</title>
+<style>
+:root{
+  --paper:#fff;--ink:#171717;--muted:#777;--soft:#bdbdbd;--line:#d8d8d8;
+  --serif: "Bodoni MT","Didot","Times New Roman",serif;
+  --sans: "Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{background:#f4f4f4}
+body{margin:0;color:var(--ink);font-family:var(--sans);background:var(--paper);min-height:100vh}
+button,input{font:inherit}
+button{color:inherit}
+.topline{height:1px;background:var(--ink);margin:0 28px}
+.site-head{display:flex;align-items:center;justify-content:space-between;padding:22px 28px 18px;gap:18px}
+.wordmark{font-family:var(--serif);font-size:19px;letter-spacing:.06em}
+.head-note{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.head-actions{display:flex;align-items:center;gap:22px}
+.text-action{position:relative;border:0;background:transparent;padding:4px 0 8px;cursor:pointer;font-family:var(--serif);font-size:17px;font-style:italic;transition:opacity .2s}
+.text-action:after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;transform:scaleX(.58);transform-origin:left;transition:transform .25s ease}
+.text-action:hover:after,.text-action:focus-visible:after{transform:scaleX(1)}
+.text-action:focus-visible,.icon-action:focus-visible{outline:1px solid #888;outline-offset:5px}
+.text-action.subtle{color:#666}
+.text-action.subtle:after{background:#999}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:44px;padding:34px 28px 48px;max-width:1440px;margin:auto}
+.poster{position:relative;min-height:650px;padding:24px 26px 26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.poster-meta{display:flex;justify-content:space-between;align-items:center;font-size:9px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.poster-main{display:grid;grid-template-columns:1fr 150px;gap:16px;align-items:start;margin-top:66px}
+.kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#777;margin-bottom:18px}
+.poster-title{font-family:var(--serif);font-weight:400;font-size:clamp(64px,10vw,144px);line-height:.76;letter-spacing:-.065em;margin:0 0 28px;max-width:780px}
+.poster-title em{font-weight:400;display:block;margin-left:11%;letter-spacing:-.075em}
+.cn-title{font-size:13px;letter-spacing:.22em;margin:0 0 12px}
+.description{font-size:11px;line-height:1.9;letter-spacing:.035em;color:#555;max-width:330px}
+.side-index{border-left:1px solid var(--line);padding:4px 0 0 16px;margin-top:8px}
+.index-no{font-family:var(--serif);font-size:36px;line-height:1}
+.index-label{font-size:9px;color:var(--muted);letter-spacing:.15em;margin-top:12px;line-height:1.7}
+.image-composition{display:grid;grid-template-columns:1.05fr .72fr;gap:12px;margin:48px 7% 0 12%;align-items:end}
+.photo{position:relative;overflow:hidden;background:#e8e8e8;cursor:pointer;outline:0;transition:transform .25s,outline-color .25s}
+.photo:focus-visible{outline:1px solid #666;outline-offset:4px}
+.photo.tall{height:228px}
+.photo.short{height:158px;margin-bottom:28px}
+.photo:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#d6d6d6 0%,#f7f7f7 38%,#bcbcbc 100%)}
+.photo.tall:after{content:"";position:absolute;width:42%;height:83%;left:31%;bottom:-8%;border-radius:48% 48% 8% 8%;background:linear-gradient(110deg,#a9a9a9,#f6f6f6 48%,#8b8b8b);filter:grayscale(1);opacity:.8}
+.photo.short:after{content:"";position:absolute;width:64%;height:54%;left:18%;top:25%;border-radius:50%;background:linear-gradient(120deg,#aaa,#fff 48%,#9b9b9b);opacity:.8}
+.photo-label{position:absolute;z-index:2;left:12px;bottom:10px;font-size:8px;letter-spacing:.15em;color:#444;text-transform:uppercase}
+.poster-foot{display:flex;justify-content:space-between;align-items:end;margin-top:28px;padding-top:13px;border-top:1px solid var(--line)}
+.foot-copy{font-size:9px;letter-spacing:.12em;color:#777;line-height:1.8}
+.foot-num{font-family:var(--serif);font-size:20px}
+.editable{cursor:pointer;transition:background .2s,outline-color .2s}
+.editable.is-selected{outline:1px solid #999;outline-offset:5px;background:rgba(0,0,0,.025)}
+.editable.is-selected:after{content:"SELECTED";position:absolute;top:-15px;right:0;font:8px var(--sans);letter-spacing:.16em;color:#666}
+h1.editable{position:relative}
+.editor{border-top:1px solid var(--ink);padding-top:15px;align-self:start}
+.editor-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px}
+.editor-title{font-family:var(--serif);font-size:26px;font-weight:400}
+.editor-count{font-size:9px;letter-spacing:.12em;color:var(--muted)}
+.editor-intro{font-size:11px;line-height:1.85;color:#666;margin:0 0 28px;max-width:230px}
+.tool-group{padding:15px 0;border-top:1px solid var(--line)}
+.tool-label{font-size:9px;letter-spacing:.16em;color:#777;text-transform:uppercase;margin-bottom:12px}
+.tool-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tool-name{font-size:12px}
+.icon-action{width:28px;height:28px;border:0;border-bottom:1px solid #aaa;background:transparent;display:grid;place-items:center;cursor:pointer;transition:border-color .2s,transform .2s}
+.icon-action:hover{border-color:#111;transform:translateY(-2px)}
+.icon-action svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.mini-actions{display:flex;gap:17px;flex-wrap:wrap}
+.mini-action{border:0;background:none;padding:2px 0 6px;position:relative;font-family:var(--serif);font-style:italic;font-size:15px;cursor:pointer}
+.mini-action:after{content:"";position:absolute;bottom:0;left:0;width:18px;height:1px;background:#aaa;transition:width .2s}
+.mini-action:hover:after{width:100%;background:#111}
+.status{font-size:10px;line-height:1.7;color:#777;min-height:18px;margin-top:15px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#171717;color:#fff;padding:10px 16px;font-size:11px;letter-spacing:.05em;transition:opacity .22s,transform .22s;z-index:10}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.bottom-note{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:15px 28px 24px;font-size:9px;letter-spacing:.13em;color:#777}
+@media(max-width:800px){
+ .site-head{padding:18px 18px 15px}.topline{margin:0 18px}
+ .layout{grid-template-columns:1fr;gap:34px;padding:22px 18px 32px}
+ .poster{min-height:auto;padding:18px 12px 22px}
+ .poster-main{grid-template-columns:1fr 78px;margin-top:50px}
+ .poster-title{font-size:clamp(58px,17vw,110px)}
+ .side-index{padding-left:10px}
+ .image-composition{margin:38px 4% 0 7%;gap:8px}
+ .photo.tall{height:190px}.photo.short{height:130px}
+ .editor{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
+ .editor-head,.editor-intro,.status{grid-column:1/-1}
+ .tool-group{min-width:0}
+ .bottom-note{padding:14px 18px 20px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="topline"></div>
+<header class="site-head">
+  <div>
+    <div class="wordmark">MAOMAO <span style="font-size:10px;color:#777">/ STUDIO</span></div>
+    <div class="head-note" style="margin-top:5px">Independent visual journal</div>
+  </div>
+  <div class="head-actions">
+    <button class="text-action subtle" id="resetBtn">重置</button>
+    <button class="text-action" id="saveBtn">保存</button>
+  </div>
+</header>
+<main class="layout">
+  <section class="poster" aria-label="互动海报预览">
+    <div class="poster-meta"><span>Visual archive / 001</span><span>Edition 2026</span></div>
+    <div class="poster-main">
+      <div>
+        <div class="kicker editable" data-editable>Notes on quiet things</div>
+        <h1 class="poster-title editable" data-editable tabindex="0" aria-label="点击选中标题">Soft <em>focus.</em></h1>
+        <p class="cn-title editable" data-editable>关于安静事物的记录</p>
+        <p class="description editable" data-editable>在日常的边缘，收集光线、形状与短暂的停顿。让视觉保持安静，让细节慢慢出现。</p>
+      </div>
+      <aside class="side-index editable" data-editable tabindex="0">
+        <div class="index-no">01</div>
+        <div class="index-label">STUDY<br>IN MONOCHROME</div>
+      </aside>
+    </div>
+    <div class="image-composition">
+      <div class="photo tall editable" tabindex="0" role="button" aria-label="选择主图" data-editable><span class="photo-label">Plate 01 / Form</span></div>
+      <div class="photo short editable" tabindex="0" role="button" aria-label="选择副图" data-editable><span class="photo-label">Plate 02 / Light</span></div>
+    </div>
+    <div class="poster-foot">
+      <div class="foot-copy">A SMALL COLLECTION OF MOMENTS<br>BLACK / WHITE / GREY</div>
+      <div class="foot-num">MM—01</div>
+    </div>
+  </section>
+  <aside class="editor">
+    <div class="editor-head"><div class="editor-title">细节调整</div><div class="editor-count">STUDIO / 01</div></div>
+    <p class="editor-intro">点选海报中的文字或图像，轻量调整它的状态。编辑工具只在需要时出现。</p>
+    <div class="tool-group">
+      <div class="tool-label">01 / Selection</div>
+      <div class="tool-row"><span class="tool-name" id="selectedName">尚未选择元素</span><button class="icon-action" id="clearSelection" aria-label="取消选择">
+        <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>
+      </button></div>
+    </div>
+    <div class="tool-group">
+      <div class="tool-label">02 / Typography</div>
+      <div class="mini-actions">
+        <button class="mini-action" id="serifBtn">Serif</button>
+        <button class="mini-action" id="sansBtn">Sans</button>
+        <button class="mini-action" id="italicBtn">Italic</button>
+      </div>
+    </div>
+    <div class="tool-group">
+      <div class="tool-label">03 / Treatment</div>
+      <div class="tool-row"><span class="tool-name">细线选中框</span><button class="icon-action" id="outlineBtn" aria-label="切换细线选中框">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" stroke-dasharray="2 2"/></svg>
+      </button></div>
+      <div class="tool-row" style="margin-top:13px"><span class="tool-name">编辑标注</span><button class="icon-action" id="labelBtn" aria-label="显示或隐藏标注">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+      </button></div>
+    </div>
+    <div class="tool-group">
+      <div class="tool-label">04 / Actions</div>
+      <div class="mini-actions">
+        <button class="mini-action" id="finishBtn">完成</button>
+        <button class="mini-action" id="editBtn">继续编辑</button>
+      </div>
+      <div class="status" id="statusText">点击海报任意元素开始。修改仅作用于当前预览。</div>
+    </div>
+  </aside>
+</main>
+<footer class="bottom-note"><span>MAOMAO / EDITORIAL INTERFACE STUDY</span><span>WHITE SPACE · FINE LINES · TYPE</span></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const editable = [...document.querySelectorAll('[data-editable]')];
+const selectedName = document.getElementById('selectedName');
+const statusText = document.getElementById('statusText');
+const toast = document.getElementById('toast');
+let selected = null;
+let labelsVisible = true;
+const names = new Map([
+  ['h1','主标题'],['p','文字注释'],['div','版式元素'],['aside','侧边编号']
+]);
+function showToast(message){
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(()=>toast.classList.remove('show'),1800);
+}
+function selectElement(el){
+  editable.forEach(item=>item.classList.remove('is-selected'));
+  selected = el;
+  if(selected){ selected.classList.add('is-selected'); selectedName.textContent = selected.getAttribute('aria-label') || names.get(selected.tagName.toLowerCase()) || (selected.classList.contains('photo')?'图像元素':'文字元素'); statusText.textContent='已选中元素。可切换字体样式，或完成编辑。'; }
+  else { selectedName.textContent='尚未选择元素'; statusText.textContent='点击海报任意元素开始。修改仅作用于当前预览。'; }
+}
+editable.forEach(el=>{
+  el.addEventListener('click',()=>selectElement(el));
+  el.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ') && (el.tagName==='H1'||el.tagName==='ASIDE'||el.classList.contains('photo'))){e.preventDefault();selectElement(el)}});
+});
+document.getElementById('clearSelection').addEventListener('click',()=>selectElement(null));
+document.getElementById('serifBtn').addEventListener('click',()=>{if(!selected){showToast('请先点选一个元素');return}selected.style.fontFamily='var(--serif)';showToast('已切换为衬线字体')});
+document.getElementById('sansBtn').addEventListener('click',()=>{if(!selected){showToast('请先点选一个元素');return}selected.style.fontFamily='var(--sans)';showToast('已切换为无衬线字体')});
+document.getElementById('italicBtn').addEventListener('click',()=>{if(!selected){showToast('请先点选一个元素');return}selected.style.fontStyle=selected.style.fontStyle==='italic'?'normal':'italic';showToast('字体样式已调整')});
+document.getElementById('outlineBtn').addEventListener('click',()=>{document.body.classList.toggle('hide-selection-outline');document.querySelectorAll('.is-selected').forEach(el=>el.classList.toggle('is-selected'));showToast(document.body.classList.contains('hide-selection-outline')?'已收起选中描边':'已恢复选中描边')});
+document.getElementById('labelBtn').addEventListener('click',()=>{labelsVisible=!labelsVisible;document.querySelectorAll('.poster-meta,.kicker,.side-index,.photo-label,.poster-foot').forEach(el=>el.style.visibility=labelsVisible?'':'hidden');showToast(labelsVisible?'标注已显示':'标注已隐藏')});
+document.getElementById('finishBtn').addEventListener('click',()=>{selectElement(null);document.body.classList.add('presentation-mode');document.querySelector('.editor').style.display='none';document.querySelector('.layout').style.gridTemplateColumns='minmax(0,1fr)';document.querySelector('.layout').style.maxWidth='1000px';statusText.textContent='';showToast('已切换至纯净展示')});
+document.getElementById('editBtn').addEventListener('click',()=>{document.body.classList.remove('presentation-mode');document.querySelector('.editor').style.display='';document.querySelector('.layout').style.gridTemplateColumns='minmax(0,1fr) 260px';document.querySelector('.layout').style.maxWidth='1440px';showToast('已返回编辑模式')});
+document.getElementById('saveBtn').addEventListener('click',()=>{showToast('当前预览已记录在页面中');statusText.textContent='预览样式已更新。此演示尚未连接项目存储。'});
+document.getElementById('resetBtn').addEventListener('click',()=>{location.reload()});
+</script>
+</body>
+</html>
