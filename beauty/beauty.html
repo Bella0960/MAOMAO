@@ -351,13 +351,15 @@ function savePreset(){
   var target = getCurrentTarget();
   if (!name) { showToast('起个名字'); return; }
   var list = getPresets();
+  var previous = editingIndex >= 0 ? list[editingIndex] : null;
   if (editingIndex >= 0) list[editingIndex] = { name: name, css: css, target: target };
   else list.push({ name: name, css: css, target: target });
   setPresets(list);
-  // 保存与启用分离：新预设不会被静默启用；编辑已启用预设时保留其启用状态。
+  // 保存不等于启用。已启用的预设重命名时同步状态；改作用范围时清除旧范围的启用记录。
   var active = getActive();
-  if (editingIndex >= 0 && active[target] === list[editingIndex].name) {
-    active[target] = name;
+  if (previous && active[previous.target] === previous.name) {
+    if (previous.target === target) active[target] = name;
+    else delete active[previous.target];
     setActive(active);
   }
   showToast('已保存预设');
