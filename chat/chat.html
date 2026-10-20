@@ -501,6 +501,33 @@
   .gm-cancel { background: #F0F0F2; color: #666666; }
   .gm-create { background: #111111; color: #FFFFFF; }
 
+  /* 聊天应用内的功能入口：通话与通讯录不再独立占用桌面 Dock */
+  .chat-hub-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 2px 0 4px;
+  }
+  .chat-hub-action {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid rgba(225,225,225,.9);
+    border-radius: 12px;
+    background: rgba(250,250,250,.78);
+    color: #222;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: .02em;
+    transition: background .18s ease, transform .18s ease;
+  }
+  .chat-hub-action:active { background: rgba(235,235,235,.95); transform: scale(.985); }
+  .chat-hub-action svg { width: 17px; height: 17px; flex: 0 0 auto; stroke: #555; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .chat-hub-action span { display: flex; flex-direction: column; gap: 2px; }
+  .chat-hub-action small { color: #888; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+
   /* 聊天卡流容器（动态渲染） */
   #chatListContainer {
     display: flex;
@@ -777,6 +804,16 @@
           </div>
 
           <!-- 动态聊天列表 -->
+          <div class="chat-hub-actions" aria-label="聊天功能入口">
+            <a class="chat-hub-action" href="call.html">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span>通话<small>CALL HISTORY</small></span>
+            </a>
+            <a class="chat-hub-action" href="contacts.html">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+              <span>通讯录<small>CONTACTS</small></span>
+            </a>
+          </div>
           <div id="chatListContainer"></div>
 
         </div>
