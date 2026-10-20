@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>外观美化 · 小手机</title>
+<title>聊天美化 · 小手机</title>
 <script src="../js/font-loader.js"></script>
 <script src="../js/native-feel.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
@@ -134,6 +134,51 @@
     padding: 10px 18px; border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100;
   }
   .toast.show { opacity: 1; }
+
+  /* MAOMAO Editorial Beauty — refinement */
+.field-hint{margin-top:8px;color:#858585;font-size:11px;line-height:1.7;letter-spacing:.01em;max-width:34em}
+.copy-btn{white-space:nowrap}
+  body{background:#e9e9e9;color:#151515}
+  .phone{border-radius:30px;box-shadow:0 18px 60px rgba(0,0,0,.10);border:1px solid #d6d6d6;position:relative}
+  .status-bar{font-size:11px;letter-spacing:.12em;font-weight:500;padding:17px 25px 12px}
+  .header{align-items:flex-start;gap:13px;padding:7px 22px 20px;border-bottom:1px solid #e8e8e8}
+  .back-btn{background:transparent;border-radius:0;width:25px;height:32px;border-right:1px solid #dedede;padding-right:10px;flex:0 0 25px}
+  .title{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:30px;letter-spacing:-.055em;line-height:1}
+  .title:after{content:"INTERFACE CUSTOMIZATION";display:block;font-family:Arial,sans-serif;font-size:8px;letter-spacing:.19em;color:#888;margin-top:9px;font-weight:500}
+  .content{padding:18px 22px 125px}
+  .toolbar{justify-content:space-between;gap:14px;margin-bottom:23px;border-bottom:1px solid #dedede;padding-bottom:13px}
+  .circle-btn{background:transparent;border-radius:0;width:30px;height:28px;border-bottom:1px solid #222}
+  .circle-btn:active,.copy-btn:active{background:transparent;color:#777}
+  .copy-btn{background:transparent;border-radius:0;padding:8px 0;border-bottom:1px solid #222;font-family:Georgia,serif;font-style:italic;font-size:14px;font-weight:400}
+  .preset-list{gap:0}
+  .preset-item{position:relative;background:transparent;border:0;border-top:1px solid #dedede;border-radius:0;padding:17px 4px 17px 2px;gap:13px;transition:padding .2s ease}
+  .preset-item:last-child{border-bottom:1px solid #dedede}
+  .preset-item.active{background:transparent;border-color:#bdbdbd;padding-left:9px}
+  .preset-item.active:before{content:"";position:absolute;left:0;top:19px;bottom:19px;width:2px;background:#111}
+  .preset-dot{width:4px;height:4px;border-radius:0;background:#bdbdbd;transform:rotate(45deg)}
+  .preset-item.active .preset-dot{background:#111}
+  .preset-name{font-family:Georgia,"Times New Roman",serif;font-size:17px;font-weight:400;letter-spacing:-.02em}
+  .preset-meta{font-family:Arial,sans-serif;font-size:9px;letter-spacing:.09em;color:#898989;margin-top:6px;text-transform:uppercase}
+  .preset-del{border-radius:0;width:28px;height:28px;font-size:20px;color:#999}
+  .empty{padding:52px 8px;text-align:left;font-family:Georgia,serif;font-size:19px;line-height:1.7;color:#555}
+  .empty:before{content:"NO PRESETS / 00";display:block;font:9px Arial,sans-serif;letter-spacing:.17em;color:#999;margin-bottom:12px}
+  .field{margin-bottom:23px}
+  .field label{font-size:9px;letter-spacing:.16em;color:#777;margin-bottom:9px;text-transform:uppercase}
+  .field input,.field textarea,.field select{background:#f7f7f7;border:0;border-bottom:1px solid #cfcfcf;border-radius:0;padding:13px 10px;font-size:13px}
+  .field input:focus,.field textarea:focus,.field select:focus{border-bottom-color:#111;box-shadow:0 1px 0 #111}
+  .field textarea{min-height:235px;border:1px solid #dedede;line-height:1.75;font-size:11px}
+  .target-pills{gap:0 15px;border-bottom:1px solid #dedede}
+  .pill{background:transparent;border:0;border-radius:0;padding:9px 0 10px;font-size:11px;color:#888;position:relative}
+  .pill.on{background:transparent;color:#111}
+  .pill.on:after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:#111}
+  .footer{position:absolute;background:linear-gradient(to top,#fff 76%,rgba(255,255,255,0));padding:20px 23px calc(21px + env(safe-area-inset-bottom));gap:24px;align-items:center}
+  .btn{flex:0 0 auto;height:auto;min-height:34px;border-radius:0;font-family:Georgia,"Times New Roman",serif;font-size:15px;font-style:italic;font-weight:400;background:transparent;color:#111;position:relative;padding:4px 0 8px}
+  .btn:after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:currentColor;transition:transform .22s ease;transform-origin:left}
+  .btn:active{background:transparent;opacity:.55}
+  .btn-primary,.btn-secondary{background:transparent;color:#111}
+  .toast{border-radius:0;background:#171717;padding:10px 16px;font-size:11px;letter-spacing:.04em}
+  @media(max-width:420px){.phone{width:100vw;height:100dvh;border-radius:0;border:0}body{background:#fff}}
+
 </style>
 </head>
 <body>
@@ -143,7 +188,7 @@
     <button class="back-btn" onclick="goBack()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="title">Beauty</div>
+    <div class="title">聊天美化</div>
   </div>
   <div class="content">
     <div class="list-view" id="listView">
@@ -151,7 +196,7 @@
         <button class="circle-btn" onclick="document.getElementById('importFile').click()" title="导入CSS文件">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </button>
-        <button class="copy-btn" onclick="copyRef()">复制类名表</button>
+        <button class="copy-btn" onclick="copyRef()">复制聊天全局 CSS</button>
       </div>
       <input type="file" id="importFile" accept=".css,.txt" style="display:none;">
       <div class="preset-list" id="presetList"></div>
@@ -164,12 +209,12 @@
       <div class="field">
         <label>用在哪</label>
         <div class="target-pills" id="targetPills">
-          <div class="pill on" data-target="all">全局</div>
+          <div class="pill on" data-target="all">聊天全局</div>
         </div>
       </div>
       <div class="field">
         <label>CSS</label>
-        <textarea id="presetCss" placeholder=".chat-header { background: #fef0f5; }"></textarea>
+        <textarea id="presetCss" placeholder=".chat-slim-card { border-radius: 10px; }"></textarea>\n        <div class="field-hint">聊天全局会同时作用于聊天列表和聊天详情；角色专属只作用于该角色的聊天详情。点击正在使用的预设可停用。保存前会检查括号、引号和空内容。</div>
       </div>
     </div>
   </div>
@@ -184,15 +229,21 @@ var LIST_KEY = 'beauty_presets';
 var ACTIVE_KEY = 'beauty_active';
 var editingIndex = -1;
 
-function getPresets(){ try { return JSON.parse(localStorage.getItem(LIST_KEY)||'[]'); } catch(e){ return []; } }
+function getPresets(){
+  try {
+    var value = JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
+    return Array.isArray(value) ? value.filter(function(p){ return p && typeof p === 'object'; }) : [];
+  } catch(e){ return []; }
+}
 function setPresets(p){ localStorage.setItem(LIST_KEY, JSON.stringify(p)); }
-function getActive(){ try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); } catch(e){ return {}; } }
+function getActive(){ try { var a = JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); return a && typeof a === 'object' && !Array.isArray(a) ? a : {}; } catch(e){ return {}; } }
 function setActive(o){ localStorage.setItem(ACTIVE_KEY, JSON.stringify(o)); }
 
 function loadRoleOptions(){
   var box = document.getElementById('targetPills');
   var roles = [];
   try { roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]'); } catch(e){}
+  if (!Array.isArray(roles)) roles = [];
   roles.forEach(function(r){
     var p = document.createElement('div');
     p.className = 'pill';
@@ -219,12 +270,12 @@ function setCurrentTarget(t){
 }
 
 function targetLabel(t){
-  if (t === 'all') return '全局';
+  if (t === 'all') return '聊天全局';
   try {
-    var roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]');
-    var r = roles.find(function(x){ return x.id === t; });
-    return r ? r.name : '';
-  } catch(e){ return ''; }
+    var roles = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
+    var r = Array.isArray(roles) && roles.find(function(x){ return x.id === t; });
+    return r ? r.name : '角色已不存在';
+  } catch(e){ return '角色已不存在'; }
 }
 
 function renderList(){
@@ -247,23 +298,31 @@ function renderList(){
     '</div>';
   }).join('');
 }
-function esc(s){ return String(s).replace(/</g,'&lt;'); }
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 function usePreset(i){
   var list = getPresets();
   var p = list[i];
   if (!p) return;
   var active = getActive();
-  active[p.target] = p.name;
-  setActive(active);
-  localStorage.setItem('custom_css', p.css);
-  showToast('已启用');
-  setTimeout(function(){ location.reload(); }, 500);
+  if (active[p.target] === p.name) {
+    delete active[p.target];
+    setActive(active);
+    showToast('已停用这个美化预设');
+  } else {
+    active[p.target] = p.name;
+    setActive(active);
+    showToast('已启用 · 聊天列表与聊天页面下次打开时生效');
+  }
+  renderList();
 }
 function delPreset(e, i){
   e.stopPropagation();
   var list = getPresets();
   var p = list[i];
+  if (p && p.target === 'all' && p.name === '微信清爽版') localStorage.setItem('beauty_wechat_preset_dismissed', '1');
   list.splice(i,1);
   setPresets(list);
   var active = getActive();
@@ -303,81 +362,123 @@ function goBack(){
   if (document.getElementById('editView').classList.contains('show')) showList();
   else history.back();
 }
+function validatePresetCSS(css){
+  if (!css || !css.trim()) return 'CSS 内容是空的，先粘贴或导入样式。';
+  var stack = [], quote = '', escaped = false, comment = false;
+  for (var i = 0; i < css.length; i++) {
+    var ch = css[i], next = css[i + 1];
+    if (comment) {
+      if (ch === '*' && next === '/') { comment = false; i++; }
+      continue;
+    }
+    if (quote) {
+      if (escaped) { escaped = false; continue; }
+      if (ch === '\\') { escaped = true; continue; }
+      if (ch === quote) quote = '';
+      continue;
+    }
+    if (ch === '/' && next === '*') { comment = true; i++; continue; }
+    if (ch === '"' || ch === "'") { quote = ch; continue; }
+    if (ch === '{' || ch === '(' || ch === '[') stack.push({ch:ch, index:i});
+    if (ch === '}' || ch === ')' || ch === ']') {
+      var top = stack.pop();
+      var expected = ch === '}' ? '{' : ch === ')' ? '(' : '[';
+      if (!top || top.ch !== expected) return 'CSS 括号不匹配，请检查第 ' + (i + 1) + ' 个字符附近。';
+    }
+  }
+  if (comment) return 'CSS 注释没有结束，请补上 */。';
+  if (quote) return 'CSS 字符串没有闭合，请检查引号。';
+  if (stack.length) return 'CSS 括号没有闭合，请检查第 ' + (stack[stack.length - 1].index + 1) + ' 个字符附近。';
+  return '';
+}
 function savePreset(){
   var name = document.getElementById('presetName').value.trim();
   var css = document.getElementById('presetCss').value;
   var target = getCurrentTarget();
-  if (!name) { showToast('起个名字'); return; }
+  if (!name) { showToast('请先填写预设名称'); return; }
+  var cssError = validatePresetCSS(css);
+  if (cssError) { showToast(cssError); return; }
+
   var list = getPresets();
+  var previous = editingIndex >= 0 ? list[editingIndex] : null;
+  var duplicate = list.some(function(p, index){
+    return index !== editingIndex && p.target === target && p.name.trim() === name;
+  });
+  if (duplicate) { showToast('这个作用范围里已有同名预设，请换个名字'); return; }
+
+  if (editingIndex >= 0 && !previous) { showToast('预设不存在，已取消保存'); showList(); return; }
   if (editingIndex >= 0) list[editingIndex] = { name: name, css: css, target: target };
   else list.push({ name: name, css: css, target: target });
   setPresets(list);
+
+  // 仅当原预设已启用时才同步改名；改作用范围则解除旧范围启用状态。
   var active = getActive();
-  active[target] = name;
-  setActive(active);
-  localStorage.setItem('custom_css', css);
-  showToast('已保存');
-  setTimeout(function(){ showList(); }, 500);
+  if (previous && active[previous.target] === previous.name) {
+    if (previous.target === target) active[target] = name;
+    else delete active[previous.target];
+    setActive(active);
+  }
+  showToast('已保存预设 · 保存不会自动启用');
+  setTimeout(function(){ showList(); }, 350);
 }
 
 function copyRef(){
-  var text = [
-    '/* ===== 小手机完整 CSS 模板 · 直接改 ===== */',
-    '',
-    '/* 顶栏 */',
-    '.chat-header {',
-    '  padding: 48px 14px 10px;',
-    '  display: flex; justify-content: space-between; align-items: center;',
-    '  background: rgba(244,244,246,0.85);',
-    '  backdrop-filter: blur(16px);',
-    '  border-bottom: 1px solid rgba(0,0,0,0.04);',
-    '}',
-    '.chat-user-name { font-size: 0.844rem; font-weight: 800; color: #111; }',
-    '.chat-status-sub { font-size: 0.5rem; color: #888; font-family: monospace; }',
-    '',
-    '/* 消息气泡 */',
-    '.msg-avatar {',
-    '  width: 32px; height: 32px; border-radius: 50%;',
-    '  background: linear-gradient(135deg,#EFEFEF,#DCDCDC);',
-    '}',
-    '.msg-bubble {',
-    '  padding: 9.5px 13px;',
-    '  font-size: 0.75rem; line-height: 1.5; font-weight: 500;',
-    '}',
-    '.msg-row.received .msg-bubble { background: #fff; color: #111; border-radius: 4px 18px 18px 18px; }',
-    '.msg-row.sent .msg-bubble { background: #111; color: #fff; border-radius: 18px 4px 18px 18px; }',
-    '',
-    '/* 输入栏 */',
-    '.input-capsule {',
-    '  background: #fff; border-radius: 20px; min-height: 36px;',
-    '}',
-    '.send-icon-btn {',
-    '  width: 26px; height: 26px; border-radius: 50%; background: #111;',
-    '}',
-    '',
-    '/* 卡片 */',
-    '.pay-card-red { background: #111; color: #fff; }',
-    '.pay-card-transfer { background: #fff; border: 1px solid #E5E5EA; color: #111; }',
-    '',
-    '/* ===== 改完上面的颜色/圆角就是你自己的美化 ===== */',
-    '/* 示例：淡粉顶栏 */',
-    '.chat-header { background: #fef0f5; }'
-  ].join('\n');
-  navigator.clipboard.writeText(text).then(function(){
-    showToast('已复制完整模板');
-  }).catch(function(){
+  var list = getPresets();
+  var active = getActive();
+  var current = list.find(function(p){ return p && p.target === 'all' && p.name === active.all; });
+  if (!current) current = list.find(function(p){ return p && p.target === 'all' && p.name === '微信清爽版'; });
+  if (!current || typeof current.css !== 'string' || !current.css.trim()) {
+    showToast('当前没有可复制的 CSS');
+    return;
+  }
+  var text = current.css;
+  function copied(){ showToast('已复制聊天全局 CSS'); }
+  function fallbackCopy(){
     var ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); copied(); }
+    catch(e) { showToast('复制失败，请进入编辑页手动复制'); }
     document.body.removeChild(ta);
-    showToast('已复制');
-  });
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(copied).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
 }
 function showToast(msg){
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 1500);
 }
+
+function ensureWechatPreset(){
+  var list = getPresets();
+  var name = '微信清爽版';
+  var existing = list.find(function(p){ return p && p.target === 'all' && p.name === name; });
+  var dismissed = localStorage.getItem('beauty_wechat_preset_dismissed') === '1';
+  if (existing && existing.builtIn === true && Number(existing.version || 1) < 2) {
+    existing.css = "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.input-dock { background: #F7F7F7 !important; border-top: 1px solid #E8E8E8 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n";
+    existing.version = 2;
+    setPresets(list);
+  } else if (!existing && !dismissed) {
+    list.push({ name: name, target: 'all', css: "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.input-dock { background: #F7F7F7 !important; border-top: 1px solid #E8E8E8 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n", builtIn: true, version: 2 });
+    setPresets(list);
+  }
+  // 不覆盖用户已经启用的聊天全局预设；若当前没有全局预设，则启用这套示例方便直接预览。
+  var active = getActive();
+  if (!active.all) {
+    active.all = name;
+    setActive(active);
+  }
+}
+
+ensureWechatPreset();
 loadRoleOptions();
 renderList();
 
