@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>书架 · MAOMAO</title>
+<script src="../js/native-feel.js"></script>
+<style>
+/* ============================================================
+   MAOMAO — Editorial Reading App
+   黑白灰 + 极简细线 + 衬线正文
+   红线：无 Emoji、隐藏滚动条、无阴影无圆角
+   ============================================================ */
+:root{
+  --paper:#ffffff;
+  --ink:#171717;
+  --muted:#777;
+  --soft:#bdbdbd;
+  --line:#d8d8d8;
+  --tabbar-h:58px;
+  --serif:"Bodoni MT","Didot","Times New Roman","Songti SC","Noto Serif CJK SC","STSong",serif;
+  --sans:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent}
+
+/* ===== 红线：隐藏所有滚动条 ===== */
+::-webkit-scrollbar{display:none;width:0;height:0}
+*{scrollbar-width:none;-ms-overflow-style:none}
+
+/* ===== 手机外框 ===== */
+.phone-mockup{position:relative;width:min(410px,calc(100vw - 24px));height:min(890px,calc(100dvh - 24px));min-height:620px;margin:12px auto;background:#fff;overflow:hidden;overflow:clip}
+@media(max-width:500px){
+  html,body{background:#fff}
+  .phone-mockup{width:100%;height:100dvh;min-height:0;margin:0}
+}
+
+/* ===== 视图容器 + 平滑切换 ===== */
+.view{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;background:var(--paper);
+  transition:opacity .34s cubic-bezier(.32,.72,0,1),transform .34s cubic-bezier(.32,.72,0,1),visibility .34s;will-change:opacity,transform}
+.view.above-tabbar{inset:0 0 calc(var(--tabbar-h) + env(safe-area-inset-bottom)) 0}
+.view.reader{z-index:30;background:var(--reader-bg,#fff)}
+.view.is-hidden{opacity:0;pointer-events:none;transform:translateX(26px);visibility:hidden}
+
+/* ===== 顶部细黑线 + 页眉（起始页） ===== */
+.topline{flex:0 0 auto;height:1px;background:var(--ink);margin:0 22px}
+.site-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px 12px}
+.back-line{position:relative;padding:3px 0 7px;display:inline-flex;align-items:center;gap:7px;color:var(--ink)}
+.back-line svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.back-line:after{content:"";position:absolute;left:0;bottom:1px;width:100%;height:1px;background:currentColor;transform:scaleX(.5);transform-origin:left;transition:transform .25s ease}
+.back-line:active:after{transform:scaleX(1)}
+.head-brand{text-align:right}
+.wordmark{font-family:var(--serif);font-size:15px;letter-spacing:.06em;line-height:1}
+.wordmark span{font-size:9px;letter-spacing:.12em;color:var(--muted);font-family:var(--sans)}
+.head-note{font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:6px}
+
+/* ===== 居中式页面标题（书架 / 设置） ===== */
+.page-head{flex:0 0 auto;padding:22px 22px 16px;text-align:center}
+.page-title{font-family:var(--serif);font-weight:400;font-size:24px;letter-spacing:.06em;margin:0;color:var(--ink)}
+.page-sub{font-size:8px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-top:9px}
+
+/* ===== 可滚动主体 ===== */
+.scroll{flex:1;min-height:0;overflow:auto;padding:0 22px;scrollbar-width:none}
+
+/* ===== 起始页海报区 ===== */
+.hero{padding:18px 0 22px;border-bottom:1px solid var(--line)}
+.poster-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.kicker{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:#777;margin:26px 0 12px}
+.hero-title{font-family:var(--serif);font-weight:400;font-size:clamp(46px,15vw,62px);line-height:.84;letter-spacing:-.055em;margin:0;color:var(--ink)}
+.hero-title em{display:block;font-style:normal;margin-left:14%;letter-spacing:-.07em}
+.cn-title{font-size:12px;letter-spacing:.24em;color:#333;margin:18px 0 0}
+.description{font-size:10px;line-height:1.95;letter-spacing:.035em;color:#555;max-width:270px;margin:12px 0 0}
+.hero-row{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:14px;align-items:start}
+.side-index{border-left:1px solid var(--line);padding:4px 0 0 14px;margin-top:6px}
+.index-no{font-family:var(--serif);font-size:34px;line-height:1;letter-spacing:-.03em}
+.index-label{font-size:8px;color:var(--muted);letter-spacing:.16em;margin-top:12px;line-height:1.9}
+
+/* ===== 书籍网格 ===== */
+.shelf-block{padding:22px 0 4px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:18px}
+.section-title{font-family:var(--serif);font-size:16px;letter-spacing:.02em;font-weight:400}
+.section-count{font-size:8px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.shelf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 15px}
+
+/* 书籍图版：渐变灰度占位 + 1px 细边框，无阴影无圆角 */
+.book-card{display:block;padding:0;text-align:left;min-width:0}
+.book-cover{position:relative;width:100%;aspect-ratio:3/4;background:#e8e8e8;border:1px solid var(--line);overflow:hidden;transition:border-color .22s}
+.book-cover:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#d6d6d6 0%,#f7f7f7 40%,#bcbcbc 100%)}
+.book-cover:after{content:"";position:absolute;width:46%;height:58%;left:27%;bottom:7%;background:linear-gradient(110deg,#b0b0b0,#f4f4f4 48%,#8f8f8f);opacity:.82;transition:opacity .22s}
+.book-card:active .book-cover{border-color:#b5b5b5}
+.book-card:active .book-cover:after{opacity:.62}
+.plate-no{position:absolute;z-index:2;top:6px;right:7px;font-family:var(--serif);font-size:12px;color:#4a4a4a;letter-spacing:.02em}
+.plate-label{position:absolute;z-index:2;left:7px;bottom:6px;font-size:7px;letter-spacing:.16em;color:#444;text-transform:uppercase}
+.book-meta{margin-top:11px;line-height:1.35}
+.book-name{display:block;font-family:var(--serif);font-size:12px;letter-spacing:.01em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.book-author{display:block;font-size:8px;color:var(--muted);letter-spacing:.08em;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== 起始页页脚 ===== */
+.poster-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px;padding:13px 0 0;border-top:1px solid var(--line)}
+.foot-copy{font-size:8px;letter-spacing:.14em;color:#777;line-height:1.9;text-transform:uppercase}
+.foot-num{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
+
+/* ===== 设置列表：细线行，无圆角无阴影 ===== */
+.set-block{padding:22px 0 4px}
+.set-list{border-top:1px solid var(--line)}
+.set-row{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);text-align:left}
+.set-label{display:block;font-size:11px;letter-spacing:.06em;color:var(--ink)}
+.set-sub{display:block;font-size:7px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:5px}
+.set-right{display:inline-flex;align-items:center;gap:10px;flex:0 0 auto}
+.set-value{font-size:10px;letter-spacing:.1em;color:#555}
+.row-icon{width:13px;height:13px;flex:0 0 auto;stroke:#9a9a9a;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.swatch{width:20px;height:20px;border:1px solid var(--line);background:#fff}
+.step{width:26px;height:26px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink)}
+.step:active{background:#f2f2f2}
+.step.is-off{color:#c8c8c8}
+
+/* ===== 斜体衬线文字按钮（弹窗用） ===== */
+.text-action{position:relative;padding:4px 0 9px;font-family:var(--serif);font-size:16px;font-style:italic;letter-spacing:.02em;color:var(--ink)}
+.text-action:after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;transform:scaleX(.55);transform-origin:left;transition:transform .28s ease}
+.text-action:active:after{transform:scaleX(1)}
+
+/* ===== 底部状态栏导航 ===== */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 0 8px;color:#b5b5b5;transition:color .22s ease}
+.tab-item svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.tab-label{font-size:9px;letter-spacing:.14em}
+.tab-item.is-active{color:var(--ink)}
+
+/* ===== 阅读器：左右滑动翻页（scroll-snap） ===== */
+.reader-head{position:relative;z-index:1;flex:0 0 auto;display:flex;align-items:center;padding:15px 22px 12px;border-bottom:1px solid var(--reader-line,#d8d8d8)}
+.head-back{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;color:var(--reader-ink,#171717)}
+.head-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.reader-title{position:absolute;left:50%;transform:translateX(-50%);max-width:60%;margin:0;text-align:center;
+  font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.02em;color:var(--reader-ink,#171717);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== 阅读器正文容器：基础 + 三种翻页模式 ===== */
+.reader-body{position:relative;z-index:1;flex:1;min-height:0;background:var(--reader-bg,#fff);color:var(--reader-ink,#171717);
+  filter:brightness(var(--reader-bright,1));transition:background .3s ease;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chapter-page{overflow-x:hidden}
+.reader-content{max-width:330px;margin:0 auto}
+/* 上下模式（默认）：竖向滚动，禁止横向 */
+.reader-body.mode-scroll{display:block;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+.reader-body.mode-scroll .chapter-page{width:100%;padding:26px 26px 20px}
+/* 平滑模式：横向整页滑动 */
+.reader-body.mode-smooth{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.reader-body.mode-smooth .chapter-page{flex:0 0 100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;padding:26px 26px 88px}
+/* 无动画模式：瞬间切换单章 */
+.reader-body.mode-none{display:block;overflow-y:auto;overflow-x:hidden}
+.reader-body.mode-none .chapter-page{display:none;width:100%;padding:26px 26px 96px}
+.reader-body.mode-none .chapter-page.is-active{display:block}
+
+/* 全屏背景图 + 半透明白遮罩（保证文字可读） */
+.reader-bgimg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;
+  opacity:0;pointer-events:none;transition:opacity .3s ease}
+.reader-bgimg.has-img{opacity:1}
+.reader-bgimg:after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.6)}
+.view.reader.has-img{background:transparent}
+.reader-meta{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;color:var(--reader-ink,#8c8c8c);opacity:.55;text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--reader-line,#d8d8d8)}
+.reader-chapter{margin:30px 0 24px}
+.chapter-no{font-size:8px;letter-spacing:.28em;color:var(--reader-ink,#8c8c8c);opacity:.5}
+.chapter-title{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.08;letter-spacing:-.04em;margin:9px 0 0}
+.reader-content p{font-family:var(--reader-font,var(--serif));font-size:var(--reader-fs,16px);line-height:var(--reader-lh,1.8);color:var(--reader-ink,#2c2c2c);margin:0 0 var(--reader-para,1.5em);text-indent:2em;text-align:justify}
+.reader-divider{width:26px;height:1px;background:var(--reader-ink,#171717);opacity:.5;margin:34px auto}
+.reader-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:13px;border-top:1px solid var(--reader-line,#d8d8d8)}
+.reader-foot .foot-num{font-size:18px}
+
+/* ===== 阅读器底部：悬浮药丸气泡（毛玻璃） ===== */
+.reader-controls{position:absolute;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));z-index:36;
+  width:min(300px,calc(100% - 52px));display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid rgba(23,23,23,.08);border-radius:999px;
+  transform:translate(-50%,150%);opacity:0;visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),opacity .34s ease,visibility .34s}
+.reader-controls.is-open{transform:translate(-50%,0);opacity:1;visibility:visible}
+.ctrl{display:inline-flex;align-items:center;justify-content:center;width:36px;height:34px;color:#3a3a3a;
+  border-radius:999px;transition:background .2s ease,opacity .2s ease}
+.ctrl svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.ctrl:active{background:rgba(23,23,23,.06)}
+.ctrl.is-off{opacity:.26}
+.ctrl-page{flex:0 0 auto;min-width:46px;text-align:center;font-size:10px;letter-spacing:.12em;color:#5a5a5a;
+  font-variant-numeric:tabular-nums}
+
+/* ===== 阅读设置面板（底部滑出，顶部 24px 大圆角，内部可滚动） ===== */
+.read-settings{position:absolute;left:0;right:0;bottom:0;z-index:46;display:flex;flex-direction:column;max-height:80%;
+  background:#fff;border-radius:24px 24px 0 0;
+  transform:translateY(101%);visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.read-settings.is-open{transform:translateY(0);visibility:visible}
+.rs-scroll{flex:1;min-height:0;overflow-y:auto;padding:8px 24px calc(20px + env(safe-area-inset-bottom));scrollbar-width:none}
+.rs-row{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #efefef}
+.rs-row:last-child{border-bottom:0}
+.rs-label{flex:0 0 56px;font-size:12px;letter-spacing:.06em;color:#555}
+.rs-range{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:2px;background:#dcdcdc;border-radius:2px;outline:none}
+.rs-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#171717;border:0;cursor:pointer}
+.rs-range::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#171717;border:0;cursor:pointer}
+.rs-fs{display:flex;align-items:center;gap:4px;margin-left:auto}
+.rs-step{font-family:var(--serif);font-size:14px;letter-spacing:.03em;color:#171717;padding:5px 10px}
+.rs-step:active{opacity:.5}
+.rs-step.is-off{opacity:.24;pointer-events:none}
+.rs-fs-value{min-width:30px;text-align:center;font-size:14px;color:#171717;font-variant-numeric:tabular-nums}
+.rs-themes{display:flex;align-items:center;gap:14px;margin-left:auto}
+.rs-theme{width:22px;height:22px;padding:0;border-radius:50%;border:1px solid rgba(23,23,23,.12)}
+.rs-theme[data-bg="0"]{background:#fff}
+.rs-theme[data-bg="1"]{background:#ececec}
+.rs-theme[data-bg="2"]{background:#f6f1e7}
+.rs-theme[data-bg="3"]{background:#000;border-color:rgba(23,23,23,.45)}
+.rs-theme.is-current{outline:1px solid #171717;outline-offset:2px}
+/* 背景图片上传圆钮 */
+.rs-upload{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:0;margin-left:4px;
+  border:1px solid rgba(23,23,23,.3);border-radius:50%;color:#171717}
+.rs-upload svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round}
+.rs-upload.is-current{border-color:#171717;background:#171717;color:#fff}
+/* 文字按钮组（字体 / 翻页） */
+.rs-chips{display:flex;align-items:center;gap:20px;margin-left:auto}
+.rs-chip{font-size:13px;letter-spacing:.04em;color:#9a9a9a;padding:2px 0;transition:color .2s ease,font-weight .2s ease}
+.rs-chip.is-current{color:#171717;font-weight:700}
+/* iOS 拨动开关 */
+.rs-switch{position:relative;flex:0 0 auto;width:44px;height:26px;margin-left:auto;padding:0;border:0;
+  border-radius:999px;background:#dcdcdc;transition:background .2s ease}
+.rs-switch:after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.18);transition:transform .2s ease}
+.rs-switch.is-on{background:#171717}
+.rs-switch.is-on:after{transform:translateX(18px)}
+
+/* 遮罩 + 底部面板（目录 / 弹窗） */
+.sheet-backdrop{position:absolute;inset:0;z-index:40;background:rgba(20,20,20,.22);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease,visibility .3s}
+.sheet-backdrop.is-open{opacity:1;pointer-events:auto;visibility:visible}
+.toc-sheet{position:absolute;left:0;right:0;bottom:0;z-index:45;display:flex;flex-direction:column;max-height:66%;background:#fff;border-top:1px solid var(--ink);
+  transform:translateY(101%);visibility:hidden;transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.toc-sheet.is-open{transform:translateY(0);visibility:visible}
+.toc-head{flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:16px 22px 12px;border-bottom:1px solid var(--line);
+  font-size:9px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+.toc-list{flex:1;min-height:0;overflow:auto;padding:4px 22px calc(20px + env(safe-area-inset-bottom))}
+.toc-item{display:flex;width:100%;align-items:baseline;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);text-align:left}
+.toc-no{min-width:22px;font-family:var(--serif);font-size:11px;letter-spacing:.04em;color:#9a9a9a}
+.toc-name{font-family:var(--serif);font-size:13px;color:#666}
+.toc-item.is-current .toc-no,.toc-item.is-current .toc-name{color:var(--ink)}
+.toc-item.is-current .toc-name{font-style:italic}
+.dialog{position:absolute;left:0;right:0;bottom:0;z-index:45;background:#fff;border-top:1px solid var(--ink);
+  padding:22px 22px calc(22px + env(safe-area-inset-bottom));transform:translateY(101%);visibility:hidden;
+  transition:transform .34s cubic-bezier(.32,.72,0,1),visibility .34s}
+.dialog.is-open{transform:translateY(0);visibility:visible}
+.dialog-title{font-family:var(--serif);font-weight:400;font-size:18px;letter-spacing:.02em}
+.dialog-body{font-size:10px;line-height:1.95;letter-spacing:.03em;color:#555;margin-top:10px}
+.dialog .text-action{margin-top:14px}
+
+/* ===== 轻提示（黑白灰，无圆角） ===== */
+.toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:60;
+  background:var(--ink);color:#fff;padding:10px 16px;font-size:11px;letter-spacing:.05em;white-space:nowrap;
+  transition:opacity .24s ease,transform .24s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ===== 动效 / 可访问性 ===== */
+@media(prefers-reduced-motion:reduce){
+  .view,.text-action:after,.back-line:after,.reader-controls,.toc-sheet,.dialog,.read-settings,.sheet-backdrop{transition:none!important}
+  .view.is-hidden{transform:none!important}
+}
+</style>
+</head>
+<body>
+<div class="phone-mockup" id="phone">
+
+  <!-- ==================== 页面 A：起始页 ==================== -->
+  <section class="view above-tabbar" id="homeView" aria-label="起始页">
+    <div class="topline"></div>
+    <header class="site-head">
+      <button class="back-line js-to-desktop" type="button" aria-label="返回桌面" title="返回桌面">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
+        <span style="font-size:11px">返回桌面</span>
+      </button>
+      <div class="head-brand">
+        <div class="wordmark">MAOMAO <span>/ READING</span></div>
+        <div class="head-note">Explore today</div>
+      </div>
+    </header>
+
+    <div class="scroll">
+      <section class="hero">
+        <div class="poster-meta">
+          <span>Explore / 001</span>
+          <span>Edition 2026</span>
+        </div>
+        <div class="kicker">Welcome back</div>
+        <div class="hero-row">
+          <div>
+            <h1 class="hero-title">安静地<em>读一会儿</em></h1>
+            <p class="cn-title">今天，从哪一页开始</p>
+            <p class="description">挑一本书，把这一小段时间留给自己。<br>字会替你记得，那些说不出口的停顿。</p>
+          </div>
+          <aside class="side-index">
+            <div class="index-no">01</div>
+            <div class="index-label" id="homeIndexLabel">TWO<br>PICKS<br>TODAY</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="shelf-block">
+        <div class="section-head">
+          <span class="section-title">今日推荐</span>
+          <span class="section-count" id="homeCount">02 Volumes</span>
+        </div>
+        <div class="shelf-grid" id="homeGrid"><!-- 推荐书籍由 JS 渲染 --></div>
+      </section>
+
+      <div class="poster-foot">
+        <div class="foot-copy">Start here<br>read a little</div>
+        <div class="foot-num">MM—00</div>
+      </div>
+      <div style="height:26px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 B：书架（只留书） ==================== -->
+  <section class="view above-tabbar is-hidden" id="shelfView" aria-label="书架" aria-hidden="true">
+    <div class="topline"></div>
+    <header class="page-head">
+      <h1 class="page-title">书架</h1>
+      <div class="page-sub">My Library</div>
+    </header>
+    <div class="scroll">
+      <div class="shelf-grid" id="shelfGrid"><!-- 书籍由 JS 渲染 --></div>
+      <div style="height:26px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 C：设置 ==================== -->
+  <section class="view above-tabbar is-hidden" id="settingsView" aria-label="设置" aria-hidden="true">
+    <div class="topline"></div>
+    <header class="page-head">
+      <h1 class="page-title">设置</h1>
+      <div class="page-sub">Preferences</div>
+    </header>
+
+    <div class="scroll">
+      <section class="set-block">
+        <div class="section-head">
+          <span class="section-title">阅读偏好</span>
+          <span class="section-count">02 Items</span>
+        </div>
+        <div class="set-list">
+          <button class="set-row" type="button" id="bgRow">
+            <span>
+              <span class="set-label">阅读背景颜色</span>
+              <span class="set-sub">Reading background</span>
+            </span>
+            <span class="set-right">
+              <span class="swatch" id="bgSwatch"></span>
+              <span class="set-value" id="bgValue">白纸</span>
+            </span>
+          </button>
+          <div class="set-row">
+            <span>
+              <span class="set-label">字体大小</span>
+              <span class="set-sub">Type size</span>
+            </span>
+            <span class="set-right">
+              <button class="step" type="button" id="fsDown" aria-label="减小字号">−</button>
+              <span class="set-value" id="fsValue">15</span>
+              <button class="step" type="button" id="fsUp" aria-label="增大字号">+</button>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 数据与操作：功能全部收纳在这里 -->
+      <section class="set-block">
+        <div class="section-head">
+          <span class="section-title">数据与操作</span>
+          <span class="section-count">03 Items</span>
+        </div>
+        <div class="set-list">
+          <button class="set-row" type="button" id="importRow">
+            <span>
+              <span class="set-label">导入本地书籍</span>
+              <span class="set-sub">Import local text</span>
+            </span>
+            <svg class="row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="set-row" type="button" id="writeRow">
+            <span>
+              <span class="set-label">让 TA 写一本</span>
+              <span class="set-sub">Ask TA to write one</span>
+            </span>
+            <svg class="row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+          <button class="set-row" type="button" id="clearRow">
+            <span>
+              <span class="set-label">清空本地书籍</span>
+              <span class="set-sub">Remove imported books</span>
+            </span>
+            <span class="set-value">清空</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="poster-foot">
+        <div class="foot-copy">Maomao / Reading Room<br>keep it quiet</div>
+        <div class="foot-num">MM—02</div>
+      </div>
+      <div style="height:26px"></div>
+    </div>
+
+    <!-- 隐藏的本地文件选择器：仅接受 .txt -->
+    <input type="file" id="importFile" accept=".txt,text/plain" hidden>
+  </section>
+
+  <!-- ==================== 底部状态栏导航 ==================== -->
+  <nav class="tabbar" id="tabbar" aria-label="主导航">
+    <button class="tab-item" type="button" data-route="home" aria-label="起始页">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.4 8.6-2.1 4.7-4.7 2.1 2.1-4.7z"/></svg>
+      <span class="tab-label">起始页</span>
+    </button>
+    <button class="tab-item" type="button" data-route="shelf" aria-label="书架">
+      <svg viewBox="0 0 24 24"><path d="M12 7.2C10.9 6 9.3 5.4 7 5.4H4v12h3.6c1.9 0 3.3.6 4.4 1.8 1.1-1.2 2.5-1.8 4.4-1.8H20v-12h-3c-2.3 0-3.9.6-5 1.8Z"/><path d="M12 7.2v12"/></svg>
+      <span class="tab-label">书架</span>
+    </button>
+    <button class="tab-item" type="button" data-route="settings" aria-label="设置">
+      <svg viewBox="0 0 24 24"><path d="M4 7.5h16M4 12h16M4 16.5h16"/><circle cx="9" cy="7.5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="16.5" r="2"/></svg>
+      <span class="tab-label">设置</span>
+    </button>
+  </nav>
+
+  <!-- ==================== 阅读器（全屏，左右滑动翻页） ==================== -->
+  <section class="view reader is-hidden" id="readerView" aria-label="阅读器" aria-hidden="true">
+    <div class="reader-bgimg" id="readerBgImg" aria-hidden="true"></div>
+    <header class="reader-head">
+      <button class="head-back" id="readerBack" type="button" aria-label="返回书架" title="返回书架">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg>
+      </button>
+      <h2 class="reader-title" id="readerTitle">书名</h2>
+    </header>
+    <main class="reader-body" id="readerBody"><!-- 每章一页，由 JS 渲染 --></main>
+  </section>
+
+  <!-- 控制栏（悬浮药丸气泡） / 目录面板 / 阅读设置 / 弹窗 -->
+  <div class="reader-controls" id="readerControls">
+    <button class="ctrl" type="button" id="ctrlToc" aria-label="目录" title="目录">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button class="ctrl" type="button" id="ctrlPrev" aria-label="上一章" title="上一章">
+      <svg viewBox="0 0 24 24"><path d="m14.5 5.5-6.5 6.5 6.5 6.5"/></svg>
+    </button>
+    <span class="ctrl-page" id="ctrlPage">01/03</span>
+    <button class="ctrl" type="button" id="ctrlNext" aria-label="下一章" title="下一章">
+      <svg viewBox="0 0 24 24"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></svg>
+    </button>
+    <button class="ctrl" type="button" id="ctrlSet" aria-label="阅读设置" title="阅读设置">
+      <svg viewBox="0 0 24 24"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.2"/><circle cx="8" cy="16" r="2.2"/></svg>
+    </button>
+  </div>
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="toc-sheet" id="tocSheet" aria-label="目录">
+    <div class="toc-head">
+      <span>Contents / 目录</span>
+      <span id="tocCount">03</span>
+    </div>
+    <div class="toc-list" id="tocList"></div>
+  </div>
+  <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog-title" id="dialogTitle">标题</div>
+    <div class="dialog-body" id="dialogBody">内容</div>
+    <button class="text-action" type="button" id="dialogOk">知道了</button>
+  </div>
+
+  <!-- 阅读设置面板 -->
+  <div class="read-settings" id="readSettings" role="dialog" aria-modal="true" aria-label="阅读设置">
+    <div class="rs-scroll">
+      <div class="rs-row">
+        <span class="rs-label">亮度</span>
+        <input class="rs-range" type="range" id="rsBrightness" min="40" max="140" step="1" value="100" aria-label="亮度">
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">字号</span>
+        <span class="rs-fs">
+          <button class="rs-step" type="button" id="rsFsDown" aria-label="减小字号">A-</button>
+          <span class="rs-fs-value" id="rsFsValue">16</span>
+          <button class="rs-step" type="button" id="rsFsUp" aria-label="增大字号">A+</button>
+        </span>
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">背景</span>
+        <span class="rs-themes">
+          <button class="rs-theme is-current" type="button" data-bg="0" aria-label="纯白日间"></button>
+          <button class="rs-theme" type="button" data-bg="1" aria-label="浅灰护眼"></button>
+          <button class="rs-theme" type="button" data-bg="2" aria-label="米黄纸张"></button>
+          <button class="rs-theme" type="button" data-bg="3" aria-label="纯黑夜间"></button>
+          <button class="rs-upload" type="button" id="rsUpload" aria-label="上传背景图片" title="上传背景图片">
+            <svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>
+          </button>
+        </span>
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">行距</span>
+        <input class="rs-range" type="range" id="rsLineHeight" min="14" max="24" step="1" value="18" aria-label="行距">
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">段距</span>
+        <input class="rs-range" type="range" id="rsParaGap" min="6" max="26" step="1" value="15" aria-label="段距">
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">字体</span>
+        <span class="rs-chips" id="rsFontChips">
+          <button class="rs-chip" type="button" data-font="sans">默认</button>
+          <button class="rs-chip is-current" type="button" data-font="serif">衬线</button>
+          <button class="rs-chip" type="button" data-font="mono">等宽</button>
+        </span>
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">翻页</span>
+        <span class="rs-chips" id="rsModeChips">
+          <button class="rs-chip is-current" type="button" data-mode="scroll">上下</button>
+          <button class="rs-chip" type="button" data-mode="smooth">平滑</button>
+          <button class="rs-chip" type="button" data-mode="none">无</button>
+        </span>
+      </div>
+      <div class="rs-row">
+        <span class="rs-label">显示段评</span>
+        <button class="rs-switch" type="button" id="rsComments" role="switch" aria-checked="false" aria-label="显示段评"></button>
+      </div>
+    </div>
+    <input type="file" id="rsImageInput" accept="image/*" hidden>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 书籍数据：每本含多章，章内含段落 ===== */
+  var books = [
+    {
+      id: 'b1', name: '月光与回声', author: '林远舟',
+      chapters: [
+        { label: '第一章', title: '夜色与纽扣', paras: [
+          '夜色把整座城市收进一只旧木匣，街灯像被遗忘的纽扣，一颗一颗亮在潮湿的空气里。她推开窗，风带着远处江水的气息，轻轻擦过耳侧。',
+          '很多年以后，她仍然记得那个夜晚的温度。不是因为发生了什么惊天动地的事，而是因为那是她第一次意识到，原来告别可以安静得像一片叶子落在水面。'
+        ]},
+        { label: '第二章', title: '便利店的灯', paras: [
+          '楼下的便利店还开着，日光灯把门口一小块地方照得发白。她忽然很想下去走一走，不为买什么，只是想让脚底碰到真实的地面。',
+          '收银台后面的年轻人正在看书，头也没抬。她买了一瓶水，站在门口慢慢喝完，忽然觉得这座城市也没有那么冷。'
+        ]},
+        { label: '第三章', title: '枕边的纸条', paras: [
+          '第二天清晨，她在枕边发现一张纸条，上面只有一行字：我把回声寄给你了。字是他的笔迹，瘦而长，像他说话时总带着的那点犹豫。',
+          '她把纸条折好，夹进一本没有读完的书里。窗外天色渐亮，远处的江面浮起一层薄雾，像一封还没有拆开的信。'
+        ]}
+      ]
+    },
+    {
+      id: 'b2', name: '纸鹤集', author: '苏微',
+      chapters: [
+        { label: '序', title: '写在纸上', paras: [
+          '小时候她以为，只要把愿望写在纸上，再折成一只鹤，愿望就会顺着风飞走，飞到某个能听见它的地方。',
+          '长大以后她才明白，纸鹤飞不远，它们大多落在屋顶、树梢，或者某条无人经过的小巷里。但写愿望的那个瞬间，是真的。'
+        ]},
+        { label: '第一折', title: '玻璃瓶', paras: [
+          '她把这些年折过的鹤都收在一只玻璃瓶里，瓶口用棉线绕了三圈，像给愿望打了一个不紧不松的结。',
+          '她不常打开它，只是偶尔把瓶子举到光下看一看，看那些单薄的纸在瓶子里面，安安静静地叠着。'
+        ]},
+        { label: '第二折', title: '迟来的雪', paras: [
+          '搬家的时候瓶子碎了，纸鹤散落一地，像一场迟来的雪。她蹲下来一只一只捡，忽然觉得自己好像也被重新拼凑了一遍。',
+          '如果你也有一只纸鹤，请别急着放飞它。先把它握在手心一会儿，让它知道你是认真的。'
+        ]}
+      ]
+    },
+    {
+      id: 'b3', name: '海边的旧信', author: '陈屿',
+      chapters: [
+        { label: '第一封信', title: '潮水退去', paras: [
+          '潮水退去的时候，沙滩上会留下一些奇怪的东西。半只贝壳，一段绳子，有时候是一封信。',
+          '他捡到那封信的时候，信纸已经被海水泡得发软，字迹模糊得像一场没做完的梦。但他还是看出来了，那是一封写给某个名字的信，开头写着：见字如面。'
+        ]},
+        { label: '第二封信', title: '洇开的字', paras: [
+          '他把信带回家，夹在一本旧书里。后来他搬了很多次家，丢了很多东西，但那封信一直都在。',
+          '只是偶尔，在下雨的傍晚，他会把信拿出来看一眼。那些洇开的字，像海面上最后一点光。'
+        ]}
+      ]
+    }
+  ];
+
+  var PLATE_LABELS = ['Plate 01 / Form', 'Plate 02 / Light', 'Plate 03 / Tide'];
+  var MAIN_ROUTES = ['home', 'shelf', 'settings'];
+
+  /* ===== 设置项（内存态） ===== */
+  var BG_TONES = [
+    { name: '纯白日间', bg: '#ffffff', ink: '#2c2c2c', line: '#d8d8d8' },
+    { name: '浅灰护眼', bg: '#ececec', ink: '#2c2c2c', line: '#d0d0d0' },
+    { name: '米黄纸张', bg: '#f6f1e7', ink: '#39342b', line: '#e2d9c6' },
+    { name: '纯黑夜间', bg: '#000000', ink: '#e8e8e8', line: '#2a2a2a' }
+  ];
+  var FONT_STACKS = {
+    sans: '"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif',
+    serif: '"Bodoni MT","Didot","Times New Roman","Songti SC","Noto Serif CJK SC","STSong",serif',
+    mono: 'ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace'
+  };
+  var settings = {
+    bg: 0,          /* 0 纯白 / 1 浅灰 / 2 米黄 / 3 纯黑 */
+    fs: 16,         /* 字号 14-22 */
+    bright: 1,      /* 亮度 0.4-1.4 */
+    lh: 1.8,        /* 行距 */
+    para: 1.5,      /* 段距（em） */
+    font: 'serif',  /* sans | serif | mono */
+    mode: 'scroll', /* scroll 上下 | smooth 平滑 | none 无动画 */
+    image: '',      /* 背景图 dataURL */
+    comments: false /* 显示段评 */
+  };
+
+  /* ===== DOM ===== */
+  var phone = document.getElementById('phone');
+  var tabbar = document.getElementById('tabbar');
+  var readerView = document.getElementById('readerView');
+  var readerBody = document.getElementById('readerBody');
+  var readerBgImg = document.getElementById('readerBgImg');
+  var readerTitle = document.getElementById('readerTitle');
+  var readerControls = document.getElementById('readerControls');
+  var ctrlPage = document.getElementById('ctrlPage');
+  var readSettings = document.getElementById('readSettings');
+  var rsBrightness = document.getElementById('rsBrightness');
+  var rsLineHeight = document.getElementById('rsLineHeight');
+  var rsParaGap = document.getElementById('rsParaGap');
+  var rsFsValue = document.getElementById('rsFsValue');
+  var rsThemeBtns = document.querySelectorAll('.rs-theme');
+  var rsFsDown = document.getElementById('rsFsDown');
+  var rsFsUp = document.getElementById('rsFsUp');
+  var rsFontChips = document.querySelectorAll('#rsFontChips .rs-chip');
+  var rsModeChips = document.querySelectorAll('#rsModeChips .rs-chip');
+  var rsComments = document.getElementById('rsComments');
+  var rsUpload = document.getElementById('rsUpload');
+  var rsImageInput = document.getElementById('rsImageInput');
+  var tocSheet = document.getElementById('tocSheet');
+  var tocList = document.getElementById('tocList');
+  var tocCount = document.getElementById('tocCount');
+  var sheetBackdrop = document.getElementById('sheetBackdrop');
+  var dialog = document.getElementById('dialog');
+  var toastEl = document.getElementById('toast');
+  var importInput = document.getElementById('importFile');
+  var grid = document.getElementById('shelfGrid');
+  var homeGrid = document.getElementById('homeGrid');
+  var homeCount = document.getElementById('homeCount');
+  var homeIndexLabel = document.getElementById('homeIndexLabel');
+
+  /* ===== 阅读状态 ===== */
+  var state = { book: null, ch: 0 };
+  var lastMain = 'home';
+
+  /* ===== 工具 ===== */
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function findBook(id) { return books.filter(function (b) { return b.id === id; })[0]; }
+  function setHidden(el, hidden) {
+    el.classList.toggle('is-hidden', hidden);
+    el.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+  }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
+  }
+
+  /* ===== 书籍图版 ===== */
+  function cardHtml(b, i) {
+    var no = pad2(i + 1);
+    var label = PLATE_LABELS[i] || ('Plate ' + no + ' / Local');
+    return '<button class="book-card" type="button" data-book-id="' + esc(b.id) + '" aria-label="打开 ' + esc(b.name) + '">' +
+      '<div class="book-cover">' +
+        '<span class="plate-no">' + no + '</span>' +
+        '<span class="plate-label">' + esc(label) + '</span>' +
+      '</div>' +
+      '<div class="book-meta">' +
+        '<span class="book-name">' + esc(b.name) + '</span>' +
+        '<span class="book-author">' + esc(b.author) + '</span>' +
+      '</div>' +
+    '</button>';
+  }
+
+  function renderShelf() {
+    grid.innerHTML = books.map(cardHtml).join('');
+  }
+
+  function renderHome() {
+    var picks = books.slice(0, 2);
+    homeGrid.innerHTML = picks.map(cardHtml).join('');
+    homeCount.textContent = pad2(picks.length) + ' Volumes';
+    homeIndexLabel.innerHTML = (picks.length === 1 ? 'ONE' : 'TWO') + '<br>PICKS<br>TODAY';
+  }
+
+  /* ===== 阅读器：章节渲染 + 三种翻页模式 ===== */
+  function pageHtml(book, ch, i) {
+    var total = book.chapters.length;
+    var pos = pad2(i + 1) + ' / ' + pad2(total);
+    return '<div class="reader-meta"><span>' + esc(book.author) + '</span><span>' + pos + '</span></div>' +
+      '<div class="reader-chapter">' +
+        '<div class="chapter-no">' + esc(ch.label) + '</div>' +
+        '<h3 class="chapter-title">' + esc(ch.title) + '</h3>' +
+      '</div>' +
+      ch.paras.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+      '<div class="reader-divider"></div>' +
+      '<div class="reader-foot">' +
+        '<div class="foot-copy">' + esc(book.name) + '<br>' + pos + '</div>' +
+        '<div class="foot-num">' + pad2(i + 1) + '</div>' +
+      '</div>';
+  }
+
+  function buildReader(book) {
+    readerTitle.textContent = book.name;
+    readerBody.innerHTML = book.chapters.map(function (ch, i) {
+      return '<section class="chapter-page" data-ch="' + i + '">' +
+        '<article class="reader-content">' + pageHtml(book, ch, i) + '</article>' +
+      '</section>';
+    }).join('');
+    readerBody.scrollLeft = 0;
+    readerBody.scrollTop = 0;
+  }
+
+  function chapterPages() { return readerBody.querySelectorAll('.chapter-page'); }
+
+  function syncReaderUi() {
+    var total = state.book.chapters.length;
+    document.getElementById('ctrlPrev').classList.toggle('is-off', state.ch <= 0);
+    document.getElementById('ctrlNext').classList.toggle('is-off', state.ch >= total - 1);
+    ctrlPage.textContent = pad2(state.ch + 1) + '/' + pad2(total);
+    Array.prototype.forEach.call(tocList.children, function (el, i) {
+      el.classList.toggle('is-current', i === state.ch);
+    });
+  }
+
+  /* 根据滚动位置反算当前章（平滑 / 上下模式） */
+  function indexFromScroll() {
+    if (settings.mode === 'smooth') {
+      var w = readerBody.clientWidth;
+      if (!w) return -1;
+      return Math.round(readerBody.scrollLeft / w);
+    }
+    if (settings.mode === 'scroll') {
+      var pages = chapterPages();
+      var probe = readerBody.scrollTop + 40;
+      var idx = 0;
+      for (var k = 0; k < pages.length; k++) {
+        if (pages[k].offsetTop <= probe) idx = k;
+      }
+      return idx;
+    }
+    return -1;
+  }
+
+  /* 切换章节：三种模式各自定位 */
+  function goChapter(i, instant) {
+    var total = state.book.chapters.length;
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    state.ch = i;
+    var pages = chapterPages();
+    if (settings.mode === 'smooth') {
+      var left = i * readerBody.clientWidth;
+      if (instant) readerBody.scrollLeft = left;
+      else readerBody.scrollTo({ left: left, behavior: 'smooth' });
+    } else if (settings.mode === 'scroll') {
+      var top = pages[i] ? pages[i].offsetTop : 0;
+      if (instant) readerBody.scrollTop = top;
+      else readerBody.scrollTo({ top: top, behavior: 'smooth' });
+    } else {
+      /* 无动画：瞬间只显示当前章 */
+      Array.prototype.forEach.call(pages, function (p, k) { p.classList.toggle('is-active', k === i); });
+      readerBody.scrollTop = 0;
+    }
+    syncReaderUi();
+  }
+
+  /* 切换翻页模式：重设容器类名 + 重新定位 */
+  function setMode(mode) {
+    settings.mode = mode;
+    readerBody.classList.remove('mode-scroll', 'mode-smooth', 'mode-none');
+    readerBody.classList.add('mode-' + mode);
+    var pages = chapterPages();
+    Array.prototype.forEach.call(pages, function (p, i) {
+      p.classList.toggle('is-active', mode !== 'none' || i === state.ch);
+    });
+    readerBody.scrollTop = 0;
+    readerBody.scrollLeft = 0;
+    goChapter(state.ch, true);
+    applySettings();
+  }
+
+  function renderToc() {
+    tocCount.textContent = pad2(state.book.chapters.length);
+    tocList.innerHTML = state.book.chapters.map(function (c, i) {
+      return '<button class="toc-item" type="button" data-ch="' + i + '">' +
+        '<span class="toc-no">' + pad2(i + 1) + '</span>' +
+        '<span class="toc-name">' + esc(c.label) + ' · ' + esc(c.title) + '</span>' +
+      '</button>';
+    });
+    syncReaderUi();
+  }
+
+  function toggleControls(force) {
+    var open = (typeof force === 'boolean') ? force : !readerControls.classList.contains('is-open');
+    readerControls.classList.toggle('is-open', open);
+  }
+
+  function closeSheets() {
+    tocSheet.classList.remove('is-open');
+    dialog.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
+    sheetBackdrop.classList.remove('is-open');
+  }
+  function openToc() {
+    toggleControls(false);
+    dialog.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
+    tocSheet.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
+  }
+  function openReadSettings() {
+    toggleControls(false);
+    tocSheet.classList.remove('is-open');
+    dialog.classList.remove('is-open');
+    readSettings.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
+  }
+  function openDialog(title, body) {
+    toggleControls(false);
+    tocSheet.classList.remove('is-open');
+    readSettings.classList.remove('is-open');
+    document.getElementById('dialogTitle').textContent = title;
+    document.getElementById('dialogBody').textContent = body;
+    dialog.classList.add('is-open');
+    sheetBackdrop.classList.add('is-open');
+  }
+
+  function hideAllMain() {
+    MAIN_ROUTES.forEach(function (r) { setHidden(document.getElementById(r + 'View'), true); });
+  }
+
+  function openReader(book) {
+    state.book = book;
+    state.ch = 0;
+    buildReader(book);
+    renderToc();
+    toggleControls(false);
+    closeSheets();
+    hideAllMain();
+    setHidden(readerView, false);
+    setMode(settings.mode);   /* 按当前翻页模式布局 */
+  }
+
+  /* ===== 路由（哈希） ===== */
+  function showMain(route) {
+    if (MAIN_ROUTES.indexOf(route) < 0) route = 'home';
+    lastMain = route;
+    MAIN_ROUTES.forEach(function (r) {
+      setHidden(document.getElementById(r + 'View'), r !== route);
+    });
+    Array.prototype.forEach.call(tabbar.querySelectorAll('.tab-item'), function (el) {
+      el.classList.toggle('is-active', el.dataset.route === route);
+    });
+  }
+
+  function applyRoute(route) {
+    if (!route) route = 'home';
+    if (route.indexOf('read-') === 0) {
+      var book = findBook(route.slice(5));
+      if (book) { openReader(book); return; }
+      route = lastMain;
+    }
+    setHidden(readerView, true);
+    toggleControls(false);
+    closeSheets();
+    showMain(route);
+  }
+
+  function go(route) {
+    if (location.hash === '#' + route) { applyRoute(route); return; }
+    location.hash = route;
+  }
+
+  window.addEventListener('hashchange', function () {
+    applyRoute(location.hash.replace(/^#/, ''));
+  });
+
+  /* ===== 设置 ===== */
+  function applySettings() {
+    var tone = BG_TONES[settings.bg];
+    var hasImg = !!settings.image;
+    /* 有背景图时底色透明、文字强制深色，保证叠加白遮罩后可读 */
+    readerView.style.setProperty('--reader-bg', hasImg ? 'transparent' : tone.bg);
+    readerView.style.setProperty('--reader-ink', hasImg ? '#1c1c1c' : tone.ink);
+    readerView.style.setProperty('--reader-line', hasImg ? 'rgba(0,0,0,.18)' : tone.line);
+    readerView.style.setProperty('--reader-fs', settings.fs + 'px');
+    readerView.style.setProperty('--reader-bright', settings.bright);
+    readerView.style.setProperty('--reader-font', FONT_STACKS[settings.font]);
+    readerView.style.setProperty('--reader-lh', settings.lh);
+    readerView.style.setProperty('--reader-para', settings.para + 'em');
+    readerView.classList.toggle('has-img', hasImg);
+    readerBgImg.style.backgroundImage = hasImg ? 'url("' + settings.image + '")' : '';
+    readerBgImg.classList.toggle('has-img', hasImg);
+    /* 设置页同步 */
+    document.getElementById('bgSwatch').style.background = tone.bg;
+    document.getElementById('bgValue').textContent = tone.name;
+    document.getElementById('fsValue').textContent = settings.fs;
+    document.getElementById('fsDown').classList.toggle('is-off', settings.fs <= 14);
+    document.getElementById('fsUp').classList.toggle('is-off', settings.fs >= 22);
+    /* 阅读设置面板同步 */
+    rsBrightness.value = Math.round(settings.bright * 100);
+    rsLineHeight.value = Math.round(settings.lh * 10);
+    rsParaGap.value = Math.round(settings.para * 10);
+    rsFsValue.textContent = settings.fs;
+    rsFsDown.classList.toggle('is-off', settings.fs <= 14);
+    rsFsUp.classList.toggle('is-off', settings.fs >= 22);
+    Array.prototype.forEach.call(rsThemeBtns, function (el) {
+      el.classList.toggle('is-current', parseInt(el.dataset.bg, 10) === settings.bg);
+    });
+    rsUpload.classList.toggle('is-current', hasImg);
+    Array.prototype.forEach.call(rsFontChips, function (el) {
+      el.classList.toggle('is-current', el.dataset.font === settings.font);
+    });
+    Array.prototype.forEach.call(rsModeChips, function (el) {
+      el.classList.toggle('is-current', el.dataset.mode === settings.mode);
+    });
+    rsComments.classList.toggle('is-on', settings.comments);
+    rsComments.setAttribute('aria-checked', settings.comments ? 'true' : 'false');
+  }
+
+  /* ===== 事件绑定 ===== */
+  tabbar.addEventListener('click', function (e) {
+    var tab = e.target.closest('.tab-item');
+    if (tab) go(tab.dataset.route);
+  });
+
+  /* 书籍点击（书架 + 起始页推荐，统一委托） */
+  phone.addEventListener('click', function (e) {
+    var card = e.target.closest('.book-card');
+    if (!card) return;
+    var book = findBook(card.dataset.bookId);
+    if (book) go('read-' + book.id);
+  });
+
+  /* 阅读器：点击正文切换气泡控制栏 */
+  readerBody.addEventListener('click', function () {
+    if (tocSheet.classList.contains('is-open') || readSettings.classList.contains('is-open')) return;
+    toggleControls();
+  });
+
+  /* 滚动 / 滑动 → 反算当前章，与目录、页码联动（无动画模式不参与） */
+  readerBody.addEventListener('scroll', function () {
+    if (!state.book || settings.mode === 'none') return;
+    var i = indexFromScroll();
+    if (i >= 0 && i !== state.ch) { state.ch = i; syncReaderUi(); }
+  }, { passive: true });
+
+  window.addEventListener('resize', function () {
+    if (!state.book) return;
+    goChapter(state.ch, true);
+  });
+
+  document.getElementById('readerBack').addEventListener('click', function () {
+    go(lastMain);
+  });
+
+  document.getElementById('ctrlToc').addEventListener('click', openToc);
+  document.getElementById('ctrlPrev').addEventListener('click', function () { goChapter(state.ch - 1); });
+  document.getElementById('ctrlNext').addEventListener('click', function () { goChapter(state.ch + 1); });
+  document.getElementById('ctrlSet').addEventListener('click', openReadSettings);
+
+  /* 阅读设置：亮度 / 字号 / 背景 / 排版 / 字体 / 翻页 / 段评（全部真实生效） */
+  rsBrightness.addEventListener('input', function () {
+    settings.bright = parseInt(rsBrightness.value, 10) / 100;
+    readerView.style.setProperty('--reader-bright', settings.bright);
+  });
+  rsFsDown.addEventListener('click', function () {
+    if (settings.fs > 14) { settings.fs -= 1; applySettings(); }
+  });
+  rsFsUp.addEventListener('click', function () {
+    if (settings.fs < 22) { settings.fs += 1; applySettings(); }
+  });
+  Array.prototype.forEach.call(rsThemeBtns, function (el) {
+    el.addEventListener('click', function () {
+      settings.bg = parseInt(el.dataset.bg, 10);
+      settings.image = '';          /* 选纯色即撤下背景图 */
+      applySettings();
+    });
+  });
+  /* 排版：行距 / 段距 */
+  rsLineHeight.addEventListener('input', function () {
+    settings.lh = parseInt(rsLineHeight.value, 10) / 10;
+    readerView.style.setProperty('--reader-lh', settings.lh);
+  });
+  rsParaGap.addEventListener('input', function () {
+    settings.para = parseInt(rsParaGap.value, 10) / 10;
+    readerView.style.setProperty('--reader-para', settings.para + 'em');
+  });
+  /* 字体：默认 / 衬线 / 等宽 */
+  Array.prototype.forEach.call(rsFontChips, function (el) {
+    el.addEventListener('click', function () {
+      settings.font = el.dataset.font;
+      applySettings();
+    });
+  });
+  /* 翻页：上下 / 平滑 / 无动画 */
+  Array.prototype.forEach.call(rsModeChips, function (el) {
+    el.addEventListener('click', function () {
+      if (settings.mode === el.dataset.mode) return;
+      setMode(el.dataset.mode);
+    });
+  });
+  /* 段评开关 */
+  rsComments.addEventListener('click', function () {
+    settings.comments = !settings.comments;
+    applySettings();
+  });
+  /* 背景图片：静默上传本地图片 */
+  rsUpload.addEventListener('click', function () {
+    rsImageInput.value = '';
+    rsImageInput.click();
+  });
+  rsImageInput.addEventListener('change', function () {
+    var file = rsImageInput.files && rsImageInput.files[0];
+    if (!file) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      settings.image = fr.result;
+      applySettings();
+    };
+    fr.readAsDataURL(file);
+  });
+
+  tocList.addEventListener('click', function (e) {
+    var item = e.target.closest('.toc-item');
+    if (!item) return;
+    goChapter(parseInt(item.dataset.ch, 10));
+    closeSheets();
+    toggleControls(false);
+  });
+  sheetBackdrop.addEventListener('click', closeSheets);
+  document.getElementById('dialogOk').addEventListener('click', closeSheets);
+
+  /* 返回桌面 */
+  Array.prototype.forEach.call(document.querySelectorAll('.js-to-desktop'), function (el) {
+    el.addEventListener('click', function () { location.href = '../index.html'; });
+  });
+
+  /* 设置项 */
+  document.getElementById('bgRow').addEventListener('click', function () {
+    settings.bg = (settings.bg + 1) % BG_TONES.length;
+    settings.image = '';
+    applySettings();
+  });
+  document.getElementById('fsDown').addEventListener('click', function () {
+    if (settings.fs > 14) { settings.fs -= 1; applySettings(); }
+  });
+  document.getElementById('fsUp').addEventListener('click', function () {
+    if (settings.fs < 22) { settings.fs += 1; applySettings(); }
+  });
+  document.getElementById('clearRow').addEventListener('click', function () {
+    var hasLocal = books.some(function (b) { return b.isLocal; });
+    if (!hasLocal) { showToast('没有本地书籍'); return; }
+    books = books.filter(function (b) { return !b.isLocal; });
+    renderShelf();
+    renderHome();
+    showToast('已清空本地书籍');
+  });
+
+  /* ===== 数据与操作：导入本地 .txt ===== */
+  document.getElementById('importRow').addEventListener('click', function () {
+    importInput.value = '';          // 允许重复选择同一个文件
+    importInput.click();             // 触发隐藏的文件选择器
+  });
+
+  importInput.addEventListener('change', function () {
+    var file = importInput.files && importInput.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+
+    reader.onload = function () {
+      var buf = reader.result;
+      var text = new TextDecoder('utf-8').decode(buf);
+      /* 中文 txt 常见 GBK 编码，出现替换字符时回退解码 */
+      if (text.indexOf('\uFFFD') !== -1) {
+        try { text = new TextDecoder('gbk').decode(buf); } catch (e) { /* 保持 utf-8 */ }
+      }
+
+      var paragraphs = text.replace(/\r\n?/g, '\n').split('\n')
+        .map(function (l) { return l.trim(); })
+        .filter(function (l) { return l.length > 0; });
+
+      if (paragraphs.length === 0) {
+        showToast('文件内容为空');
+        return;
+      }
+
+      var name = file.name.replace(/\.txt$/i, '').trim() || '未命名';
+      books.push({
+        id: 'local_' + Date.now(),
+        name: name,
+        author: '本地导入',
+        isLocal: true,
+        chapters: [
+          { label: '本地文本', title: name, paras: paragraphs }
+        ]
+      });
+
+      renderShelf();
+      renderHome();
+      showToast('已导入《' + name + '》');
+    };
+
+    reader.onerror = function () { showToast('文件读取失败'); };
+
+    reader.readAsArrayBuffer(file);
+  });
+
+  /* 让 TA 写一本：先给一个极简弹窗占位 */
+  document.getElementById('writeRow').addEventListener('click', function () {
+    openDialog('让 TA 写一本', '这一步还没有接通。等它准备好，会在这里把写好的书放进你的书架。');
+  });
+
+  /* ===== 启动 ===== */
+  renderShelf();
+  renderHome();
+  applySettings();
+  applyRoute(location.hash.replace(/^#/, '') || 'home');
+})();
+</script>
+</body>
+</html>
