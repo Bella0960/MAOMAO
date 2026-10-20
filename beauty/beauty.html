@@ -234,13 +234,14 @@ function getPresets(){
   } catch(e){ return []; }
 }
 function setPresets(p){ localStorage.setItem(LIST_KEY, JSON.stringify(p)); }
-function getActive(){ try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); } catch(e){ return {}; } }
+function getActive(){ try { var a = JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}'); return a && typeof a === 'object' && !Array.isArray(a) ? a : {}; } catch(e){ return {}; } }
 function setActive(o){ localStorage.setItem(ACTIVE_KEY, JSON.stringify(o)); }
 
 function loadRoleOptions(){
   var box = document.getElementById('targetPills');
   var roles = [];
   try { roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]'); } catch(e){}
+  if (!Array.isArray(roles)) roles = [];
   roles.forEach(function(r){
     var p = document.createElement('div');
     p.className = 'pill';
@@ -369,7 +370,7 @@ function validatePresetCSS(css){
     }
     if (quote) {
       if (escaped) { escaped = false; continue; }
-      if (ch === '\\\\') { escaped = true; continue; }
+      if (ch === '\\') { escaped = true; continue; }
       if (ch === quote) quote = '';
       continue;
     }
