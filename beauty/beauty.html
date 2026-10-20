@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>外观美化 · 小手机</title>
+<title>聊天美化 · 小手机</title>
 <script src="../js/font-loader.js"></script>
 <script src="../js/native-feel.js"></script>
 <link rel="stylesheet" href="../css/mobile-fit.css">
@@ -186,7 +186,7 @@
     <button class="back-btn" onclick="goBack()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="title">Beauty Archive</div>
+    <div class="title">Chat Beauty</div>
   </div>
   <div class="content">
     <div class="list-view" id="listView">
@@ -207,7 +207,7 @@
       <div class="field">
         <label>用在哪</label>
         <div class="target-pills" id="targetPills">
-          <div class="pill on" data-target="all">全局</div>
+          <div class="pill on" data-target="all">聊天全局</div>
         </div>
       </div>
       <div class="field">
@@ -262,7 +262,7 @@ function setCurrentTarget(t){
 }
 
 function targetLabel(t){
-  if (t === 'all') return '全局';
+  if (t === 'all') return '聊天全局';
   try {
     var roles = JSON.parse(localStorage.getItem('ai_custom_characters')||'[]');
     var r = roles.find(function(x){ return x.id === t; });
