@@ -196,7 +196,7 @@
         <button class="circle-btn" onclick="document.getElementById('importFile').click()" title="导入CSS文件">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </button>
-        <button class="copy-btn" onclick="copyRef()">复制 CSS 模板</button>
+        <button class="copy-btn" onclick="copyRef()">复制当前 CSS</button>
       </div>
       <input type="file" id="importFile" accept=".css,.txt" style="display:none;">
       <div class="preset-list" id="presetList"></div>
@@ -423,70 +423,33 @@ function savePreset(){
 }
 
 function copyRef(){
-  var text = [
-    '/* ===== 小手机完整 CSS 模板 · 直接改 ===== */',
-    '',
-    '/* 顶栏 */',
-    '.chat-header {',
-    '  padding: 48px 14px 10px;',
-    '  display: flex; justify-content: space-between; align-items: center;',
-    '  background: rgba(244,244,246,0.85);',
-    '  backdrop-filter: blur(16px);',
-    '  border-bottom: 1px solid rgba(0,0,0,0.04);',
-    '}',
-    '.chat-user-name { font-size: 0.844rem; font-weight: 800; color: #111; }',
-    '.chat-status-sub { font-size: 0.5rem; color: #888; font-family: monospace; }',
-    '',
-    '/* ===== 聊天列表：列表卡片与文字 ===== */',
-    '.chat-slim-card { background: rgba(255,255,255,.82); border: 1px solid #E5E5E5; border-radius: 12px; padding: 10px 12px; box-shadow: none; }',
-    '.chat-slim-card:active { transform: scale(.99); background: #F5F5F5; }',
-    '.chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: #E8E8E8; }',
-    '.chat-name { color: #171717; font-size: .8rem; font-weight: 650; }',
-    '.chat-time { color: #999; font-size: .6rem; }',
-    '.chat-last-msg { color: #777; font-size: .68rem; }',
-    '',
-    '/* ===== 聊天详情：顶栏 ===== */',
-    '.chat-header { padding: 48px 14px 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(244,244,246,.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.04); }',
-    '.chat-user-name { font-size: .844rem; font-weight: 800; color: #111; }',
-    '.chat-status-sub { font-size: .5rem; color: #888; font-family: monospace; }',
-    '',
-    '/* 消息气泡 */',
-    '.msg-avatar {',
-    '  width: 32px; height: 32px; border-radius: 50%;',
-    '  background: linear-gradient(135deg,#EFEFEF,#DCDCDC);',
-    '}',
-    '.msg-bubble {',
-    '  padding: 9.5px 13px;',
-    '  font-size: 0.75rem; line-height: 1.5; font-weight: 500;',
-    '}',
-    '.msg-row.received .msg-bubble { background: #fff; color: #111; border-radius: 4px 18px 18px 18px; }',
-    '.msg-row.sent .msg-bubble { background: #111; color: #fff; border-radius: 18px 4px 18px 18px; }',
-    '',
-    '/* 输入栏 */',
-    '.input-capsule {',
-    '  background: #fff; border-radius: 20px; min-height: 36px;',
-    '}',
-    '.send-icon-btn {',
-    '  width: 26px; height: 26px; border-radius: 50%; background: #111;',
-    '}',
-    '',
-    '/* 卡片 */',
-    '.pay-card-red { background: #111; color: #fff; }',
-    '.pay-card-transfer { background: #fff; border: 1px solid #E5E5EA; color: #111; }',
-    '',
-    '/* ===== 改完上面的颜色/圆角就是你自己的美化 ===== */',
-    '/* 示例：淡粉顶栏 */',
-    '.chat-header { background: #fef0f5; }'
-  ].join('\n');
-  navigator.clipboard.writeText(text).then(function(){
-    showToast('已复制 CSS 模板');
-  }).catch(function(){
+  var list = getPresets();
+  var active = getActive();
+  var current = list.find(function(p){ return p && p.target === 'all' && p.name === active.all; });
+  if (!current) current = list.find(function(p){ return p && p.target === 'all' && p.name === '微信清爽版'; });
+  if (!current || typeof current.css !== 'string' || !current.css.trim()) {
+    showToast('当前没有可复制的 CSS');
+    return;
+  }
+  var text = current.css;
+  function copied(){ showToast('已复制当前 CSS'); }
+  function fallbackCopy(){
     var ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); copied(); }
+    catch(e) { showToast('复制失败，请进入编辑页手动复制'); }
     document.body.removeChild(ta);
-    showToast('已复制 CSS 模板');
-  });
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(copied).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
 }
 function showToast(msg){
   var t = document.getElementById('toast');
@@ -499,8 +462,12 @@ function ensureWechatPreset(){
   var name = '微信清爽版';
   var existing = list.find(function(p){ return p && p.target === 'all' && p.name === name; });
   var dismissed = localStorage.getItem('beauty_wechat_preset_dismissed') === '1';
-  if (!existing && !dismissed) {
-    list.push({ name: name, target: 'all', css: "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.chat-footer, .input-toolbar { background: #F7F7F7 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n", builtIn: true });
+  if (existing && existing.builtIn === true && Number(existing.version || 1) < 2) {
+    existing.css = "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.input-dock { background: #F7F7F7 !important; border-top: 1px solid #E8E8E8 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n";
+    existing.version = 2;
+    setPresets(list);
+  } else if (!existing && !dismissed) {
+    list.push({ name: name, target: 'all', css: "/* MAOMAO · 微信清爽版：聊天列表 + 聊天详情 */\n.phone-mockup {\n  background: #F7F7F7 !important;\n}\n.chat-slim-card {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-bottom: 1px solid #F0F0F0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  padding: 12px 16px !important;\n  gap: 12px !important;\n  transform: none;\n}\n.chat-slim-card:active {\n  background: #F5F5F5 !important;\n  transform: none !important;\n}\n.chat-avatar {\n  width: 46px !important;\n  height: 46px !important;\n  border-radius: 7px !important;\n  background: #E7E7E7 !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-avatar.group-avatar { border-radius: 7px !important; }\n.chat-meta { min-width: 0; flex: 1; }\n.chat-title-row { display: flex; align-items: center; min-width: 0; gap: 8px; }\n.chat-name {\n  color: #191919 !important;\n  font-size: 14px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0 !important;\n}\n.chat-time {\n  color: #B2B2B2 !important;\n  font-size: 10px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n  font-weight: 400 !important;\n}\n.chat-last-msg {\n  color: #999999 !important;\n  font-size: 12px !important;\n  line-height: 1.45 !important;\n  margin-top: 4px !important;\n}\n.chat-header {\n  background: #F7F7F7 !important;\n  border-bottom: 1px solid #EDEDED !important;\n  box-shadow: none !important;\n  backdrop-filter: blur(16px);\n}\n.chat-user-name { color: #191919 !important; font-weight: 650 !important; }\n.chat-status-sub { color: #A0A0A0 !important; letter-spacing: .06em !important; }\n.nav-circle-btn {\n  background: #EEEEEE !important;\n  border: 0 !important;\n  box-shadow: none !important;\n}\n.chat-stage {\n  background: #EDEDED !important;\n  background-image: none !important;\n}\n.message-time {\n  color: #A0A0A0 !important;\n  background: rgba(0,0,0,.045) !important;\n  border-radius: 4px !important;\n  font-family: -apple-system, BlinkMacSystemFont, \"PingFang SC\", sans-serif !important;\n}\n.msg-avatar {\n  border-radius: 5px !important;\n  border: 0 !important;\n  box-shadow: none !important;\n  background: #DCDCDC !important;\n}\n.msg-bubble {\n  border-radius: 5px !important;\n  box-shadow: none !important;\n  font-size: 13px !important;\n  line-height: 1.65 !important;\n  font-weight: 400 !important;\n  letter-spacing: 0 !important;\n}\n.msg-row.received .msg-bubble, .msg-row.left .msg-bubble {\n  background: #FFFFFF !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n}\n.msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {\n  background: #95EC69 !important;\n  color: #191919 !important;\n  border: 0 !important;\n  border-radius: 5px !important;\n  box-shadow: none !important;\n}\n.input-capsule {\n  background: #FFFFFF !important;\n  border: 0 !important;\n  border-radius: 6px !important;\n  box-shadow: none !important;\n}\n.input-capsule:focus-within {\n  transform: none !important;\n  border-color: #E2E2E2 !important;\n}\n.real-input { color: #191919 !important; font-size: 14px !important; }\n.send-icon-btn {\n  background: #07C160 !important;\n  border-radius: 5px !important;\n  width: 30px !important;\n  height: 28px !important;\n}\n.send-icon-btn svg { stroke: #FFFFFF !important; }\n.plus-action-btn {\n  background: #FFFFFF !important;\n  border: 1px solid #E6E6E6 !important;\n  box-shadow: none !important;\n  border-radius: 6px !important;\n}\n.input-dock { background: #F7F7F7 !important; border-top: 1px solid #E8E8E8 !important; }\n.chat-notice-bar { border-radius: 4px !important; }\n", builtIn: true, version: 2 });
     setPresets(list);
   }
   // 不覆盖用户已经启用的聊天全局预设；若当前没有全局预设，则启用这套示例方便直接预览。
