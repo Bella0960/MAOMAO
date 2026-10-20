@@ -472,7 +472,8 @@ function ensureWechatPreset(){
   }
   // 不覆盖用户已经启用的聊天全局预设；若当前没有全局预设，则启用这套示例方便直接预览。
   var active = getActive();
-  if (!active.all) {
+  var activePresetExists = list.some(function(p){ return p && p.target === 'all' && p.name === active.all; });
+  if (!activePresetExists && (existing || !dismissed)) {
     active.all = name;
     setActive(active);
   }
