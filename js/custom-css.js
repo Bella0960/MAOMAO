@@ -1,29 +1,45 @@
-// 自定义美化 CSS 注入：根据当前页面是哪个角色的聊天，加载对应预设
-(function(){
+// 聊天美化预设加载器：聊天列表和聊天详情共用「聊天全局」预设，角色预设只作用于对应角色详情页。
+(function () {
+  'use strict';
   try {
-    // 读所有预设
     var presets = JSON.parse(localStorage.getItem('beauty_presets') || '[]');
-    if (!presets.length) return;
     var active = JSON.parse(localStorage.getItem('beauty_active') || '{}');
-    // 判断当前页面角色
-    var params = new URLSearchParams(location.search);
+    if (!Array.isArray(presets) || !presets.length || !active || typeof active !== 'object') return;
+
+    var path = (location.pathname || '').toLowerCase();
+    var isChatDetail = /chat-detail\.html$/.test(path);
+    var params = new URLSearchParams(location.search || '');
     var currentRole = params.get('id') || '';
     var cssToApply = [];
-    // 1. 全局预设先加载
-    presets.forEach(function(p){
-      if (p.target === 'all' && active['all'] === p.name) cssToApply.push(p.css);
+
+    // 「聊天全局」预设应用于聊天列表与聊天详情页。
+    presets.forEach(function (preset) {
+      if (preset && preset.target === 'all' &&
+          active.all === preset.name && typeof preset.css === 'string') {
+        cssToApply.push(preset.css);
+      }
     });
-    // 2. 当前角色专属预设
-    if (currentRole && !currentRole.startsWith('g')) {
-      presets.forEach(function(p){
-        if (p.target === currentRole && active[currentRole] === p.name) cssToApply.push(p.css);
+
+    // 角色专属预设只在角色聊天详情页加载，避免串到列表或群聊。
+    if (isChatDetail && currentRole && !/^g/i.test(currentRole)) {
+      presets.forEach(function (preset) {
+        if (preset && preset.target === currentRole &&
+            active[currentRole] === preset.name && typeof preset.css === 'string') {
+          cssToApply.push(preset.css);
+        }
       });
     }
-    if (cssToApply.length) {
-      var s = document.createElement('style');
-      s.id = 'custom-beauty-css';
-      s.textContent = cssToApply.join('\n');
-      (document.head || document.documentElement).appendChild(s);
+
+    if (!cssToApply.length) return;
+    var style = document.getElementById('custom-beauty-css');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'custom-beauty-css';
+      (document.head || document.documentElement).appendChild(style);
     }
-  } catch(e) {}
+    style.textContent = cssToApply.join('\n');
+  } catch (error) {
+    // 美化预设异常不能影响聊天页面本身的运行。
+    console.warn('[聊天美化] 预设加载失败：', error);
+  }
 })();
