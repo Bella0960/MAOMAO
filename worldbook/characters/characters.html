@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色管理</title>
+    <script src="../../shared/js/font-loader.js"></script>
+    <script src="../../shared/js/native-feel.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+            color: #111111;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .phone-mockup {
+            position: relative;
+            width: min(390px, calc(100vw - 24px));
+            height: min(844px, calc(100vh - 24px));
+            background-color: #FFFFFF;
+            border-radius: 45px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 8px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 14px 28px;
+            font-size: 0.813rem;
+            font-weight: 500;
+            color: #111111;
+            z-index: 50;
+            pointer-events: none;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            letter-spacing: .03em;
+        }
+
+        /* 顶部：圆形返回 + 大英文标题靠左 + 右侧小按钮 */
+        .header {
+            padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 16px;
+            background-color: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #editorView .header {
+            background-color: #FFFFFF;
+        }
+        .back-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F8F8FA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111111;
+            text-decoration: none;
+            font-size: 1.25rem;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: transform .2s ease, background .2s ease;
+        }
+        .back-circle:active {
+            transform: scale(0.95);
+            background: #EEEEF0;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            flex: 1;
+            margin-left: 14px;
+        }
+        .btn-header {
+            background: #111111;
+            color: #FFFFFF;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            box-shadow: none;
+            flex-shrink: 0;
+            transition: transform .2s ease;
+        }
+        .btn-header:active { transform: scale(0.95); }
+        .btn-header svg { display: block; }
+
+        /* 列表视图 */
+        .view-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .role-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 24px !important;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scrollbar-width: none;
+        }
+        .role-list::-webkit-scrollbar { display: none; }
+
+        /* 列表卡片：纯净灰底，无玻璃拟态 */
+        .role-slim-bar {
+            background: #F8F8FA;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .role-slim-bar:active {
+            background: #EEEEF0;
+            transform: scale(0.98);
+        }
+        .role-slim-bar.active-role {
+            background: #F0F0F2;
+        }
+
+        .bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .slim-avatar {
+            width: 40px;
+            height: 40px;
+            background: #EEEEF0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .slim-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .slim-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slim-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #111111;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .slim-tag {
+            font-size: 0.625rem;
+            font-weight: 500;
+            color: #999999;
+            background: #EEEEF0;
+            padding: 2px 6px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .slim-desc {
+            font-size: 0.75rem;
+            color: #999999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.688rem;
+            font-weight: 500;
+            color: #666666;
+            flex-shrink: 0;
+        }
+
+        .bar-right .act-opt {
+            background: none;
+            border: none;
+            padding: 4px 6px;
+            font: inherit;
+            color: #666666;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        /* 删除按钮改灰阶，不用红色 */
+        .bar-right .act-opt.del {
+            color: #999999;
+        }
+        .bar-right .act-opt.del:active {
+            color: #666666;
+        }
+
+        .empty-tip { text-align: center; color: #999999; font-size: 0.875rem; padding: 40px 0; }
+
+        /* 编辑页面表单视图 */
+        .editor-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scrollbar-width: none;
+            background-color: #FFFFFF;
+        }
+        .editor-container::-webkit-scrollbar { display: none; }
+
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 0;
+        }
+        .avatar-bubble-wrapper {
+            position: relative;
+            cursor: pointer;
+            width: 80px;
+            height: 80px;
+        }
+        .editor-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 1.875rem;
+            transition: transform 0.2s ease;
+            user-select: none;
+            object-fit: cover;
+        }
+        .avatar-bubble-wrapper:active .editor-avatar {
+            transform: scale(0.96);
+        }
+        .avatar-badge-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 26px;
+            height: 26px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            font-size: 0.75rem;
+            color: #666666;
+            border: 1px solid #EEEEF0;
+        }
+
+        .editor-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #999999;
+            padding-left: 2px;
+            letter-spacing: 0.02em;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            background-color: #F8F8FA;
+            border: none;
+            border-radius: 16px;
+            padding: 0 16px;
+            font-size: 0.938rem;
+            color: #111111;
+            outline: none;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+        .form-input:focus {
+            background-color: #FFFFFF;
+            box-shadow: inset 0 0 0 1px #E5E5EA;
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            background-color: #F8F8FA;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #111111;
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            transition: background 0.2s ease;
+        }
+        .form-textarea.tone {
+            min-height: 100px;
+        }
+        .form-textarea:focus {
+            background-color: #FFFFFF;
+            box-shadow: inset 0 0 0 1px #E5E5EA;
+        }
+        .form-textarea::placeholder {
+            color: #B0B0B5;
+            font-size: 0.813rem;
+        }
+
+        .btn-save-fixed {
+            height: 52px;
+            background-color: #111111;
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: auto;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .btn-save-fixed:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        .btn-header-cancel {
+            color: #111111;
+            font-size: 1.25rem;
+            background: #F8F8FA;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: transform .2s ease, background .2s ease;
+        }
+        .btn-header-cancel:active {
+            transform: scale(0.95);
+            background: #EEEEF0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .floating-nav {
+            display: none !important;
+        }
+
+        .editor-container,
+        .editor-container input,
+        .editor-container textarea {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        /* 绑定世界书：极简多选列表 */
+        .wb-bind-list {
+            display: flex;
+            flex-direction: column;
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            border-radius: 16px;
+        }
+        .wb-bind-list::-webkit-scrollbar { display: none; }
+        .wb-bind-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 48px;
+            padding: 0 16px;
+            background: #F8F8FA;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .wb-bind-item:last-child { margin-bottom: 0; }
+        .wb-bind-item:active { background: #EEEEF0; }
+        .wb-bind-name {
+            font-size: 0.875rem;
+            color: #111111;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 12px;
+        }
+        .wb-bind-circle {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1.5px solid #E5E5EA;
+            background: transparent;
+            position: relative;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .wb-bind-item.is-checked { background: #F0F0F2; }
+        .wb-bind-item.is-checked .wb-bind-circle {
+            background: #111111;
+            border-color: #111111;
+        }
+        .wb-bind-item.is-checked .wb-bind-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FFFFFF;
+        }
+        .wb-bind-empty {
+            font-size: 0.75rem;
+            color: #999999;
+            padding: 12px 4px;
+        }
+
+        /* 沉浸式头像编辑器：保留原头像，确认后才进入资料草稿 */
+        .portrait-studio {
+            position: absolute; inset: 0; z-index: 120;
+            display: flex; flex-direction: column; background: #F7F7F5;
+            padding: calc(18px + env(safe-area-inset-top, 0px)) 22px calc(18px + env(safe-area-inset-bottom, 0px));
+            animation: studio-in .24s ease both;
+        }
+        .portrait-studio.hidden { display: none !important; }
+        @keyframes studio-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .studio-topline { display:flex; justify-content:space-between; align-items:center; color:#777; font-size:.65rem; letter-spacing:.12em; }
+        .studio-heading { margin: 26px 0 5px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 10vw, 2.8rem); font-weight:400; letter-spacing:-.055em; line-height:1; }
+        .studio-subtitle { color:#777; font-size:.78rem; line-height:1.6; }
+        .studio-canvas-wrap { flex:1; min-height:180px; display:flex; align-items:center; justify-content:center; padding:18px 0; }
+        #portraitCropCanvas { width:min(100%, 300px); aspect-ratio:1; height:auto; display:block; background:#E7E6E2; touch-action:none; cursor:grab; border:1px solid #D7D6D1; }
+        #portraitCropCanvas:active { cursor:grabbing; }
+        .studio-adjust { padding:14px 0 20px; border-top:1px solid #D8D7D2; }
+        .studio-adjust-row { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; font-size:.78rem; }
+        .studio-adjust-row output { font-variant-numeric:tabular-nums; color:#555; }
+        #portraitZoom { width:100%; accent-color:#222; }
+        .studio-hint { color:#888; font-size:.68rem; margin-top:10px; line-height:1.5; }
+        .studio-actions { display:grid; grid-template-columns:1fr 1.25fr; gap:10px; }
+        .studio-action { min-height:48px; border:1px solid #D2D1CC; border-radius:4px; background:transparent; color:#222; font:inherit; font-size:.85rem; cursor:pointer; }
+        .studio-action.primary { background:#222; color:#fff; border-color:#222; }
+        .studio-action:active { transform:scale(.985); }
+        .save-status { min-height:18px; font-size:.75rem; color:#777; text-align:center; letter-spacing:.02em; transition:opacity .25s ease; }
+        .save-status[data-state="success"] { color:#333; }
+        .save-status[data-state="error"] { color:#555; }
+        .recovery-dialog-backdrop { position:absolute; inset:0; z-index:110; background:rgba(20,20,20,.22); display:flex; align-items:center; justify-content:center; padding:22px; }
+        .recovery-dialog-backdrop.hidden { display:none !important; }
+        .recovery-dialog { width:100%; max-width:320px; background:#FAFAF8; padding:22px; border:1px solid #E1E0DB; box-shadow:0 18px 55px rgba(0,0,0,.12); animation:studio-in .2s ease both; }
+        .recovery-kicker { font-size:.62rem; letter-spacing:.14em; color:#888; }
+        .recovery-title { font-family:Georgia, 'Times New Roman', serif; font-size:1.75rem; font-weight:400; letter-spacing:-.04em; margin:13px 0 8px; }
+        .recovery-copy { color:#666; font-size:.8rem; line-height:1.7; margin-bottom:20px; }
+        .recovery-actions { display:flex; flex-direction:column; gap:8px; }
+        .recovery-action { min-height:44px; border:1px solid #D6D5D0; background:transparent; color:#222; font:inherit; font-size:.82rem; cursor:pointer; }
+        .recovery-action.primary { background:#222; color:#fff; border-color:#222; }
+        .recovery-action:active { transform:scale(.99); }
+        @media (prefers-reduced-motion: reduce) { .portrait-studio, .recovery-dialog { animation:none; } }
+
+
+        /* PERSONA ARCHIVE — editorial poster layout */
+        #listView .header {
+            padding: calc(58px + env(safe-area-inset-top, 0px)) 24px 8px;
+            align-items:center;
+        }
+        #listView .header-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .18em;
+            text-transform: uppercase; margin-left: 13px; color:#777;
+        }
+        #listView .back-circle {
+            width:32px;height:32px;border-radius:0;background:transparent;
+            border:1px solid #D9D9D5;font-size:22px;
+        }
+        #listView .btn-header {
+            border-radius:0; padding:10px 12px; letter-spacing:.02em;
+            background:#171717; min-height:36px;
+        }
+        .archive-intro {
+            padding: 18px 24px 24px;
+            display:grid; grid-template-columns:minmax(0,1fr) auto;
+            align-items:end; column-gap:10px; row-gap:14px;
+        }
+        .archive-kicker {
+            grid-column:1/-1; display:flex; align-items:center; gap:9px;
+            color:#858580; font-size:9px; letter-spacing:.17em; text-transform:uppercase;
+        }
+        .archive-kicker:before { content:""; width:22px; height:1px; background:#777; }
+        .archive-headline {
+            font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+            font-size:clamp(44px, 14vw, 62px); font-weight:400; letter-spacing:-.075em;
+            line-height:.86; color:#171717; max-width:260px;
+        }
+        .archive-headline span { display:block; font-style:italic; font-weight:400; }
+        .archive-count { align-self:end; text-align:right; padding-bottom:3px; }
+        .archive-count strong { display:block; font:400 32px/1 Georgia,serif; letter-spacing:-.06em; }
+        .archive-count span { display:block; margin-top:6px; color:#888; font-size:9px; letter-spacing:.12em; }
+        .archive-description {
+            grid-column:1/-1; display:flex; justify-content:space-between; align-items:end;
+            gap:16px; padding-top:12px; border-top:1px solid #D8D8D3;
+            color:#777; font-size:11px; line-height:1.7;
+        }
+        .archive-description strong { color:#222; font-weight:500; }
+        .archive-description .archive-index { flex-shrink:0; font:italic 16px Georgia,serif; color:#999; }
+        .role-list {
+            padding:0 24px 32px !important; gap:0;
+            background:#fff;
+        }
+        .role-slim-bar {
+            position:relative; border-radius:0; background:#fff !important;
+            border-top:1px solid #D9D9D4; padding:18px 0;
+            display:grid; grid-template-columns: minmax(100px, 36%) minmax(0,1fr);
+            align-items:stretch; gap:16px; min-height:154px;
+            transition:background .25s ease, padding .25s ease;
+        }
+        .role-slim-bar:last-child { border-bottom:1px solid #D9D9D4; }
+        .role-slim-bar:active { transform:none; background:#F7F7F4 !important; }
+        .role-slim-bar.active-role { background:#fff !important; }
+        .bar-left { display:contents; }
+        .slim-avatar {
+            grid-column:1; grid-row:1 / span 3;
+            width:100%; height:142px; border-radius:0; object-fit:cover;
+            background:#ECECE8; border:0; align-self:start;
+            filter:none;
+        }
+        .slim-meta {
+            grid-column:2; grid-row:1; min-width:0; align-self:start;
+            gap:9px; overflow:visible; padding-top:3px;
+        }
+        .slim-name-row { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+        .slim-name {
+            font-family:Georgia,"Noto Serif SC",serif; font-size:23px;
+            font-weight:400; letter-spacing:-.055em; white-space:normal;
+            line-height:1.12; overflow:visible; text-overflow:clip;
+        }
+        .slim-tag {
+            background:transparent; border-radius:0; border:0; border-left:1px solid #888;
+            padding:1px 0 1px 7px; color:#777; font-size:9px; letter-spacing:.08em;
+        }
+        .slim-desc {
+            white-space:normal; overflow:hidden; display:-webkit-box;
+            -webkit-line-clamp:4; -webkit-box-orient:vertical;
+            font-size:11px; line-height:1.65; color:#777;
+        }
+        .bar-right {
+            grid-column:2; grid-row:2; justify-content:flex-start; align-self:end;
+            border-top:1px solid #E7E7E2; padding-top:9px; gap:15px;
+            font-size:10px; letter-spacing:.04em;
+        }
+        .bar-right .act-opt { padding:2px 0; color:#444; font-size:10px; }
+        .bar-right .act-opt.del { color:#999; }
+        .role-slim-bar:after {
+            content:""; position:absolute; left:0; bottom:-1px; width:0; height:1px;
+            background:#222; transition:width .25s ease;
+        }
+        .role-slim-bar:active:after { width:100%; }
+        .empty-tip {
+            text-align:left; color:#777; font-family:Georgia,serif; font-size:18px;
+            padding:28px 0; border-top:1px solid #D9D9D4; line-height:1.6;
+        }
+        /* Editor retains all existing fields while using editorial hierarchy */
+        #editorView .header {
+            padding:calc(58px + env(safe-area-inset-top, 0px)) 24px 16px;
+            border-bottom:1px solid #E5E5E0;
+        }
+        #editorView .header-title {
+            font-family:Georgia,"Noto Serif SC",serif; font-size:25px;
+            font-weight:400; letter-spacing:-.045em;
+        }
+        .editor-container {
+            padding:0 24px 28px; gap:0;
+        }
+        .avatar-section {
+            align-items:flex-start; padding:25px 0 27px; border-bottom:1px solid #D9D9D4;
+            margin-bottom:24px; position:relative;
+        }
+        .avatar-section:before {
+            content:"PORTRAIT / 01"; display:block; color:#888; font-size:9px;
+            letter-spacing:.16em; margin-bottom:16px;
+        }
+        .avatar-bubble-wrapper { width:104px; height:124px; }
+        .editor-avatar { width:104px; height:124px; border-radius:0; background-size:cover; }
+        .avatar-badge-btn { width:25px;height:25px;border-radius:0;right:-8px;bottom:-7px;box-shadow:none;border-color:#D5D5D0; }
+        .editor-field-group {
+            padding:19px 0 21px; border-bottom:1px solid #E3E3DE; gap:10px;
+        }
+        .field-label {
+            font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+            padding:0; color:#858580;
+        }
+        .form-input {
+            height:auto; min-height:48px; border-radius:0; padding:10px 0;
+            background:transparent; border:0; border-bottom:1px solid #D9D9D4;
+            font-family:Georgia,"Noto Serif SC",serif; font-size:20px; font-weight:400;
+        }
+        .form-input:focus { background:transparent; box-shadow:none; border-bottom-color:#222; }
+        .form-textarea {
+            border-radius:0; background:#F7F7F4; padding:14px;
+            font-size:13px; line-height:1.8; min-height:140px;
+        }
+        .form-textarea.tone { min-height:110px; }
+        .form-textarea:focus { background:#F4F4F0; box-shadow:inset 0 0 0 1px #D5D5D0; }
+        .wb-bind-list { border-radius:0; gap:0; }
+        .wb-bind-item {
+            border-radius:0; background:transparent; border-bottom:1px solid #E5E5E0;
+            margin:0; padding:0 2px; min-height:48px;
+        }
+        .wb-bind-item.is-checked { background:#F4F4F1; }
+        .btn-save-fixed { border-radius:0; margin-top:20px; min-height:52px; }
+        .save-status { margin-top:14px; }
+        @media (max-width:360px) {
+            .archive-intro { padding-left:19px; padding-right:19px; }
+            .role-list { padding-left:19px !important; padding-right:19px !important; }
+            .role-slim-bar { grid-template-columns:minmax(88px,34%) minmax(0,1fr); gap:12px; }
+            .slim-avatar { height:128px; }
+            .slim-name { font-size:20px; }
+        }
+
+    
+        /* Fine-tuning pass: neutral grayscale + tighter editorial rhythm */
+        #listView .header { padding-top:calc(34px + env(safe-area-inset-top, 0px)); padding-bottom:4px; }
+        .archive-intro { padding-top:12px; padding-bottom:17px; row-gap:9px; }
+        .archive-kicker { color:#777777; }
+        .archive-kicker:before { background:#777777; }
+        .archive-headline { line-height:.9; }
+        .archive-count strong { color:#1A1A1A; }
+        .archive-description { padding-top:8px; line-height:1.5; gap:10px; }
+        .role-list { padding-bottom:20px !important; }
+        .role-slim-bar { padding:12px 0; min-height:0; gap:13px; border-color:#D8D8D8; }
+        .slim-avatar { height:124px; background:#EEEEEE; }
+        .slim-meta { gap:6px; padding-top:1px; }
+        .slim-name-row { gap:5px; }
+        .slim-name { font-size:21px; }
+        .slim-desc { line-height:1.5; -webkit-line-clamp:3; }
+        .bar-right { padding-top:6px; }
+        #editorView .header { padding-top:calc(34px + env(safe-area-inset-top, 0px)); padding-bottom:12px; }
+        .avatar-section { padding:18px 0 19px; margin-bottom:12px; }
+        .avatar-section:before { margin-bottom:10px; }
+        .editor-field-group { padding:13px 0 14px; gap:7px; }
+        .form-input { min-height:42px; padding:7px 0; }
+        .form-textarea { min-height:120px; padding:12px; line-height:1.65; background:#F5F5F5; }
+        .form-textarea.tone { min-height:92px; }
+        .btn-save-fixed { margin-top:14px; min-height:48px; }
+        .save-status { margin-top:9px; }
+        .portrait-studio { background:#F7F7F7; }
+        .studio-canvas-wrap { padding:12px 0; }
+        #portraitCropCanvas { background:#E8E8E8; border-color:#D6D6D6; }
+        .studio-adjust { border-color:#D6D6D6; }
+        .recovery-dialog-backdrop { background:rgba(0,0,0,.2); }
+        .recovery-dialog { background:#FAFAFA; border-color:#DDDDDD; }
+        .recovery-action { border-color:#D5D5D5; }
+        @media (max-width:360px) {
+            .archive-intro { padding-top:10px; padding-bottom:14px; }
+            .role-slim-bar { gap:10px; padding:10px 0; }
+            .slim-avatar { height:112px; }
+            .slim-name { font-size:19px; }
+        }
+
+    </style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+    <div class="phone-mockup">
+        <div class="status-bar"><span>09:41</span></div>
+        
+        <!-- 角色列表界面 -->
+        <div class="view-section" id="listView">
+            <header class="header">
+                <a class="back-circle" href="../../index.html" aria-label="返回主屏幕">‹</a>
+                <h1 class="header-title">PERSONA ARCHIVE</h1>
+                <button class="btn-header" id="btnAddRole" type="button"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>添加</span></button>
+            </header>
+            <section class="archive-intro" aria-label="角色档案标题">
+                <div class="archive-kicker">A collection of personalities</div>
+                <h2 class="archive-headline">Persona <span>Archive.</span></h2>
+                <div class="archive-count"><strong id="archiveRoleCount">00</strong><span>CHARACTERS</span></div>
+                <div class="archive-description">
+                    <span><strong>角色档案 / PERSONA INDEX</strong><br>每一个角色，都是独立的故事与声音。</span>
+                    <span class="archive-index">No. 01—</span>
+                </div>
+            </section>
+            <main class="role-list" id="roleListContainer"></main>
+        </div>
+
+        <!-- 角色卡编辑/新增界面 -->
+        <div class="view-section hidden" id="editorView">
+            <header class="header">
+                <button class="btn-header-cancel" id="btnCancelEdit" type="button" aria-label="取消并返回">‹</button>
+                <h1 class="header-title" id="editorTitle">Character</h1>
+                <span style="width: 36px;"></span>
+            </header>
+            <main class="editor-container">
+                <input type="hidden" id="editRoleId" value="">
+
+                <!-- 1. 头像上传区 -->
+                <div class="avatar-section">
+                    <div class="avatar-bubble-wrapper" id="avatarBubbleWrapper" title="点击上传头像">
+                        <div class="editor-avatar" id="editAvatarPreview">角</div>
+                        <div class="avatar-badge-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" class="hidden">
+                </div>
+
+                <!-- 2. 姓名 -->
+                <div class="editor-field-group">
+                    <label class="field-label" for="editRoleName">姓名</label>
+                    <input class="form-input" id="editRoleName" type="text" placeholder="输入角色名字" maxlength="30" />
+                </div>
+
+                <!-- 3. 人设设定 -->
+                <div class="editor-field-group">
+                    <label class="field-label" for="editRolePersona">人设设定</label>
+                    <textarea
+                        class="form-textarea"
+                        id="editRolePersona"
+                        placeholder="请详细描述TA的身份、性格、背景等"
+                    ></textarea>
+                </div>
+
+                <!-- 4. 聊天语气 -->
+                <div class="editor-field-group">
+                    <label class="field-label" for="editRoleTone">聊天语气</label>
+                    <textarea
+                        class="form-textarea tone"
+                        id="editRoleTone"
+                        placeholder="例如：说话简短、经常使用句号、高冷、偶尔傲娇"
+                    ></textarea>
+                </div>
+
+                <!-- 5. 绑定世界书（多选） -->
+                <div class="editor-field-group">
+                    <label class="field-label" style="color: #8E8E93;">绑定世界书</label>
+                    <div class="wb-bind-list" id="worldBookBindList"></div>
+                </div>
+
+                <!-- 6. 保存按钮 -->
+                <div class="save-status" id="saveStatus" aria-live="polite" role="status"></div>
+                <button class="btn-save-fixed" id="btnSaveRole" type="button">保存设定</button>
+            </main>
+        </div>
+
+        <!-- 沉浸式头像裁切页 -->
+        <section class="portrait-studio hidden" id="portraitStudio" aria-label="头像照片编辑器">
+            <div class="studio-topline"><span>MAOMAO / IMAGE STUDIO</span><span>01 — PORTRAIT</span></div>
+            <h2 class="studio-heading">Portrait</h2>
+            <p class="studio-subtitle">拖动照片调整构图，使用滑杆微调缩放。</p>
+            <div class="studio-canvas-wrap"><canvas id="portraitCropCanvas" width="600" height="600" aria-label="拖动以调整头像裁切"></canvas></div>
+            <div class="studio-adjust">
+                <div class="studio-adjust-row"><label for="portraitZoom">缩放比例</label><output id="portraitZoomValue">100%</output></div>
+                <input id="portraitZoom" type="range" min="100" max="300" step="1" value="100">
+                <p class="studio-hint">照片只会在确认后进入待保存资料，正式头像不会被提前覆盖。</p>
+            </div>
+            <div class="studio-actions">
+                <button class="studio-action" id="btnCancelPortrait" type="button">取消</button>
+                <button class="studio-action primary" id="btnConfirmPortrait" type="button">确认头像</button>
+            </div>
+        </section>
+
+        <!-- 草稿恢复提示 -->
+        <div class="recovery-dialog-backdrop hidden" id="recoveryDialog" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+            <div class="recovery-dialog">
+                <div class="recovery-kicker">MAOMAO / LOCAL ARCHIVE</div>
+                <h2 class="recovery-title" id="recoveryTitle">A moment left unfinished.</h2>
+                <p class="recovery-copy" id="recoveryCopy">检测到上次未正式保存的角色资料。要恢复这份草稿吗？</p>
+                <div class="recovery-actions">
+                    <button class="recovery-action primary" id="btnRecoverDraft" type="button">恢复上次编辑</button>
+                    <button class="recovery-action" id="btnDiscardDraft" type="button">放弃草稿</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="js/characters-manager.js"></script>
+    <script src="../../shared/js/nav.js"></script>
+<script src="../../shared/js/statusbar-control.js"></script>
+</body>
+</html>

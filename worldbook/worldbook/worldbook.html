@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>世界书 · 小手机</title>
+<script src="../../shared/js/font-loader.js"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    min-height: 0;
+    background-color: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;   /* 状态栏不拦截点击，避免遮挡返回键 */
+  }
+  /* 本页为全屏编辑类页面，隐藏全局悬浮导航（仅本页 CSS，不改 nav.js） */
+  .floating-nav { display: none !important; }
+
+  /* 主滚动区（顶部 50px 让状态栏高度由 .wb-topbar 承担；左右 16；底部避让固定按钮） */
+  .wb-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 84px !important;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #FFFFFF;
+  }
+  .wb-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：左返回 / 中标题 / 右操作，三栏严格水平对齐 ===== */
+  .wb-topbar {
+    position: relative !important;
+    z-index: 30 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 -16px !important;   /* 抵消 .wb-stage 的左右 16px，内边距由本栏自控 */
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 12px 16px !important;
+  }
+  /* 左栏收窄，标题紧贴返回按钮 */
+  .wb-top-left,
+  .wb-top-actions {
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+  }
+  .wb-top-left { width: 40px !important; justify-content: flex-start !important; }
+  .wb-top-actions { width: 72px !important; justify-content: flex-end !important; gap: 8px !important; position: relative !important; }
+  .wb-en {
+    flex: 1 !important;
+    text-align: left !important;
+    margin-left: 8px !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    color: #8E8E93 !important;
+  }
+  .wb-circle-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative !important;
+    z-index: 30 !important;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  /* 隐形热区：把 32px 圆钮的可点区域扩大到约 44px，不影响视觉尺寸 */
+  .wb-circle-btn::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: -6px !important;
+  }
+  .wb-circle-btn:active { transform: scale(0.94); }
+  .wb-circle-btn.is-ghost { background: #F2F2F7; }
+  .wb-circle-btn.is-dark { background: #1C1C1E; }
+  .wb-circle-btn svg { width: 16px !important; height: 16px !important; }
+  .wb-circle-btn.is-ghost svg { stroke: #333333; }
+  .wb-circle-btn.is-dark svg { stroke: #FFFFFF; }
+
+  /* 独立椭圆气泡：选中变亮（深色），其余变灰，互不相连 */
+  .wb-filter-pills {
+    margin-top: 14px !important;
+    background: transparent;
+    padding: 0 !important;
+    display: flex;
+    gap: 8px !important;
+  }
+  .wb-filter-pill {
+    flex: 1;
+    height: 30px !important;
+    padding: 0 14px !important;
+    border: none;
+    border-radius: 15px;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px !important;
+    font-size: 0.688rem !important;
+    font-weight: 600;
+    font-family: inherit;
+    color: #8E8E93;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .wb-filter-pill svg { width: 12px !important; height: 12px !important; stroke: currentColor; }
+  .wb-filter-pill .wb-pill-count { color: #AEAEB2; font-weight: 500; }
+  .wb-filter-pill.active { background: #1C1C1E; color: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+  .wb-filter-pill.active .wb-pill-count { color: rgba(255,255,255,0.75); }
+
+  /* ===== 列表 ===== */
+  .wb-list-title {
+    margin-top: 16px !important;
+    margin-bottom: 8px !important;
+    font-size: 0.875rem !important;
+    font-weight: 800;
+    color: #111111;
+  }
+  .wb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;          /* 卡片自带 margin-bottom: 8px，这里清零避免间距叠加 */
+    height: auto !important;
+    flex: none !important;
+    min-height: 0 !important;
+  }
+  /* ===== 世界书卡片（新模板类名：book-card / book-icon / book-info / book-title / book-desc / book-arrow） ===== */
+  .book-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 16px !important;
+    background: #FFFFFF !important;
+    border-radius: 16px !important;
+    margin-bottom: 8px !important;
+    height: 64px !important;              /* 死锁高度，内容再多也不会被撑高 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+    overflow: hidden !important;           /* 溢出直接裁掉，杜绝撑破卡片 */
+    cursor: pointer;
+  }
+  .book-icon {
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  .book-icon svg { width: 17px !important; height: 17px !important; stroke: #555555 !important; }
+  .book-info {
+    flex: 1 !important;
+    min-width: 0 !important;               /* 极其重要，不加这句文字无法折叠 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  .book-title {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.3 !important;
+  }
+  .book-desc {
+    font-size: 0.75rem !important;
+    color: #8E8E93 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-top: 2px !important;
+    line-height: 1.3 !important;
+  }
+  .book-arrow {
+    flex-shrink: 0 !important;
+    margin-left: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .book-arrow svg { width: 16px !important; height: 16px !important; stroke: #C7C7CC !important; transition: transform 0.2s ease; }
+  .book-edit-btn {
+    flex-shrink: 0; width: 26px; height: 26px;
+    border: none; background: none; padding: 0; margin-left: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .book-edit-btn svg { width: 14px; height: 14px; stroke: #C7C7CC; }
+  .book-edit-btn:active svg { stroke: #333333; }
+
+  /* ===== 树形逐级展开：卡片展开态 + 条目子节点 ===== */
+  .book-card.expanded { border-radius: 16px 16px 6px 6px !important; margin-bottom: 2px !important; }
+  .book-card.expanded .book-arrow svg { transform: rotate(90deg); }
+  .book-children {
+    margin: 0 0 8px 24px;
+    padding: 4px 0 2px 12px;
+    border-left: 2px solid #EDEDF0;
+  }
+  .entry-node {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px;
+    background: #FAFAFC;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+  .entry-node:active { background: #F2F2F7; }
+  .entry-node.is-disabled { opacity: 0.5; }
+  .entry-node-name {
+    flex: 1; min-width: 0;
+    font-size: 0.75rem; font-weight: 600; color: #333333;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .en-tag {
+    flex-shrink: 0;
+    font-size: 0.563rem; font-weight: 600;
+    padding: 2px 6px; border-radius: 6px;
+  }
+  .en-tag.t-text { background: #F2F2F7; color: #666666; }
+  .en-tag.t-regex { background: #FFF2CC; color: #996600; }
+  .en-tag.p-front { background: #E8F5E9; color: #2E7D32; }
+  .en-tag.p-middle { background: #E3F2FD; color: #1565C0; }
+  .en-tag.p-back { background: #FCE4EC; color: #C2185B; }
+  .en-tag.m-mode { background: #F7F7F9; color: #8E8E93; }
+  .wb-children-empty { padding: 2px 10px 6px; font-size: 0.688rem; color: #C7C7CC; }
+  .wb-add-entry {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px;
+    font-size: 0.75rem; font-weight: 600; color: #8E8E93;
+    border-radius: 10px; cursor: pointer;
+  }
+  .wb-add-entry:active { background: #F2F2F7; }
+  .wb-add-entry svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
+
+  /* ===== 二级折叠：条目独立展开内容区 ===== */
+  .en-chevron { flex-shrink: 0; display: flex; align-items: center; }
+  .en-chevron svg { width: 12px; height: 12px; stroke: #C7C7CC; transition: transform 0.2s ease; }
+  .entry-item.open .en-chevron svg { transform: rotate(90deg); }
+  .entry-edit-btn {
+    flex-shrink: 0; width: 24px; height: 24px;
+    border: none; background: none; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .entry-edit-btn svg { width: 13px; height: 13px; stroke: #8E8E93; }
+  .entry-edit-btn:active svg { stroke: #333333; }
+  .entry-detail {
+    background: #F7F7F9;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin: -2px 0 6px;
+  }
+  .entry-detail-content {
+    font-size: 0.688rem; color: #555555; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-all; white-space: pre-wrap;
+  }
+  .entry-detail-kws { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .en-kw {
+    font-size: 0.563rem; font-weight: 600;
+    background: #FFFFFF; color: #666666;
+    padding: 2px 7px; border-radius: 6px;
+    border: 1px solid #EDEDF0;
+  }
+  .entry-detail-meta { margin-top: 6px; font-size: 0.625rem; color: #8E8E93; }
+
+  .wb-empty {
+    text-align: center;
+    font-size: 0.75rem !important;
+    color: #8E8E93;
+    padding: 28px 20px !important;
+    height: auto !important;
+    flex: none !important;
+  }
+
+  /* ===== 底部固定按钮 ===== */
+  .wb-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px 16px 20px !important;
+    display: flex;
+    gap: 10px !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 30%);
+    z-index: 20;
+  }
+  .wb-footer-btn {
+    flex: 1;
+    height: 40px !important;
+    border: none;
+    border-radius: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px !important;
+    font-size: 0.813rem !important;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .wb-footer-btn:active { transform: scale(0.98); }
+  .wb-footer-btn svg { width: 15px !important; height: 15px !important; }
+  .wb-footer-btn.is-light { background: #F2F2F7; color: #111111; }
+  .wb-footer-btn.is-light svg { stroke: #111111; }
+  .wb-footer-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .wb-footer-btn.is-dark svg { stroke: #FFFFFF; }
+
+  /* ===== 通用底部抽屉 ===== */
+  .wb-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 600;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .wb-overlay.show { display: flex; }
+  .wb-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+  .wb-sheet {
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px 20px 0 0;
+    padding: 10px 16px 26px;
+    animation: wbSlideUp 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    max-height: 86%;
+    overflow-y: auto;
+  }
+  @keyframes wbSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .wb-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #E5E5EA;
+    margin: 0 auto 14px;
+    flex-shrink: 0;
+  }
+  .wb-sheet-title {
+    text-align: center;
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 14px;
+  }
+  /* 加号正下方锚定的浮动小菜单（用户死命令：禁止底部抽屉式弹窗） */
+  .wb-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 168px;
+    background: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+    padding: 6px;
+    z-index: 200;
+  }
+  .wb-popover.show { display: block; }
+  .wb-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 10px 8px;
+    font-size: 0.813rem;
+    font-family: inherit;
+    color: #111111;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 10px;
+  }
+  .wb-menu-item:active { background: #F2F2F7; }
+  .wb-menu-item .wb-menu-ico {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #F7F7F9;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .wb-menu-item .wb-menu-ico svg { width: 15px; height: 15px; stroke: #333333; }
+
+  /* 二选一/三选一胶囊（条目表单） */
+  .wb-seg {
+    display: flex;
+    background: #F2F2F7;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .wb-seg-btn {
+    flex: 1;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #8E8E93;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+  .wb-seg-btn.active { background: #FFFFFF; color: #111111; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+  /* 启用开关行 */
+  .wb-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .wb-toggle-label { font-size: 0.875rem; font-weight: 500; color: #333333; }
+  .wb-toggle {
+    width: 40px; height: 22px;
+    border-radius: 11px;
+    border: none;
+    padding: 0;
+    background: #E5E5EA;
+    position: relative;
+    transition: background 0.25s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .wb-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.25s ease;
+  }
+  .wb-toggle.on { background: #34C759; }
+  .wb-toggle.on::after { transform: translateX(18px); }
+
+  /* 概率滑块 */
+  .wb-prob-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  /* 概率滑块：极细轨道+小圆点，禁止浏览器默认粗样式（全局死命令） */
+  .wb-prob-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: #E5E5EA;
+    border-radius: 1px;
+    outline: none;
+  }
+  .wb-prob-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #1C1C1E;
+    border: none;
+    cursor: pointer;
+  }
+  .wb-prob-row input[type=range]::-moz-range-track {
+    height: 2px;
+    background: #E5E5EA;
+    border-radius: 1px;
+  }
+  .wb-prob-row input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #1C1C1E;
+    border: none;
+    cursor: pointer;
+  }
+  .wb-prob-val {
+    font-size: 0.813rem; font-weight: 600; color: #111111;
+    min-width: 38px; text-align: right; font-variant-numeric: tabular-nums;
+  }
+
+  /* 编辑抽屉表单 */
+  .wb-field { margin-bottom: 12px; flex-shrink: 0; }
+  .wb-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #8E8E93;
+    margin-bottom: 6px;
+  }
+  .wb-field input, .wb-field textarea {
+    width: 100%;
+    background: #F2F2F7;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #333333;
+  }
+  .wb-field input { height: 42px; padding: 0 14px; }
+  .wb-field textarea {
+    min-height: 110px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    resize: none;
+  }
+  .wb-field input::placeholder, .wb-field textarea::placeholder { color: #B0B0B5; }
+  .wb-sheet-actions { display: flex; gap: 10px; margin-top: 4px; flex-shrink: 0; }
+  .wb-btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .wb-btn.is-light { background: #F2F2F7; color: #333333; }
+  .wb-btn.is-danger { background: #FFF0F3; color: #C2185B; }
+  .wb-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .wb-btn:active { opacity: 0.9; }
+
+  /* Toast */
+  .wb-toast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 700;
+    background: rgba(28,28,30,0.9);
+    color: #FFFFFF;
+    font-size: 0.813rem;
+    padding: 12px 20px;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    max-width: 80%;
+    text-align: center;
+  }
+  .wb-toast.show { opacity: 1; }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="wb-stage">
+
+      <!-- 顶部导航栏：左侧返回 / WORLDBOOK 紧贴返回 / 右侧加号弹出导入/导出菜单 -->
+      <div class="wb-topbar">
+        <div class="wb-top-left">
+          <button class="wb-circle-btn is-ghost" type="button" aria-label="返回"
+            onclick="window.location.href='../../index.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="wb-en">WORLDBOOK</span>
+        <div class="wb-top-actions">
+          <button class="wb-circle-btn is-dark" id="btnAddTop" type="button" aria-label="导入或导出" title="导入或导出">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <!-- 锚定加号下方的浮动菜单 -->
+          <div class="wb-popover" id="actionPopover">
+            <button class="wb-menu-item" id="menuImport" type="button">
+              <span class="wb-menu-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </span>
+              导入本地文件
+            </button>
+            <button class="wb-menu-item" id="menuExport" type="button">
+              <span class="wb-menu-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </span>
+              导出文件
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 范围切换：全部 / 全局 / 局部 -->
+      <div class="wb-filter-pills">
+        <button class="wb-filter-pill active" data-scope="all" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>
+          全部 <span class="wb-pill-count" id="countAll">0 本</span>
+        </button>
+        <button class="wb-filter-pill" data-scope="global" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          全局 <span class="wb-pill-count" id="countGlobal">0 本</span>
+        </button>
+        <button class="wb-filter-pill" data-scope="local" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          局部 <span class="wb-pill-count" id="countLocal">0 本</span>
+        </button>
+      </div>
+
+      <!-- 列表 -->
+      <div class="wb-list-title" id="listTitle">世界书列表</div>
+      <div class="wb-list" id="wbList"></div>
+
+    </main>
+
+    <!-- 底部固定按钮 -->
+    <div class="wb-footer">
+      <button class="wb-footer-btn is-dark" id="btnAddFooter" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建世界书
+      </button>
+    </div>
+
+    <!-- 新建条目抽屉 -->
+    <div class="wb-overlay" id="editOverlay">
+      <div class="wb-backdrop" data-close="editOverlay"></div>
+      <div class="wb-sheet">
+        <div class="wb-handle"></div>
+        <div class="wb-sheet-title" id="drawerTitle">新建世界书</div>
+        <div class="wb-field">
+          <label for="edName">名称</label>
+          <input id="edName" type="text" maxlength="40" placeholder="输入条目名称">
+        </div>
+        <div class="wb-field" id="edFieldType">
+          <label>类型</label>
+          <div class="wb-seg" id="edTypeSeg">
+            <button class="wb-seg-btn active" data-type="text" type="button">文本</button>
+            <button class="wb-seg-btn" data-type="regex" type="button">正则</button>
+          </div>
+        </div>
+        <div class="wb-field" id="edFieldContent">
+          <label for="edContent">内容</label>
+          <textarea id="edContent" maxlength="10000" placeholder="输入条目内容…"></textarea>
+        </div>
+        <div class="wb-field" id="edFieldPos">
+          <label>注入的位置</label>
+          <div class="wb-seg" id="edPosSeg">
+            <button class="wb-seg-btn" data-pos="front" type="button">前</button>
+            <button class="wb-seg-btn active" data-pos="middle" type="button">中</button>
+            <button class="wb-seg-btn" data-pos="back" type="button">后</button>
+          </div>
+        </div>
+        <div class="wb-field" id="edFieldEnabled">
+          <div class="wb-toggle-row">
+            <span class="wb-toggle-label">启用此条目</span>
+            <button class="wb-toggle on" id="edEnabled" type="button"></button>
+          </div>
+        </div>
+        <div class="wb-field" id="edFieldMode">
+          <label>注入模式</label>
+          <div class="wb-seg" id="edModeSeg">
+            <button class="wb-seg-btn active" data-mode="always" type="button">始终注入</button>
+            <button class="wb-seg-btn" data-mode="keyword" type="button">按关键词</button>
+            <button class="wb-seg-btn" data-mode="probability" type="button">概率注入</button>
+          </div>
+        </div>
+        <div class="wb-field" id="edKeywordsField" style="display:none;">
+          <label for="edKeywords">输入关键词（逗号分隔）</label>
+          <input id="edKeywords" type="text" maxlength="100" placeholder="如：魔法,学院,战斗">
+        </div>
+        <div class="wb-field" id="edProbField" style="display:none;">
+          <label>注入概率</label>
+          <div class="wb-prob-row">
+            <input type="range" id="edProb" min="0" max="100" value="50">
+            <span class="wb-prob-val" id="edProbVal">50%</span>
+          </div>
+        </div>
+        <div class="wb-sheet-actions">
+          <button class="wb-btn is-danger" id="btnEntryDelete" type="button" style="display:none;">删除</button>
+          <button class="wb-btn is-light" id="btnEditCancel" type="button">取消</button>
+          <button class="wb-btn is-dark" id="btnEditSave" type="button">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 隐藏文件选择框 -->
+    <input type="file" id="importInput" accept=".json,.txt,.csv,.md,.jsonl,.yaml,.yml" style="display:none;">
+
+    <!-- Toast -->
+    <div class="wb-toast" id="wbToast"></div>
+
+    <script src="../../shared/js/nav.js"></script>
+  </div>
+
+<script>
+  var STORAGE_KEY = 'phone_worldbooks';
+
+  /* ================= 数据层 ================= */
+  function loadBooks() {
+    var list = [];
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) list = arr;
+      }
+    } catch (e) { list = []; }
+
+    // 一次性清除历史脏数据并写回 localStorage，防止"12"等测试数据再次渲染到列表
+    var cleaned = list.filter(function (b) { return isValidBook(b); });
+    if (cleaned.length !== list.length) {
+      try { saveBooks(cleaned); } catch (e) {}
+    }
+    return cleaned;
+  }
+  function saveBooks(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function genId() {
+    return 'wb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+  function genEntryId() {
+    return 'e_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+
+  function normalizeEntry(raw) {
+    var e = raw && typeof raw === 'object' ? raw : {};
+    return {
+      id: e.id || genEntryId(),
+      name: String(e.name || '未命名条目'),
+      type: e.type === 'regex' ? 'regex' : 'text',
+      content: String(e.content == null ? '' : e.content),
+      position: (e.position === 'front' || e.position === 'back') ? e.position : 'middle',
+      enabled: e.enabled !== false,   // 默认启用
+      injectMode: (e.injectMode === 'keyword' || e.injectMode === 'probability') ? e.injectMode : 'always',
+      keywords: Array.isArray(e.keywords) ? e.keywords.map(function (k) { return String(k).trim(); }).filter(Boolean) : [],
+      probability: (typeof e.probability === 'number' && e.probability >= 0 && e.probability <= 100) ? e.probability : 50
+    };
+  }
+
+  function normalizeBook(raw, fallbackType) {
+    var b = raw && typeof raw === 'object' ? raw : {};
+    var book = {
+      id: b.id || genId(),
+      title: String(b.title || b.name || '未命名世界书'),
+      content: String(b.content == null ? (b.desc || b.text || '') : b.content),
+      scope: b.scope === 'local' ? 'local' : 'global',
+      type: b.type === 'style' ? 'style' : (fallbackType || 'worldbook'),
+      categoryId: b.categoryId == null ? '' : String(b.categoryId),
+      keywords: Array.isArray(b.keywords)
+        ? b.keywords.map(function (k) { return String(k == null ? '' : k).trim(); }).filter(Boolean)
+        : [],
+      createdAt: b.createdAt || Date.now()
+    };
+
+    // ===== entries：嵌套条目数组（v2 新字段） =====
+    if (Array.isArray(b.entries) && b.entries.length) {
+      book.entries = b.entries.map(normalizeEntry);
+    } else if (typeof b.content === 'string' && b.content.trim()) {
+      // v1 → v2 迁移：旧 content 变成一个默认条目
+      book.entries = [normalizeEntry({
+        id: 'migrated_' + book.id,
+        name: '默认条目',
+        type: 'text',
+        content: b.content,
+        position: 'middle',
+        enabled: true,
+        injectMode: 'always'
+      })];
+    } else {
+      book.entries = [];
+    }
+
+    return book;
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ================= 页面状态 ================= */
+  var state = {
+    scope: 'all'        // all | global | local
+  };
+  /* 已展开的世界书 id（单页树形逐级展开，不再跳转详情页） */
+  var expandedIds = {};
+  /* 已展开的条目折叠面板，key 为 bookId + '_' + 序号 */
+  var entryExpandedIds = {};
+
+  /* ================= 图标片段 ================= */
+  var SVG_GLOBAL = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  var SVG_LOCAL = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  var SVG_BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+  var SVG_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+  var SVG_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+  var SVG_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>';
+
+  /* ================= 渲染 ================= */
+  var listEl = document.getElementById('wbList');
+  var countAllEl = document.getElementById('countAll');
+  var countGlobalEl = document.getElementById('countGlobal');
+  var countLocalEl = document.getElementById('countLocal');
+
+  /* 严格校验：只接受普通书本对象，排除数字 / 字符串 / 数组 / 空记录 / 历史测试数据 */
+  function isValidBook(b) {
+    if (!b || typeof b !== 'object' || Array.isArray(b)) return false;      // 非对象（裸数字、裸字符串）
+    var title = String(b.title == null ? '' : b.title).trim();
+    var content = String(b.content == null ? '' : b.content).trim();
+    if (!title && !content) return false;                                   // 标题与内容都为空
+    if (title === '12') return false;                                       // 历史测试记录
+    if (content.length >= 20 && /^[0-9\s]+$/.test(content)) return false;   // 纯数字测试串（如一堆 1）
+    return true;
+  }
+
+  function getVisibleBooks() {
+    return loadBooks().filter(function (b) {
+      if (!isValidBook(b)) return false;
+      if ((b.type || 'worldbook') !== 'worldbook') return false;
+      if (state.scope !== 'all' && b.scope !== state.scope) return false;
+      return true;
+    });
+  }
+
+  function renderCounts() {
+    var inTab = loadBooks().filter(function (b) {
+      if (!isValidBook(b)) return false;
+      if ((b.type || 'worldbook') !== 'worldbook') return false;
+      return true;
+    });
+    var globals = inTab.filter(function (b) { return b.scope === 'global'; }).length;
+    var locals = inTab.filter(function (b) { return b.scope === 'local'; }).length;
+    countAllEl.textContent = inTab.length + ' 本';
+    countGlobalEl.textContent = globals + ' 本';
+    countLocalEl.textContent = locals + ' 本';
+  }
+
+  function renderList() {
+    var books = getVisibleBooks();
+    if (!books.length) {
+      listEl.innerHTML = '<div class="wb-empty">还没有世界书，点击下方新建</div>';
+      return;
+    }
+    var POS_LABEL = { front: '前', middle: '中', back: '后' };
+    var MODE_LABEL = { always: '始终', keyword: '关键词', probability: '概率' };
+    listEl.innerHTML = books.map(function (b) {
+      var title = String(b.title == null ? '' : b.title).trim() || '未命名世界书';
+      var desc = String(b.content == null ? '' : b.content).replace(/\s+/g, ' ').trim();
+      if (!desc) desc = '暂无描述';
+      var expanded = !!expandedIds[b.id];
+      var html = '<div class="book-card' + (expanded ? ' expanded' : '') + '" data-id="' + escapeHtml(b.id) + '">' +
+        '<div class="book-icon">' + SVG_BOOK + '</div>' +
+        '<div class="book-info">' +
+          '<div class="book-title">' + escapeHtml(title) + '</div>' +
+          '<div class="book-desc">' + escapeHtml(desc) + '</div>' +
+        '</div>' +
+        '<button class="book-edit-btn" type="button" data-id="' + escapeHtml(b.id) + '" aria-label="编辑世界书名称">' + SVG_EDIT + '</button>' +
+        '<div class="book-arrow">' + SVG_ARROW + '</div>' +
+      '</div>';
+      if (expanded) {
+        var entries = Array.isArray(b.entries) ? b.entries : [];
+        var rows = '';
+        if (!entries.length) {
+          rows = '<div class="wb-children-empty">还没有条目</div>';
+        } else {
+          rows = entries.map(function (raw, idx) {
+            var e = raw && typeof raw === 'object' ? raw : {};
+            var name = String(e.name == null ? '未命名条目' : e.name);
+            var type = e.type === 'regex' ? 'regex' : 'text';
+            var pos = (e.position === 'front' || e.position === 'back') ? e.position : 'middle';
+            var mode = (e.injectMode === 'keyword' || e.injectMode === 'probability') ? e.injectMode : 'always';
+            var disabled = e.enabled === false;
+            var key = b.id + '_' + idx;
+            var open = !!entryExpandedIds[key];
+            var head = '<div class="entry-node' + (disabled ? ' is-disabled' : '') + '" data-book="' + escapeHtml(b.id) + '" data-index="' + idx + '">' +
+              '<span class="entry-node-name">' + escapeHtml(name) + '</span>' +
+              '<span class="en-tag t-' + type + '">' + (type === 'regex' ? '正则' : '文本') + '</span>' +
+              '<span class="en-tag p-' + pos + '">' + POS_LABEL[pos] + '</span>' +
+              '<span class="en-tag m-mode">' + MODE_LABEL[mode] + '</span>' +
+              '<button class="entry-edit-btn" type="button" data-book="' + escapeHtml(b.id) + '" data-index="' + idx + '" aria-label="编辑条目">' + SVG_EDIT + '</button>' +
+              '<span class="en-chevron">' + SVG_CHEVRON + '</span>' +
+            '</div>';
+            var detail = '';
+            if (open) {
+              var content = String(e.content == null ? '' : e.content).trim();
+              var kwHtml = (Array.isArray(e.keywords) && e.keywords.length)
+                ? '<div class="entry-detail-kws">' + e.keywords.map(function (k) { return '<span class="en-kw">' + escapeHtml(String(k)) + '</span>'; }).join('') + '</div>'
+                : '';
+              var meta = mode === 'probability'
+                ? '注入概率 ' + ((typeof e.probability === 'number') ? e.probability : 50) + '%'
+                : (mode === 'keyword' ? '命中关键词时注入' : '始终注入');
+              detail = '<div class="entry-detail">' +
+                '<div class="entry-detail-content">' + (content ? escapeHtml(content) : '（无内容）') + '</div>' +
+                kwHtml +
+                '<div class="entry-detail-meta">' + meta + (disabled ? ' · 已禁用' : '') + '</div>' +
+              '</div>';
+            }
+            return '<div class="entry-item' + (open ? ' open' : '') + '">' + head + detail + '</div>';
+          }).join('');
+        }
+        html += '<div class="book-children">' + rows +
+          '<div class="wb-add-entry" data-book="' + escapeHtml(b.id) + '">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+            '添加条目' +
+          '</div>' +
+        '</div>';
+      }
+      return html;
+    }).join('');
+  }
+
+  function renderAll() {
+    renderCounts();
+    renderList();
+  }
+
+  /* ================= 抽屉通用 ================= */
+  function openOverlay(id) { document.getElementById(id).classList.add('show'); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+  document.querySelectorAll('.wb-backdrop[data-close]').forEach(function (el) {
+    el.addEventListener('click', function () { closeOverlay(el.getAttribute('data-close')); });
+  });
+
+  /* ================= Toast ================= */
+  var toastEl = document.getElementById('wbToast');
+  var toastTimer = null;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+  }
+
+  /* ================= 范围切换：全部 / 全局 / 局部 ================= */
+  document.querySelectorAll('.wb-filter-pill').forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      state.scope = pill.getAttribute('data-scope');
+      renderAll();
+      document.querySelectorAll('.wb-filter-pill').forEach(function (p) {
+        p.classList.toggle('active', p === pill);
+      });
+    });
+  });
+
+  /* ================= 新建世界书：点击底部按钮直接打开「新建条目」表单 ================= */
+  document.getElementById('btnAddFooter').addEventListener('click', function () { openEntryDrawer(); });
+
+  /* ---- 新建条目抽屉 ---- */
+  var edNameInput = document.getElementById('edName');
+  var edContentInput = document.getElementById('edContent');
+  var edKeywordsInput = document.getElementById('edKeywords');
+  var edEnabledBtn = document.getElementById('edEnabled');
+  var edProbInput = document.getElementById('edProb');
+  var edProbValEl = document.getElementById('edProbVal');
+  var edKeywordsField = document.getElementById('edKeywordsField');
+  var edProbField = document.getElementById('edProbField');
+  var edType = 'text', edPos = 'middle', edMode = 'always';
+
+  /* 触发关键词：字符串按中英文逗号分割 → 去空格 → 去空项 → 去重；空输入返回 [] */
+  function parseKeywords(raw) {
+    var arr = String(raw == null ? '' : raw).split(/[,，]/);
+    var seen = {};
+    var result = [];
+    arr.forEach(function (item) {
+      var word = item.trim();
+      if (!word) return;
+      var key = word.toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      result.push(word);
+    });
+    return result;
+  }
+
+  function syncSeg(containerId, value, attrName) {
+    document.querySelectorAll('#' + containerId + ' .wb-seg-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute(attrName) === value);
+    });
+  }
+
+  function updateModeFields() {
+    edKeywordsField.style.display = (edMode === 'keyword') ? 'block' : 'none';
+    edProbField.style.display = (edMode === 'probability') ? 'block' : 'none';
+  }
+
+  var drawerTitleEl = document.getElementById('drawerTitle');
+  var btnEntryDeleteEl = document.getElementById('btnEntryDelete');
+  var drawerMode = 'newbook';      // newbook 新建世界书 | addentry 添加条目 | edentry 编辑条目
+  var drawerBookId = null;
+  var drawerEntryIndex = null;
+
+  function findBookById(list, id) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].id === id) return list[i];
+    }
+    return null;
+  }
+
+  function collectEntryForm() {
+    return {
+      name: edNameInput.value.trim(),
+      type: edType,
+      content: edContentInput.value,
+      position: edPos,
+      enabled: edEnabledBtn.classList.contains('on'),
+      injectMode: edMode,
+      keywords: parseKeywords(edKeywordsInput.value),
+      probability: (function () { var p = parseInt(edProbInput.value, 10); return isNaN(p) ? 50 : p; })()
+    };
+  }
+
+  function resetEntryForm() {
+    edNameInput.value = '';
+    edContentInput.value = '';
+    edKeywordsInput.value = '';
+    edProbInput.value = 50;
+    edProbValEl.textContent = '50%';
+    edEnabledBtn.classList.add('on');
+    edType = 'text';
+    edPos = 'middle';
+    edMode = 'always';
+    syncSeg('edTypeSeg', edType, 'data-type');
+    syncSeg('edPosSeg', edPos, 'data-pos');
+    syncSeg('edModeSeg', edMode, 'data-mode');
+    updateModeFields();
+  }
+
+  /* 抽屉四模式：不传参数=新建世界书；bookId+edbook=改书名；只传 bookId=添加条目；bookId+entryIndex=编辑条目 */
+  var ED_FIELDS = ['edFieldType', 'edFieldContent', 'edFieldPos', 'edFieldEnabled', 'edFieldMode'];
+  function setEntryFieldsVisible(show) {
+    ED_FIELDS.forEach(function (fid) {
+      document.getElementById(fid).style.display = show ? '' : 'none';
+    });
+  }
+
+  function openEntryDrawer(bookId, entryIndex, mode) {
+    if (mode === 'edbook') {
+      drawerMode = 'edbook';
+      drawerBookId = bookId || null;
+      drawerEntryIndex = null;
+      drawerTitleEl.textContent = '编辑世界书';
+      btnEntryDeleteEl.style.display = 'none';
+      setEntryFieldsVisible(false);
+      edKeywordsField.style.display = 'none';
+      edProbField.style.display = 'none';
+      var bk = findBookById(loadBooks(), drawerBookId);
+      edNameInput.value = bk ? String(bk.title == null ? '' : bk.title) : '';
+      openOverlay('editOverlay');
+      setTimeout(function () { edNameInput.focus(); edNameInput.select(); }, 260);
+      return;
+    }
+    setEntryFieldsVisible(true);
+    drawerBookId = bookId || null;
+    drawerEntryIndex = (typeof entryIndex === 'number' && !isNaN(entryIndex)) ? entryIndex : null;
+    drawerMode = !drawerBookId ? 'newbook' : (drawerEntryIndex !== null ? 'edentry' : 'addentry');
+    drawerTitleEl.textContent = drawerMode === 'newbook' ? '新建世界书' : (drawerMode === 'addentry' ? '添加条目' : '编辑条目');
+    btnEntryDeleteEl.style.display = drawerMode === 'edentry' ? '' : 'none';
+    if (drawerMode === 'edentry') {
+      var book = findBookById(loadBooks(), drawerBookId);
+      var raw = (book && Array.isArray(book.entries)) ? book.entries[drawerEntryIndex] : null;
+      var e = raw && typeof raw === 'object' ? raw : {};
+      edNameInput.value = String(e.name == null ? '' : e.name);
+      edContentInput.value = String(e.content == null ? '' : e.content);
+      edType = e.type === 'regex' ? 'regex' : 'text';
+      edPos = (e.position === 'front' || e.position === 'back') ? e.position : 'middle';
+      edMode = (e.injectMode === 'keyword' || e.injectMode === 'probability') ? e.injectMode : 'always';
+      edKeywordsInput.value = Array.isArray(e.keywords) ? e.keywords.join(',') : '';
+      edProbInput.value = (typeof e.probability === 'number') ? e.probability : 50;
+      edProbValEl.textContent = edProbInput.value + '%';
+      edEnabledBtn.classList.toggle('on', e.enabled !== false);
+      syncSeg('edTypeSeg', edType, 'data-type');
+      syncSeg('edPosSeg', edPos, 'data-pos');
+      syncSeg('edModeSeg', edMode, 'data-mode');
+      updateModeFields();
+    } else {
+      resetEntryForm();
+    }
+    openOverlay('editOverlay');
+    setTimeout(function () { edNameInput.focus(); }, 260);
+  }
+
+  document.getElementById('edTypeSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.wb-seg-btn') : null;
+    if (!btn) return;
+    edType = btn.getAttribute('data-type');
+    syncSeg('edTypeSeg', edType, 'data-type');
+  });
+  document.getElementById('edPosSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.wb-seg-btn') : null;
+    if (!btn) return;
+    edPos = btn.getAttribute('data-pos');
+    syncSeg('edPosSeg', edPos, 'data-pos');
+  });
+  document.getElementById('edModeSeg').addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.wb-seg-btn') : null;
+    if (!btn) return;
+    edMode = btn.getAttribute('data-mode');
+    syncSeg('edModeSeg', edMode, 'data-mode');
+    updateModeFields();
+  });
+
+  edEnabledBtn.addEventListener('click', function () { this.classList.toggle('on'); });
+  edProbInput.addEventListener('input', function () { edProbValEl.textContent = this.value + '%'; });
+
+  document.getElementById('btnEditCancel').addEventListener('click', function () {
+    closeOverlay('editOverlay');
+  });
+
+  /* 保存：按抽屉模式分别处理（新建世界书 / 添加条目 / 编辑条目），保存后就地刷新并保持展开 */
+  document.getElementById('btnEditSave').addEventListener('click', function () {
+    var form = collectEntryForm();
+    if (!form.name) { showToast('请填写名称'); edNameInput.focus(); return; }
+    var list = loadBooks();
+    if (drawerMode === 'edbook') {
+      var bk = findBookById(list, drawerBookId);
+      if (!bk) {
+        closeOverlay('editOverlay');
+        renderAll();
+        showToast('该世界书不存在');
+        return;
+      }
+      bk.title = form.name;
+    } else if (drawerMode === 'newbook') {
+      var entry = normalizeEntry(form);
+      list.unshift({
+        id: genId(),
+        title: form.name,
+        content: form.content,
+        scope: 'global',
+        type: 'worldbook',
+        categoryId: '',
+        keywords: form.keywords,
+        createdAt: Date.now(),
+        entries: [entry]
+      });
+    } else {
+      var book = findBookById(list, drawerBookId);
+      if (!book) {
+        closeOverlay('editOverlay');
+        renderAll();
+        showToast('该世界书不存在');
+        return;
+      }
+      if (!Array.isArray(book.entries)) book.entries = [];
+      if (drawerMode === 'addentry') {
+        book.entries.push(normalizeEntry(form));
+      } else {
+        var merged = Object.assign({}, book.entries[drawerEntryIndex] || {}, form);
+        book.entries[drawerEntryIndex] = normalizeEntry(merged);
+      }
+    }
+    try {
+      saveBooks(list);
+    } catch (err) {
+      if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+        showToast('存储空间不足，请压缩内容');
+      } else {
+        showToast('保存失败，请重试');
+      }
+      return;
+    }
+    closeOverlay('editOverlay');
+    renderAll();
+    showToast(drawerMode === 'newbook' ? '新建成功' : (drawerMode === 'addentry' ? '已添加条目' : (drawerMode === 'edbook' ? '已改名' : '已保存修改')));
+  });
+
+  /* 删除条目：仅在编辑条目模式显示 */
+  btnEntryDeleteEl.addEventListener('click', function () {
+    if (drawerMode !== 'edentry') return;
+    var list = loadBooks();
+    var book = findBookById(list, drawerBookId);
+    if (book && Array.isArray(book.entries)) {
+      book.entries.splice(drawerEntryIndex, 1);
+      try {
+        saveBooks(list);
+      } catch (err) {
+        showToast('保存失败，请重试');
+        return;
+      }
+    }
+    entryExpandedIds = {};   /* 删除后条目序号变化，清空二级折叠状态 */
+    closeOverlay('editOverlay');
+    renderAll();
+    showToast('已删除条目');
+  });
+
+  /* 树形交互：点书卡片展开/收起；点条目行独立展开内容区；行尾铅笔进编辑抽屉；「添加条目」新增 */
+  listEl.addEventListener('click', function (e) {
+    var editBtn = e.target.closest('.entry-edit-btn');
+    if (editBtn) {
+      openEntryDrawer(editBtn.getAttribute('data-book'), parseInt(editBtn.getAttribute('data-index'), 10));
+      return;
+    }
+    var node = e.target.closest('.entry-node');
+    if (node) {
+      var key = node.getAttribute('data-book') + '_' + node.getAttribute('data-index');
+      entryExpandedIds[key] = !entryExpandedIds[key];
+      renderList();
+      return;
+    }
+    var addRow = e.target.closest('.wb-add-entry');
+    if (addRow) {
+      openEntryDrawer(addRow.getAttribute('data-book'), null);
+      return;
+    }
+    var bookEdit = e.target.closest('.book-edit-btn');
+    if (bookEdit) {
+      openEntryDrawer(bookEdit.getAttribute('data-id'), null, 'edbook');
+      return;
+    }
+    var card = e.target.closest('.book-card');
+    if (!card) return;
+    var id = card.getAttribute('data-id');
+    if (!id) return;
+    expandedIds[id] = !expandedIds[id];
+    renderList();
+  });
+
+  /* ---- 顶部加号：锚定浮动菜单（点外部关闭，禁用底部抽屉） ---- */
+  var importInput = document.getElementById('importInput');
+  var actionPopover = document.getElementById('actionPopover');
+  document.getElementById('btnAddTop').addEventListener('click', function (e) {
+    e.stopPropagation();
+    actionPopover.classList.toggle('show');
+  });
+  document.addEventListener('click', function (e) {
+    if (actionPopover.classList.contains('show') &&
+        !actionPopover.contains(e.target)) {
+      actionPopover.classList.remove('show');
+    }
+  });
+  document.getElementById('menuImport').addEventListener('click', function () {
+    actionPopover.classList.remove('show');
+    importInput.value = '';
+    importInput.click();
+  });
+
+  importInput.addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var fileName = file.name || '导入的世界书';
+    // 拒绝 Word 文档
+    if (/\.docx?$|\.doc$/i.test(fileName)) {
+      showToast('暂不支持 Word 文档，请先复制内容粘贴，或转为 TXT 文件');
+      importInput.value = '';
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var buf = ev.target.result;
+      var text = '';
+      var ext = (fileName.split('.').pop() || '').toLowerCase();
+      var baseTitle = fileName.replace(/\.[^.]+$/, '').trim() || '导入的世界书';
+      // 先 UTF-8
+      try { text = new TextDecoder('utf-8', {fatal:false}).decode(buf); } catch (e) { text = ''; }
+      // 只要有乱码迹象（替换字符/连续高位字符）就试 GBK，不管扩展名
+      var looksGarbled = /\uFFFD/.test(text) || /[锟斤拷烫]/g.test(text) || /[\u00C0-\u00FF]{6,}/.test(text);
+      if (looksGarbled) {
+        try { text = new TextDecoder('gbk').decode(buf); } catch (e) {}
+      }
+      var added = [];
+      try {
+        if (ext === 'json' || text.trim().startsWith('{') || text.trim().startsWith('[')) {
+          var parsed = JSON.parse(text);
+          var arr = null;
+          if (Array.isArray(parsed)) arr = parsed;
+          else if (parsed && Array.isArray(parsed.books)) arr = parsed.books;
+          else if (parsed && Array.isArray(parsed.worldbooks)) arr = parsed.worldbooks;
+          else if (parsed && Array.isArray(parsed.entries)) arr = parsed.entries;
+          else if (parsed && parsed.entries && typeof parsed.entries === 'object') {
+            // SillyTavern / 酒馆世界书：entries 是 {key: entryObj}
+            arr = Object.keys(parsed.entries).map(function (k) { return parsed.entries[k]; });
+          }
+          else if (parsed && typeof parsed === 'object') arr = [parsed];
+          if (!arr) throw new Error('JSON 结构无法识别');
+          arr.forEach(function (item) {
+            if (!item) return;
+            // 兼容酒馆字段：content/comment/key/name/description
+            var title = item.title || item.name || item.comment || (item.key && (Array.isArray(item.key) ? item.key.join(' ') : item.key)) || baseTitle;
+            var content = item.content || item.text || item.description || item.body || '';
+            added.push(normalizeBook({ title: String(title), content: String(content), scope: 'global' }, 'worldbook'));
+          });
+        } else if (ext === 'csv' || ext === 'jsonl') {
+          // CSV/JSONL：按行拆，每行一本
+          text.split(/\r?\n/).forEach(function (line, i) {
+            line = line.trim();
+            if (!line) return;
+            if (ext === 'jsonl') {
+              try {
+                var o = JSON.parse(line);
+                added.push(normalizeBook({ title: o.title || o.name || '行 ' + (i+1), content: o.content || o.text || JSON.stringify(o), scope: 'global' }, 'worldbook'));
+              } catch(e) {}
+            } else {
+              added.push(normalizeBook({ title: '行 ' + (i+1), content: line, scope: 'global' }, 'worldbook'));
+            }
+          });
+        } else {
+          // txt/md/其他：纯文本生成一本新世界书，标题取文件名
+          var title = fileName.replace(/\.[^.]+$/, '').trim() || '导入的文本';
+          added.push(normalizeBook({ title: title, content: text, scope: 'global' }, 'worldbook'));
+        }
+      } catch (err) {
+        showToast('导入失败：文件格式无法识别');
+        return;
+      }
+
+      var list = loadBooks();
+      added.forEach(function (b) { list.push(b); });
+      try {
+        saveBooks(list);
+      } catch (err) {
+        showToast('存储空间不足，导入未完成');
+        return;
+      }
+      renderAll();
+      showToast('导入成功，新增 ' + added.length + ' 本');
+    };
+    reader.onerror = function () { showToast('文件读取失败'); };
+    reader.readAsArrayBuffer(file);
+  });
+
+  /* ---- 导出 ---- */
+  document.getElementById('menuExport').addEventListener('click', function () {
+    actionPopover.classList.remove('show');
+    var list = loadBooks();
+    if (!list.length) { showToast('还没有世界书可导出'); return; }
+
+    var d = new Date();
+    var ymd = '' + d.getFullYear() +
+      String(d.getMonth() + 1).padStart(2, '0') +
+      String(d.getDate()).padStart(2, '0');
+
+    var blob;
+    try {
+      blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json;charset=utf-8' });
+    } catch (err) {
+      showToast('导出失败');
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '世界书备份_' + ymd + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('已开始导出');
+  });
+
+  /* ================= 初始化 ================= */
+  renderAll();
+</script>
+<script src="../../shared/js/statusbar-control.js"></script>
+</body>
+</html>

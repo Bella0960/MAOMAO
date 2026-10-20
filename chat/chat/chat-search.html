@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>查找记录 · 小手机</title>
+<script src="../../shared/js/font-loader.js"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: #F7F7F9;
+    border-radius: 45px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 8px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+  /* 本页无底部悬浮导航，无需 nav.js；此规则仅作兜底 */
+  .floating-nav { display: none !important; }
+
+  /* 可滚动内容区 */
+  .cs-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 40px 16px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #F7F7F9;
+  }
+  .cs-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：左返回 / 中标题 / 右占位 ===== */
+  .cs-topbar {
+    position: relative;
+    z-index: 30;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 -16px;
+    padding: calc(50px + env(safe-area-inset-top, 0px)) 16px 12px 16px;
+  }
+  .cs-top-left,
+  .cs-top-right {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .cs-top-left { justify-content: flex-start; }
+  .cs-top-right { justify-content: flex-end; }
+  .cs-circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+  }
+  .cs-circle-btn:active { transform: scale(0.94); }
+  .cs-circle-btn svg { width: 16px; height: 16px; stroke: #333333; }
+  .cs-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #111111;
+  }
+
+  /* ===== 搜索框：纯白、无边框、圆角 12 ===== */
+  .search-wrap {
+    margin-top: 10px;
+    height: 40px;
+    background: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .search-wrap svg {
+    width: 15px;
+    height: 15px;
+    stroke: #8E8E93;
+    flex-shrink: 0;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.844rem;
+    color: #111111;
+    font-family: inherit;
+  }
+  .search-input::placeholder { color: #B0B0B5; }
+
+  /* 搜索结果挂载点（后续步骤使用，骨架阶段保持空白） */
+  .search-results {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="cs-stage">
+
+      <!-- 顶部导航 -->
+      <div class="cs-topbar">
+        <div class="cs-top-left">
+          <button class="cs-circle-btn" type="button" aria-label="返回" id="btnBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="cs-title">查找记录</span>
+        <div class="cs-top-right"></div>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="输入关键词搜索..." autocomplete="off">
+      </div>
+
+      <!-- 搜索结果（后续步骤渲染） -->
+      <div class="search-results" id="searchResults"></div>
+
+    </main>
+
+  </div>
+
+<script>
+  // ================= 解析 roleId（URLSearchParams + 正则兜底，与 chat-settings.html 一致） =================
+  function getRoleIdFromUrl() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var v = p.get('roleId'); // URLSearchParams 已自动解码一次，切勿再 decode
+      if (v) return v;
+    } catch (e) {}
+    var m = window.location.search.match(/[?&]roleId=([^&]*)/);
+    return m ? decodeURIComponent(m[1]) : ''; // 正则取到的是原始串，需要手动解码
+  }
+  var roleId = getRoleIdFromUrl();
+  console.log('[chat-search] roleId =', roleId);
+
+  // ================= 搜索结果样式（JS 注入，不改动 head 中已做好的极简 CSS） =================
+  var searchExtraStyle = document.createElement('style');
+  searchExtraStyle.textContent = [
+    '.sr-card { position: relative; display: flex; align-items: flex-start; gap: 10px; background: #FFFFFF; border-radius: 14px; padding: 11px 12px; cursor: pointer; transition: opacity 0.12s ease; }',
+    '.sr-card:active { opacity: 0.8; }',
+    '.sr-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #ECECF0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }',
+    '.sr-avatar img { width: 100%; height: 100%; object-fit: cover; }',
+    '.sr-avatar svg { width: 18px; height: 18px; stroke: #AEAEB2; }',
+    '.sr-body { flex: 1; min-width: 0; padding-right: 52px; }',
+    '.sr-text { font-size: 0.781rem; line-height: 1.5; color: #111111; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }',
+    '.sr-text mark { background: #E5E5EA; color: #111111; border-radius: 4px; padding: 0 2px; }',
+    '.sr-time { position: absolute; top: 10px; right: 12px; font-size: 0.625rem; color: #8E8E93; font-family: ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; }',
+    '.sr-empty { text-align: center; font-size: 0.75rem; color: #8E8E93; padding: 40px 16px; }'
+  ].join('\n');
+  document.head.appendChild(searchExtraStyle);
+
+  // ================= 数据读取 =================
+  var PERSON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch];
+    });
+  }
+  function escapeRegExp(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // 对方头像：ai_custom_characters 中按 roleId 找；我方头像：myProfile.avatar
+  var roleAvatar = '';
+  try {
+    var rawChars = localStorage.getItem('ai_custom_characters');
+    if (rawChars) {
+      var chars = JSON.parse(rawChars);
+      if (Array.isArray(chars)) {
+        for (var i = 0; i < chars.length; i++) {
+          if (chars[i] && String(chars[i].id) === String(roleId)) {
+            roleAvatar = chars[i].avatar || '';
+            break;
+          }
+        }
+      }
+    }
+  } catch (e) {}
+
+  var myAvatar = '';
+  try {
+    var rawMe = localStorage.getItem('myProfile');
+    if (rawMe) {
+      var me = JSON.parse(rawMe);
+      if (me && me.avatar) myAvatar = me.avatar;
+    }
+  } catch (e) {}
+
+  // 历史记录：解析失败/空数组统一返回 []
+  // 注意：变量名不能用 history（会遮蔽只读的 window.history，赋值被忽略导致脚本报错中断）
+  var historyList = [];
+  try {
+    var rawHistory = localStorage.getItem('chat_history_' + roleId);
+    if (rawHistory) {
+      var parsedHistory = JSON.parse(rawHistory);
+      if (Array.isArray(parsedHistory)) historyList = parsedHistory;
+    }
+  } catch (e) {}
+
+  // 与 chat-detail.html renderAllMessages 的清洗规则保持一致，
+  // 保证这里的数组下标 == 聊天页渲染时 .msg-row 的 data-idx
+  var displayList = historyList.filter(function (m) {
+    var t = String((m && (m.text || m.content)) || '');
+    return t.indexOf('定位失败') === -1 && t.indexOf('Timeout expired') === -1;
+  });
+
+  function isSentMsg(m) {
+    return m && (m.role === 'sent' || m.role === 'user');
+  }
+  function isErrorMsg(m) {
+    return m && (m.isError || m.role === 'system_error');
+  }
+  function msgText(m) {
+    return String((m && (m.text || m.content)) || '');
+  }
+  function formatTime(t) {
+    if (!t) return '';
+    var d = new Date(t);
+    if (isNaN(d.getTime())) return '';
+    var now = new Date();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mi = String(d.getMinutes()).padStart(2, '0');
+    return d.getFullYear() === now.getFullYear()
+      ? mm + '-' + dd + ' ' + hh + ':' + mi
+      : d.getFullYear() + '-' + mm + '-' + dd + ' ' + hh + ':' + mi;
+  }
+
+  // 关键词高亮：先转义文本与关键词，再 gi 替换包裹 <mark>
+  function highlight(text, keyword) {
+    var safe = escapeHtml(text);
+    if (!keyword) return safe;
+    var safeKw = escapeHtml(escapeRegExp(keyword));
+    return safe.replace(new RegExp('(' + safeKw + ')', 'gi'),
+      '<mark style="background:#E5E5EA;color:#111;border-radius:4px;padding:0 2px;">$&</mark>');
+  }
+
+  var searchInput = document.getElementById('searchInput');
+  var searchResults = document.getElementById('searchResults');
+
+  function renderEmpty(text) {
+    searchResults.innerHTML = '<div class="sr-empty">' + escapeHtml(text) + '</div>';
+  }
+
+  function renderResults(keyword) {
+    var kw = keyword.trim();
+    var kwLower = kw.toLowerCase();
+
+    // 携带在 displayList 中的真实下标，供跳转定位（聊天页参数名为 id）
+    var matched = [];
+    for (var i = 0; i < displayList.length; i++) {
+      var mm = displayList[i];
+      if (isErrorMsg(mm)) continue;
+      if (kwLower && msgText(mm).toLowerCase().indexOf(kwLower) !== -1) {
+        matched.push({ msg: mm, idx: i });
+      }
+    }
+    matched.reverse(); // 最新的在前
+
+    if (matched.length === 0) {
+      renderEmpty('没有找到相关记录');
+      return;
+    }
+
+    var html = matched.map(function (item) {
+      var m = item.msg;
+      var sent = isSentMsg(m);
+      var avatarUrl = sent ? myAvatar : roleAvatar;
+      var avatarHtml = avatarUrl
+        ? '<img src="' + escapeHtml(avatarUrl) + '" alt="">'
+        : PERSON_SVG;
+      return '' +
+        '<div class="sr-card" data-idx="' + item.idx + '">' +
+          '<div class="sr-time">' + escapeHtml(formatTime(m.time)) + '</div>' +
+          '<div class="sr-avatar">' + avatarHtml + '</div>' +
+          '<div class="sr-body"><div class="sr-text">' + highlight(msgText(m), kw) + '</div></div>' +
+        '</div>';
+    }).join('');
+
+    searchResults.innerHTML = html;
+  }
+
+  // 点击结果：回聊天页并定位到该消息（?id=<roleId>&hl=<序号>）
+  searchResults.addEventListener('click', function (e) {
+    var card = e.target.closest ? e.target.closest('.sr-card') : null;
+    if (!card || !searchResults.contains(card)) return;
+    var idx = parseInt(card.getAttribute('data-idx'), 10);
+    if (isNaN(idx)) return;
+    window.location.href = 'chat-detail.html?id=' + encodeURIComponent(roleId) + '&hl=' + idx;
+  });
+
+  // 初始状态：完全没有历史 -> 暂无聊天记录；否则提示开始搜索
+  if (displayList.filter(function (m) { return !isErrorMsg(m); }).length === 0) {
+    renderEmpty('暂无聊天记录');
+    searchInput.disabled = true;
+    searchInput.placeholder = '暂无聊天记录';
+  } else {
+    renderEmpty('输入关键词开始搜索');
+    searchInput.addEventListener('input', function () {
+      if (searchInput.value.trim() === '') {
+        renderEmpty('输入关键词开始搜索');
+        return;
+      }
+      renderResults(searchInput.value);
+    });
+  }
+
+  // 返回上一页；无历史时兜底回聊天列表
+  document.getElementById('btnBack').addEventListener('click', function () {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'chat.html';
+    }
+  });
+
+  // 进入页面自动聚焦搜索框
+  window.addEventListener('load', function () {
+    var input = document.getElementById('searchInput');
+    if (input) input.focus();
+  });
+</script>
+<script src="../../shared/js/statusbar-control.js"></script>
+</body>
+</html>

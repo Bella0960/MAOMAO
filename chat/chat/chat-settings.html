@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>对话设置 · 小手机</title>
+<script src="../../shared/js/font-loader.js"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background-color: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #111111;
+  }
+
+  /* 项目统一手机外壳 */
+  .phone-mockup {
+    position: relative;
+    width: min(390px, calc(100vw - 24px));
+    height: min(844px, calc(100vh - 24px));
+    background-color: #FFFFFF;
+    border-radius: 45px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000;
+    z-index: 50;
+    pointer-events: none !important;
+  }
+  /* 本页无底部悬浮导航，无需 nav.js；此规则仅作兜底 */
+  .floating-nav { display: none !important; }
+
+  /* 可滚动内容区 */
+  .cs-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 18px 40px 18px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    background: #FFFFFF;
+  }
+  .cs-stage::-webkit-scrollbar { display: none; }
+
+  /* ===== 顶部：圆形返回 + 大英文标题左对齐 ===== */
+  .cs-topbar {
+    position: relative;
+    z-index: 30;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    gap: 14px;
+    margin: 0 -18px;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 22px 16px 22px;
+  }
+  .cs-top-left,
+  .cs-top-right {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .cs-top-left { justify-content: flex-start; }
+  .cs-top-right { display: none; }
+  .cs-circle-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: #F4F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  .cs-circle-btn:active { transform: scale(0.97); background: #B0B0B5; }
+  .cs-circle-btn svg { width: 14px; height: 14px; stroke: #111111; }
+  .cs-title {
+    flex: 1;
+    text-align: left;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.3px !important;
+    line-height: 1.1;
+    color: #111111 !important;
+  }
+
+  /* 副标题彻底隐藏（保留元素以兼容 JS，视觉上不存在） */
+  .cs-meta {
+    display: none !important;
+  }
+
+  /* ===== 卡片列表区 ===== */
+  .settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;
+  }
+  .settings-card {
+    background: #F8F8FA;
+    border-radius: 20px !important;
+    box-shadow: none;
+    overflow: hidden;
+  }
+  .settings-card + .settings-card { margin-top: 10px; }
+  .action-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px !important;
+    padding: 13px 16px !important;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: background 0.15s ease;
+  }
+  .action-row:active { background: #ECECEF; }
+  .action-row[disabled] { cursor: default; }
+  .action-row[disabled]:active { background: none; }
+  .action-icon {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50%;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .action-icon svg { width: 14px !important; height: 14px !important; stroke: #111111; }
+  .action-icon.danger svg { stroke: #666666; }
+  .action-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px !important;
+  }
+  .action-title {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #111111;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .action-title.danger { color: #111111; }
+  .action-sub {
+    font-size: 0.688rem !important;
+    color: #999999 !important;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .action-arrow { flex-shrink: 0; display: flex; align-items: center; }
+  .action-arrow svg { width: 12px !important; height: 12px !important; stroke: #B0B0B5; }
+
+  .cs-footer {
+    margin-top: 20px !important;
+    text-align: center;
+    font-size: 0.625rem !important;
+    color: #C7C7CC !important;
+  }
+
+  /* ===== 挂载世界书：卡片内平滑展开区（独立类，不影响既有卡片） ===== */
+  .action-arrow svg { transition: transform 0.28s ease; }
+  .wb-card.is-open .action-arrow svg { transform: rotate(90deg); }
+
+  .wb-panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease, opacity 0.28s ease;
+    border-top: 1px solid transparent;
+  }
+  .wb-card.is-open .wb-panel {
+    max-height: 60vh;
+    opacity: 1;
+    border-top-color: #F2F2F7;
+  }
+  .wb-panel-inner { padding: 12px 14px 14px; }
+  .wb-panel-title {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    margin-bottom: 10px;
+  }
+  .wb-mount-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .wb-mount-list::-webkit-scrollbar { display: none; }
+  .wb-mount-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: #F7F7F9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .wb-mount-item:active { background: #EFEFF2; }
+  .wb-mount-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-right: 10px;
+  }
+  .wb-mount-name {
+    font-size: 0.813rem;
+    color: #111111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wb-mount-cat {
+    font-size: 0.656rem;
+    color: #8E8E93;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wb-mount-circle {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid #8E8E93;
+    background: transparent;
+    position: relative;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .wb-mount-item.is-checked .wb-mount-circle {
+    background: #111111;
+    border-color: #111111;
+  }
+  .wb-mount-item.is-checked .wb-mount-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #FFFFFF;
+  }
+  .wb-mount-empty {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    text-align: center;
+    padding: 18px 10px;
+  }
+  .wb-save-btn {
+    width: 100%;
+    margin-top: 12px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .wb-save-btn:active { opacity: 0.82; }
+
+  /* ===== 分组标题（英文小字，与 settings 页一致） ===== */
+  .section-label {
+    margin: 18px 6px 6px;
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #B0B0B5;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .alias-card.is-open .action-arrow svg { transform: rotate(90deg); }
+  .alias-panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease, opacity 0.28s ease;
+    border-top: 1px solid transparent;
+  }
+  .alias-card.is-open .alias-panel {
+    max-height: 60vh;
+    opacity: 1;
+    border-top-color: #F2F2F7;
+  }
+  .alias-panel-inner {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .alias-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .alias-field label {
+    font-size: 0.688rem;
+    color: #8E8E93;
+    padding-left: 2px;
+  }
+  .alias-input {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    background: #F2F2F7;
+    padding: 0 14px;
+    font-size: 0.844rem;
+    color: #111111;
+    font-family: inherit;
+  }
+  .alias-input::placeholder { color: #B0B0B5; }
+  .alias-save-btn {
+    width: 100%;
+    margin-top: 2px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .alias-save-btn:active { opacity: 0.82; }
+
+  /* ===== 群聊信息（GROUP 区块） ===== */
+  .gp-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #F2F2F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    flex-wrap: wrap;
+    padding: 2px;
+    gap: 1px;
+  }
+  .gp-avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .gp-avatar > img.gp-avatar-cell,
+  .gp-avatar > svg {
+    width: 50%;
+    height: 50%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: 1px;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .gp-avatar > svg {
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+  .gp-avatar-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .gp-avatar-edit-btn {
+    font-size: 0.844rem;
+    color: #666666;
+    padding: 9px 14px;
+    border-radius: 12px;
+    background: #F2F2F7;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .gp-avatar-edit-btn:active { background: #E5E5EA; }
+  .gp-notice-textarea {
+    height: auto;
+    min-height: 84px;
+    padding: 12px 14px;
+    resize: none;
+    line-height: 1.55;
+    font-family: inherit;
+  }
+  .gp-manage-label {
+    font-size: 0.688rem;
+    color: #8E8E93;
+    padding-left: 2px;
+  }
+  .gp-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .gp-member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: #F8F8FA;
+  }
+  .gp-member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #EEEEF0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .gp-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gp-member-avatar svg {
+    width: 15px;
+    height: 15px;
+    stroke: #999999;
+    stroke-width: 1.5;
+  }
+  .gp-member-name {
+    flex: 1;
+    font-size: 0.844rem;
+    color: #111111;
+  }
+  .gp-member-remove {
+    font-size: 0.75rem;
+    color: #666666;
+    background: #EEEEF0;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 11px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease;
+  }
+  .gp-member-remove:active { background: #E0E0E5; }
+  .gp-dismiss-btn {
+    width: 100%;
+    margin-top: 8px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #F2F2F7;
+    color: #666666;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .gp-dismiss-btn:active { background: #E5E5EA; }
+  .gp-clear-btn {
+    width: 100%;
+    margin-top: 8px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #EEEEF0;
+    color: #444444;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .gp-clear-btn:active { background: #E0E0E5; }
+
+  /* ===== 弹性果冻开关 44×26（外层平移 + 内层形变彻底分离，硬件加速） ===== */
+  .ios-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 44px !important;
+    height: 26px !important;
+    flex-shrink: 0 !important;
+    pointer-events: none !important; /* 整行点击驱动，避免按钮内嵌控件双重触发 */
+  }
+  .ios-switch input {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    cursor: pointer;
+  }
+  /* 轨道：只管颜色过渡，不参与任何位移/形变 */
+  .ios-switch .toggle-track {
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 999px !important;
+    background: #F2F2F7 !important;
+    transition: background 0.25s ease !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+  }
+  .ios-switch input:checked + .toggle-track { background: #111111 !important; }
+
+  /* 外层：只管平移。will-change 强制提升合成层，位移只走 GPU 不掉帧 */
+  .ios-switch .knob-wrapper {
+    position: absolute !important;
+    top: 4px !important;
+    left: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+    transform: translateX(4px) !important;
+    will-change: transform !important;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+  }
+  .ios-switch input:checked + .toggle-track .knob-wrapper { transform: translateX(22px) !important; }
+
+  /* 内层：只管果冻形变与显示文字，默认状态无任何动画 */
+  .ios-switch .knob-inner {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    pointer-events: none !important;
+  }
+  .ios-switch .knob-inner.jelly { animation: jelly 0.45s ease-out !important; }
+  @keyframes jelly {
+    0%   { transform: scaleX(1) scaleY(1); }
+    45%  { transform: scaleX(1.3) scaleY(0.8); }
+    100% { transform: scaleX(1) scaleY(1); }
+  }
+
+  /* ON/OFF 文字：跟随滑块，白底上用深灰 #333，200ms 交叉淡化 */
+  .ios-switch .knob-txt {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: monospace !important;
+    font-weight: 600 !important;
+    font-size: 0.5rem !important;
+    line-height: 1 !important;
+    color: #333333 !important;
+    transition: opacity 0.2s ease !important;
+    pointer-events: none !important;
+  }
+  .ios-switch .knob-txt-off { opacity: 1 !important; }
+  .ios-switch .knob-txt-on  { opacity: 0 !important; }
+  .ios-switch input:checked + .toggle-track .knob-txt-off { opacity: 0 !important; }
+  .ios-switch input:checked + .toggle-track .knob-txt-on  { opacity: 1 !important; }
+
+  /* ===== 上下文条数展开面板（动画与备注面板同款，独立类） ===== */
+  .mem-card.is-open .action-arrow svg { transform: rotate(90deg); }
+  .mem-panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease, opacity 0.28s ease;
+    border-top: 1px solid transparent;
+  }
+  .mem-card.is-open .mem-panel {
+    max-height: 60vh;
+    opacity: 1;
+    border-top-color: #F2F2F7;
+  }
+  .mem-panel-inner { padding: 6px 14px 12px; }
+  .mem-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 2px;
+    border-bottom: 1px solid #F2F2F7;
+    font-size: 0.844rem;
+    color: #111111;
+    cursor: pointer;
+    user-select: none;
+  }
+  .mem-opt:last-child { border-bottom: none; }
+  .mem-radio {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #8E8E93;
+    flex-shrink: 0;
+  }
+  .mem-opt.is-checked .mem-radio { border-color: #111111; }
+  .mem-opt.is-checked .mem-radio::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #111111;
+  }
+  .mem-opt-hint {
+    font-size: 0.656rem;
+    color: #8E8E93;
+    margin-left: auto;
+    margin-right: 10px;
+  }
+
+  /* ===== 时间感知底部抽屉（独立类，覆盖手机外壳范围） ===== */
+  .tc-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .tc-overlay.is-show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .tc-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 8px 18px 26px;
+    transform: translateY(100%);
+    transition: transform 0.28s ease;
+    max-height: 82%;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .tc-sheet::-webkit-scrollbar { display: none; }
+  .tc-overlay.is-show .tc-sheet { transform: translateY(0); }
+  .tc-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: #111111;
+    opacity: 0.85;
+    margin: 4px auto 12px;
+  }
+  .tc-sheet-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111111;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .tc-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 2px;
+    border-bottom: 1px solid #F2F2F7;
+    font-size: 0.844rem;
+    color: #111111;
+    cursor: pointer;
+    user-select: none;
+  }
+  .tc-opt:last-of-type { border-bottom: none; }
+  .tc-opt-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .tc-opt-hint { font-size: 0.656rem; color: #8E8E93; }
+  .tc-radio {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #8E8E93;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .tc-opt.is-checked .tc-radio { border-color: #111111; }
+  .tc-opt.is-checked .tc-radio::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #111111;
+  }
+  .tc-field-wrap {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.25s ease;
+  }
+  .tc-field-wrap.is-show {
+    max-height: 160px;
+    opacity: 1;
+    margin: 4px 0 2px;
+  }
+  .tc-textarea {
+    width: 100%;
+    min-height: 76px;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    background: #F2F2F7;
+    padding: 10px 12px;
+    font-size: 0.813rem;
+    line-height: 1.5;
+    color: #111111;
+    font-family: inherit;
+    resize: none;
+  }
+  .tc-textarea::placeholder { color: #B0B0B5; }
+  .tc-save-btn {
+    width: 100%;
+    margin-top: 14px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.844rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .tc-save-btn:active { opacity: 0.82; }
+
+  /* Toast */
+  .cs-toast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 900;
+    background: rgba(28, 28, 30, 0.92);
+    color: #FFFFFF;
+    font-size: 0.813rem;
+    padding: 12px 20px;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    max-width: 80%;
+    text-align: center;
+  }
+  .cs-toast.show { opacity: 1; }
+
+  /* ===== 社交媒体自动化（警告行 + 手动生成动态抽屉） ===== */
+  .sm-warn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px 0;
+    font-size: 0.625rem;
+    color: #8E8E93;
+    line-height: 1.4;
+  }
+  .sm-warn svg { width: 11px; height: 11px; flex: 0 0 auto; stroke: #8E8E93; }
+
+  .sm-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .sm-overlay.is-show { opacity: 1; pointer-events: auto; }
+  .sm-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 8px 18px 26px;
+    transform: translateY(100%);
+    transition: transform 0.28s ease;
+    max-height: 82%;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .sm-sheet::-webkit-scrollbar { display: none; }
+  .sm-overlay.is-show .sm-sheet { transform: translateY(0); }
+
+  /* 音效选项列表 */
+  .sound-option-list { margin-top: 8px; }
+  .sound-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 4px;
+    border-bottom: 0.5px solid #E5E5EA;
+    font-size: 0.938rem;
+    color: #111;
+    cursor: pointer;
+  }
+  .sound-option:last-child { border-bottom: none; }
+  .sound-option .so-name { font-weight: 500; }
+  .sound-option .so-check {
+    color: #111;
+    font-size: 16px;
+    opacity: 0;
+  }
+  .sound-option.active .so-check { opacity: 1; }
+  .sound-option.active .so-name { font-weight: 700; }
+  .sound-option:active { background: #F8F8FA; }
+  .sm-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: #111111;
+    opacity: 0.85;
+    margin: 4px auto 12px;
+  }
+  .sm-sheet-title {
+    position: relative;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 12px;
+  }
+  .sm-close {
+    position: absolute;
+    right: 0;
+    top: -3px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .sm-close svg { width: 15px; height: 15px; stroke: #8E8E93; }
+  .sm-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    margin-bottom: 12px;
+  }
+  .sm-role-list::-webkit-scrollbar { display: none; }
+  .sm-role-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #F7F7F9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .sm-role-item:active { background: #EFEFF2; }
+  .sm-role-name {
+    font-size: 0.813rem;
+    color: #111111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+  }
+  .sm-check {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    border: 1.5px solid #C7C7CC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .sm-check svg { width: 10px; height: 10px; stroke: #FFFFFF; opacity: 0; transition: opacity 0.15s ease; }
+  .sm-role-item.is-checked .sm-check { background: #111111; border-color: #111111; }
+  .sm-role-item.is-checked .sm-check svg { opacity: 1; }
+  .sm-empty {
+    padding: 18px 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #8E8E93;
+  }
+  .sm-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    touch-action: none; /* 整行拖动都不触发页面滚动 */
+  }
+  .sm-slider-label {
+    font-size: 0.75rem;
+    color: #8E8E93;
+    flex: 0 0 auto;
+  }
+  .sm-slider {
+    position: relative;
+    flex: 1;
+    height: 24px;
+    cursor: pointer;
+    touch-action: none; /* 拖动时不触发页面滚动 */
+  }
+  .sm-slider-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 4px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: #E5E5EA;
+  }
+  .sm-slider-fill {
+    height: 100%;
+    width: 25%; /* 默认第 2 档（范围 1-5） */
+    border-radius: 999px;
+    background: #111111;
+    transition: width 0.08s ease-out; /* 填充条慢半拍跟上，拖动时有弹性 */
+  }
+  .sm-slider-thumb {
+    position: absolute;
+    top: 0;
+    left: 25%; /* 默认第 2 档 */
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    transform: translateX(-50%);
+    transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* 拖拽中：压扁成椭圆 + 关闭过渡，实时跟手 */
+  .sm-slider-thumb.is-dragging {
+    transition: none;
+    transform: translateX(-50%) scaleX(1.2) scaleY(0.85);
+  }
+  .sm-slider-value {
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: #111111;
+    flex: 0 0 auto;
+    min-width: 32px;
+    text-align: right;
+  }
+  .sm-generate-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 0;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: #FFFFFF;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .sm-generate-btn:active { opacity: 0.85; }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+
+  <div class="phone-mockup">
+
+    <!-- 状态栏 -->
+    <div class="status-bar"><span>4:41</span></div>
+
+    <main class="cs-stage">
+
+      <!-- 顶部导航 -->
+      <div class="cs-topbar">
+        <div class="cs-top-left">
+          <button class="cs-circle-btn" type="button" aria-label="返回" id="btnBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <span class="cs-title">Chat Settings</span>
+        <div class="cs-top-right"></div>
+      </div>
+
+      <!-- 当前对话信息 -->
+      <div class="cs-meta" id="metaInfo">加载中…</div>
+
+      <!-- 群聊信息（仅群聊显示） -->
+      <div id="groupInfoSection" style="display:none;">
+        <div class="section-label" style="margin-top:18px;">GROUP</div>
+        <div class="settings-list" style="margin-top:0;">
+
+          <!-- 群资料：头像 + 群名 + 成员数 -->
+          <div class="settings-card alias-card" id="gpInfoCard">
+            <button type="button" class="action-row" id="actionGroupInfo">
+              <span class="gp-avatar" id="gpAvatar"></span>
+              <span class="action-body">
+                <span class="action-title" id="gpNameText">群聊</span>
+                <span class="action-sub" id="gpMetaSub">成员 · 0人</span>
+              </span>
+              <span class="action-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </button>
+            <input type="file" id="gpAvatarInput" accept="image/*" style="display:none!important;">
+            <div class="alias-panel" id="gpInfoPanel">
+              <div class="alias-panel-inner">
+                <div class="gp-avatar-row">
+                  <span class="gp-avatar" id="gpAvatarEdit"></span>
+                  <span class="gp-avatar-edit-btn" id="gpAvatarEditBtn">更换头像</span>
+                </div>
+                <div class="alias-field">
+                  <label for="gpNameInput">群名称</label>
+                  <input class="alias-input" id="gpNameInput" type="text" maxlength="20" placeholder="群名称">
+                </div>
+                <button type="button" class="alias-save-btn" id="gpInfoSaveBtn">保存</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 群备注 -->
+          <div class="settings-card alias-card" id="gpAliasCard">
+            <button type="button" class="action-row" id="actionGroupAlias">
+              <span class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <span class="action-body">
+                <span class="action-title">群备注</span>
+                <span class="action-sub" id="gpAliasSub">给这个群一个专属称呼</span>
+              </span>
+              <span class="action-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </button>
+            <div class="alias-panel" id="gpAliasPanel">
+              <div class="alias-panel-inner">
+                <div class="alias-field">
+                  <label for="gpAliasInput">我的群备注</label>
+                  <input class="alias-input" id="gpAliasInput" type="text" maxlength="12" placeholder="在聊天列表显示为备注名">
+                </div>
+                <button type="button" class="alias-save-btn" id="gpAliasSaveBtn">保存</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 群公告 -->
+          <div class="settings-card alias-card" id="gpNoticeCard">
+            <button type="button" class="action-row" id="actionGroupNotice">
+              <span class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </span>
+              <span class="action-body">
+                <span class="action-title">群公告</span>
+                <span class="action-sub" id="gpNoticeSub">未设置公告</span>
+              </span>
+              <span class="action-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </button>
+            <div class="alias-panel" id="gpNoticePanel">
+              <div class="alias-panel-inner">
+                <div class="alias-field">
+                  <label for="gpNoticeInput">群公告</label>
+                  <textarea class="alias-input gp-notice-textarea" id="gpNoticeInput" rows="3" maxlength="200" placeholder="公告内容，群成员可见"></textarea>
+                </div>
+                <button type="button" class="alias-save-btn" id="gpNoticeSaveBtn">保存</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 群管理 -->
+          <div class="settings-card alias-card" id="gpManageCard">
+            <button type="button" class="action-row" id="actionGroupManage">
+              <span class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10z"/></svg>
+              </span>
+              <span class="action-body">
+                <span class="action-title">群管理</span>
+                <span class="action-sub">管理群成员</span>
+              </span>
+              <span class="action-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </button>
+            <div class="alias-panel" id="gpManagePanel">
+              <div class="alias-panel-inner">
+                <div class="gp-manage-label">群成员</div>
+                <div class="gp-members-list" id="gpMembersList"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 基础信息分组 -->
+      <div class="section-label">BASIC</div>
+      <div class="settings-list" style="margin-top:0;">
+
+        <div class="settings-card alias-card" id="aliasCard">
+          <button type="button" class="action-row" id="actionAlias">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">双方备注</span>
+              <span class="action-sub" id="aliasSub">设置你和 TA 的专属称呼</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+          <div class="alias-panel" id="aliasPanel">
+            <div class="alias-panel-inner">
+              <div class="alias-field">
+                <label for="myAliasInput">我的备注</label>
+                <input class="alias-input" id="myAliasInput" type="text" maxlength="12" placeholder="给自己起个称呼">
+              </div>
+              <div class="alias-field">
+                <label for="roleAliasInput">TA的备注</label>
+                <input class="alias-input" id="roleAliasInput" type="text" maxlength="12" placeholder="给 TA 起个称呼">
+              </div>
+              <button type="button" class="alias-save-btn" id="aliasSaveBtn">保存</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionBackground">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">聊天背景</span>
+              <span class="action-sub" id="bgSub">自定义对话背景图片</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+          <input type="file" id="bgFileInput" accept="image/*" style="display:none!important;">
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionPin">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 0-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">置顶对话</span>
+              <span class="action-sub" id="pinSub">置顶后将显示在列表最前面</span>
+            </span>
+            <span class="ios-switch">
+              <input type="checkbox" id="pinToggle" aria-label="置顶对话">
+              <span class="toggle-track">
+                <span class="knob-wrapper">
+                  <span class="knob-inner">
+                    <span class="knob-txt knob-txt-on">ON</span>
+                    <span class="knob-txt knob-txt-off">OFF</span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 记忆与数据分组 -->
+      <div class="section-label" style="margin-top:18px;">MEMORY</div>
+      <div class="settings-list" style="margin-top:0;">
+
+        <div class="settings-card mem-card" id="memCard">
+          <button type="button" class="action-row" id="actionMemoryLimit">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">上下文条数</span>
+              <span class="action-sub" id="memLimitSub">20条</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+          <div class="mem-panel" id="memPanel">
+            <div class="mem-panel-inner" id="memOptList">
+              <div class="mem-opt" data-limit="10">
+                <span>10条</span>
+                <span class="mem-opt-hint">最省消耗</span>
+                <span class="mem-radio"></span>
+              </div>
+              <div class="mem-opt" data-limit="20">
+                <span>20条</span>
+                <span class="mem-opt-hint">推荐</span>
+                <span class="mem-radio"></span>
+              </div>
+              <div class="mem-opt" data-limit="30">
+                <span>30条</span>
+                <span class="mem-radio"></span>
+              </div>
+              <div class="mem-opt" data-limit="50">
+                <span>50条</span>
+                <span class="mem-opt-hint">记忆更长</span>
+                <span class="mem-radio"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionSearchHistory">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">查找聊天记录</span>
+              <span class="action-sub">按关键词搜索本对话的消息</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 进阶交互分组 -->
+      <div class="section-label" style="margin-top:18px;">INTERACTION</div>
+      <div class="settings-list" style="margin-top:0;">
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionTimeAware">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">时间感知</span>
+              <span class="action-sub" id="timeAwareSub">真实时间</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionSticker">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">挂载表情包</span>
+              <span class="action-sub" id="stickerSub">勾选要给这个角色用的表情包库</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="callSettingsCard">
+          <button type="button" class="action-row" id="actionCallSettings">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">通话设置</span>
+              <span class="action-sub">语音与视频通话的全局设置</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="autoCallCard">
+          <button type="button" class="action-row" id="actionAutoCall">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">自动来电</span>
+              <span class="action-sub" id="autoCallSub">开启后，AI 主动来电将自动弹出接听</span>
+            </span>
+            <span class="ios-switch">
+              <input type="checkbox" id="autoCallToggle" aria-label="自动来电">
+              <span class="toggle-track">
+                <span class="knob-wrapper">
+                  <span class="knob-inner">
+                    <span class="knob-txt knob-txt-on">ON</span>
+                    <span class="knob-txt knob-txt-off">OFF</span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 音效分组 -->
+      <div class="section-label" style="margin-top:18px;">SOUND</div>
+      <div class="settings-list" style="margin-top:0;" id="soundList">
+        <div class="settings-card" id="soundCard">
+          <button type="button" class="action-row" id="actionSound">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">消息音效</span>
+              <span class="action-sub" id="soundSub">跟随全局默认</span>
+            </span>
+            <span class="action-chevron" style="color:#B0B0B5;font-size:18px;">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 社交媒体分组（上移到前面） -->
+      <div class="section-label" style="margin-top:18px;" id="socialLabel">SOCIAL</div>
+      <div class="settings-list" style="margin-top:0;" id="socialList">
+
+        <div class="settings-card" id="autoMomentCard">
+          <button type="button" class="action-row" id="actionAutoMoment">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">自动发动态</span>
+              <span class="action-sub" id="autoMomentSub">开启后，TA 会主动发布空间动态</span>
+            </span>
+            <span class="ios-switch">
+              <input type="checkbox" id="autoMomentToggle" aria-label="自动发动态">
+              <span class="toggle-track">
+                <span class="knob-wrapper">
+                  <span class="knob-inner">
+                    <span class="knob-txt knob-txt-on">ON</span>
+                    <span class="knob-txt knob-txt-off">OFF</span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="autoCommentCard">
+          <button type="button" class="action-row" id="actionAutoComment">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">自动评论我的动态</span>
+              <span class="action-sub" id="autoCommentSub">开启后，TA 会主动评论你的动态</span>
+            </span>
+            <span class="ios-switch">
+              <input type="checkbox" id="autoCommentToggle" aria-label="自动评论我的动态">
+              <span class="toggle-track">
+                <span class="knob-wrapper">
+                  <span class="knob-inner">
+                    <span class="knob-txt knob-txt-on">ON</span>
+                    <span class="knob-txt knob-txt-off">OFF</span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="autoInteractCard">
+          <button type="button" class="action-row" id="actionAutoInteract">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">角色自动互动</span>
+              <span class="action-sub" id="autoInteractSub">开启后，角色之间会自动互动</span>
+            </span>
+            <span class="ios-switch">
+              <input type="checkbox" id="autoInteractToggle" aria-label="角色自动互动">
+              <span class="toggle-track">
+                <span class="knob-wrapper">
+                  <span class="knob-inner">
+                    <span class="knob-txt knob-txt-on">ON</span>
+                    <span class="knob-txt knob-txt-off">OFF</span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+      </div>
+      <div class="sm-warn" id="smWarn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>开启自动化互动会消耗 API Token，请根据余额情况酌情开启。</span>
+      </div>
+
+      <div class="settings-list" style="margin-top:10px;" id="smGenWrap">
+        <div class="settings-card" id="smGenCard">
+          <button type="button" class="action-row" id="actionSmGen">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">手动生成动态</span>
+              <span class="action-sub">选择角色与篇数，批量生成空间动态</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 聊天相关工具统一收纳在会话设置，不占用桌面应用位 -->
+        <div class="settings-card">
+          <button type="button" class="action-row" onclick="window.location.href='../moments/moments.html'">
+            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m7 15 3-3 3 3 4-5"/></svg></span>
+            <span class="action-body"><span class="action-title">时刻</span><span class="action-sub">查看聊天相关的时刻与动态</span></span>
+            <span class="action-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+          </button>
+        </div>
+
+      <div class="section-label" style="margin-top:18px;">CHAT TOOLS</div>
+      <div class="settings-list" style="margin-top:0;">
+        <div class="settings-card">
+          <button type="button" class="action-row" onclick="window.location.href='../footprint/footprint.html'">
+            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a9 9 0 0 1 18 0c0 7-9 12-9 12S3 17 3 10Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <span class="action-body"><span class="action-title">足迹</span><span class="action-sub">查看聊天相关的足迹记录</span></span>
+            <span class="action-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+        </div>
+        <div class="settings-card">
+          <button type="button" class="action-row" onclick="window.location.href='../../worldbook/mask/mask.html'">
+            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v2a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8v-2Z"/><path d="M8 11h.01M16 11h.01M9 15c2 1 4 1 6 0"/></svg></span>
+            <span class="action-body"><span class="action-title">面具</span><span class="action-sub">打开角色面具与身份设定</span></span>
+            <span class="action-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+        </div>
+        <div class="settings-card">
+          <button type="button" class="action-row" onclick="window.location.href='../../worldbook/settings/rp-protocol.html'">
+            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <span class="action-body"><span class="action-title">伴侣协议</span><span class="action-sub">聊天角色遵循的互动协议</span></span>
+            <span class="action-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 聊天管理分组：导出/世界书在上，记忆总结/清空沉底 -->
+      <div class="section-label" style="margin-top:18px;">CHAT</div>
+      <div class="settings-list" style="margin-top:0;">
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionExport">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">导出聊天记录</span>
+              <span class="action-sub" id="exportSub">导出为 TXT 文件</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card wb-card" id="wbCard">
+          <button type="button" class="action-row" id="actionMount">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h6"/><path d="M9 11h4"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">挂载世界书</span>
+              <span class="action-sub" id="mountSub">未挂载世界书</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+          <div class="wb-panel" id="wbPanel">
+            <div class="wb-panel-inner">
+              <div class="wb-panel-title">选择要挂载的世界书</div>
+              <div class="wb-mount-list" id="wbMountList"></div>
+              <button type="button" class="wb-save-btn" id="wbSaveBtn">保存挂载</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="action-row" id="actionMemory">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title" id="memoryLabel">记忆总结</span>
+              <span class="action-sub">基于最近 30 条记录生成并写入角色记忆</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="clearRecordCard">
+          <button type="button" class="action-row" id="actionClear">
+            <span class="action-icon danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title danger">清空聊天记录</span>
+              <span class="action-sub">删除后不可恢复，请谨慎操作</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- 拉黑 / 删除会话 -->
+        <div class="settings-card" id="blockCard">
+          <button type="button" class="action-row" id="actionBlock">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">拉黑 TA</span>
+              <span class="action-sub">拉黑后 TA 不会收到也不会回复消息</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="deleteChatCard">
+          <button type="button" class="action-row" id="actionDeleteChat">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">删除会话</span>
+              <span class="action-sub">从消息列表移除，聊天记录保留</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="deleteChatForeverCard">
+          <button type="button" class="action-row" id="actionDeleteChatForever">
+            <span class="action-icon danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title danger">删除会话并清空记录</span>
+              <span class="action-sub">会话与聊天记录一起消失，不可恢复</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- 群聊专属：清理群记录 / 解散群聊（置底，仅群聊显示） -->
+        <div class="settings-card" id="gpClearRecordCard" style="display:none;">
+          <button type="button" class="action-row" id="actionGpClearRecord">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title">清理群记录</span>
+              <span class="action-sub">清空本群聊天记录，群聊保留</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <div class="settings-card" id="gpDismissCard" style="display:none;">
+          <button type="button" class="action-row" id="actionGpDismiss">
+            <span class="action-icon danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <span class="action-body">
+              <span class="action-title danger">解散群聊</span>
+              <span class="action-sub">删除群聊及其全部聊天记录，不可恢复</span>
+            </span>
+            <span class="action-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="cs-footer">更多功能即将上线</div>
+
+    </main>
+
+    <div class="cs-toast" id="csToast"></div>
+
+    <!-- 时间感知底部抽屉 -->
+    <div class="tc-overlay" id="tcOverlay">
+      <div class="tc-sheet" id="tcSheet">
+        <div class="tc-handle"></div>
+        <div class="tc-sheet-title">时间感知</div>
+
+        <div class="tc-opt" data-mode="off">
+          <span class="tc-opt-left">
+            <span>关闭</span>
+            <span class="tc-opt-hint">不向 AI 提供时间信息</span>
+          </span>
+          <span class="tc-radio"></span>
+        </div>
+        <div class="tc-opt" data-mode="real">
+          <span class="tc-opt-left">
+            <span>真实时间</span>
+            <span class="tc-opt-hint">跟随设备当前日期时间</span>
+          </span>
+          <span class="tc-radio"></span>
+        </div>
+        <div class="tc-opt" data-mode="virtual">
+          <span class="tc-opt-left">
+            <span>虚拟时间</span>
+            <span class="tc-opt-hint">由你设定时间与场景氛围</span>
+          </span>
+          <span class="tc-radio"></span>
+        </div>
+
+        <div class="tc-field-wrap" id="tcFieldWrap">
+          <textarea class="tc-textarea" id="tcVirtualInput" maxlength="60" placeholder="例如：深秋的傍晚，下着小雨"></textarea>
+        </div>
+
+        <button type="button" class="tc-save-btn" id="tcSaveBtn">保存</button>
+      </div>
+    </div>
+
+    <!-- 社交媒体自动化：手动生成动态底部抽屉 -->
+    <div class="sm-overlay" id="smOverlay">
+      <div class="sm-sheet">
+        <div class="sm-handle"></div>
+        <div class="sm-sheet-title">
+          选择角色与篇数
+          <button type="button" class="sm-close" id="smCloseBtn" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="sm-role-list" id="smRoleList"></div>
+        <div class="sm-slider-row">
+          <span class="sm-slider-label">生成篇数</span>
+          <div class="sm-slider" id="smSlider">
+            <div class="sm-slider-track">
+              <div class="sm-slider-fill" id="smSliderFill"></div>
+            </div>
+            <div class="sm-slider-thumb" id="smSliderThumb"></div>
+          </div>
+          <span class="sm-slider-value" id="smSliderValue">2 篇</span>
+        </div>
+        <button type="button" class="sm-generate-btn" id="smGenerateBtn">开始生成</button>
+      </div>
+    </div>
+
+    <!-- 消息音效选择弹层 -->
+    <div class="sm-overlay" id="soundOverlay">      <div class="sm-sheet">
+        <div class="sm-handle"></div>
+        <div class="sm-sheet-title">
+          消息音效
+          <button type="button" class="sm-close" id="soundCloseBtn" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="sound-option-list" id="soundOptionList"></div>
+      </div>
+    </div>
+
+    <!-- 挂载表情包库选择弹层 -->
+    <div class="sm-overlay" id="stickerOverlay">
+      <div class="sm-sheet">
+        <div class="sm-handle"></div>
+        <div class="sm-sheet-title">
+          挂载表情包库
+          <button type="button" class="sm-close" id="stickerCloseBtn" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="sound-option-list" id="stickerLibList"></div>
+        <button type="button" class="sm-generate-btn" id="stickerManageBtn" style="margin-top:14px;">管理表情包库</button>
+      </div>
+    </div>
+  </div>
+
+<script src="../../shared/js/sound-system.js"></script>
+<script>
+  // ================= 基础数据（与 chat-detail.html 同一套 localStorage 约定） =================
+  var ROLE_STORAGE_KEY = 'ai_custom_characters';
+  var API_STORAGE_KEY = 'api_settings';
+
+  // 从 URL 查询参数中解析 roleId（由 chat-detail.html 跳转时携带）
+  function getRoleIdFromUrl() {
+    try {
+      var id = new URLSearchParams(window.location.search).get('roleId');
+      return id ? id : ''; // URLSearchParams 已自动解码，切勿再 decodeURIComponent（否则双重解码）
+    } catch (e) {
+      var m = window.location.search.match(/[?&]roleId=([^&]*)/);
+      return m ? decodeURIComponent(m[1]) : '';
+    }
+  }
+
+  var roleId = getRoleIdFromUrl();
+  console.log('对话设置 roleId =', roleId);
+
+  function getRoleById(id) {
+    if (!id) return null;
+    try {
+      var raw = localStorage.getItem(ROLE_STORAGE_KEY);
+      if (raw) {
+        var roles = JSON.parse(raw);
+        if (Array.isArray(roles)) {
+          for (var i = 0; i < roles.length; i++) {
+            if (String(roles[i].id) === String(id)) return roles[i];
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  var role = getRoleById(roleId) || { id: roleId || 'default', name: '聊天' };
+  // 群聊支持：roleId 以 g 开头时从 phone_groups 读取群信息
+  if (!getRoleById(roleId) && roleId && String(roleId).indexOf('g') === 0) {
+    try {
+      var rawGroups = localStorage.getItem('phone_groups');
+      if (rawGroups) {
+        var groups = JSON.parse(rawGroups);
+        if (Array.isArray(groups)) {
+          for (var gi = 0; gi < groups.length; gi++) {
+            if (String(groups[gi].id) === String(roleId)) {
+              role = { id: roleId, name: groups[gi].name };
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {}
+  }
+  var contactName = role.name || '聊天';
+
+  // 群聊：隐藏不适用的设置项（双方备注 / 通话设置 / 自动来电 / 社交自动化 / 手动生成动态）
+  // 普通单聊不受影响
+  var isGroupSetting = roleId && String(roleId).indexOf('g') === 0;
+  if (isGroupSetting) {
+    var hideIds = ['aliasCard', 'callSettingsCard', 'autoCallCard', 'socialLabel', 'socialList', 'smWarn', 'smGenWrap', 'clearRecordCard'];
+    hideIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // 群聊专属置底操作（清理群记录 / 解散群聊）
+    var gpFootIds = ['gpClearRecordCard', 'gpDismissCard'];
+    gpFootIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+  }
+
+  // ================= 群聊信息（GROUP 区块：头像 / 群名 / 备注 / 公告 / 管理） =================
+  // 数据源：phone_groups（群本体）、chat_group_alias_<gid>（群备注）、chat_group_notice_<gid>（群公告）
+  if (isGroupSetting) {
+    var GROUP_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    var PERSON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    var groupInfoSection = document.getElementById('groupInfoSection');
+    var gpNameText = document.getElementById('gpNameText');
+    var gpMetaSub = document.getElementById('gpMetaSub');
+    var gpAvatar = document.getElementById('gpAvatar');
+    var gpAvatarEdit = document.getElementById('gpAvatarEdit');
+    var gpAvatarInput = document.getElementById('gpAvatarInput');
+    var gpNameInput = document.getElementById('gpNameInput');
+    var gpAliasSub = document.getElementById('gpAliasSub');
+    var gpAliasInput = document.getElementById('gpAliasInput');
+    var gpNoticeSub = document.getElementById('gpNoticeSub');
+    var gpNoticeInput = document.getElementById('gpNoticeInput');
+    var gpMembersList = document.getElementById('gpMembersList');
+
+    var GP_ALIAS_KEY = 'chat_group_alias_' + roleId;
+    var GP_NOTICE_KEY = 'chat_group_notice_' + roleId;
+
+    function loadCurrentGroup() {
+      try {
+        var raw = localStorage.getItem('phone_groups');
+        if (raw) {
+          var arr = JSON.parse(raw);
+          if (Array.isArray(arr)) {
+            for (var i = 0; i < arr.length; i++) {
+              if (String(arr[i].id) === String(roleId)) return arr[i];
+            }
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+    function saveCurrentGroup(group) {
+      try {
+        var raw = localStorage.getItem('phone_groups');
+        var arr = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(arr)) arr = [];
+        var hit = false;
+        for (var i = 0; i < arr.length; i++) {
+          if (String(arr[i].id) === String(group.id)) { arr[i] = group; hit = true; break; }
+        }
+        if (!hit) arr.push(group);
+        localStorage.setItem('phone_groups', JSON.stringify(arr));
+        return true;
+      } catch (e) { return false; }
+    }
+    function renderGroupAvatar(el, group) {
+      if (!el) return;
+      if (group && group.avatar) {
+        el.innerHTML = '<img src="' + group.avatar + '" alt="">';
+        return;
+      }
+      var members = (group && group.members) || [];
+      if (members.length) {
+        var cells = members.slice(0, 4).map(function (m) {
+          return m.avatar
+            ? '<img class="gp-avatar-cell" src="' + m.avatar + '" alt="">'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        }).join('');
+        el.innerHTML = cells;
+      } else {
+        el.innerHTML = GROUP_SVG;
+      }
+    }
+    function renderGroupInfo() {
+      var g = loadCurrentGroup();
+      if (!g) return;
+      gpNameText.textContent = g.name || '群聊';
+      var members = Array.isArray(g.members) ? g.members : [];
+      gpMetaSub.textContent = '成员 · ' + members.length + '人';
+      renderGroupAvatar(gpAvatar, g);
+      renderGroupAvatar(gpAvatarEdit, g);
+      gpNameInput.value = g.name || '';
+      // 群备注
+      var alias = '';
+      try { alias = localStorage.getItem(GP_ALIAS_KEY) || ''; } catch (e) {}
+      gpAliasInput.value = alias;
+      gpAliasSub.textContent = alias ? alias : '给这个群一个专属称呼';
+      // 群公告
+      var notice = '';
+      try { notice = localStorage.getItem(GP_NOTICE_KEY) || ''; } catch (e) {}
+      gpNoticeInput.value = notice;
+      gpNoticeSub.textContent = notice ? (notice.length > 18 ? notice.slice(0, 18) + '…' : notice) : '未设置公告';
+      // 成员列表
+      gpMembersList.innerHTML = members.length ? members.map(function (m) {
+        var av = m.avatar
+          ? '<img src="' + m.avatar + '" alt="">'
+          : PERSON_SVG;
+        return '<div class="gp-member-row" data-mid="' + String(m.id) + '">' +
+          '<div class="gp-member-avatar">' + av + '</div>' +
+          '<span class="gp-member-name">' + String(m.name || '成员') + '</span>' +
+          '<button type="button" class="gp-member-remove">移除</button>' +
+        '</div>';
+      }).join('') : '<div style="color:#999;font-size:12px;padding:6px 2px;">暂无成员</div>';
+      gpMembersList.querySelectorAll('.gp-member-remove').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var row = btn.closest('.gp-member-row');
+          var mid = row.getAttribute('data-mid');
+          var g2 = loadCurrentGroup();
+          if (!g2) return;
+          g2.members = Array.isArray(g2.members) ? g2.members.filter(function (m) { return String(m.id) !== String(mid); }) : [];
+          saveCurrentGroup(g2);
+          renderGroupInfo();
+          showToast('已移除成员');
+        });
+      });
+    }
+
+    // 面板展开/收起（与 alias 面板同款）
+    function bindPanel(cardId, actionId, panelId) {
+      var card = document.getElementById(cardId);
+      var action = document.getElementById(actionId);
+      var panel = document.getElementById(panelId);
+      if (!card || !action || !panel) return;
+      action.addEventListener('click', function () {
+        var willOpen = !card.classList.contains('is-open');
+        if (willOpen) {
+          // 收起其他面板
+          document.querySelectorAll('.alias-card.is-open').forEach(function (c) {
+            if (c.id !== cardId) c.classList.remove('is-open');
+          });
+          card.classList.add('is-open');
+        } else {
+          card.classList.remove('is-open');
+        }
+      });
+    }
+    bindPanel('gpInfoCard', 'actionGroupInfo', 'gpInfoPanel');
+    bindPanel('gpAliasCard', 'actionGroupAlias', 'gpAliasPanel');
+    bindPanel('gpNoticeCard', 'actionGroupNotice', 'gpNoticePanel');
+    bindPanel('gpManageCard', 'actionGroupManage', 'gpManagePanel');
+
+    // 群头像上传（压缩 200px）
+    document.getElementById('gpAvatarEditBtn').addEventListener('click', function () {
+      gpAvatarInput.click();
+    });
+    gpAvatarInput.addEventListener('change', function () {
+      var file = gpAvatarInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var canvas = document.createElement('canvas');
+            var side = Math.min(img.width, img.height);
+            canvas.width = 200;
+            canvas.height = 200;
+            canvas.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 200, 200);
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+            var g = loadCurrentGroup();
+            if (!g) return;
+            g.avatar = dataUrl;
+            if (saveCurrentGroup(g)) {
+              renderGroupInfo();
+              showToast('群头像已更新');
+            } else {
+              showToast('保存失败，请重试');
+            }
+          } catch (err) {
+            showToast('图片处理失败，请更换图片');
+          }
+        };
+        img.onerror = function () { showToast('图片读取失败'); };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      gpAvatarInput.value = '';
+    });
+
+    // 保存群名
+    document.getElementById('gpInfoSaveBtn').addEventListener('click', function () {
+      var name = gpNameInput.value.trim();
+      if (!name) { showToast('群名称不能为空'); return; }
+      var g = loadCurrentGroup();
+      if (!g) return;
+      g.name = name;
+      if (saveCurrentGroup(g)) {
+        renderGroupInfo();
+        document.getElementById('gpInfoCard').classList.remove('is-open');
+        showToast('群名称已更新');
+      } else {
+        showToast('保存失败，请重试');
+      }
+    });
+
+    // 保存群备注
+    document.getElementById('gpAliasSaveBtn').addEventListener('click', function () {
+      var val = gpAliasInput.value.trim();
+      try { localStorage.setItem(GP_ALIAS_KEY, val); } catch (e) { showToast('保存失败，请重试'); return; }
+      renderGroupInfo();
+      document.getElementById('gpAliasCard').classList.remove('is-open');
+      showToast('群备注已保存');
+    });
+
+    // 保存群公告
+    document.getElementById('gpNoticeSaveBtn').addEventListener('click', function () {
+      var val = gpNoticeInput.value.trim();
+      try { localStorage.setItem(GP_NOTICE_KEY, val); } catch (e) { showToast('保存失败，请重试'); return; }
+      renderGroupInfo();
+      document.getElementById('gpNoticeCard').classList.remove('is-open');
+      showToast('群公告已发布');
+    });
+
+    // 清理群记录（保留群本身，仅清空聊天记录）
+    document.getElementById('actionGpClearRecord').addEventListener('click', function () {
+      if (!window.confirm('确定清理该群的全部聊天记录吗？清理后不可恢复。')) return;
+      try { localStorage.removeItem('chat_history_' + roleId); } catch (e) {}
+      showToast('群记录已清理');
+    });
+
+    // 解散群聊（置底卡片）
+    document.getElementById('actionGpDismiss').addEventListener('click', function () {
+      if (!window.confirm('解散群聊后将清空该群的聊天记录，且不可恢复。确定解散吗？')) return;
+      try {
+        var raw = localStorage.getItem('phone_groups');
+        var arr = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(arr)) {
+          localStorage.setItem('phone_groups', JSON.stringify(arr.filter(function (g) { return String(g.id) !== String(roleId); })));
+        }
+      } catch (e) {}
+      try { localStorage.removeItem('chat_history_' + roleId); } catch (e) {}
+      try { localStorage.removeItem(GP_ALIAS_KEY); } catch (e) {}
+      try { localStorage.removeItem(GP_NOTICE_KEY); } catch (e) {}
+      window.location.href = 'chat.html';
+    });
+
+    groupInfoSection.style.display = '';
+    renderGroupInfo();
+  }
+  var storageKey = 'chat_history_' + role.id;
+
+  // 只读历史消息（不创建欢迎消息，避免设置页产生副作用）
+  function readMessages() {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) return arr;
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  function getAiConfig() {
+    try {
+      var raw = localStorage.getItem(API_STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed) return parsed;
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  // ================= Toast =================
+  var csToast = document.getElementById('csToast');
+  var toastTimer = null;
+  function showToast(text, duration) {
+    if (!csToast) return;
+    csToast.textContent = text;
+    csToast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { csToast.classList.remove('show'); }, duration || 2000);
+  }
+
+  // ================= 对话信息刷新 =================
+  var metaInfo = document.getElementById('metaInfo');
+  var exportSub = document.getElementById('exportSub');
+  function refreshMeta() {
+    var count = readMessages().length;
+    if (metaInfo) metaInfo.textContent = '与「' + contactName + '」的对话 · ' + count + ' 条消息';
+    if (exportSub) exportSub.textContent = count ? ('当前共 ' + count + ' 条消息，导出为 TXT') : '暂无消息可导出';
+  }
+
+  // ================= 导出聊天记录（逻辑与原菜单一致） =================
+  function formatExportTime(ts) {
+    if (!ts) return '--';
+    var d = new Date(ts);
+    function pad(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  document.getElementById('actionExport').addEventListener('click', function () {
+    var list = readMessages();
+    if (!list.length) { showToast('暂无聊天记录可导出'); return; }
+    var lines = list
+      .filter(function (m) { return !(m.isError || m.role === 'system_error'); })
+      .map(function (m) {
+        var who = (m.role === 'sent' || m.role === 'user') ? '用户' : contactName;
+        var text = (m.text || m.content || '').replace(/\s+$/, '');
+        return '[' + formatExportTime(m.time) + '] ' + who + '：' + text;
+      });
+    if (!lines.length) { showToast('暂无聊天记录可导出'); return; }
+    // UTF-8 BOM，防止 Windows 记事本打开乱码
+    var blob = new Blob([String.fromCharCode(0xFEFF) + lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = contactName + '_聊天记录.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('已导出');
+  });
+
+  // ================= 清空聊天记录 =================
+  document.getElementById('actionClear').addEventListener('click', function () {
+    if (!confirm('确定要清空与「' + contactName + '」的所有聊天记录吗？')) return;
+    try { localStorage.removeItem(storageKey); } catch (e) {}
+    refreshMeta();
+    showToast('已清空聊天记录');
+  });
+
+  // ================= 拉黑 / 删除会话（拉黑=不能聊；删除=不在列表；两者正交） =================
+  var BLOCKED_KEY = 'chat_blocked_ids';
+  var HIDDEN_KEY = 'hidden_chat_dialog_ids';
+
+  function readIdList(key) {
+    try {
+      var arr = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(arr) ? arr.map(String) : [];
+    } catch (e) { return []; }
+  }
+  function writeIdList(key, arr) {
+    try { localStorage.setItem(key, JSON.stringify(arr)); return true; }
+    catch (e) { showToast('保存失败：本地存储空间不足'); return false; }
+  }
+  function refreshBlockUI() {
+    var blocked = readIdList(BLOCKED_KEY).indexOf(String(roleId)) !== -1;
+    var btn = document.getElementById('actionBlock');
+    if (!btn) return;
+    var t = btn.querySelector('.action-title');
+    var s = btn.querySelector('.action-sub');
+    if (t) t.textContent = blocked ? '解除拉黑' : '拉黑 TA';
+    if (s) s.textContent = blocked ? '当前已拉黑，TA 不会回复你的消息' : '拉黑后 TA 不会收到也不会回复消息';
+  }
+
+  var actionBlockBtn = document.getElementById('actionBlock');
+  if (actionBlockBtn) {
+    actionBlockBtn.addEventListener('click', function () {
+      var arr = readIdList(BLOCKED_KEY);
+      var idx = arr.indexOf(String(roleId));
+      if (idx === -1) arr.push(String(roleId)); else arr.splice(idx, 1);
+      if (!writeIdList(BLOCKED_KEY, arr)) return;
+      refreshBlockUI();
+      showToast(idx === -1 ? '已拉黑「' + contactName + '」' : '已解除拉黑');
+    });
+  }
+
+  var actionDeleteChatBtn = document.getElementById('actionDeleteChat');
+  if (actionDeleteChatBtn) {
+    actionDeleteChatBtn.addEventListener('click', function () {
+      var arr = readIdList(HIDDEN_KEY);
+      if (arr.indexOf(String(roleId)) === -1) arr.push(String(roleId));
+      if (!writeIdList(HIDDEN_KEY, arr)) return;
+      showToast('已从消息列表移除');
+      setTimeout(function () { window.location.href = 'chat.html'; }, 600);
+    });
+  }
+
+  var actionDeleteForeverBtn = document.getElementById('actionDeleteChatForever');
+  if (actionDeleteForeverBtn) {
+    actionDeleteForeverBtn.addEventListener('click', function () {
+      if (!confirm('删除后「' + contactName + '」的会话与聊天记录都会消失，且不可恢复。确定继续？')) return;
+      var arr = readIdList(HIDDEN_KEY);
+      if (arr.indexOf(String(roleId)) === -1) arr.push(String(roleId));
+      if (!writeIdList(HIDDEN_KEY, arr)) return;
+      try { localStorage.removeItem(storageKey); } catch (e) {}
+      showToast('已删除会话');
+      setTimeout(function () { window.location.href = 'chat.html'; }, 600);
+    });
+  }
+
+  refreshBlockUI();
+
+  // ================= API 调用记录 — 委托 PhoneStorage =================
+  var _storage = window.PhoneStorage;
+  function logApiCall(model, status, startTime, errorMsg) {
+    if (_storage) { _storage.pushApiLog({ model: model || 'unknown', status: status, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' }); return; }
+    try {
+      var logs = JSON.parse(localStorage.getItem('api_call_logs') || '[]');
+      var entry = { id: Date.now().toString(36), time: Date.now(), model: model || 'unknown', status: status, duration: Date.now() - startTime, errorMsg: (status === 'error' && errorMsg) ? String(errorMsg).slice(0, 200) : '' };
+      logs.unshift(entry);
+      while (logs.length > 50) logs.pop();
+      localStorage.setItem('api_call_logs', JSON.stringify(logs));
+    } catch (e) { /* 日志失败不影响主流程 */ }
+  }
+
+  // ================= 记忆总结（逻辑与原菜单一致：最近30条 → API → 写入角色 memory） =================
+  var actionMemory = document.getElementById('actionMemory');
+  var memoryLabel = document.getElementById('memoryLabel');
+
+  actionMemory.addEventListener('click', async function () {
+    var history = readMessages()
+      .filter(function (m) { return !(m.isError || m.role === 'system_error'); })
+      .slice(-30);
+    if (!history.length) { showToast('暂无聊天记录，无法总结'); return; }
+
+    var config = getAiConfig();
+    var apiKey = (config.apiKey || '').trim();
+    var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+    var apiModel = (config.model || 'gpt-3.5-turbo').trim();
+    if (!apiKey) { showToast('请先到设置页配置 API Key'); return; }
+
+    memoryLabel.textContent = '正在总结...';
+    actionMemory.disabled = true;
+
+    var transcript = history.map(function (m) {
+      var who = (m.role === 'sent' || m.role === 'user') ? '用户' : (contactName || '角色');
+      return who + '：' + (m.text || m.content || '');
+    }).join('\n');
+
+    var memoryApiStart = Date.now();
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+
+    try {
+      var response = await fetch(baseUrl + '/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiKey
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: apiModel,
+          temperature: 0.3,
+          stream: false,
+          messages: [
+            {
+              role: 'system',
+              content: '你是记忆整理助手。根据用户提供的聊天记录，提炼对方的性格特点、喜好习惯、重要事件与约定，输出简洁的要点列表，不超过200字，不要添加评论。'
+            },
+            {
+              role: 'user',
+              content: '角色：' + contactName + '\n聊天记录：\n' + transcript
+            }
+          ]
+        })
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        var bodyText = await response.text().catch(function () { return ''; });
+        var detail = '';
+        try {
+          var errJson = JSON.parse(bodyText);
+          detail = errJson && errJson.error && errJson.error.message ? errJson.error.message : bodyText.slice(0, 80);
+        } catch (e) {
+          detail = bodyText.slice(0, 80);
+        }
+        showToast('总结失败: HTTP ' + response.status + (detail ? ' (' + detail + ')' : ''), 3000);
+        logApiCall(apiModel, 'error', memoryApiStart, 'HTTP ' + response.status + (detail ? ' ' + detail : ''));
+        return;
+      }
+
+      var data = await response.json();
+      logApiCall(apiModel, 'success', memoryApiStart);
+      var summary = data.choices && data.choices[0] && data.choices[0].message
+        ? (data.choices[0].message.content || '').trim() : '';
+      if (!summary) { showToast('总结结果为空，请重试'); return; }
+
+      // 写入角色对象的 memory 字段
+      try {
+        var raw = localStorage.getItem(ROLE_STORAGE_KEY);
+        var roles = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(roles)) {
+          var target = null;
+          for (var i = 0; i < roles.length; i++) {
+            if (String(roles[i].id) === String(role.id)) { target = roles[i]; break; }
+          }
+          if (target) {
+            target.memory = summary;
+          } else {
+            roles.push({ id: role.id, name: contactName, memory: summary });
+          }
+          localStorage.setItem(ROLE_STORAGE_KEY, JSON.stringify(roles));
+        }
+      } catch (e) {
+        console.warn('保存记忆失败:', e);
+      }
+
+      showToast('记忆已更新');
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        showToast('总结超时（15秒），请重试', 3000);
+      } else {
+        showToast('网络错误（可能是跨域或地址不正确）', 3000);
+      }
+      logApiCall(apiModel, 'error', memoryApiStart, err.name === 'AbortError' ? '请求超时（15秒）' : (err.message || '网络错误'));
+    } finally {
+      memoryLabel.textContent = '记忆总结';
+      actionMemory.disabled = false;
+    }
+  });
+
+  // ================= 挂载世界书（独立存储键 chat_worldbooks_<roleId>，不注入发消息逻辑） =================
+  var WB_STORAGE_KEY = 'phone_worldbooks';
+  var WB_CATEGORY_KEY = 'worldbook_categories';
+  var wbCard = document.getElementById('wbCard');
+  var actionMount = document.getElementById('actionMount');
+  var wbMountList = document.getElementById('wbMountList');
+  var wbSaveBtn = document.getElementById('wbSaveBtn');
+  var mountSub = document.getElementById('mountSub');
+  var mountIds = [];   // 当前展开会话内勾选的世界书 ID
+
+  function wbMountKey() {
+    return 'chat_worldbooks_' + roleId;
+  }
+  // 只读所有世界书（过滤无效条目）
+  function loadWorldBooks() {
+    try {
+      var raw = localStorage.getItem(WB_STORAGE_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return [];
+      var result = [];
+      for (var i = 0; i < arr.length; i++) {
+        var b = arr[i];
+        if (b && typeof b === 'object' && b.id != null &&
+            String(b.title == null ? '' : b.title).trim() !== '') {
+          result.push(b);
+        }
+      }
+      return result;
+    } catch (e) { return []; }
+  }
+  // 只读分类，返回 id -> name 映射
+  function loadCategoryNameMap() {
+    var map = {};
+    try {
+      var raw = localStorage.getItem(WB_CATEGORY_KEY);
+      if (!raw) return map;
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return map;
+      for (var i = 0; i < arr.length; i++) {
+        var c = arr[i];
+        if (c && c.id != null) map[String(c.id)] = String(c.name == null ? '' : c.name);
+      }
+    } catch (e) {}
+    return map;
+  }
+  // 读取当前角色已挂载 ID（null/损坏兜底为空数组）
+  function readMountedIds() {
+    try {
+      var raw = localStorage.getItem(wbMountKey());
+      if (raw === null) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.map(String) : [];
+    } catch (e) { return []; }
+  }
+  function wbEsc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  // 更新卡片副标题“已挂载 N 本”
+  function refreshMountSub() {
+    if (!mountSub) return;
+    mountSub.textContent = mountIds.length ? ('已挂载 ' + mountIds.length + ' 本世界书') : '未挂载世界书';
+  }
+  // 渲染多选列表（每次展开都重新读取，保证数据最新）
+  function renderMountList() {
+    var books = loadWorldBooks();
+    if (!books.length) {
+      wbMountList.innerHTML = '<div class="wb-mount-empty">暂无世界书</div>';
+      return;
+    }
+    // 自动剔除已删除世界书的失效 ID
+    var existingIds = books.map(function (b) { return String(b.id); });
+    mountIds = mountIds.filter(function (id) { return existingIds.indexOf(id) !== -1; });
+
+    var catMap = loadCategoryNameMap();
+    var html = '';
+    for (var i = 0; i < books.length; i++) {
+      var book = books[i];
+      var id = String(book.id);
+      var checked = mountIds.indexOf(id) !== -1;
+      var catName = book.categoryId ? catMap[String(book.categoryId)] : '';
+      html +=
+        '<div class="wb-mount-item' + (checked ? ' is-checked' : '') + '" data-wb-id="' + wbEsc(id) + '" role="checkbox" aria-checked="' + checked + '">' +
+          '<span class="wb-mount-info">' +
+            '<span class="wb-mount-name">' + wbEsc(book.title || '未命名世界书') + '</span>' +
+            (catName ? '<span class="wb-mount-cat">' + wbEsc(catName) + '</span>' : '') +
+          '</span>' +
+          '<span class="wb-mount-circle" aria-hidden="true"></span>' +
+        '</div>';
+    }
+    wbMountList.innerHTML = html;
+  }
+
+  // 点卡片行：展开 / 收起
+  actionMount.addEventListener('click', function () {
+    var willOpen = !wbCard.classList.contains('is-open');
+    if (willOpen) {
+      mountIds = readMountedIds();   // 展开时读取已挂载数据用于回显
+      renderMountList();
+      wbCard.classList.add('is-open');
+    } else {
+      wbCard.classList.remove('is-open');
+    }
+  });
+
+  // 面板级事件委托：点某行切换勾选（不整体重绘）
+  wbMountList.addEventListener('click', function (e) {
+    var item = e.target.closest ? e.target.closest('.wb-mount-item') : null;
+    if (!item) return;
+    var id = item.getAttribute('data-wb-id');
+    var idx = mountIds.indexOf(id);
+    var nowChecked;
+    if (idx === -1) { mountIds.push(id); nowChecked = true; }
+    else { mountIds.splice(idx, 1); nowChecked = false; }
+    item.classList.toggle('is-checked', nowChecked);
+    item.setAttribute('aria-checked', nowChecked ? 'true' : 'false');
+  });
+
+  // 保存挂载
+  wbSaveBtn.addEventListener('click', function () {
+    try {
+      localStorage.setItem(wbMountKey(), JSON.stringify(mountIds));
+    } catch (e) {
+      showToast('保存失败，请重试');
+      return;
+    }
+    refreshMountSub();
+    wbCard.classList.remove('is-open');
+    showToast('挂载设置已保存');
+  });
+
+  // 进入页面即显示当前已挂载数量（不展开）
+  mountIds = readMountedIds();
+  refreshMountSub();
+
+  // ================= 双方备注（chat_alias_<roleId> = {myAlias, roleAlias}） =================
+  var ALIAS_KEY = 'chat_alias_' + roleId;
+  var aliasCard = document.getElementById('aliasCard');
+  var actionAlias = document.getElementById('actionAlias');
+  var myAliasInput = document.getElementById('myAliasInput');
+  var roleAliasInput = document.getElementById('roleAliasInput');
+  var aliasSaveBtn = document.getElementById('aliasSaveBtn');
+  var aliasSub = document.getElementById('aliasSub');
+  var actionBackground = document.getElementById('actionBackground');
+
+  function readAlias() {
+    try {
+      var raw = localStorage.getItem(ALIAS_KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && typeof o === 'object') {
+          return {
+            myAlias: String(o.myAlias == null ? '' : o.myAlias),
+            roleAlias: String(o.roleAlias == null ? '' : o.roleAlias)
+          };
+        }
+      }
+    } catch (e) {}
+    return { myAlias: '', roleAlias: '' };
+  }
+  function refreshAliasSub(a) {
+    if (!aliasSub) return;
+    if (a.myAlias || a.roleAlias) {
+      var parts = [];
+      if (a.myAlias) parts.push('我：' + a.myAlias);
+      if (a.roleAlias) parts.push('TA：' + a.roleAlias);
+      aliasSub.textContent = parts.join('　');
+    } else {
+      aliasSub.textContent = '设置你和 TA 的专属称呼';
+    }
+  }
+
+  actionAlias.addEventListener('click', function () {
+    var willOpen = !aliasCard.classList.contains('is-open');
+    if (willOpen) {
+      var a = readAlias();
+      myAliasInput.value = a.myAlias;
+      roleAliasInput.value = a.roleAlias;
+      aliasCard.classList.add('is-open');
+    } else {
+      aliasCard.classList.remove('is-open');
+    }
+  });
+
+  aliasSaveBtn.addEventListener('click', function () {
+    var data = {
+      myAlias: myAliasInput.value.trim(),
+      roleAlias: roleAliasInput.value.trim()
+    };
+    try {
+      localStorage.setItem(ALIAS_KEY, JSON.stringify(data));
+    } catch (e) {
+      showToast('保存失败，请重试');
+      return;
+    }
+    refreshAliasSub(data);
+    aliasCard.classList.remove('is-open');
+    showToast('备注已保存');
+  });
+
+  refreshAliasSub(readAlias());
+
+  // ================= 聊天背景（chat_bg_<roleId> = 压缩后的 JPEG base64） =================
+  var BG_KEY = 'chat_bg_' + roleId;
+  var bgFileInput = document.getElementById('bgFileInput');
+  var bgSub = document.getElementById('bgSub');
+
+  function refreshBgSub() {
+    if (!bgSub) return;
+    bgSub.textContent = localStorage.getItem(BG_KEY) ? '已设置，点击可重新选择' : '自定义对话背景图片';
+  }
+
+  // Canvas 压缩：宽度上限 600px 等比缩放（不放大），JPEG 质量 0.7，白底兜底透明图
+  function compressImageFile(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var maxW = 600;
+            var scale = img.width > maxW ? maxW / img.width : 1;
+            var w = Math.max(1, Math.round(img.width * scale));
+            var h = Math.max(1, Math.round(img.height * scale));
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = function () { reject(new Error('image load failed')); };
+        img.src = reader.result;
+      };
+      reader.onerror = function () { reject(new Error('file read failed')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (actionBackground && bgFileInput) {
+    actionBackground.addEventListener('click', function () {
+      bgFileInput.click();
+    });
+
+    bgFileInput.addEventListener('change', function () {
+      var file = bgFileInput.files && bgFileInput.files[0];
+      if (!file) return;
+      if (!/^image\//.test(file.type)) {
+        showToast('请选择图片文件');
+        bgFileInput.value = '';
+        return;
+      }
+      showToast('正在处理图片…');
+      compressImageFile(file).then(function (dataUrl) {
+        try {
+          localStorage.setItem(BG_KEY, dataUrl);
+          refreshBgSub();
+          showToast('聊天背景已更新');
+        } catch (e) {
+          showToast('图片过大或存储空间不足');
+        }
+        bgFileInput.value = '';
+      }).catch(function () {
+        showToast('图片处理失败，请换一张');
+        bgFileInput.value = '';
+      });
+    });
+  }
+
+  refreshBgSub();
+
+  // ================= 置顶对话（chat_pin_<roleId> = 布尔） =================
+  var PIN_KEY = 'chat_pin_' + roleId;
+  var actionPin = document.getElementById('actionPin');
+  var pinToggle = document.getElementById('pinToggle');
+  var pinSub = document.getElementById('pinSub');
+
+  function readPinned() {
+    return localStorage.getItem(PIN_KEY) === 'true';
+  }
+  function refreshPinUI(pinned) {
+    pinToggle.checked = pinned;
+    pinSub.textContent = pinned ? '已置顶，显示在列表最前面' : '置顶后将显示在列表最前面';
+  }
+
+  if (actionPin) {
+    refreshPinUI(readPinned());
+    actionPin.addEventListener('click', function () {
+      var next = !pinToggle.checked;
+      try {
+        localStorage.setItem(PIN_KEY, next);
+      } catch (e) {
+        showToast('操作失败，请重试');
+        return;
+      }
+      refreshPinUI(next);
+      showToast(next ? '已置顶' : '已取消置顶');
+    });
+  }
+
+  // ================= 自动来电（chat_auto_call_<roleId> — 聊天页判断 AI 主动来电气泡是否跳转） =================
+  var AUTO_CALL_KEY = 'chat_auto_call_' + roleId;
+  var actionAutoCall = document.getElementById('actionAutoCall');
+  var autoCallToggle = document.getElementById('autoCallToggle');
+  var autoCallSub = document.getElementById('autoCallSub');
+
+  function readAutoCall() {
+    return localStorage.getItem(AUTO_CALL_KEY) === 'true';
+  }
+  function refreshAutoCallUI(enabled) {
+    autoCallToggle.checked = enabled;
+    autoCallSub.textContent = enabled ? '已开启，AI 来电会自动弹出接听' : '开启后，AI 主动来电将自动弹出接听';
+  }
+
+  if (actionAutoCall) {
+    refreshAutoCallUI(readAutoCall());
+    actionAutoCall.addEventListener('click', function () {
+      var next = !autoCallToggle.checked;
+      try {
+        localStorage.setItem(AUTO_CALL_KEY, next ? 'true' : 'false');
+      } catch (e) {
+        showToast('操作失败，请重试');
+        return;
+      }
+      refreshAutoCallUI(next);
+      showToast(next ? '已开启自动来电' : '已关闭自动来电');
+    });
+  }
+
+  // ================= 自动发动态（chat_auto_moment_<roleId> = true/false） =================
+  var AUTO_MOMENT_KEY = 'chat_auto_moment_' + roleId;
+  var actionAutoMoment = document.getElementById('actionAutoMoment');
+  var autoMomentToggle = document.getElementById('autoMomentToggle');
+  var autoMomentSub = document.getElementById('autoMomentSub');
+
+  function readAutoMoment() {
+    try {
+      var raw = localStorage.getItem(AUTO_MOMENT_KEY);
+      if (raw === null) return false;
+      return JSON.parse(raw) === true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function refreshAutoMomentUI(enabled) {
+    autoMomentToggle.checked = enabled;
+    autoMomentSub.textContent = enabled ? '已开启，TA 会主动发布空间动态' : '开启后，TA 会主动发布空间动态';
+  }
+
+  if (actionAutoMoment) {
+    refreshAutoMomentUI(readAutoMoment());
+    actionAutoMoment.addEventListener('click', function () {
+      var next = !autoMomentToggle.checked;
+      try {
+        localStorage.setItem(AUTO_MOMENT_KEY, JSON.stringify(next));
+      } catch (e) {
+        showToast('操作失败，请重试');
+        return;
+      }
+      refreshAutoMomentUI(next);
+      showToast(next ? '自动发动态已开启' : '自动发动态已关闭');
+    });
+  }
+
+  // ================= 上下文条数（chat_memory_limit_<roleId> = 10/20/30/50） =================
+  var MEM_LIMIT_KEY = 'chat_memory_limit_' + roleId;
+  var MEM_LIMIT_OPTIONS = [10, 20, 30, 50];
+  var memCard = document.getElementById('memCard');
+  var actionMemoryLimit = document.getElementById('actionMemoryLimit');
+  var memOptList = document.getElementById('memOptList');
+  var memLimitSub = document.getElementById('memLimitSub');
+
+  function readMemoryLimit() {
+    var n = parseInt(localStorage.getItem(MEM_LIMIT_KEY), 10);
+    return MEM_LIMIT_OPTIONS.indexOf(n) !== -1 ? n : 20; // 未设置/脏值默认 20
+  }
+  function markMemoryOption(n) {
+    var opts = memOptList.querySelectorAll('.mem-opt');
+    for (var i = 0; i < opts.length; i++) {
+      if (parseInt(opts[i].getAttribute('data-limit'), 10) === n) {
+        opts[i].classList.add('is-checked');
+      } else {
+        opts[i].classList.remove('is-checked');
+      }
+    }
+  }
+  function refreshMemLimitUI() {
+    var n = readMemoryLimit();
+    memLimitSub.textContent = n + '条';
+    markMemoryOption(n);
+  }
+
+  if (actionMemoryLimit) {
+    refreshMemLimitUI();
+    actionMemoryLimit.addEventListener('click', function () {
+      var willOpen = !memCard.classList.contains('is-open');
+      if (willOpen) {
+        refreshMemLimitUI();
+        memCard.classList.add('is-open');
+      } else {
+        memCard.classList.remove('is-open');
+      }
+    });
+
+    // 事件委托：点选项即保存，无需额外保存按钮
+    memOptList.addEventListener('click', function (e) {
+      var opt = e.target.closest ? e.target.closest('.mem-opt') : null;
+      if (!opt || !memOptList.contains(opt)) return;
+      var n = parseInt(opt.getAttribute('data-limit'), 10);
+      if (MEM_LIMIT_OPTIONS.indexOf(n) === -1) return;
+      try {
+        localStorage.setItem(MEM_LIMIT_KEY, n);
+      } catch (err) {
+        showToast('保存失败，请重试');
+        return;
+      }
+      refreshMemLimitUI();
+      memCard.classList.remove('is-open');
+      showToast('已设置为 ' + n + ' 条');
+    });
+  }
+
+  // ================= 时间感知（chat_time_config_<roleId> = {mode, virtualTimeStr}） =================
+  var TC_KEY = 'chat_time_config_' + roleId;
+  var TC_MODES = ['off', 'real', 'virtual'];
+  var TC_LABELS = { off: '关闭', real: '真实时间', virtual: '虚拟时间' };
+  var actionTimeAware = document.getElementById('actionTimeAware');
+  var timeAwareSub = document.getElementById('timeAwareSub');
+  var tcOverlay = document.getElementById('tcOverlay');
+  var tcSheet = document.getElementById('tcSheet');
+  var tcFieldWrap = document.getElementById('tcFieldWrap');
+  var tcVirtualInput = document.getElementById('tcVirtualInput');
+  var tcSaveBtn = document.getElementById('tcSaveBtn');
+  var tcDraftMode = 'real'; // 抽屉打开期间的临时选择，点保存才落盘
+
+  function readTimeConfig() {
+    try {
+      var raw = localStorage.getItem(TC_KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && TC_MODES.indexOf(o.mode) !== -1) {
+          return { mode: o.mode, virtualTimeStr: String(o.virtualTimeStr == null ? '' : o.virtualTimeStr) };
+        }
+      }
+    } catch (e) {}
+    // 无配置默认真实时间，与聊天页当前行为一致
+    return { mode: 'real', virtualTimeStr: '' };
+  }
+  function refreshTimeSub(cfg) {
+    if (timeAwareSub) timeAwareSub.textContent = TC_LABELS[cfg.mode] || '真实时间';
+  }
+  function markTcOption(mode) {
+    var opts = tcOverlay.querySelectorAll('.tc-opt');
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i].getAttribute('data-mode') === mode) opts[i].classList.add('is-checked');
+      else opts[i].classList.remove('is-checked');
+    }
+    tcFieldWrap.classList.toggle('is-show', mode === 'virtual');
+  }
+  function openTcSheet() {
+    var cfg = readTimeConfig();
+    tcDraftMode = cfg.mode;
+    tcVirtualInput.value = cfg.virtualTimeStr;
+    markTcOption(tcDraftMode);
+    tcOverlay.classList.add('is-show');
+  }
+  function closeTcSheet() {
+    tcOverlay.classList.remove('is-show');
+  }
+
+  if (actionTimeAware) {
+    refreshTimeSub(readTimeConfig());
+    actionTimeAware.addEventListener('click', openTcSheet);
+
+    // 点遮罩空白处关闭（点抽屉内部不关闭）
+    tcOverlay.addEventListener('click', function (e) {
+      if (e.target === tcOverlay) closeTcSheet();
+    });
+    tcSheet.addEventListener('click', function (e) {
+      var opt = e.target.closest ? e.target.closest('.tc-opt') : null;
+      if (!opt || !tcSheet.contains(opt)) return;
+      var mode = opt.getAttribute('data-mode');
+      if (TC_MODES.indexOf(mode) === -1) return;
+      tcDraftMode = mode;
+      markTcOption(mode);
+      if (mode === 'virtual') {
+        setTimeout(function () { tcVirtualInput.focus(); }, 260);
+      }
+    });
+
+    tcSaveBtn.addEventListener('click', function () {
+      var virtualStr = tcVirtualInput.value.trim();
+      if (tcDraftMode === 'virtual' && !virtualStr) {
+        showToast('请填写虚拟时间描述');
+        tcVirtualInput.focus();
+        return;
+      }
+      var data = { mode: tcDraftMode, virtualTimeStr: virtualStr };
+      try {
+        localStorage.setItem(TC_KEY, JSON.stringify(data));
+      } catch (e) {
+        showToast('保存失败，请重试');
+        return;
+      }
+      refreshTimeSub(data);
+      closeTcSheet();
+      showToast('时间感知设置已保存');
+    });
+  }
+
+  // ================= 通话设置：跳转全局通话设置页（无需传参） =================
+  var actionCallSettings = document.getElementById('actionCallSettings');
+  if (actionCallSettings) {
+    actionCallSettings.addEventListener('click', function () {
+      window.location.href = '../call/call-settings.html';
+    });
+  }
+
+  // ================= 挂载表情包：跳转全局表情包库（无需传参） =================
+  var actionSticker = document.getElementById('actionSticker');
+  if (actionSticker) {
+    actionSticker.addEventListener('click', function () {
+      openStickerLibPicker();
+    });
+  }
+
+  // ================= 查找聊天记录：跳转 chat-search.html 并透传 roleId =================
+  var actionSearchHistory = document.getElementById('actionSearchHistory');
+  if (actionSearchHistory) {
+    actionSearchHistory.addEventListener('click', function () {
+      window.location.href = 'chat-search.html?roleId=' + encodeURIComponent(roleId);
+    });
+  }
+
+  // ================= 返回上一页；无历史时兜底回聊天列表 =================
+  document.getElementById('btnBack').addEventListener('click', function () {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'chat.html';
+    }
+  });
+
+  // ================= 社交媒体自动化：两个新增开关（评论 / 互动） =================
+  // 存储约定与现有 chat_auto_moment_ 一致：JSON.stringify 写入、JSON.parse 读取
+  function initSocialToggle(cardId, toggleId, subId, storageKey, onSub, offSub, label) {
+    var card = document.getElementById(cardId);
+    var toggle = document.getElementById(toggleId);
+    var sub = document.getElementById(subId);
+    if (!card || !toggle) return;
+    function readState() {
+      try {
+        var raw = localStorage.getItem(storageKey);
+        if (raw === null) return false;
+        return JSON.parse(raw) === true;
+      } catch (e) {
+        return false;
+      }
+    }
+    function refresh(enabled) {
+      toggle.checked = enabled;
+      if (sub) sub.textContent = enabled ? onSub : offSub;
+    }
+    refresh(readState());
+    card.addEventListener('click', function () {
+      var next = !toggle.checked;
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      } catch (e) {
+        showToast('操作失败，请重试');
+        return;
+      }
+      refresh(next);
+      showToast(next ? label + '已开启' : label + '已关闭');
+    });
+  }
+  initSocialToggle('actionAutoComment', 'autoCommentToggle', 'autoCommentSub',
+    'chat_auto_comment_' + roleId,
+    '已开启，TA 会主动评论你的动态', '开启后，TA 会主动评论你的动态', '自动评论');
+  initSocialToggle('actionAutoInteract', 'autoInteractToggle', 'autoInteractSub',
+    'chat_auto_interact_' + roleId,
+    '已开启，角色之间会自动互动', '开启后，角色之间会自动互动', '自动互动');
+
+  // ================= 手动生成动态抽屉（仅 UI 与数据收集，本轮不调用 API） =================
+  var smOverlay = document.getElementById('smOverlay');
+  var smRoleList = document.getElementById('smRoleList');
+  var smGenerateBtn = document.getElementById('smGenerateBtn');
+  var smCloseBtn = document.getElementById('smCloseBtn');
+  var actionSmGen = document.getElementById('actionSmGen');
+  var smSelectedIds = [];
+  var smSelectedCount = 2; // 滑块默认第 2 档（范围 1-5）
+
+  function smEscape(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // 读取角色池：优先 ai_custom_characters，为空时兜底 characters
+  function readCharacterPool() {
+    var keys = ['ai_custom_characters', 'characters'];
+    for (var i = 0; i < keys.length; i++) {
+      try {
+        var raw = localStorage.getItem(keys[i]);
+        if (!raw) continue;
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) return arr;
+      } catch (e) {}
+    }
+    return [];
+  }
+
+  function renderSmRoles() {
+    var roles = readCharacterPool();
+    smSelectedIds = []; // 默认全不选，每次打开抽屉重置
+    if (!roles.length) {
+      smRoleList.innerHTML = '<div class="sm-empty">暂无角色</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < roles.length; i++) {
+      var rid = String(roles[i].id != null ? roles[i].id : i);
+      var name = roles[i].name || ('角色' + (i + 1));
+      html += '<div class="sm-role-item" data-id="' + smEscape(rid) + '">' +
+        '<span class="sm-role-name">' + smEscape(name) + '</span>' +
+        '<span class="sm-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>' +
+        '</div>';
+    }
+    smRoleList.innerHTML = html;
+  }
+
+  // ================= 篇数滑块（1-5，纯 Pointer Events，无外部库） =================
+  var SM_MIN = 1;
+  var SM_MAX = 5;
+  var smSlider = document.getElementById('smSlider');
+  var smSliderFill = document.getElementById('smSliderFill');
+  var smSliderThumb = document.getElementById('smSliderThumb');
+  var smSliderValue = document.getElementById('smSliderValue');
+
+  function smCountToPercent(n) {
+    return (n - SM_MIN) / (SM_MAX - SM_MIN) * 100;
+  }
+  // 按当前 smSelectedCount 同步圆钮/填充条/数值
+  function smRenderSlider() {
+    var pct = smCountToPercent(smSelectedCount) + '%';
+    if (smSliderThumb) smSliderThumb.style.left = pct;
+    if (smSliderFill) smSliderFill.style.width = pct;
+    if (smSliderValue) smSliderValue.textContent = smSelectedCount + ' 篇';
+  }
+
+  function openSmSheet() {
+    renderSmRoles();
+    smRenderSlider(); // 重开抽屉时圆钮与数值保持同步
+    smOverlay.classList.add('is-show');
+  }
+  function closeSmSheet() {
+    smOverlay.classList.remove('is-show');
+  }
+
+  if (actionSmGen && smOverlay) {
+    actionSmGen.addEventListener('click', openSmSheet);
+    // 点遮罩空白处关闭（点抽屉内部不关闭）
+    smOverlay.addEventListener('click', function (e) {
+      if (e.target === smOverlay) closeSmSheet();
+    });
+    if (smCloseBtn) smCloseBtn.addEventListener('click', closeSmSheet);
+
+    // 角色多选（事件委托）
+    smRoleList.addEventListener('click', function (e) {
+      var item = e.target.closest ? e.target.closest('.sm-role-item') : null;
+      if (!item) return;
+      var rid = item.getAttribute('data-id');
+      var idx = smSelectedIds.indexOf(rid);
+      if (idx === -1) {
+        smSelectedIds.push(rid);
+        item.classList.add('is-checked');
+      } else {
+        smSelectedIds.splice(idx, 1);
+        item.classList.remove('is-checked');
+      }
+    });
+
+    // 篇数滑块交互：点击跳转 / 拖动跟手 / 松手吸附回弹
+    // 监听绑定在整行 .sm-slider-row 上：消除标签与轨道间的点击死区，触控热区更大
+    // 同时监听 Pointer 与 Mouse 两套事件：手机以 Pointer 为主，两者处理幂等不会冲突；
+    // 纯 click 合成事件（无按下前缀）仅在 detail===0 时处理，避免真机 tap 二次跳动
+    var smSliderRow = document.querySelector('.sm-slider-row');
+    var smHitArea = smSliderRow || smSlider;
+    var smDragging = false;
+    var smLastDownAt = 0;
+    function smRatioFromEvent(e) {
+      var rect = smSlider.getBoundingClientRect();
+      var ratio = (e.clientX - rect.left) / rect.width;
+      return Math.min(1, Math.max(0, ratio));
+    }
+    function smSetFromRatio(ratio) {
+      var pct = (ratio * 100) + '%';
+      smSliderThumb.style.left = pct;
+      smSliderFill.style.width = pct;
+      var n = SM_MIN + Math.round(ratio * (SM_MAX - SM_MIN));
+      if (n !== smSelectedCount) {
+        smSelectedCount = n;
+        smSliderValue.textContent = n + ' 篇';
+      }
+    }
+    function smBegin(e) {
+      smDragging = true;
+      smLastDownAt = Date.now();
+      try {
+        if (smHitArea.setPointerCapture && e.pointerId != null) smHitArea.setPointerCapture(e.pointerId);
+      } catch (err) {}
+      // 点击跳转：此时 transition 仍在，圆钮平滑滑到落点
+      smSetFromRatio(smRatioFromEvent(e));
+    }
+    function smMove(e) {
+      if (!smDragging) return;
+      if (!smSliderThumb.classList.contains('is-dragging')) {
+        smSliderThumb.classList.add('is-dragging'); // 首次移动：压扁 + 关闭过渡，实时跟手
+      }
+      smSetFromRatio(smRatioFromEvent(e));
+    }
+    var smEnd = function (e) {
+      if (!smDragging) return;
+      smDragging = false;
+      smSliderThumb.classList.remove('is-dragging'); // 松手：0.4s 弹簧回圆
+      smRenderSlider(); // 吸附到最近整数档位
+      try {
+        if (smHitArea.hasPointerCapture && e.pointerId != null && smHitArea.hasPointerCapture(e.pointerId)) {
+          smHitArea.releasePointerCapture(e.pointerId);
+        }
+      } catch (err) {}
+    };
+    if (smHitArea && smSlider && smSliderThumb && smSliderFill && smSliderValue) {
+      smHitArea.addEventListener('pointerdown', smBegin);
+      smHitArea.addEventListener('mousedown', smBegin);
+      smHitArea.addEventListener('pointermove', smMove);
+      smHitArea.addEventListener('mousemove', smMove);
+      smHitArea.addEventListener('pointerup', smEnd);
+      smHitArea.addEventListener('pointercancel', smEnd);
+      smHitArea.addEventListener('mouseup', smEnd);
+      // 兼容仅派发合成 click 的环境（真机 tap 的 click 有 detail>=1，已被 pointer 处理过，这里忽略）
+      smHitArea.addEventListener('click', function (e) {
+        if (e.detail === 0 || Date.now() - smLastDownAt > 800) {
+          smSetFromRatio(smRatioFromEvent(e));
+        }
+      });
+    }
+
+    // 开始生成：本轮仅收集并 Toast 展示结果，不调用 API
+    smGenerateBtn.addEventListener('click', function () {
+      if (!smSelectedIds.length) {
+        showToast('请先选择角色');
+        return;
+      }
+      var pool = readCharacterPool();
+      var names = [];
+      for (var i = 0; i < pool.length; i++) {
+        var rid = String(pool[i].id != null ? pool[i].id : i);
+        if (smSelectedIds.indexOf(rid) !== -1) names.push(pool[i].name || '角色');
+      }
+      showToast('已选择 ' + names.length + ' 个角色（' + names.join('、') + '），每人 ' + smSelectedCount + ' 篇', 3000);
+      closeSmSheet();
+    });
+  }
+
+  // ===== 果冻开关形变触发（事件委托，不改任何卡片现有切换/存储逻辑） =====
+  document.addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('.action-row') : null;
+    if (!row) return;
+    var knob = row.querySelector('.ios-switch .knob-inner');
+    if (!knob) return;
+    knob.classList.remove('jelly');
+    void knob.offsetWidth; // 强制回流：连续快速点击也能每次重放形变动画
+    knob.classList.add('jelly');
+  });
+  document.addEventListener('animationend', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('knob-inner')) {
+      e.target.classList.remove('jelly');
+    }
+  });
+
+  // ===== 消息音效（单角色覆盖） =====
+  (function setupCharSound() {
+    var overlay = document.getElementById('soundOverlay');
+    var sub = document.getElementById('soundSub');
+    var list = document.getElementById('soundOptionList');
+    var entry = document.getElementById('actionSound');
+    if (!overlay || !entry || !list) return;
+
+    function currentKey() {
+      var v = null;
+      try { v = localStorage.getItem('sound_char_' + roleId); } catch (e) {}
+      return v || 'default';
+    }
+    function renderSub() {
+      var k = currentKey();
+      sub.textContent = (k === 'default' || !SoundSystem.SOUNDS[k]) ? '跟随全局默认' : SoundSystem.SOUNDS[k];
+    }
+    function renderList() {
+      list.innerHTML = '';
+      var cur = currentKey();
+      var defItem = document.createElement('div');
+      defItem.className = 'sound-option' + (cur === 'default' ? ' active' : '');
+      defItem.innerHTML = '<span class="so-name">跟随全局默认</span><span class="so-check">✓</span>';
+      defItem.addEventListener('click', function () {
+        try { localStorage.setItem('sound_char_' + roleId, 'default'); } catch (e) {}
+        renderSub(); renderList();
+      });
+      list.appendChild(defItem);
+      Object.keys(SoundSystem.SOUNDS).forEach(function (key) {
+        var item = document.createElement('div');
+        item.className = 'sound-option' + (cur === key ? ' active' : '');
+        item.innerHTML = '<span class="so-name">' + SoundSystem.SOUNDS[key] + '</span><span class="so-check">✓</span>';
+        item.addEventListener('click', function () {
+          try { localStorage.setItem('sound_char_' + roleId, key); } catch (e) {}
+          SoundSystem.playKey(key);
+          renderSub(); renderList();
+        });
+        list.appendChild(item);
+      });
+    }
+    entry.addEventListener('click', function () { renderList(); overlay.classList.add('is-show'); });
+    document.getElementById('soundCloseBtn').addEventListener('click', function () { overlay.classList.remove('is-show'); });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('is-show'); });
+    renderSub();
+  })();
+
+  // ===== 挂载表情包库（chat_sticker_libs_<roleId> = [libId,...]） =====
+  (function setupStickerPicker() {
+    var overlay = document.getElementById('stickerOverlay');
+    var list = document.getElementById('stickerLibList');
+    var sub = document.getElementById('stickerSub');
+    if (!overlay || !list) return;
+
+    function readMounted() {
+      try { return JSON.parse(localStorage.getItem('chat_sticker_libs_' + roleId) || '[]'); }
+      catch (e) { return []; }
+    }
+    function saveMounted(arr) {
+      try { localStorage.setItem('chat_sticker_libs_' + roleId, JSON.stringify(arr)); } catch (e) {}
+    }
+    function updateSub() {
+      var mounted = readMounted();
+      sub.textContent = mounted.length ? '已挂载 ' + mounted.length + ' 个库' : '勾选要给这个角色用的表情包库';
+    }
+    window.openStickerLibPicker = function () {
+      var libs = [];
+      try { libs = JSON.parse(localStorage.getItem('sticker_libraries') || '[]'); } catch (e) {}
+      var mounted = readMounted();
+      list.innerHTML = '';
+      if (!libs.length) {
+        list.innerHTML = '<div style="text-align:center;color:#B0B0B5;padding:30px 0;font-size:0.875rem;">还没有表情包库<br>点底部按钮新建</div>';
+      } else {
+        libs.forEach(function (lib) {
+          var checked = mounted.indexOf(String(lib.id)) !== -1;
+          var item = document.createElement('div');
+          item.className = 'sound-option' + (checked ? ' active' : '');
+          item.innerHTML = '<span class="so-name">' + lib.name + '（' + (lib.stickers ? lib.stickers.length : 0) + '）</span><span class="so-check">✓</span>';
+          item.addEventListener('click', function () {
+            var m = readMounted();
+            var idx = m.indexOf(String(lib.id));
+            if (idx >= 0) m.splice(idx, 1); else m.push(String(lib.id));
+            saveMounted(m);
+            updateSub();
+            openStickerLibPicker();
+          });
+          list.appendChild(item);
+        });
+      }
+      overlay.classList.add('is-show');
+    };
+    document.getElementById('stickerCloseBtn').addEventListener('click', function () { overlay.classList.remove('is-show'); });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('is-show'); });
+    document.getElementById('stickerManageBtn').addEventListener('click', function () {
+      window.location.href = '../sticker/sticker-manager.html';
+    });
+    updateSub();
+  })();
+
+  refreshMeta();
+</script>
+<script src="../../shared/js/statusbar-control.js"></script>
+</body>
+</html>

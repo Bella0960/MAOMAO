@@ -55,7 +55,7 @@
     {
       "name": "世界书",
       "short_name": "世界书",
-      "url": "./worldbook/worldbook.html",
+      "url": "worldbook/worldbook/worldbook.html",
       "icons": [
         {
           "src": "./assets/icon-192.png",

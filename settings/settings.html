@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings · 设置</title>
-    <script src="../js/font-loader.js"></script>
-    <script src="../js/native-feel.js"></script>
-    <script src="../js/phone/phone_storage.js"></script>
-    <script src="../js/statusbar-control.js"></script>
-    <link rel="stylesheet" href="../css/settings.css">
+    <script src="../shared/js/font-loader.js"></script>
+    <script src="../shared/js/native-feel.js"></script>
+    <script src="../shared/js/phone/phone_storage.js"></script>
+    <script src="../shared/js/statusbar-control.js"></script>
+    <link rel="stylesheet" href="css/settings.css">
     <script>
     (function () {
         try {
@@ -18,7 +18,7 @@
         } catch (e) {}
     })();
     </script>
-<link rel="stylesheet" href="../css/mobile-fit.css">
+<link rel="stylesheet" href="../shared/css/mobile-fit.css">
 </head>
 <body>
     <div class="phone-mockup">
@@ -90,7 +90,7 @@
                     <div class="menu-title"><span class="t-cn">外观美化</span><span class="t-en">Beauty CSS</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='../chat/bubble-theme.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../chat/chat/bubble-theme.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
                     <div class="menu-title"><span class="t-cn">气泡设置</span><span class="t-en">Bubble</span></div>
                     <div class="menu-arrow">›</div>
@@ -100,7 +100,7 @@
                     <div class="menu-title"><span class="t-cn">字体设置</span><span class="t-en">Font</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='../chat/sticker-manager.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../chat/sticker/sticker-manager.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
                     <div class="menu-title"><span class="t-cn">贴纸管理</span><span class="t-en">Stickers</span></div>
                     <div class="menu-arrow">›</div>
@@ -110,7 +110,7 @@
                     <div class="menu-title"><span class="t-cn">音效设置</span><span class="t-en">Sound</span></div>
                     <div class="menu-arrow">›</div>
                 </div>
-                <div class="menu-row" onclick="window.location.href='../worldbook/regex-settings.html?v=20261013new'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../worldbook/settings/regex-settings.html?v=20261013new'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></div>
                     <div class="menu-title"><span class="t-cn">正则过滤</span><span class="t-en">Regex</span></div>
                     <div class="menu-arrow">›</div>
@@ -128,7 +128,7 @@
             <!-- 其他功能设置：统一收纳，不再单独占用桌面图标 -->
             <div class="group-title">MORE SETTINGS</div>
             <section class="card">
-                <div class="menu-row" onclick="window.location.href='../chat/call-settings.html'" role="button" tabindex="0">
+                <div class="menu-row" onclick="window.location.href='../chat/call/call-settings.html'" role="button" tabindex="0">
                     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
                     <div class="menu-title"><span class="t-cn">通话设置</span><span class="t-en">Call</span></div>
                     <div class="menu-arrow">›</div>
@@ -278,7 +278,7 @@
 
         <div class="toast-msg" id="toastMsg">已保存设置</div>
     </div>
-    <script src="../js/settings.js"></script>
+    <script src="js/settings.js"></script>
     <script>
     // 设置页用户卡片 + 深色模式开关
     (function () {
