@@ -106,6 +106,13 @@ apps/settings/          # ⚠️ 孤儿目录：无任何引用的旧样式副�
 
 AI 接口配置存 `api_settings`（默认 `https://api.openai.com/v1`，内置 DeepSeek / Moonshot / 智谱 / 硅基流动预设，见 settings/js/settings.js）。新增 App 接入 AI 时：在 `PHONE_APPS` 注册（写 prompt + jsonSchema），数据落 `phoneData[contactId][appId]`。
 
+### 聊天主链路健壮性（chat-detail.html sendMsg）
+
+- **三段式超时**：连接 15s（等响应头）→ 流式「无数据看门狗」30s（每收到 chunk 重置）→ 120s 硬性总上限；中断时已生成内容保留落库，不丢弃。
+- **上下文字符预算 `CTX_CAP`**：人设 5000 / 长期记忆 3000 / 用户记忆 2000 / 世界书 8000 / RP 协议原文 6000（变量替换后整段 16000），超限经 `capText` 静默截断降级，防 400 超长。
+- **流式渲染 rAF 节流**：delta 只累计文本，正则清洗 + DOM 写入合并到每帧一次；流结束后补处理残留 SSE buffer，防丢尾字。
+- **发送防重入**：`aiSending` 锁（sendMsg / regenerateReply 双入口检查，`finally` 统一解锁）；HTTP 错误经 `friendlyHttpError` 映射为中文提示（原始细节进 api-logs）。
+
 ## 项目字典
 
 ### 业务术语
