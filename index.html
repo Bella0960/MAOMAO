@@ -2,19 +2,40 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#F7F7F9" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="manifest" href="manifest.json" />
+    <script>
+      // ===== 优先级最高：强制解除所有 Service Worker 缓存 + 清除旧布局 localStorage =====
+      (function () {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          });
+        }
+        // 清除所有历史版本的布局键，防止旧脏数据命中
+        var keys = Object.keys(localStorage);
+        keys.forEach(function (k) { if (/^ds_layout_v/.test(k)) localStorage.removeItem(k); });
+        // 兼容 ds_polaroid_v1 / ds_image_v1 等挂件数据保留，只清布局
+      })();
+    </script>
     <title>手机模拟器</title>
     <meta name="description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
     <meta property="og:title" content="手机模拟器" />
     <meta property="og:description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
     <script src="shared/js/font-loader.js"></script>
     <script src="shared/js/native-feel.js"></script>
-    <link rel="stylesheet" href="desktop/css/styles.css?v=20261017v1">
+    <link rel="stylesheet" href="desktop/css/styles.css?v=20261021v6">
   <link rel="stylesheet" href="shared/css/mobile-fit.css?v=20261015v3">
+  <style>
+    /* ===== 添加挂件：跳转独立挂件管理页（desktop/widgets.html） ===== */
+    .edit-add-btn { margin-right: 8px; }
+  </style>
 </head>
   <body>
     <main class="simulator-stage">
@@ -25,6 +46,7 @@
           <header class="status-bar">
             <time id="status-time">09:41</time>
             <div class="edit-mode-indicator" id="editModeIndicator" style="display: none;">
+              <button class="edit-done-btn edit-add-btn" id="editAddWidgetBtn" type="button">＋ 挂件</button>
               <button class="edit-done-btn" id="editDoneBtn" type="button">✓ 完成</button>
             </div>
             <div class="status-icons" aria-label="设备状态">
@@ -35,7 +57,7 @@
           </header>
 
           <section class="pages-container" id="homeScreen">
-            <!-- 第一页：主屏幕全部应用，进页面即展示完整手机应用网格（4×4共16个应用） -->
+            <!-- 元素仓库（初始内容）：每个应用/挂件在这里只写一次；实际显示在哪一页由下方脚本按保存的布局决定，每一页都可以混放应用和挂件 -->
             <div class="home-page" data-page="0">
               <div class="desktop-grid" id="gridPage0">
 
@@ -141,7 +163,7 @@
               </div>
             </div>
 
-            <!-- 第二页：更多应用与趣味互动小组件 -->
+            <!-- 元素仓库（续）：同样只是初始内容，不再规定“第二页放挂件” -->
             <div class="home-page" data-page="1">
               <div class="desktop-grid" id="gridPage1">
 
@@ -234,6 +256,23 @@
                   <span class="ds-del" title="移除组件">×</span>
                 </div>
 
+                <!-- ========== 时钟组件（2×2）：实时时间与日期 ========== -->
+                <div class="ds-clock ds-widget" data-drag="clock">
+                  <div class="cl-time" id="clTime">--:--</div>
+                  <div class="cl-week" id="clWeek">WEDNESDAY</div>
+                  <div class="cl-date" id="clDate">SEPTEMBER 20</div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
+                <!-- ========== 图片组件（4×2）：纯图片上传横幅 ========== -->
+                <div class="ds-image ds-widget" data-drag="image">
+                  <div class="im-placeholder" id="imPlaceholder">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                    <span class="im-hint">点击添加图片</span>
+                  </div>
+                  <span class="ds-del" title="移除组件">×</span>
+                </div>
+
               </div>
             </div>
 
@@ -293,7 +332,7 @@
   <script>
     // ===== 手机桌面拖拽引擎：实时自动让位 + 跨页流转 + Dock 自由布局 =====
     (function () {
-      var LS_KEY = 'ds_layout_v4';
+      var MAX_PAGES = 4; // 桌面最多页数
 
       var editing = false;
       var isDragging = false;
@@ -322,35 +361,57 @@
         }
       }
 
-      // ===== 布局数据加载与默认全应用首页 =====
-      var LS_KEY = 'ds_layout_v5';
+      // ===== 布局数据：统一网格，每一页都可混放应用和挂件 =====
+      // v12 格式：{ v: 12, pages: [[id,...], ...], dock: [id,...], removed: [id,...] }
+      // removed = 用户从桌面移除的应用/挂件（元素暂存在隐藏仓库里，之后可以重新添加）
+      var LS_KEY = 'ds_layout_v12';
+      var LS_KEY_OLD = 'ds_layout_v5'; // 旧版本，只读取用于迁移，不会被删除
 
       function getDefaultLayout() {
+        // 默认布局（参考参考图分布）：正上方大幅图片上传组件(4×2整行)；中间左侧4个应用+右侧时钟(2×2)；下方左侧一个组件(2×2)+右侧4个应用
         return {
+          v: 12,
           pages: [
             [
-              'app_worldbook', 'app_memory',
-              'app_forum', 'app_wallet', 'app_music', 'app_beauty',
-              'app_characters', 'app_settings', 'app_finance',
-              'app_font'
+              'image',
+              'app_worldbook', 'app_memory', 'clock',
+              'app_forum', 'app_wallet',
+              'polaroid',
+              'app_music', 'app_beauty', 'app_characters', 'app_settings'
             ],
             [
-              'app_diary', 'app_dreamtravel',
-              'app_shopadmin', 'app_cafe', 'app_library',
-              'postcard', 'polaroid', 'dialog', 'music'
+              'app_finance', 'app_games', 'app_cafe', 'app_library',
+              'app_diary', 'app_dreamtravel', 'app_shopadmin',
+              'dialog', 'music'
             ]
           ],
-          dock: ['app_chat', 'app_shop']
+          dock: ['app_chat', 'app_shop'],
+          removed: ['postcard']
         };
       }
 
+      function readJSON(key) {
+        try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+      }
+
+      // 只检查结构是否可用；不再要求“第一页至少 4 个”，否则用户腾空第一页会导致整份布局被重置
+      function isValidLayout(v) {
+        return !!(v && Array.isArray(v.pages) && v.pages.length > 0 &&
+          v.pages.every(function (p) { return Array.isArray(p); }) &&
+          Array.isArray(v.dock));
+      }
+
       function loadLayout() {
-        try {
-          var v = JSON.parse(localStorage.getItem(LS_KEY));
-          if (v && Array.isArray(v.pages) && v.pages.length > 0 && Array.isArray(v.pages[0]) && v.pages[0].length >= 4 && Array.isArray(v.dock)) {
-            return v;
-          }
-        } catch (e) {}
+        var v = readJSON(LS_KEY);
+        if (isValidLayout(v)) {
+          if (!Array.isArray(v.removed)) v.removed = [];
+          return v;
+        }
+        // 从旧版 v5 迁移：保留各页应用/挂件的顺序和 Dock
+        var old = readJSON(LS_KEY_OLD);
+        if (isValidLayout(old)) {
+          return { v: 6, pages: old.pages, dock: old.dock, removed: [] };
+        }
         return getDefaultLayout();
       }
 
@@ -375,17 +436,40 @@
         currentLayout.dock = (currentLayout.dock || []).filter(function (id) {
           return !!valid[id] && id !== 'app_call' && id !== 'app_contacts';
         });
+        currentLayout.removed = (currentLayout.removed || []).filter(function (id) {
+          return !!valid[id];
+        });
         // 若旧布局未把聊天/商店放在 Dock，保留用户选择；默认布局会提供这两个入口。
         saveLayout(currentLayout);
       })();
+
+      // ===== 隐藏仓库：被移除的应用/挂件放这里（保留在页面里，挂件的事件绑定才不会失效，之后可重新添加） =====
+      function getShelf() {
+        var shelf = document.getElementById('itemShelf');
+        if (!shelf) {
+          shelf = document.createElement('div');
+          shelf.id = 'itemShelf';
+          shelf.hidden = true;
+          shelf.style.display = 'none';
+          shelf.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(shelf);
+        }
+        return shelf;
+      }
+
+      function moveToShelf(el) {
+        if (!el) return;
+        el.classList.remove('is-dragging-source');
+        getShelf().appendChild(el);
+      }
 
       // ===== 恢复布局到 DOM =====
       function restoreLayout() {
         if (!homeScreen || !dockBar) return;
 
-        // 确保桌面页数与配置匹配
-        var pages = Array.from(homeScreen.querySelectorAll('.home-page'));
-        var requiredPages = Math.max(2, currentLayout.pages.length);
+        // 页数完全由保存的布局决定（至少 1 页），不再固定为 2 页
+        var requiredPages = Math.max(1, currentLayout.pages.length);
+        var pages = getPages();
 
         while (pages.length < requiredPages) {
           var newPageIndex = pages.length;
@@ -416,39 +500,51 @@
           });
         }
 
-        // 2. 恢复桌面各页
-        pages = Array.from(homeScreen.querySelectorAll('.home-page'));
-        if (Array.isArray(currentLayout.pages)) {
-          currentLayout.pages.forEach(function (pageIds, pi) {
-            var page = pages[pi];
-            if (!page) return;
-            var grid = page.querySelector('.desktop-grid');
-            if (!grid) return;
-            if (Array.isArray(pageIds)) {
-              pageIds.forEach(function (id) {
-                var el = itemMap[id];
-                if (el) {
-                  setElementAsDesktop(el);
-                  grid.appendChild(el);
-                  delete itemMap[id];
-                }
-              });
+        // 2. 恢复桌面各页（应用和挂件在任何一页都一视同仁）
+        pages = getPages();
+        currentLayout.pages.forEach(function (pageIds, pi) {
+          var page = pages[pi];
+          if (!page) return;
+          var grid = page.querySelector('.desktop-grid');
+          if (!grid) return;
+          pageIds.forEach(function (id) {
+            var el = itemMap[id];
+            if (el) {
+              setElementAsDesktop(el);
+              grid.appendChild(el);
+              delete itemMap[id];
             }
           });
-        }
+        });
 
-        // 3. 如果还有未放置的应用，自动补到第二页或第一页末尾
+        // 3. 用户移除过的应用/挂件：放进隐藏仓库，不再显示（重启后也不会“复活”）
+        (currentLayout.removed || []).forEach(function (id) {
+          var el = itemMap[id];
+          if (el) {
+            moveToShelf(el);
+            delete itemMap[id];
+          }
+        });
+
+        // 4. 既没被放置、也没被移除的（例如以后新增的应用）：补到布局的最后一页末尾
         var remainingIds = Object.keys(itemMap);
         if (remainingIds.length > 0) {
-          var fallbackPage = pages[1] || pages[0];
-          var fallbackGrid = fallbackPage ? fallbackPage.querySelector('.desktop-grid') : null;
-          if (fallbackGrid) {
+          pages = getPages();
+          var lastPage = pages[requiredPages - 1] || pages[pages.length - 1];
+          var lastGrid = lastPage ? lastPage.querySelector('.desktop-grid') : null;
+          if (lastGrid) {
             remainingIds.forEach(function (id) {
               var el = itemMap[id];
               setElementAsDesktop(el);
-              fallbackGrid.appendChild(el);
+              lastGrid.appendChild(el);
             });
           }
+        }
+
+        // 5. 清掉 HTML 里多余的空页（例如布局只有 1 页时，原来写死的第二页）
+        pages = getPages();
+        for (var i = pages.length - 1; i >= requiredPages; i--) {
+          if (pages[i].querySelectorAll('[data-drag]').length === 0) pages[i].remove();
         }
 
         updateDotsUI();
@@ -511,7 +607,7 @@
       // 动态新建页面（最多 4 页）
       function createPageIfNeeded() {
         var pages = getPages();
-        if (pages.length >= 4) return null;
+        if (pages.length >= MAX_PAGES) return null;
         var newIdx = pages.length;
         var newPage = document.createElement('div');
         newPage.className = 'home-page';
@@ -522,18 +618,22 @@
         return newPage;
       }
 
-      // 清理末尾空页
+      // 清理末尾空页（至少保留 1 页）
       function cleanupEmptyTrailingPages() {
         var pages = getPages();
-        if (pages.length <= 2) return;
-        for (var i = pages.length - 1; i >= 2; i--) {
-          var p = pages[i];
-          var items = p.querySelectorAll('[data-drag]');
+        for (var i = pages.length - 1; i >= 1; i--) {
+          var items = pages[i].querySelectorAll('[data-drag]');
           if (items.length === 0) {
-            p.remove();
+            pages[i].remove();
           } else {
             break;
           }
+        }
+        // 如果当前正停留在被清掉的页，退回到最后一页
+        var left = getPages().length;
+        if (activePageIndex >= left) {
+          activePageIndex = left - 1;
+          homeScreen.scrollTo({ left: activePageIndex * (homeScreen.clientWidth || 360) });
         }
         updateDotsUI();
       }
@@ -582,7 +682,12 @@
           if (el.dataset.drag) dockOrder.push(el.dataset.drag);
         });
 
-        currentLayout = { pages: pagesOrder, dock: dockOrder };
+        var removedOrder = [];
+        Array.from(getShelf().children).forEach(function (el) {
+          if (el.dataset && el.dataset.drag) removedOrder.push(el.dataset.drag);
+        });
+
+        currentLayout = { v: 6, pages: pagesOrder, dock: dockOrder, removed: removedOrder };
         saveLayout(currentLayout);
       }
 
@@ -602,7 +707,7 @@
         placeholder.className = 'drag-placeholder';
 
         if (isWidget) {
-          if (dragId === 'postcard') {
+          if (dragId === 'postcard' || dragId === 'image') {
             placeholder.classList.add('span-4');
           } else {
             placeholder.classList.add('span-2');
@@ -680,7 +785,7 @@
                     newGrid.appendChild(placeholder);
                   }
                   vibrate(15);
-                } else if (pages.length < 4) {
+                } else if (pages.length < MAX_PAGES) {
                   // 在末尾拉出新页
                   createPageIfNeeded();
                   pages = getPages();
@@ -958,8 +1063,86 @@
         }
       });
 
+      // 2b. 长按桌面空白处进入编辑模式（进入后点顶部“＋ 挂件”添加挂件）
+      var EMPTY_PRESS_MS = 450;
+      var emptyPressTimer = null;
+      var emptyPressX = 0, emptyPressY = 0;
+      var swallowEmptyPressClick = false; // 长按进入编辑后，松手那一下“点击”要忽略，否则会马上退出编辑
+
+      // 是否按在桌面的空白处：在桌面区域内，且不是应用/挂件/页码点
+      function isEmptyHomeArea(target) {
+        if (!target || !target.closest) return false;
+        if (!target.closest('#homeScreen')) return false;
+        return !target.closest('[data-drag]') && !target.closest('.dot');
+      }
+
+      function cancelEmptyPress() {
+        if (emptyPressTimer) {
+          clearTimeout(emptyPressTimer);
+          emptyPressTimer = null;
+        }
+      }
+
+      function startEmptyPress(target, x, y) {
+        cancelEmptyPress();
+        if (editing || isDragging || !isEmptyHomeArea(target)) return;
+        emptyPressX = x;
+        emptyPressY = y;
+        emptyPressTimer = setTimeout(function () {
+          emptyPressTimer = null;
+          if (editing) return;
+          enterEdit();
+          swallowEmptyPressClick = true;
+        }, EMPTY_PRESS_MS);
+      }
+
+      function moveEmptyPress(x, y) {
+        // 手指移动超过阈值，说明是在左右滑动翻页，不是长按
+        if (emptyPressTimer && Math.hypot(x - emptyPressX, y - emptyPressY) > 9) cancelEmptyPress();
+      }
+
+      function endEmptyPress() {
+        cancelEmptyPress();
+        if (swallowEmptyPressClick) {
+          setTimeout(function () { swallowEmptyPressClick = false; }, 350);
+        }
+      }
+
+      document.addEventListener('touchstart', function (e) {
+        var touch = e.touches && e.touches[0];
+        if (touch) startEmptyPress(e.target, touch.clientX, touch.clientY);
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        var touch = e.touches && e.touches[0];
+        if (touch) moveEmptyPress(touch.clientX, touch.clientY);
+      }, { passive: true });
+      document.addEventListener('touchend', endEmptyPress);
+      document.addEventListener('touchcancel', endEmptyPress);
+
+      document.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        startEmptyPress(e.target, e.clientX, e.clientY);
+      });
+      document.addEventListener('mousemove', function (e) {
+        moveEmptyPress(e.clientX, e.clientY);
+      });
+      document.addEventListener('mouseup', endEmptyPress);
+
+      // 空白处长按时不要弹出浏览器的右键/长按菜单
+      if (homeScreen) {
+        homeScreen.addEventListener('contextmenu', function (e) {
+          if (!e.target.closest('[data-drag]')) e.preventDefault();
+        });
+      }
+
       // 3. 点击事件处理：删除组件/退出编辑
       document.addEventListener('click', function (e) {
+        if (swallowEmptyPressClick) {
+          swallowEmptyPressClick = false;
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
         if (!editing) return;
 
         // 点击红叉删除组件或应用
@@ -968,7 +1151,7 @@
           e.preventDefault();
           var item = e.target.closest('[data-drag]');
           if (item) {
-            item.remove();
+            moveToShelf(item);
             cleanupEmptyTrailingPages();
             persistCurrentDOM();
           }
@@ -997,6 +1180,15 @@
             });
           }
         }, { passive: true });
+      }
+
+      // ===== 添加挂件：跳转独立挂件管理页（desktop/widgets.html） =====
+      var addWidgetBtn = document.getElementById('editAddWidgetBtn');
+      if (addWidgetBtn) {
+        addWidgetBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          location.href = 'desktop/widgets.html';
+        });
       }
 
       // 初始化桌面恢复
@@ -1240,12 +1432,88 @@
         makeEditable(artistEl, 'artist', '点击编辑');
       })();
     })();
+
+    // ===== 时钟组件：实时时间与日期 =====
+    (function () {
+      var timeEl = document.getElementById('clTime');
+      var weekEl = document.getElementById('clWeek');
+      var dateEl = document.getElementById('clDate');
+      if (!timeEl) return;
+
+      var DAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      var MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+      function tick() {
+        var d = new Date();
+        timeEl.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+        weekEl.textContent = DAYS[d.getDay()];
+        dateEl.textContent = MONTHS[d.getMonth()] + ' ' + d.getDate();
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+    // ===== 图片组件：点击上传图片（Canvas 压缩，最长边 900px，JPEG 0.7） =====
+    (function () {
+      var KEY = 'ds_image_v1';
+      var data = null;
+      try { data = JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) {}
+      var el = document.querySelector('[data-drag="image"]');
+      var ph = document.getElementById('imPlaceholder');
+      if (!el) return;
+
+      function applyImg(src) {
+        el.style.backgroundImage = 'url(' + src + ')';
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        if (ph) ph.style.display = 'none';
+      }
+      if (data && data.img) applyImg(data.img);
+
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (document.body.classList.contains('home-editing')) return;
+        var fi = document.createElement('input');
+        fi.type = 'file';
+        fi.accept = 'image/*';
+        fi.onchange = function () {
+          if (!fi.files[0]) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            var img = new Image();
+            img.onload = function () {
+              var scale = Math.min(1, 900 / Math.max(img.width, img.height));
+              var w = Math.round(img.width * scale);
+              var h = Math.round(img.height * scale);
+              var canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              var ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              var out = canvas.toDataURL('image/jpeg', 0.7);
+              applyImg(out);
+              try {
+                localStorage.setItem(KEY, JSON.stringify({ img: out }));
+              } catch (err) {}
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(fi.files[0]);
+        };
+        fi.click();
+      });
+    })();
   </script>
     <script>
-      // 注册 Service Worker（PWA 装桌面）
-      if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-        navigator.serviceWorker.register('sw.js').catch(function () {});
-      }
+      // Service Worker 已禁用（PWA 缓存会导致 HTML/JS 无法更新）
+      // if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      //   navigator.serviceWorker.register('sw.js').catch(function () {});
+      // }
     </script>
 </body>
 </html>

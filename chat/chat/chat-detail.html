@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
-<head>
+<html lang="zh" class="trae-edit-mode-dragging"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天详情</title>
@@ -1657,7 +1656,14 @@
 @media(prefers-reduced-motion:reduce) { .plus-panel-sheet,.plus-item { transition:none !important; } }
 </style>
 
-</head>
+<style id="chatCoreFeatureStyle">
+      .x-core-card{background:#fff;border:1px solid #f0f0f3;border-radius:18px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.04);color:#111}
+      .x-core-muted{color:#999;font-size:12px}.x-core-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+      .x-core-actions .x-btn{border-radius:12px}.x-core-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+      .x-core-grid button{border:1px solid #eee;background:#f7f7f9;border-radius:12px;padding:12px 4px;color:#333;font-size:13px}
+      .x-core-list{display:flex;flex-direction:column;gap:8px}.x-core-list button{text-align:left;border:1px solid #eee;background:#fff;border-radius:12px;padding:12px;color:#222}
+      .x-core-input{width:100%;box-sizing:border-box;border:1px solid #d0d0d5;border-radius:12px;padding:12px;background:#fff;color:#111;font:inherit;margin:6px 0}
+    </style></head>
 <body>
     <div class="phone-mockup">
         <div class="status-bar">
@@ -1667,47 +1673,40 @@
         <!-- 顶部导航：圆形返回键 + 名字/ONLINE + 三点菜单 -->
         <header class="chat-header">
             <a class="nav-circle-btn" href="chat.html" aria-label="返回联系人列表">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
             </a>
             <div class="chat-title-box">
-                <span class="chat-user-name" id="chat-title">Lisa</span>
+                <span class="chat-user-name" id="chat-title">聊天</span>
                 <span class="chat-status-sub" id="chat-status-sub">ONLINE · ACTIVE</span>
                 <span class="chat-notice-bar" id="chat-notice-bar" style="display:none;"></span>
             </div>
             <button class="nav-circle-btn" type="button" id="btn-more-menu" aria-label="对话设置">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#111111"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#111111"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg>
             </button>
         </header>
 
         <div class="detail-toast" id="detailToast"></div>
 
         <!-- 消息列表 -->
-        <div class="chat-stage" id="chat-messages">
-            <div class="message-time">Just now</div>
-
-            <div class="msg-row received">
-                <div class="msg-avatar" id="partner-avatar">L</div>
-                <div class="msg-bubble" id="partner-initial-msg">那个设计方案我已经发你邮箱了</div>
-            </div>
-        </div>
+        <div class="chat-stage" id="chat-messages"><div class="message-time">Just now</div><div class="msg-row received" data-idx="0" data-time="1792518876947" data-mid="m1792518876947ffp"><div class="msg-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="msg-bubble">你好，我是聊天！很高兴和你聊天。</div></div></div>
 
         <!-- 引用条 -->
         <div id="quoteBar" style="display:none;position:relative;padding:8px 16px;background:#F7F7F9;border-top:1px solid #ECECF0;font-size:0.75rem;color:#666;">
             <div style="display:flex;align-items:center;gap:8px;">
                 <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid #999;padding-left:8px;" id="quoteBarText"></div>
-                <button onclick="clearQuote()" style="border:none;background:none;color:#999;font-size:1rem;cursor:pointer;padding:0 4px;">&times;</button>
+                <button onclick="clearQuote()" style="border:none;background:none;color:#999;font-size:1rem;cursor:pointer;padding:0 4px;">×</button>
             </div>
         </div>
 
         <!-- 底部输入区：轻量文字输入 + 更多功能 -->
         <form class="input-dock" id="chat-form" action="javascript:void(0);">
             <button class="plus-action-btn" type="button" id="plus-action-btn" aria-label="更多功能">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
-            <div class="input-capsule">
-                <textarea class="real-input" id="chat-input" rows="1" placeholder="发送消息…" autocomplete="off" enterkeyhint="send"></textarea>
-                <button class="send-icon-btn" type="submit" aria-label="发送">
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6c-2.2-2.2-5.7-2.2-7.9 0L12 5.5l-.9-.9c-2.2-2.2-5.7-2.2-7.9 0s-2.2 5.7 0 7.9L12 21l8.8-8.5c2.2-2.2 2.2-5.7 0-7.9Z"/></svg>
+            <div class="input-capsule" style="width: 298px; height: 20px; transform: matrix(1, 0, 0, 1, 9.53674e-07, 0);">
+                <textarea class="real-input" id="chat-input" rows="1" placeholder="发送消息…" autocomplete="off" enterkeyhint="send" style="height: 31px;"></textarea>
+                <button class="send-icon-btn disabled" type="submit" aria-label="发送" disabled="">
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6c-2.2-2.2-5.7-2.2-7.9 0L12 5.5l-.9-.9c-2.2-2.2-5.7-2.2-7.9 0s-2.2 5.7 0 7.9L12 21l8.8-8.5c2.2-2.2 2.2-5.7 0-7.9Z"></path></svg>
                 </button>
             </div>
         </form>
@@ -1728,57 +1727,57 @@
                         <span class="plus-panel-kicker">MAOMAO · CHAT TOOLS</span>
                         <span class="plus-panel-title">快捷功能</span>
                     </div>
-                    <button class="plus-panel-close" type="button" aria-label="关闭菜单" onclick="window.closePlusPanel && window.closePlusPanel()">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg>
+                    <button class="plus-panel-close" type="button" aria-label="关闭菜单" onclick="window.closePlusPanel &amp;&amp; window.closePlusPanel()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"></path></svg>
                     </button>
                 </div>
                 <div class="plus-grid">
                     <button class="plus-item" data-feat="sticker" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><path d="M9 9h.01M15 9h.01"></path></svg></span>
                         <span class="plus-label">表情包</span>
                     </button>
                     <button class="plus-item" data-feat="regenerate" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></span>
                         <span class="plus-label">重玩</span>
                     </button>
                     <button class="plus-item" data-feat="location" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
                         <span class="plus-label">位置</span>
                     </button>
                     <button class="plus-item" data-feat="anniversary" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
                         <span class="plus-label">纪念日</span>
                     </button>
                     <button class="plus-item" data-feat="narration" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></span>
                         <span class="plus-label">旁白动作</span>
                     </button>
                     <button class="plus-item" data-feat="voice" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
                         <span class="plus-label">语音通话</span>
                     </button>
                     <button class="plus-item" data-feat="video" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg></span>
                         <span class="plus-label">视频通话</span>
                     </button>
                     <button class="plus-item" data-feat="redpacket" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line><circle cx="12" cy="15" r="2"></circle></svg></span>
                         <span class="plus-label">发红包</span>
                     </button>
                     <button class="plus-item" data-feat="transfer" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></span>
                         <span class="plus-label">转账</span>
                     </button>
                     <button class="plus-item" data-feat="img" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5L5 21"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.8"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
                         <span class="plus-label">图片</span>
                     </button>
                     <button class="plus-item" data-feat="voice-msg" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><path d="M12 18v4"></path></svg></span>
                         <span class="plus-label">语音</span>
                     </button>
                     <button class="plus-item" data-feat="card" type="button">
-                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16c.8-1.4 1.8-2 3-2s2.2.6 3 2"/><path d="M14.5 10h4M14.5 13.5h4"/></svg></span>
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="11" r="2"></circle><path d="M5.5 16c.8-1.4 1.8-2 3-2s2.2.6 3 2"></path><path d="M14.5 10h4M14.5 13.5h4"></path></svg></span>
                         <span class="plus-label">名片</span>
                     </button>
                 </div>
@@ -1855,8 +1854,8 @@
             <div class="pay-drawer-sheet">
                 <div class="pay-drawer-handle"></div>
                 <div class="pay-drawer-title" id="payDrawerTitle">发红包</div>
-                <input class="pay-field" id="payAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" />
-                <input class="pay-field" id="payMessage" type="text" autocomplete="off" maxlength="30" />
+                <input class="pay-field" id="payAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">
+                <input class="pay-field" id="payMessage" type="text" autocomplete="off" maxlength="30">
                 <button class="pay-confirm-btn" id="payConfirmBtn" type="button">塞钱进红包</button>
             </div>
         </div>
@@ -1877,7 +1876,7 @@
             <div class="x-modal">
                 <div class="x-modal-header">
                     <span id="xModalTitle">标题</span>
-                    <button class="x-modal-close" id="xModalClose" type="button">&times;</button>
+                    <button class="x-modal-close" id="xModalClose" type="button">×</button>
                 </div>
                 <div class="x-modal-body" id="xModalBody"></div>
             </div>
@@ -4760,12 +4759,22 @@
 <style id="maomao-composer-position-correction">
 /* Correction: the plus floats ABOVE the composer, never inside the pill */
 .input-dock {
-  position:relative !important;
+  position:absolute !important;
+  left:0 !important; right:0 !important; bottom:0 !important;
   display:flex !important; flex-direction:row !important;
   align-items:flex-end !important; gap:0 !important;
   padding:8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
-  background:rgba(248,248,250,.34) !important;
+  background:transparent !important;
   border-top:0 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  z-index:60 !important;
+}
+.chat-stage {
+  padding-bottom:calc(100px + env(safe-area-inset-bottom)) !important;
+}
+#quoteBar {
+  margin-bottom:calc(64px + env(safe-area-inset-bottom)) !important;
 }
 .input-capsule {
   order:1 !important; flex:1 1 100% !important; width:100% !important;
@@ -4773,7 +4782,7 @@
   border-radius:9999px !important;
   background:rgba(255,255,255,.38) !important;
   border:1px solid rgba(35,35,40,.075) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.52) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.52),0 4px 20px rgba(0,0,0,.05) !important;
   padding:5px 6px 5px 16px !important;
 }
 .input-capsule:focus-within {
@@ -4820,5 +4829,6 @@
 }
 </style>
 
-</body>
-</html>
+
+
+</body></html>

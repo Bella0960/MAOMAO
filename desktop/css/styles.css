@@ -883,8 +883,8 @@ button { color: inherit; font: inherit; }
 
 /* ===== 明信片组件（4×2） ===== */
 .ds-postcard {
-  grid-column: span 4;
-  grid-row: span 2;
+  grid-column: span 4 !important;
+  grid-row: span 2 !important;
   aspect-ratio: 16/9;
   min-height: 120px;
   max-height: 180px;
@@ -1139,6 +1139,85 @@ button { color: inherit; font: inherit; }
   font-size: 0.5rem;
   color: #999;
   font-variant-numeric: tabular-nums;
+}
+
+/* ===== 时钟组件（2×2）：实时时间与日期，黑白灰杂志风 ===== */
+.ds-clock {
+  grid-column: span 2 !important;
+  grid-row: span 2 !important;
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+  background: #FFFFFF;
+  position: relative;
+}
+.ds-clock .cl-time {
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #111;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.ds-clock .cl-week {
+  margin-top: 6px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #8E8E93;
+  letter-spacing: 0.18em;
+}
+.ds-clock .cl-date {
+  font-size: 0.688rem;
+  color: #48484A;
+  letter-spacing: 0.04em;
+}
+
+/* ===== 图片组件（4×2）：纯图片上传横幅，无文字内容 ===== */
+.ds-image {
+  grid-column: span 4 !important;
+  grid-row: span 2 !important;
+  aspect-ratio: 16/9;
+  min-height: 120px;
+  max-height: 180px;
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+  background: #F7F7F9;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.ds-image .im-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.ds-image .im-placeholder svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #C7C7CC;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ds-image .im-hint {
+  font-size: 0.688rem;
+  color: #8E8E93;
+  letter-spacing: 0.08em;
 }
 
 /* Dock：默认只有商店，居中 */

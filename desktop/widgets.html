@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#F7F7F9" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>挂件管理</title>
+    <style>
+      /* ===== 挂件管理页：黑白灰杂志风 ===== */
+      * { box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+      *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+      html, body { margin: 0; padding: 0; background: #F7F7F9; color: #111; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 24px 20px 16px;
+      }
+      .back-btn {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        color: #111;
+      }
+      .back-btn svg { width: 18px; height: 18px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+      .back-txt {
+        font-family: Georgia, "Songti SC", serif;
+        font-style: italic;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+      .page-title {
+        text-align: right;
+      }
+      .page-title h1 {
+        margin: 0;
+        font-family: Georgia, "Songti SC", serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: 0.02em;
+        color: #111;
+        line-height: 1;
+      }
+      .page-title em {
+        display: block;
+        margin-top: 6px;
+        font-style: normal;
+        font-size: 11px;
+        color: #8E8E93;
+        letter-spacing: 0.2em;
+      }
+
+      .page-note {
+        margin: 0 20px 16px;
+        font-size: 12px;
+        color: #8E8E93;
+        line-height: 1.6;
+      }
+
+      .widget-list {
+        list-style: none;
+        margin: 0;
+        padding: 0 16px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .widget-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 14px;
+        background: #FFFFFF;
+        border: 1px solid #E5E5E5;
+        border-radius: 8px;
+      }
+      .w-glyph {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 34px;
+      }
+      .w-glyph i {
+        display: block;
+        border: 1px solid #111;
+        border-radius: 3px;
+        background: #F7F7F9;
+      }
+      .w-meta {
+        flex: 1;
+        min-width: 0;
+      }
+      .w-name {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        color: #111;
+      }
+      .w-desc {
+        display: block;
+        margin-top: 3px;
+        font-size: 11px;
+        color: #8E8E93;
+        letter-spacing: 0.03em;
+      }
+      .w-state {
+        flex: none;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        color: #C7C7CC;
+      }
+      .widget-item.is-on .w-state { color: #111; }
+      .w-btn {
+        flex: none;
+        min-width: 64px;
+        height: 32px;
+        border: 1px solid #111;
+        border-radius: 6px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        background: #111;
+        color: #FFFFFF;
+      }
+      .w-btn.is-remove {
+        background: #FFFFFF;
+        color: #111;
+      }
+      .w-btn:active { opacity: 0.75; }
+    </style>
+  </head>
+  <body>
+    <header class="page-header">
+      <button class="back-btn" type="button" onclick="location.href='../index.html'" aria-label="返回桌面">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span class="back-txt">Back</span>
+      </button>
+      <div class="page-title">
+        <h1>WIDGETS</h1>
+        <em>挂件管理</em>
+      </div>
+    </header>
+
+    <p class="page-note">在桌面上添加或移除挂件。添加后回到桌面即可看到；移除的挂件可随时再加回来。</p>
+
+    <ul class="widget-list" id="widgetList"></ul>
+
+    <script>
+      // ===== 挂件管理：读写桌布局（ds_layout_v12），添加/移除挂件 =====
+      (function () {
+        var LS_KEY = 'ds_layout_v12';
+        var CATALOG = [
+          { id: 'postcard', name: '明信片', cols: 4, rows: 2, desc: '头像、昵称与个性签名' },
+          { id: 'image', name: '图片', cols: 4, rows: 2, desc: '点击上传一张图片' },
+          { id: 'clock', name: '时钟', cols: 2, rows: 2, desc: '实时时间与日期' },
+          { id: 'polaroid', name: '拍立得相框', cols: 2, rows: 2, desc: '点击上传一张照片' },
+          { id: 'dialog', name: '小对话', cols: 2, rows: 2, desc: '两个头像的聊天气泡' },
+          { id: 'music', name: '音乐箱', cols: 2, rows: 2, desc: '歌名、歌手与播放条' }
+        ];
+
+        var listEl = document.getElementById('widgetList');
+
+        function readLayout() {
+          try {
+            var v = JSON.parse(localStorage.getItem(LS_KEY));
+            if (v && Array.isArray(v.pages) && v.pages.length && Array.isArray(v.dock)) {
+              if (!Array.isArray(v.removed)) v.removed = [];
+              return v;
+            }
+          } catch (e) {}
+          return null;
+        }
+
+        function saveLayout(layout) {
+          try { localStorage.setItem(LS_KEY, JSON.stringify(layout)); } catch (e) {}
+        }
+
+        function isOnDesktop(layout, id) {
+          if (!layout) return false;
+          return layout.pages.some(function (p) { return p.indexOf(id) !== -1; });
+        }
+
+        function addWidget(layout, id) {
+          if (!layout) return;
+          var ri = layout.removed.indexOf(id);
+          if (ri !== -1) layout.removed.splice(ri, 1);
+          if (!isOnDesktop(layout, id)) {
+            layout.pages[layout.pages.length - 1].push(id);
+          }
+          saveLayout(layout);
+        }
+
+        function removeWidget(layout, id) {
+          if (!layout) return;
+          layout.pages.forEach(function (p) {
+            var i = p.indexOf(id);
+            if (i !== -1) p.splice(i, 1);
+          });
+          if (layout.removed.indexOf(id) === -1) layout.removed.push(id);
+          saveLayout(layout);
+        }
+
+        function render() {
+          var layout = readLayout();
+          listEl.innerHTML = '';
+          CATALOG.forEach(function (w) {
+            var on = isOnDesktop(layout, w.id);
+            var li = document.createElement('li');
+            li.className = 'widget-item' + (on ? ' is-on' : '');
+
+            var glyph = document.createElement('span');
+            glyph.className = 'w-glyph';
+            glyph.innerHTML = '<i style="width:' + (w.cols * 12) + 'px;height:' + (w.rows * 12) + 'px"></i>';
+
+            var meta = document.createElement('span');
+            meta.className = 'w-meta';
+            meta.innerHTML = '<span class="w-name">' + w.name + '</span><span class="w-desc">' + w.desc + '</span>';
+
+            var state = document.createElement('span');
+            state.className = 'w-state';
+            state.textContent = on ? '已在桌面' : '未添加';
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'w-btn' + (on ? ' is-remove' : '');
+            btn.textContent = on ? '移除' : '添加';
+            btn.addEventListener('click', function () {
+              var cur = readLayout();
+              if (!cur) { cur = { v: 12, pages: [['image', 'app_worldbook', 'app_memory', 'clock', 'app_forum', 'app_wallet', 'polaroid', 'app_music', 'app_beauty', 'app_characters', 'app_settings'], ['app_finance', 'app_games', 'app_cafe', 'app_library', 'app_diary', 'app_dreamtravel', 'app_shopadmin', 'dialog', 'music']], dock: ['app_chat', 'app_shop'], removed: ['postcard'] }; }
+              if (isOnDesktop(cur, w.id)) {
+                removeWidget(cur, w.id);
+              } else {
+                addWidget(cur, w.id);
+              }
+              render();
+            });
+
+            li.appendChild(glyph);
+            li.appendChild(meta);
+            li.appendChild(state);
+            li.appendChild(btn);
+            listEl.appendChild(li);
+          });
+        }
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

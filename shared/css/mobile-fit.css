@@ -28,13 +28,16 @@
   /* === 高度链根节点 ===
      原来这里写死 height:100vh + overflow:hidden，会把「靠整页自然滚动」的
      独立页面（游戏 / 咖啡厅 / 商店 / 财务等）的纵向滚动一起锁死，真机上滑不动。
-     现改为：html 撑满视口、body 最小高度撑满；只锁横向，纵向放行。
+     现改为：html 用 min-height 撑满视口且随内容增高、body 最小高度撑满；
+     横向溢出由 html 的 overflow-x:hidden 兜底；body 必须保持 overflow 可见，
+     否则 iOS 上会锁死整页纵向滚动，也会破坏吸顶 Tab 的 position:sticky。
+     纵向全程放行。
      自带固定外壳 + 内部滚动容器的壳页面（聊天 / 论坛 / 设置等）内容刚好一屏，
      放开后依旧不会滚动，不受影响。 */
   html {
     margin: 0 !important;
     width: 100% !important;
-    height: 100% !important;
+    min-height: 100% !important;
     max-width: none !important;
     overflow-x: hidden !important;
     overscroll-behavior: none;
@@ -44,7 +47,6 @@
     width: 100% !important;
     min-height: 100% !important;
     max-width: none !important;
-    overflow-x: hidden !important;
     overscroll-behavior: none;
   }
 
