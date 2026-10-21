@@ -36,3 +36,33 @@ document.addEventListener('click', function (e) {
   if (e.button === 2) return; // 右键不跳转
   window.location.href = href;
 });
+
+// ===== 桌面主题：应用外观页保存的壁纸与图标底色（写入方为 settings/appearance.html） =====
+(function () {
+  // 壁纸：Base64 dataURL，铺满手机屏幕；宫格/页面容器均为透明背景，图标与挂件卡片自带底色不受影响
+  var screen = document.querySelector('.phone-screen');
+  if (screen) {
+    try {
+      var wp = localStorage.getItem('home_custom_wallpaper');
+      if (wp) {
+        screen.style.backgroundImage = 'url("' + wp + '")';
+        screen.style.backgroundSize = 'cover';
+        screen.style.backgroundPosition = 'center';
+        screen.style.backgroundRepeat = 'no-repeat';
+      }
+    } catch (e) {}
+  }
+  // 图标底色：自定义色卡优先，其次按图标风格推导（与 appearance.html 的写入语义一致）
+  try {
+    var root = document.documentElement;
+    var customBg = localStorage.getItem('home_custom_icon_bg');
+    var style = localStorage.getItem('home_icon_style');
+    if (customBg) {
+      root.style.setProperty('--icon-bg', customBg);
+    } else if (style === 'clean') {
+      root.style.setProperty('--icon-bg', '#F2F2F7');
+    } else if (style === 'glass') {
+      root.style.setProperty('--icon-bg', 'rgba(255, 255, 255, 0.6)');
+    }
+  } catch (e) {}
+})();

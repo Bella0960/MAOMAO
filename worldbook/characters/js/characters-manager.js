@@ -41,7 +41,7 @@ function selectRoleAndEnterPhone(roleId) {
     // 尊重来源：from=contacts 回通讯录，否则回主页
     var params = new URLSearchParams(window.location.search);
     var from = params.get('from');
-    window.location.href = from === 'contacts' ? '/chat/contacts/contacts.html' : '/index.html';
+    window.location.href = from === 'contacts' ? '../../chat/contacts/contacts.html' : '../../index.html';
 }
 
 const AVATAR_COLORS = [
@@ -641,6 +641,6 @@ renderRoleList();
     var params = new URLSearchParams(window.location.search);
     var from = params.get('from');
     if (from === 'contacts') {
-        backBtn.setAttribute('href', '/chat/contacts/contacts.html');
+        backBtn.setAttribute('href', '../../chat/contacts/contacts.html');
     }
 })();

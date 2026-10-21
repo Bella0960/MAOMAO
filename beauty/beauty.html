@@ -6,6 +6,7 @@
 <title>聊天美化 · 小手机</title>
 <script src="../shared/js/font-loader.js"></script>
 <script src="../shared/js/native-feel.js"></script>
+<script src="../shared/js/chat-beauty.js"></script>
 <link rel="stylesheet" href="../shared/css/mobile-fit.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
@@ -179,6 +180,40 @@
   .toast{border-radius:0;background:#171717;padding:10px 16px;font-size:11px;letter-spacing:.04em}
   @media(max-width:420px){.phone{width:100vw;height:100dvh;border-radius:0;border:0}body{background:#fff}}
 
+  /* ===== 双 Tab：可视化调节 / 深度自定义 ===== */
+  .beauty-tabs{display:flex;border-bottom:1px solid #dedede;margin-bottom:23px}
+  .btab{flex:1;background:transparent;border:0;padding:10px 0 12px;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:15px;color:#999;cursor:pointer;position:relative}
+  .btab.on{color:#111}
+  .btab.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#111}
+  .tab-view.hide{display:none}
+
+  /* ===== 可视化调节：预览区（消费 ChatBeauty 的 --chat-* 变量，与 chat-detail 同名同义） ===== */
+  /* Sticky 预览：滚动调参时始终可见；白色不透明底 + 底部轻阴影与下方滑块区隔 */
+  .vb-preview{position:sticky;top:0;z-index:5;border:1px solid #dedede;border-radius:14px;overflow:hidden;background:#FFFFFF;margin-bottom:26px;box-shadow:0 6px 18px rgba(0,0,0,.09)}
+  .vbp-stage{display:flex;flex-direction:column;gap:var(--chat-bubble-gap,13px);padding:16px 14px;min-height:230px;background-image:var(--chat-bg-image,linear-gradient(180deg,#F7F7F8 0%,#F1F1F4 100%));background-size:cover;background-position:center;background-repeat:no-repeat}
+  .vbp-time{align-self:center;font-size:8px;letter-spacing:.14em;color:#999;font-family:Arial,sans-serif;padding:2px 8px}
+  .vbp-row{display:flex;gap:8px;align-items:flex-start;max-width:var(--chat-bubble-max-width,86%)}
+  .vbp-row.ta{align-self:flex-start}
+  .vbp-row.me{align-self:flex-end}
+  .vbp-avatar{width:var(--chat-avatar-size,30px);height:var(--chat-avatar-size,30px);border-radius:var(--chat-avatar-radius,50%);background:linear-gradient(135deg,#EFEFEF 0%,#DCDCDC 100%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#444;flex-shrink:0;border:1px solid rgba(255,255,255,.8);overflow:hidden}
+  .vbp-bubble{padding:var(--chat-bubble-padding,9.5px 13px);margin-left:var(--chat-bubble-gap-x,0px);margin-right:var(--chat-bubble-gap-x,0px);font-size:12px;line-height:1.5;word-break:break-word;max-width:100%}
+  .vbp-row.ta .vbp-bubble{background:var(--chat-bubble-ta-bg,#FFFFFF);color:var(--chat-bubble-ta-color,#111111);border-radius:var(--chat-bubble-ta-radius,15px 15px 15px 4px);border:1px solid rgba(20,20,24,.035)}
+  .vbp-row.me .vbp-bubble{background:var(--chat-bubble-my-bg,#111111);color:var(--chat-bubble-my-color,#FFFFFF);border-radius:var(--chat-bubble-my-radius,15px 15px 4px 15px)}
+
+  /* ===== 可视化调节：滑块 / 色板 / 背景上传 ===== */
+  .vb-slider{margin-bottom:21px}
+  .vb-slider-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .vb-name{font-size:9px;letter-spacing:.16em;color:#777;text-transform:uppercase}
+  .vb-val{font-family:Georgia,serif;font-style:italic;font-size:13px;color:#111}
+  .vb-slider input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:2px;background:#d6d6d6;outline:none;border-radius:0;padding:0}
+  .vb-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#111;cursor:pointer;border:none}
+  .vb-slider input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#111;cursor:pointer;border:none}
+  .vb-colors{display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid #dedede;padding-top:19px;margin-bottom:23px}
+  .vb-color-row{display:flex;align-items:center;gap:10px;border-bottom:1px solid #cfcfcf;padding-bottom:7px}
+  .vb-color-row input[type=color]{width:30px;height:30px;border:none;background:none;padding:0;cursor:pointer}
+  .vb-color-hex{font-family:"SF Mono",Menlo,monospace;font-size:11px;color:#555}
+  .vb-bg-actions{display:flex;gap:24px;align-items:center;margin-bottom:8px}
+
 </style>
 </head>
 <body>
@@ -191,6 +226,97 @@
     <div class="title">聊天美化</div>
   </div>
   <div class="content">
+    <div class="beauty-tabs" id="beautyTabs">
+      <button class="btab on" type="button" data-tab="visual">可视化调节</button>
+      <button class="btab" type="button" data-tab="css">深度自定义</button>
+    </div>
+
+    <!-- ============ Tab 1：可视化调节 ============ -->
+    <div class="tab-view" id="tabVisual">
+      <div class="field">
+        <label>配置对象</label>
+        <select id="vbScope">
+          <option value="global">全局默认配置</option>
+        </select>
+        <div class="field-hint" id="vbScopeHint">对所有角色生效；某个角色可以在下拉里单独覆盖全局。</div>
+      </div>
+
+      <!-- 实时预览：类名与 chat-detail 同构，CSS 变量由 ChatBeauty.applyVars 注入 -->
+      <div class="vb-preview" id="vbPreview">
+        <div class="vbp-stage">
+          <div class="vbp-time">JUST NOW</div>
+          <div class="vbp-row ta">
+            <div class="vbp-avatar">彼</div>
+            <div class="vbp-bubble">今天下午去喝杯咖啡吗？</div>
+          </div>
+          <div class="vbp-row me">
+            <div class="vbp-bubble">好啊，老地方见～</div>
+            <div class="vbp-avatar">我</div>
+          </div>
+          <div class="vbp-row ta">
+            <div class="vbp-avatar">彼</div>
+            <div class="vbp-bubble">那就四点半，我提前把位置占好。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">头像大小</span><span class="vb-val" id="vbAvatarSizeVal">30px</span></div>
+        <input type="range" id="vbAvatarSize" min="20" max="64" step="1" value="30">
+      </div>
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">头像方圆</span><span class="vb-val" id="vbAvatarRadiusVal">50%</span></div>
+        <input type="range" id="vbAvatarRadius" min="0" max="50" step="1" value="50">
+      </div>
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">气泡间距</span><span class="vb-val" id="vbBubbleGapVal">13px</span></div>
+        <input type="range" id="vbBubbleGap" min="2" max="40" step="1" value="13">
+      </div>
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">左右间距</span><span class="vb-val" id="vbBubbleGapXVal">0px</span></div>
+        <input type="range" id="vbBubbleGapX" min="0" max="30" step="1" value="0">
+      </div>
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">气泡宽度</span><span class="vb-val" id="vbBubbleMaxWidthVal">86%</span></div>
+        <input type="range" id="vbBubbleMaxWidth" min="40" max="90" step="1" value="86">
+      </div>
+      <div class="vb-slider">
+        <div class="vb-slider-head"><span class="vb-name">气泡内边距</span><span class="vb-val" id="vbBubblePaddingVal">10px</span></div>
+        <input type="range" id="vbBubblePadding" min="5" max="20" step="1" value="10">
+      </div>
+
+      <div class="vb-colors">
+        <div class="vb-color">
+          <div class="vb-slider-head"><span class="vb-name">我的气泡 · 底色</span></div>
+          <div class="vb-color-row"><input type="color" id="vbMyBg" value="#111111"><span class="vb-color-hex" id="vbMyBgHex">#111111</span></div>
+        </div>
+        <div class="vb-color">
+          <div class="vb-slider-head"><span class="vb-name">我的气泡 · 文字</span></div>
+          <div class="vb-color-row"><input type="color" id="vbMyColor" value="#FFFFFF"><span class="vb-color-hex" id="vbMyColorHex">#FFFFFF</span></div>
+        </div>
+        <div class="vb-color">
+          <div class="vb-slider-head"><span class="vb-name">对方气泡 · 底色</span></div>
+          <div class="vb-color-row"><input type="color" id="vbPartnerBg" value="#FFFFFF"><span class="vb-color-hex" id="vbPartnerBgHex">#FFFFFF</span></div>
+        </div>
+        <div class="vb-color">
+          <div class="vb-slider-head"><span class="vb-name">对方气泡 · 文字</span></div>
+          <div class="vb-color-row"><input type="color" id="vbPartnerColor" value="#111111"><span class="vb-color-hex" id="vbPartnerColorHex">#111111</span></div>
+        </div>
+      </div>
+
+      <div class="vb-bg">
+        <div class="vb-slider-head"><span class="vb-name">聊天背景图</span></div>
+        <div class="vb-bg-actions">
+          <button class="btn btn-secondary" type="button" onclick="document.getElementById('vbBgFile').click()">上传图片</button>
+          <button class="btn btn-secondary" type="button" onclick="clearVisualBg()">恢复默认</button>
+        </div>
+        <input type="file" id="vbBgFile" accept="image/*" style="display:none;">
+        <div class="field-hint" id="vbBgHint">未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）</div>
+      </div>
+    </div>
+
+    <!-- ============ Tab 2：深度自定义（原有 CSS 预设管理，原样保留） ============ -->
+    <div class="tab-view hide" id="tabCss">
     <div class="list-view" id="listView">
       <div class="toolbar">
         <button class="circle-btn" onclick="document.getElementById('importFile').click()" title="导入CSS文件">
@@ -214,13 +340,15 @@
       </div>
       <div class="field">
         <label>CSS</label>
-        <textarea id="presetCss" placeholder=".chat-slim-card { border-radius: 10px; }"></textarea>\n        <div class="field-hint">聊天全局会同时作用于聊天列表和聊天详情；角色专属只作用于该角色的聊天详情。点击正在使用的预设可停用。保存前会检查括号、引号和空内容。</div>
+        <textarea id="presetCss" placeholder=".chat-slim-card { border-radius: 10px; }"></textarea>
+        <div class="field-hint">聊天全局会同时作用于聊天列表和聊天详情；角色专属只作用于该角色的聊天详情。点击正在使用的预设可停用。保存前会检查括号、引号和空内容。</div>
       </div>
+    </div>
     </div>
   </div>
   <div class="footer">
-    <button class="btn btn-secondary" id="btnLeft" onclick="leftAction()">新建</button>
-    <button class="btn btn-primary" id="btnRight" onclick="savePreset()">保存</button>
+    <button class="btn btn-secondary" id="btnLeft" onclick="leftAction()">恢复默认</button>
+    <button class="btn btn-primary" id="btnRight" onclick="rightAction()">保存配置</button>
   </div>
   <div class="toast" id="toast">已保存</div>
 </div>
@@ -504,6 +632,230 @@ document.getElementById('importFile').addEventListener('change', function(e){
   reader.readAsText(file);
   e.target.value = '';
 });
+</script>
+<script>
+// ====================== Tab 1：可视化调节 ======================
+// 数据链路：draft（内存）--input 事件--> applyVars 到预览区（零延迟）；点保存才 ChatBeauty.save 落盘
+(function () {
+  var VISUAL_FIELDS = ['avatarSize', 'avatarRadius', 'bubbleGap', 'bubbleGapX', 'bubbleMaxWidth', 'bubblePadding', 'myBubbleBg', 'myBubbleColor', 'partnerBubbleBg', 'partnerBubbleColor', 'chatBg'];
+  var previewEl = document.getElementById('vbPreview');
+  var scopeSel = document.getElementById('vbScope');
+  var currentScope = 'global';
+  var draft = null;
+  var activeTab = 'visual';
+
+  function readRoles() {
+    try {
+      var v = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
+      return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+  }
+  function roleName(id) {
+    var roles = readRoles();
+    for (var i = 0; i < roles.length; i++) {
+      if (String(roles[i].id) === String(id)) return roles[i].name || id;
+    }
+    return '角色';
+  }
+  function numOr(v, fb) { var n = Number(v); return isNaN(n) ? fb : n; }
+
+  // input[type=color] 只认 #rrggbb；存储值可能是 #rgb / rgba()，转不动就给 fallback（预览仍显示真实色）
+  function toHex(c, fb) {
+    c = String(c || '').trim();
+    var m = /^#([0-9a-fA-F]{6})$/.exec(c);
+    if (m) return '#' + m[1].toLowerCase();
+    m = /^#([0-9a-fA-F]{3})$/.exec(c);
+    if (m) return '#' + m[1][0] + m[1][0] + m[1][1] + m[1][1] + m[1][2] + m[1][2];
+    m = /^rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/i.exec(c);
+    if (m) {
+      function hx(n) { var s = Number(n).toString(16); return s.length < 2 ? '0' + s : s; }
+      return '#' + hx(m[1]) + hx(m[2]) + hx(m[3]);
+    }
+    return fb;
+  }
+
+  // ---- 作用域下拉：全局 + 角色列表 ----
+  (function fillScope() {
+    readRoles().forEach(function (r) {
+      if (!r || !r.id) return;
+      var opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = '角色 · ' + (r.name || r.id);
+      scopeSel.appendChild(opt);
+    });
+  })();
+
+  function updateScopeHint() {
+    document.getElementById('vbScopeHint').textContent = currentScope === 'global'
+      ? '对所有角色生效；某个角色可以在下拉里单独覆盖全局。'
+      : '正在单独配置「' + roleName(currentScope) + '」；未单独设置的项沿用全局配置。';
+  }
+
+  // ---- 控件回填（单聊无数据时 resolve 自动显示全局合并结果） ----
+  function setRange(id, v, unit, fb) {
+    var el = document.getElementById(id);
+    el.value = numOr(v, fb);
+    document.getElementById(id + 'Val').textContent = el.value + unit;
+  }
+  function setColor(id, v, fb) {
+    var hex = toHex(v, fb);
+    document.getElementById(id).value = hex;
+    document.getElementById(id + 'Hex').textContent = hex;
+  }
+
+  function loadVisualScope(scope) {
+    currentScope = scope;
+    draft = ChatBeauty.resolve(scope === 'global' ? null : scope);
+    setRange('vbAvatarSize', draft.avatarSize, 'px', 30);
+    setRange('vbAvatarRadius', draft.avatarRadius, '%', 50);
+    setRange('vbBubbleGap', draft.bubbleGap, 'px', 13);
+    setRange('vbBubbleGapX', draft.bubbleGapX, 'px', 0);
+    setRange('vbBubbleMaxWidth', draft.bubbleMaxWidth, '%', 86);
+    setRange('vbBubblePadding', draft.bubblePadding, 'px', 10);
+    setColor('vbMyBg', draft.myBubbleBg, '#111111');
+    setColor('vbMyColor', draft.myBubbleColor, '#FFFFFF');
+    setColor('vbPartnerBg', draft.partnerBubbleBg, '#FFFFFF');
+    setColor('vbPartnerColor', draft.partnerBubbleColor, '#111111');
+    updateBgHint();
+    updateScopeHint();
+    ChatBeauty.applyVars(draft, previewEl);
+  }
+
+  function updateBgHint() {
+    document.getElementById('vbBgHint').textContent = (draft && draft.chatBg)
+      ? '已设置自定义背景 · 上传时自动压缩到 800×1422 内（JPEG）'
+      : '未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）';
+  }
+
+  // ---- 交互：拖动/选色 → 只改预览区变量，不落盘 ----
+  function bindRange(id, field, unit) {
+    document.getElementById(id).addEventListener('input', function () {
+      draft[field] = Number(this.value);
+      document.getElementById(id + 'Val').textContent = this.value + unit;
+      ChatBeauty.applyVars(draft, previewEl);
+    });
+  }
+  function bindColor(id, field) {
+    document.getElementById(id).addEventListener('input', function () {
+      draft[field] = this.value;
+      document.getElementById(id + 'Hex').textContent = this.value;
+      ChatBeauty.applyVars(draft, previewEl);
+    });
+  }
+  bindRange('vbAvatarSize', 'avatarSize', 'px');
+  bindRange('vbAvatarRadius', 'avatarRadius', '%');
+  bindRange('vbBubbleGap', 'bubbleGap', 'px');
+  bindRange('vbBubbleGapX', 'bubbleGapX', 'px');
+  bindRange('vbBubbleMaxWidth', 'bubbleMaxWidth', '%');
+  bindRange('vbBubblePadding', 'bubblePadding', 'px');
+  bindColor('vbMyBg', 'myBubbleBg');
+  bindColor('vbMyColor', 'myBubbleColor');
+  bindColor('vbPartnerBg', 'partnerBubbleBg');
+  bindColor('vbPartnerColor', 'partnerBubbleColor');
+
+  scopeSel.addEventListener('change', function () { loadVisualScope(this.value); });
+
+  // ---- 背景图上传：canvas 压缩成 Base64，先进预览 ----
+  document.getElementById('vbBgFile').addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var img = new Image();
+      img.onload = function () {
+        var MAX_W = 800, MAX_H = 1422;
+        var w = img.width, h = img.height;
+        if (w > h) { if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; } }
+        else { if (h > MAX_H) { w = Math.round(w * MAX_H / h); h = MAX_H; } }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        draft.chatBg = c.toDataURL('image/jpeg', 0.8);
+        ChatBeauty.applyVars(draft, previewEl);
+        updateBgHint();
+        showToast('背景已加载到预览，点右下角「保存配置」生效');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  function clearVisualBg() {
+    draft.chatBg = '';
+    ChatBeauty.applyVars(draft, previewEl);
+    updateBgHint();
+  }
+
+  // ---- 保存：全局 = 整份快照；单聊 = 与全局做差量（一致项传 null，保持稀疏存储） ----
+  function saveVisual() {
+    var payload = {};
+    VISUAL_FIELDS.forEach(function (k) {
+      payload[k] = (k === 'chatBg') ? (draft[k] || null) : draft[k];
+    });
+    if (currentScope !== 'global') {
+      var g = ChatBeauty.resolve(null);
+      VISUAL_FIELDS.forEach(function (k) {
+        var same = (k === 'chatBg')
+          ? (!payload.chatBg || payload.chatBg === g.chatBg)
+          : (String(payload[k]) === String(g[k]));
+        payload[k] = same ? null : payload[k];
+      });
+      var hasDiff = VISUAL_FIELDS.some(function (k) { return payload[k] !== null; });
+      if (!hasDiff) {
+        ChatBeauty.reset(currentScope);
+        showToast('与全局一致：已清除「' + roleName(currentScope) + '」的单独配置');
+        return;
+      }
+    }
+    var ok = ChatBeauty.save(currentScope, payload);
+    if (ok) showToast(currentScope === 'global' ? '已保存全局配置' : '已保存「' + roleName(currentScope) + '」的专属配置');
+    else showToast('保存失败：图片过大或本地存储已满');
+  }
+
+  function resetVisualScope() {
+    if (currentScope === 'global' && !confirm('确定恢复默认外观？当前的全局配置会被清除。')) return;
+    ChatBeauty.reset(currentScope);
+    loadVisualScope(currentScope);
+    showToast(currentScope === 'global' ? '已恢复默认外观' : '已清除单独配置，恢复跟随全局');
+  }
+
+  // ---- Tab 切换（联动底部按钮含义） ----
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('#beautyTabs .btab').forEach(function (b) {
+      b.classList.toggle('on', b.dataset.tab === tab);
+    });
+    document.getElementById('tabVisual').classList.toggle('hide', tab !== 'visual');
+    document.getElementById('tabCss').classList.toggle('hide', tab !== 'css');
+    if (tab === 'visual') {
+      document.getElementById('btnLeft').textContent = '恢复默认';
+      document.getElementById('btnRight').textContent = '保存配置';
+      loadVisualScope(currentScope);   // 回到 Tab 1 时刷新一次（角色列表可能已变化）
+    } else {
+      var inEdit = document.getElementById('editView').classList.contains('show');
+      document.getElementById('btnLeft').textContent = inEdit ? '取消' : '新建';
+      document.getElementById('btnRight').textContent = '保存';
+    }
+  }
+  document.getElementById('beautyTabs').addEventListener('click', function (e) {
+    var b = e.target.closest('.btab');
+    if (!b || b.dataset.tab === activeTab) return;
+    switchTab(b.dataset.tab);
+  });
+
+  // 底部按钮分流：Tab 1 → 保存/恢复外观配置；Tab 2 → 原有预设保存/新建逻辑
+  var _leftAction = leftAction;
+  leftAction = function () {
+    if (activeTab === 'visual') { resetVisualScope(); return; }
+    _leftAction();
+  };
+  rightAction = function () { if (activeTab === 'visual') saveVisual(); else savePreset(); };
+
+  // 初始化：默认落在可视化调节
+  loadVisualScope('global');
+  switchTab('visual');
+})();
 </script>
 </body>
 </html>

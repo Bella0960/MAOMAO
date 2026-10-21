@@ -6,6 +6,7 @@
     <script src="../../shared/js/font-loader.js"></script>
     <script src="../../shared/js/native-feel.js"></script>
     <script src="../../shared/js/custom-css.js"></script>
+    <script src="../../shared/js/chat-beauty.js"></script>
     <script src="../../shared/js/phone/phone_storage.js"></script>
     <style>
         * {
@@ -145,7 +146,7 @@
         .msg-row {
             display: flex;
             gap: 8px;
-            max-width: 86%;
+            max-width: var(--chat-bubble-max-width, 86%);
             align-items: flex-start;
         }
         .msg-row.received, .msg-row.left {
@@ -185,7 +186,9 @@
             object-fit: cover;
         }
         .msg-bubble {
-            padding: 9.5px 13px;
+            padding: var(--chat-bubble-padding, 9.5px 13px);
+            margin-left: var(--chat-bubble-gap-x, 0px);
+            margin-right: var(--chat-bubble-gap-x, 0px);
             font-size: 0.75rem;
             line-height: 1.5;
             letter-spacing: -0.1px;
@@ -1291,9 +1294,12 @@
             -webkit-backdrop-filter: blur(20px);
         }
         .chat-stage {
-            background: linear-gradient(180deg, #F7F7F8 0%, #F1F1F4 100%);
+            background: var(--chat-bg-image, linear-gradient(180deg, #F7F7F8 0%, #F1F1F4 100%));
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             padding: 16px 14px;
-            gap: 13px;
+            gap: var(--chat-bubble-gap, 13px);
         }
         .msg-avatar {
             width: var(--avatar-size, 30px);
@@ -1301,13 +1307,14 @@
             border: 1px solid rgba(255,255,255,.8);
             box-shadow: none;
         }
+        /* 圆角恢复为变量驱动：此前的覆盖块写死了 15px，导致美化配置的圆角不生效 */
         .msg-row.received .msg-bubble, .msg-row.left .msg-bubble {
-            border-radius: 15px 15px 15px 4px;
+            border-radius: var(--partner-bubble-radius, 15px 15px 15px 4px);
             border: 1px solid rgba(20,20,24,.035);
             box-shadow: none;
         }
         .msg-row.sent .msg-bubble, .msg-row.right .msg-bubble {
-            border-radius: 15px 15px 4px 15px;
+            border-radius: var(--my-bubble-radius, 15px 15px 4px 15px);
             box-shadow: none;
         }
         .message-time {
@@ -2015,21 +2022,9 @@
         }
         applyBlockUI();
 
-        // ================= 聊天背景（只读应用：chat_bg_<roleId>） =================
-        // 有图：图片 cover 铺满 + 72% 白色柔和遮罩，保证黑白两种气泡文字均清晰；无图保持默认渐变背景
-        function applyChatBackground() {
-            let bg = '';
-            try {
-                bg = localStorage.getItem('chat_bg_' + aliasRoleId) || '';
-            } catch (e) {}
-            if (!bg) return;
-            chatMessages.style.backgroundImage =
-                'linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url("' + bg + '")';
-            chatMessages.style.backgroundSize = 'cover';
-            chatMessages.style.backgroundPosition = 'center center';
-            chatMessages.style.backgroundRepeat = 'no-repeat';
-        }
-        applyChatBackground();
+        // ================= 聊天背景 =================
+        // 原 applyChatBackground（chat_bg_<roleId> + 72% 白遮罩）已并入 ChatBeauty（shared/js/chat-beauty.js）：
+        // 美化配置 chatBg 优先；未配置时自动回落旧 chat_bg_<id> 并保持白遮罩观感，见下方统一应用点。
 
         const storageKey = `chat_history_${currentCharacter.id}`;
 
@@ -4201,30 +4196,10 @@
         fitInputHeight();
         updateSendBtnState();
 
-        // ================= 气泡主题变量注入（只读，不碰任何现有逻辑） =================
-        // 优先级：角色专属 theme_bubble_role_<id> > 全局 theme_bubble_global > CSS 内置默认值
-        (function applyBubbleTheme() {
-            var merged = {};
-            try {
-                var g = JSON.parse(localStorage.getItem('theme_bubble_global') || '{}');
-                if (g && typeof g === 'object') merged = g;
-            } catch (e) {}
-            try {
-                var r = JSON.parse(localStorage.getItem('theme_bubble_role_' + currentCharacter.id) || '{}');
-                if (r && typeof r === 'object') {
-                    for (var k in r) { if (r[k] != null) merged[k] = r[k]; }
-                }
-            } catch (e) {}
-            var rootStyle = document.documentElement.style;
-            if (merged.myBg) rootStyle.setProperty('--my-bubble-bg', merged.myBg);
-            if (merged.myColor) rootStyle.setProperty('--my-bubble-color', merged.myColor);
-            if (merged.partnerBg) rootStyle.setProperty('--partner-bubble-bg', merged.partnerBg);
-            if (merged.partnerColor) rootStyle.setProperty('--partner-bubble-color', merged.partnerColor);
-            if (merged.avatarSize) rootStyle.setProperty('--avatar-size', Number(merged.avatarSize) + 'px');
-            if (merged.avatarRadius) rootStyle.setProperty('--avatar-radius', Number(merged.avatarRadius) + '%');
-            if (merged.myRadius) rootStyle.setProperty('--my-bubble-radius', merged.myRadius);
-            if (merged.partnerRadius) rootStyle.setProperty('--partner-bubble-radius', merged.partnerRadius);
-        })();
+        // ================= 聊天美化应用（结构化参数，唯一注入点） =================
+        // 底层：shared/js/chat-beauty.js —— 内置默认 < beauty_chat_global_v1 < beauty_chat_<角色id>
+        // 旧 theme_bubble_* 已由 chat-beauty.js 加载时自动迁移到新 key；本块取代原 applyBubbleTheme
+        try { if (window.ChatBeauty) ChatBeauty.apply(currentCharacter.id, chatMessages); } catch (e) {}
 
         renderAllMessages();
         highlightMessageFromUrl();
@@ -4439,7 +4414,7 @@
                 var stickers = getMountedStickers();
                 grid.innerHTML = '';
                 if (!stickers.length) {
-                    grid.innerHTML = '<div class="sticker-panel-empty">还没有表情包<br><button onclick="location.href=\'sticker-manager.html\'" style="margin-top:12px;padding:8px 20px;border:none;border-radius:10px;background:#111;color:#fff;font-size:0.8rem;cursor:pointer;">+ 添加表情包</button></div>';
+                    grid.innerHTML = '<div class="sticker-panel-empty">还没有表情包<br><button onclick="location.href=\'../sticker/sticker-manager.html\'" style="margin-top:12px;padding:8px 20px;border:none;border-radius:10px;background:#111;color:#fff;font-size:0.8rem;cursor:pointer;">+ 添加表情包</button></div>';
                     return;
                 }
                 stickers.forEach(function (s) {
