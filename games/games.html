@@ -125,6 +125,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(min-width:600px){body{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #e5e5e5}.shell{padding-left:27px;padding-right:27px}.toast{bottom:35px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 
+
+/* Detective bureau: layered case workflow */
+.case-progress-strip{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid #e5e5e1;border-bottom:1px solid #e5e5e1;margin:14px 0;font-size:11px;color:#777770}.case-progress-strip strong{color:#111;font-weight:600}.case-archive-list{display:grid;gap:8px}.case-archive-item{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:14px;border:1px solid #e2e2de;background:#fff;color:#20201d;transition:background .18s,border-color .18s}.case-archive-item:active{background:#f3f3f1}.case-archive-item:disabled{opacity:.48}.case-archive-no{font-size:9px;letter-spacing:.15em;color:#8b8b84}.case-archive-item strong{font-size:15px;font-weight:600}.case-archive-desc{font-size:11px;line-height:1.65;color:#777770}.case-archive-status{align-self:flex-end;font-size:10px;color:#55554f}.case-nav-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.case-phase-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:18px 0 12px}.case-phase-track span{padding:8px 4px;border-bottom:1px solid #ddd;text-align:center;font-size:9px;color:#999991}.case-phase-track span.active,.case-phase-track span.complete{border-color:#111;color:#222}.interview-list{display:grid;gap:7px;margin-bottom:17px}.interview-item{display:grid;grid-template-columns:25px 1fr 12px;gap:8px;align-items:start;width:100%;text-align:left;background:#fff;border:1px solid #e2e2e2;padding:12px;color:#222}.interview-item.revealed{background:#f3f3f1;border-color:#cfcfc9}.interview-number{font-family:var(--serif);font-size:15px;color:#888}.interview-item strong{display:block;font-size:12px}.interview-item small{display:block;color:#888;font-size:10px;margin:3px 0 6px}.interview-text{display:block;font-size:11px;line-height:1.75;color:#696963}.interview-mark{font-size:12px;color:#777}.case-timeline{margin-top:15px;padding:14px;background:#f6f6f4;border:1px solid #e5e5e0}.timeline-row{padding:10px 0;border-top:1px solid #e2e2de}.timeline-row span{display:block;font-size:9px;color:#888;letter-spacing:.1em}.timeline-row strong{display:block;font-size:12px;margin-top:4px}.timeline-row p{font-size:11px;line-height:1.7;color:#777;margin:5px 0 0}
+
 /* Editorial polish: pure white canvas, neutral gray and sharp black accents */
 .spotlight{position:relative;overflow:hidden;background:#222220;color:#e8e6e0;padding:30px 25px 25px;margin:-7px 0 33px;cursor:pointer;outline-offset:4px;transition:background .2s}
 .spotlight:active{background:#2a2a28}
@@ -632,28 +636,35 @@ function nextHint(){
 var CASES=[
  {title:'消失的草莓蛋糕',intro:'咖啡馆打烊前，展示柜里最后一块草莓蛋糕不见了。三个人都说自己没碰过它。',evidence:[{title:'柜台记录',detail:'蛋糕在 16:10 被放进展示柜，16:25 清点时已经不见。'},{title:'围裙上的奶油',detail:'只有主厨小禾的蓝围裙上沾着新鲜奶油，她说那是试做时留下的。'},{title:'订单时间',detail:'阿泽在 16:10 到 16:30 一直处理连续订单，收银记录可以对上。'},{title:'客人去向',detail:'米粒在 16:20 取走外带咖啡后就离开了，店内监控拍到了她出门。'}],suspects:[{name:'小禾',job:'主厨'},{name:'阿泽',job:'收银员'},{name:'米粒',job:'顾客'}],answer:0,explain:'小禾说奶油来自试做，但蛋糕失踪的时间就在展示柜清点之间；她是唯一能接触后厨和展示柜的人，另外两人的时间线都有记录佐证。'},
  {title:'图书馆的借书卡',intro:'一本稀有旧书的借书卡从柜台失踪。管理员只记得三位访客来过。',evidence:[{title:'值班表',detail:'管理员在 14:00—14:15 去书库归还书籍，柜台当时无人。'},{title:'纸张碎屑',detail:'柜台旁发现的纸屑边缘带有蓝色墨水，与访客留下的蓝色便签颜色相同。'},{title:'访客留言',detail:'林同学留下的便签使用蓝色墨水，而且他承认自己曾在柜台前找笔。'},{title:'监控画面',detail:'陈女士和小周进入大厅后一直在阅览区，只有林同学在管理员离开时靠近柜台。'}],suspects:[{name:'陈女士',job:'研究者'},{name:'小周',job:'学生'},{name:'林同学',job:'来访读者'}],answer:2,explain:'蓝色墨水碎屑与林同学的便签相符，监控也显示只有他在柜台无人时靠近。线索共同指向林同学。'},
- {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'}];
-function startCase(){
-  setRoundLabel();var index=Math.floor(Math.random()*CASES.length);var c=CASES[index];
-  gameState={caseIndex:index,item:c,revealed:{},ended:false};
-  byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">CASE FILE / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div><div class="divider-label">点击线索展开证据</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">'+(i<1?esc(ev.detail):'点击查看这条证据。')+'</span></span><span class="evidence-mark">'+(i<1?'−':'+')+'</span></button>';}).join('')+'</div><div class="divider-label">你认为谁最可疑？</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(s,i){return '<button class="suspect" data-suspect="'+i+'"><div class="suspect-name">'+esc(s.name)+'</div><div class="suspect-role">'+esc(s.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看线索，再选出你的答案。</div><div class="btn-row"><button class="secondary-btn" id="newCase">换一个案件</button></div></div>';
-  byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;gameState.revealed[i]=true;var detail=byId('evidenceDetail'+i);if(detail)detail.textContent=c.evidence[i].detail;btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='−';});});
-  byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(btn){btn.addEventListener('click',function(){chooseSuspect(Number(btn.getAttribute('data-suspect')));});});
-  byId('newCase').addEventListener('click',function(){roundNumber++;startCase();roleLine('玩家选择了另一个案件，请邀请继续推理。','换案！这次我们仔细一点，别放过小细节。');});
-  byId('roleQuote').textContent='我看这事没那么简单。我们先把证据看完，再下结论。';
-}
+ {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'} ,
+ {title:'雨夜的空白车票',intro:'旧车站闭站前，一张盖过章的末班车票从失物招领柜里消失。值班员说那晚只有三个人进过办公室。',evidence:[{title:'站台时刻表',detail:'末班车在 21:18 发车，站台记录显示 21:12 后没有乘客进入办公室。'},{title:'潮湿的鞋印',detail:'办公室门口留下窄底鞋印，方向由档案柜通往后门。'},{title:'交班笔记',detail:'值班员写下 21:05 曾离开柜台三分钟，但口头称整晚没有离岗。'},{title:'车票存根',detail:'存根编号连续，只有失踪车票对应的那一格被提前撕开。'}],suspects:[{name:'许站长',job:'当班负责人'},{name:'小闻',job:'检票员'},{name:'顾客陈',job:'末班车乘客'}],answer:0,explain:'交班笔记与站长的说法矛盾，空白时段正好给了他接近档案柜的机会；鞋印方向也与办公室后门路线吻合。'},
+ {title:'画廊里的错位签名',intro:'一场小型画展结束后，收藏登记簿上的一处签名被改动，导致作品归属出现争议。三位工作人员都接触过登记桌。',evidence:[{title:'墨水干燥程度',detail:'被改动的签名墨迹明显较新，覆盖在原本已干透的笔迹上。'},{title:'布展清单',detail:'策展助理在闭展前负责整理登记簿，清单时间为 18:40。'},{title:'访客留言',detail:'一名访客写道，闭展前看见保管员在登记桌旁寻找印章。'},{title:'印章收纳盒',detail:'盒盖内侧有新鲜墨迹，与登记簿改动处使用的墨水颜色一致。'}],suspects:[{name:'策展助理林',job:'整理登记簿'},{name:'保管员周',job:'保管印章'},{name:'讲解员苏',job:'负责闭展' }],answer:1,explain:'保管员曾在登记桌附近寻找印章，盒盖墨迹又与改动签名的墨水一致，证据共同指向他接触过并改动了登记簿。'},
+ {title:'凌晨三点的来电',intro:'一位作家声称凌晨三点收到匿名电话，随后遗失了写有新书结局的手稿。电话记录、门禁和三份证词之间存在矛盾。',evidence:[{title:'电话清单',detail:'来电实际发生在 02:41，号码来自工作室内部线路，并非外部匿名号码。'},{title:'门禁记录',detail:'02:30 至 03:00 只有编辑唐的门卡打开过工作室走廊。'},{title:'稿纸纤维',detail:'桌边碎纸与编辑室专用稿纸纤维相同，但无法单独证明是谁撕碎。'},{title:'咖啡收据',detail:'咖啡在 02:36 被送到编辑室，收据签名与编辑唐的日常签名一致。'}],suspects:[{name:'编辑唐',job:'负责审稿'},{name:'邻居许',job:'住在隔壁'},{name:'作家本人',job:'手稿所有者'}],answer:0,explain:'内部线路排除了外部匿名来电，门禁和咖啡收据都把编辑唐放在关键时间与地点；稿纸纤维则补充了手稿被处理过的证据。'}
+]; 
+var CASE_INTERVIEWS={
+0:[{title:'小禾 · 主厨',text:'我确实碰过奶油，但那是下午试做时留下的。蛋糕放进展示柜后，我一直在后厨。'},{title:'阿泽 · 收银员',text:'那段时间订单排得很满，收银流水和小票都能证明我没离开柜台。'},{title:'米粒 · 顾客',text:'我只取了外带咖啡。离开时，展示柜里的蛋糕还在不在，我没有留意。'}],
+1:[{title:'陈女士 · 研究者',text:'我一直在阅览区查资料，直到离开都没有去过柜台。'},{title:'小周 · 学生',text:'我找过笔，但管理员还在柜台，我没有碰借书卡。'},{title:'林同学 · 来访读者',text:'我确实靠近过柜台找笔，看到蓝色便签时还顺手拿起来看了看。'}],
+2:[{title:'周叔 · 保管员',text:'钥匙按时归还了，我没有理由在闭馆前动灯光控制台。'},{title:'小乔 · 策展助理',text:'我在整理访客反馈，没碰控制台，也没有操作权限。'},{title:'小陆 · 讲解员',text:'我 19:30 就离开展厅了，之后发生什么我不清楚。'}],
+3:[{title:'许站长 · 当班负责人',text:'我整晚都在柜台，没有离开过，也没有打开过失物招领柜。'},{title:'小闻 · 检票员',text:'我在站台协助乘客，21:12 之后没有人再进办公室。'},{title:'顾客陈 · 末班车乘客',text:'我在发车前等车，没有进过办公室，只经过了后门附近。'}],
+4:[{title:'策展助理林 · 整理登记簿',text:'我按清单整理完登记簿就离开了，之后没有再碰它。'},{title:'保管员周 · 保管印章',text:'我去登记桌找过印章，但没有改动签名。'},{title:'讲解员苏 · 负责闭展',text:'我闭展时只检查灯光和展柜，没有查看登记簿。'}],
+5:[{title:'编辑唐 · 负责审稿',text:'我凌晨就离开了工作室，那张咖啡收据可能是别人代签的。'},{title:'邻居许 · 住在隔壁',text:'我听到过电话声，但隔着墙无法判断来自哪间房。'},{title:'作家本人 · 手稿所有者',text:'我说是匿名电话，是因为不想让别人知道工作室内部线路出了问题。'}]
+};
+function caseProgressRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_progress_v1')||'{}')||{};}catch(e){return {};}}
+function caseProgress(){var all=caseProgressRoot(),key=String(activeRole&&activeRole.id||'default-partner');if(!all[key])all[key]={completed:[],attempts:{},notes:{}};return all[key];}
+function saveCaseProgress(){var all=caseProgressRoot();all[String(activeRole&&activeRole.id||'default-partner')]=caseProgress();localStorage.setItem('maomao_detective_progress_v1',JSON.stringify(all));}
 function chooseSuspect(i){
-  if(gameState.ended)return;
-  var c=gameState.item;var buttons=byId('suspectList').querySelectorAll('[data-suspect]');
-  gameState.ended=true;
-  if(i===c.answer){
-    buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破。</strong> '+esc(c.explain);saveStat('detective','win');
-    roleLine('玩家正确找出了案件“'+c.title+'”的真凶。推理结论：'+c.explain+' 请用角色语气夸奖搭档，最多一句。','漂亮！证据没有白看，我们这次配合得不错。');
-  }else{
-    buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>这次判断有误。</strong> 正确答案是 '+esc(c.suspects[c.answer].name)+'。'+esc(c.explain);
-    saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中选错嫌疑人。正确答案为'+c.suspects[c.answer].name+'。用轻松、不挖苦的语气复盘一句。','这次被线索绕进去了。没事，真相已经找到了。');
-  }
-  buttons.forEach(function(b){b.disabled=true;});
+ if(gameState.ended)return;
+ var c=gameState.item,buttons=byId('suspectList').querySelectorAll('[data-suspect]'),progress=caseProgress();
+ if(Object.keys(gameState.revealed).length<c.evidence.length||Object.keys(gameState.interviewed).length<c.suspects.length){showToast('先完成现场取证和人物询问。');return;}
+ gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
+ var correct=i===c.answer;
+ if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress();saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress();saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
+ buttons.forEach(function(b){b.disabled=true;});
+ var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
+ var extra=byId('gameContent').querySelector('.case-result-actions');if(!extra){extra=document.createElement('div');extra.className='btn-row case-result-actions';byId('gameContent').querySelector('.board-panel').appendChild(extra);}
+ extra.innerHTML='<button class="secondary-btn" id="caseResultArchive">返回案件档案</button><button class="primary-btn" id="caseResultRetry">重新调查</button>';
+ byId('caseResultArchive').addEventListener('click',startCase);byId('caseResultRetry').addEventListener('click',function(){openCase(gameState.caseIndex);});
 }
 var WIN_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 var DIFFICULTY='normal';
