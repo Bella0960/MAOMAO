@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.12';
-  badge.setAttribute('aria-label','侦探游戏版本 V.12');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.13';
+  badge.setAttribute('aria-label','侦探游戏版本 V.13');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1660,7 +1660,7 @@ body.floating-tools-open{overflow:hidden}
  }
  function open(){
   var button=document.getElementById('teamDiscussionButton'),p=document.getElementById('teamDiscussionPanel');
-  if(!button||!p||!window.gameState||!gameState.item)return;
+  if(!button||!p||typeof gameState==='undefined'||!gameState||!gameState.item){return;}
   close();panel=p;originalParent=p.parentNode;originalNext=p.nextSibling;activeCase=gameState.item;
   overlay=document.createElement('div');overlay.className='team-discussion-overlay';overlay.setAttribute('role','presentation');
   var dialog=document.createElement('section');dialog.className='team-discussion-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','小队讨论');
@@ -1866,5 +1866,49 @@ function showCaseClosedCelebration(caseTitle){
 <style id="maomao-case-archive-closed-v12">
 .case-archive-item.is-archived{border-color:#555;background:#f7f7f7}
 .case-archive-item.is-archived .case-archive-status{font-weight:700;letter-spacing:.03em}
-</style></body>
+</style>
+<style id="maomao-team-discussion-v13">
+#teamDiscussionButton{position:relative;z-index:2;pointer-events:auto;cursor:pointer;min-height:44px}
+.team-discussion-overlay{z-index:10180!important}
+.team-discussion-dialog{max-height:82vh!important}
+.team-discussion-error{padding:14px 0;color:#555;font-size:13px;line-height:1.8}
+</style>
+<script id="maomao-team-discussion-v13-fix">
+(function(){
+ function openDiscussionFallback(){
+  var button=document.getElementById('teamDiscussionButton');
+  if(!button)return;
+  if(document.querySelector('.team-discussion-overlay'))return;
+  if(typeof gameState==='undefined'||!gameState||!gameState.item){if(typeof showToast==='function')showToast('请先打开一宗案件，再听取小队讨论。');return;}
+  var overlay=document.createElement('div');overlay.className='team-discussion-overlay';overlay.style.zIndex='10180';
+  var dialog=document.createElement('section');dialog.className='team-discussion-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+  var head=document.createElement('div');head.className='team-discussion-dialog-head';
+  var labels=document.createElement('div'),small=document.createElement('small'),title=document.createElement('h3'),close=document.createElement('button');
+  small.textContent='TEAM BRIEFING / CASE NOTES';title.textContent='小队讨论';labels.appendChild(small);labels.appendChild(title);
+  close.type='button';close.className='team-discussion-close';close.textContent='×';close.setAttribute('aria-label','关闭讨论');head.appendChild(labels);head.appendChild(close);
+  var note=document.createElement('p');note.className='team-discussion-note';note.textContent='队员将根据已公开的证据与证词讨论；推测会与已证实事实分开。';
+  var body=document.createElement('div');body.className='team-discussion-panel';body.style.display='grid';
+  var refresh=document.createElement('button');refresh.type='button';refresh.className='team-discussion-refresh';refresh.textContent='重新听取讨论';
+  dialog.appendChild(head);dialog.appendChild(note);dialog.appendChild(body);dialog.appendChild(refresh);overlay.appendChild(dialog);document.body.appendChild(overlay);
+  function generate(){body.innerHTML='<p class="team-discussion-loading">正在整理小队意见……</p>';try{
+   var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+   var c=gameState.item,team=typeof detectiveParty==='function'&&typeof detectiveTeam==='function'?detectiveParty(detectiveTeam()):[];
+   if(typeof generateTeamDiscussion==='function'){
+    var original=document.getElementById('teamDiscussionPanel');
+    if(original){original.style.display='none';generateTeamDiscussion(c,team);setTimeout(function(){if(overlay.isConnected&&original.innerHTML){body.innerHTML=original.innerHTML;}},80);setTimeout(function(){if(overlay.isConnected&&original.innerHTML&&!/正在整理/.test(original.textContent)){body.innerHTML=original.innerHTML;}},1200);}
+    else body.innerHTML='<p class="team-discussion-error">讨论引擎暂时不可用，请检查页面是否已完整加载。</p>';
+   }else body.innerHTML='<p class="team-discussion-error">当前页面没有加载小队讨论模块，请刷新部署后的页面再试。</p>';
+  }catch(err){body.innerHTML='<p class="team-discussion-error">小队讨论暂时无法打开，请稍后重试。</p>';}}
+  function done(){overlay.remove();document.removeEventListener('keydown',key);}
+  function key(e){if(e.key==='Escape')done();}
+  close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});refresh.addEventListener('click',generate);document.addEventListener('keydown',key);generate();close.focus();
+ }
+ document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('#teamDiscussionButton'):null;if(!b)return;
+  if(document.querySelector('.team-discussion-overlay'))return;
+  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+  openDiscussionFallback();
+ },true);
+})();
+</script>
+</body>
 </html>
