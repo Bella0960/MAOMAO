@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天详情</title>
-    <script src="../../shared/js/font-loader.js"></script>
+    <script src="../../shared/js/font-loader.js?v=20261022v1"></script>
     <script src="../../shared/js/native-feel.js"></script>
     <script src="../../shared/js/custom-css.js"></script>
     <script src="../../shared/js/chat-beauty.js"></script>
@@ -2806,6 +2806,7 @@
             } catch (e) { return []; }
         }
         function saveWeightMemories(roleId, arr) {
+            arr = trimMemoriesByWeight(arr, 300);   // M1：存储上限 300 条，按权重淘汰尾部
             if (_storage) { _storage.saveMemories(roleId, arr); return; }
             try { localStorage.setItem('chat_memories_' + roleId, JSON.stringify(arr)); } catch (e) {}
         }
@@ -2817,6 +2818,19 @@
             if (isNaN(imp)) imp = 3;
             imp = Math.max(1, Math.min(5, imp)) / 5;
             return imp * base * Math.pow(2, -days / half);
+        }
+        // M1：记忆存储上限 —— 超过 max 条时按权重淘汰最不重要的；fixed（钉住）永不淘汰
+        function trimMemoriesByWeight(arr, max) {
+            arr = (Array.isArray(arr) ? arr : []).filter(Boolean);
+            if (arr.length <= max) return arr;
+            var pinned = arr.filter(function (m) { return m.status === 'fixed'; });
+            var rest = arr.filter(function (m) { return m.status !== 'fixed'; });
+            var budget = Math.max(0, max - pinned.length);
+            rest = rest.map(function (m) { return { m: m, w: memoryWeight(m) }; })
+                .sort(function (a, b) { return b.w - a.w; })
+                .slice(0, budget)
+                .map(function (x) { return x.m; });
+            return pinned.concat(rest);
         }
         // 构造注入文本：fixed 永远钉住注入 / confirmed 按权重分两层 / pending 不注入
         function buildWeightedMemoryText(roleId, fallbackText) {
@@ -3436,6 +3450,13 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
+            // 高级参数（API 设置多方案升级）：maxTokens/topP 仅在明确设置时发送，留空 = 用服务商默认
+            const apiReqExtra = {};
+            const maxTok = Number(config.maxTokens);
+            if (maxTok > 0) apiReqExtra.max_tokens = Math.floor(maxTok);
+            const topPVal = Number(config.topP);
+            if (topPVal > 0 && topPVal < 1) apiReqExtra.top_p = topPVal;
+
             aiSending = true;   // R3：进入请求阶段，到流式结束由 finally 统一解锁（此前无 await，不存在并发窗口）
 
             try {
@@ -3446,12 +3467,12 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     signal: controller.signal,
-                    body: JSON.stringify({
+                    body: JSON.stringify(Object.assign({
                         model: apiModel,
                         messages: apiMessages,
                         temperature: config.temperature != null ? config.temperature : 0.7,
                         stream: true
-                    })
+                    }, apiReqExtra))
                 });
 
                 // HTTP 层错误（401/404/500 等）：读文本提取详情后直接报错，不进入流解析
@@ -4629,6 +4650,11 @@
   var sumSub = document.getElementById('sumSub');
   var btnConfirm = document.getElementById('sumConfirm');
   var btnDismiss = document.getElementById('sumDismiss');
+  // M3：非阻塞提示（showToast 为主脚本的全局函数；异常时兜底 alert）
+  function sumToast(msg) {
+    if (typeof showToast === 'function') showToast(msg, 2600);
+    else alert(msg);
+  }
 
   function getHistoryCount() {
     try {
@@ -4676,7 +4702,7 @@
       var apiKey = (config.apiKey || '').trim();
       var baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
       var apiModel = (config.model || 'gpt-3.5-turbo').trim();
-      if (!apiKey) { alert('请先到设置页配置 API Key'); overlay.style.display = 'none'; return; }
+      if (!apiKey) { sumToast('请先到设置页配置 API Key'); overlay.style.display = 'none'; return; }
 
       var history = [];
       try {
@@ -4690,6 +4716,13 @@
         var who = (m.role === 'sent' || m.role === 'user') ? '用户' : '角色';
         return who + '：' + (m.text || m.content || '');
       }).join('\n');
+      // M3：总结输入字符预算 4000 字，超长从头部截断（保留最近内容），不切代理对
+      var MAX_TRANSCRIPT_CHARS = 4000;
+      if (transcript.length > MAX_TRANSCRIPT_CHARS) {
+        var cut = transcript.length - MAX_TRANSCRIPT_CHARS;
+        if (transcript.charCodeAt(cut) >= 0xD800 && transcript.charCodeAt(cut) <= 0xDBFF) cut += 1;
+        transcript = '…（更早内容已省略）\n' + transcript.slice(cut);
+      }
 
       var controller = new AbortController();
       var timer = setTimeout(function () { controller.abort(); }, 20000);
@@ -4708,7 +4741,7 @@
         })
       });
       clearTimeout(timer);
-      if (!resp.ok) { alert(friendlyHttpError(resp.status, '')); overlay.style.display = 'none'; return; }
+      if (!resp.ok) { sumToast(friendlyHttpError(resp.status, '')); overlay.style.display = 'none'; return; }
       var data = await resp.json();
       var text = data && data.choices && data.choices[0] && data.choices[0].message
         ? (data.choices[0].message.content || '').trim() : '';
@@ -4740,7 +4773,8 @@
           createdAt: now
         });
       });
-      try { localStorage.setItem('chat_memories_' + rid, JSON.stringify(existing)); } catch (e) {}
+      // M1：统一走 saveWeightMemories（双写 phone_data_v2 + 按权重裁剪到 300 条，fixed 不淘汰）
+      try { saveWeightMemories(rid, existing); } catch (e) {}
       try { localStorage.setItem('chat_last_summary_' + rid, String(now)); } catch (e) {}
       overlay.style.display = 'none';
       var msg = '已总结：' + autoConfirmed + ' 条自动确认';
@@ -4748,7 +4782,7 @@
       btnConfirm.textContent = msg;
       setTimeout(function () { overlay.style.display = 'none'; }, 1200);
     } catch (err) {
-      alert('总结失败：' + (err.name === 'AbortError' ? '请求超时' : '网络错误'));
+      sumToast('总结失败：' + (err.name === 'AbortError' ? '请求超时' : '网络错误'));
       overlay.style.display = 'none';
     } finally {
       btnConfirm.disabled = false;

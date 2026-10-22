@@ -77,7 +77,8 @@ apps/settings/          # ⚠️ 孤儿目录：无任何引用的旧样式副�
 | `phone_worldbooks` | 世界书（lorebook）条目 |
 | `user_masks` / `active_mask_id` | 玩家身份面具（mask.js MaskSystem） |
 | `myProfile` | 玩家资料 |
-| `api_settings` / `api_call_logs` | AI 接口配置 / 调用日志（tools/api-logs.html 查看） |
+| `api_settings` / `api_call_logs` | AI 接口配置（激活方案的镜像，全站读取方零改动）/ 调用日志（tools/api-logs.html 查看） |
+| `api_profiles_v1` / `api_active_profile` | API 多方案库 + 激活指针（settings.js 管理；首次加载自动从旧 api_settings 迁移） |
 | `moments` / `moments_notifications` | 朋友圈动态 `{items:[{content,image,timestamp}]}` / 通知 |
 | `forum_posts` / `forum_config` / `forum_follows` / `forum_notifications` | 论坛数据 |
 | `finance_records` / `shop_products|shop_cart|shop_orders` / `workData` | 钱包记账 / 商店 / 打工 |
@@ -113,6 +114,14 @@ AI 接口配置存 `api_settings`（默认 `https://api.openai.com/v1`，内置 
 - **流式渲染 rAF 节流**：delta 只累计文本，正则清洗 + DOM 写入合并到每帧一次；流结束后补处理残留 SSE buffer，防丢尾字。
 - **发送防重入**：`aiSending` 锁（sendMsg / regenerateReply 双入口检查，`finally` 统一解锁）；HTTP 错误经 `friendlyHttpError` 映射为中文提示（原始细节进 api-logs）。
 
+### 长期记忆系统（chat-detail 总结 IIFE + 权重记忆）
+
+- **触发**：开聊天页 1.5s 后检查一次（聊天中不触发）；条件 = 自动开关开 且 历史条数 ≥ 角色级间隔（`chat_summary_interval_<id>`，默认 20）且距上次总结 ≥8h；弹面板**人工确认**后才调 API（20s 超时，独立于主聊天链路，失败不阻塞聊天，提示走非阻塞 toast）。
+- **注入防膨胀**：权重 = importance × 类别基准 × 2^(−天数/半衰期)（key/纪念日 365 天、plot 21 天、detail/preference 60 天），≤0.12 不注入、pending 不注入、fixed 钉住；再过 `CTX_CAP.memory` 3000 字符。`[记住:xxx]` 用户记忆存 200 条 / 注入 30 条 / 2000 字符。
+- **M1 已修**：`chat_memories_<id>` 存储上限 **300 条**（`trimMemoriesByWeight` 按权重淘汰尾部，fixed 永不淘汰）；`saveWeightMemories` 是唯一写入口（doSummarize 已改走它，顺带补上 phone_data_v2 双写）。
+- **M3 已修**：总结 transcript 上限 **4000 字符**（超长从头部截断保留最近，不切代理对）。
+- **M2 暂缓（已知风险）**：`chat_history_<id>` 无上限（含 base64 贴纸/图片消息），是 localStorage 5MB 配额的长期最大威胁；注入端只取 10-50 条不受影响，存储侧靠设置页 DATA 分组的全量备份兜底。
+
 ## 项目字典
 
 ### 业务术语
@@ -147,4 +156,5 @@ AI 接口配置存 `api_settings`（默认 `https://api.openai.com/v1`，内置 
 - 共享脚本加载顺序惯例：`font-loader.js` → `native-feel.js` →（数据页）`phone/phone_storage.js` + `phone/phone_api.js` → 页面脚本。
 - JS 里的相对路径按**页面 URL**（而非脚本位置）解析；跨目录跳转统一用相对路径（如 characters-manager.js 的 `../../index.html`），nav.js 用动态 appBase 兼容子路径部署。PHONE_APPS 注册表的 `page` 字段是根绝对路径，但目前无任何消费方（纯元数据）。
 - 改完 HTML/CSS/JS 若走静态托管缓存，记得 bump 页面引用的 `?v=` 参数。
+- 全量备份/恢复在设置页 DATA 分组（settings/js/backup.js）：JSON 带 `__backup.schema` 版本校验（当前 1，拒收更高版本），排除 `api_call_logs`；导入前自动下载当前数据作安全备份，写入失败自动回滚。
 - 无 README、无测试、lint 为空操作；`.trae/` 是 IDE 配置（git-ignored）。`docs/audit-report.html` 是历史审计报告，其中的旧路径已因目录重构失效，仅作参考。
