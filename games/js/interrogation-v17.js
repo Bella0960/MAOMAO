@@ -43,18 +43,29 @@ function open(i){
  }
  function render(){
   choices.innerHTML='';
-  var qs=caseIdx()===0&&i===1?[
-   {id:'time',label:'追问准确时间',question:'你为什么记得是晚上十点四十七分？',reply:'因为终端当时弹过一条提示。我记得时间，但我没有看清刷卡人的脸。',keyword:'异常提示',memory:'已解释时间记忆的来源',detail:'时间来自值班终端弹出的提示；提示原文仍需日志核实。'},
-   {id:'alert',label:'追问异常提示',question:'当时的提示具体是什么？',reply:'我只记得提示出现了一瞬间，像是权限验证异常。具体内容要查终端日志，我不想凭印象乱说。',keyword:'权限验证异常',memory:'已说明提示内容不完整',detail:'提示可能涉及权限验证，需由终端日志核实。'},
-   {id:'holder',label:'追问临时权限',question:'什么人可以使用临时通行权限？',reply:'通常需要有人申请或授权。具体谁能批准，我不负责。这类记录应该能在门禁后台查到。',keyword:'临时通行权限',memory:'已询问权限范围',detail:'临时权限需要申请或授权，申请人和批准人未知。'},
-   {id:'leave',label:'追问沈闻行踪',question:'沈闻离开之前，你看见他去过门禁吗？',reply:'我不敢说他刷过卡。我当时在处理值班终端的提示，视线没有一直留在门口。',keyword:'视线存在盲区',memory:'已询问沈闻行踪',detail:'值班员的视线未持续覆盖门口，不能据此确认沈闻行动。'}
-  ]:[
+  var qs;
+  if(caseIdx()===0&&i===0)qs=[
+   {id:'data',label:'追问原始潮位数据',question:'沈闻为什么让你核对原始潮位序列？',reply:'他发现内部预警时间比正式通报早了二十二分钟。我只负责技术比对，没有批准修改报告。但我承认，之前看到时间差时，我没有及时上报。',keyword:'二十二分钟时间差',memory:'已说明技术复核范围',detail:'唐越承认发现过时间差，但声称自己只负责技术比对；需核对邮件和文件发送记录。'},
+   {id:'meeting',label:'核对视频会议',question:'你说自己之后参加跨站视频会，有记录能证明吗？',reply:'应该有会议邀请和接入日志。我不能要求你只凭我的话相信我，去查会议记录会更公平。',keyword:'跨站视频会',memory:'已提出可核实的行程',detail:'唐越提到跨站视频会，尚未查看会议邀请或接入日志。'},
+   {id:'signature',label:'追问旧报告签字',question:'你在旧报告上签过技术复核，为什么没有上报时间差？',reply:'当时我以为正式发布时间已经由负责人确认。我签的是技术复核，不是批准发布时间。但我确实应该追问那二十二分钟的差异。',keyword:'技术复核签字',memory:'已承认曾注意到异常',detail:'唐越承认注意到过时间差但未及时报告；签字职责仍需查看原始报告。'}
+  ];
+  else if(caseIdx()===0&&i===1)qs=[
+   {id:'time',label:'追问离站时间',question:'你说自己20:40已经离开，为什么21:16还有登记在你名下的HY-02门卡开启资料室？',reply:'门卡登记在我名下，不代表一定是我本人刷的。记录需要核对，但我仍然坚持自己20:40就离开了。',keyword:'离站时间矛盾',memory:'已被问及21:16门禁记录',detail:'贺知远声称门卡可能被他人使用，但尚未提供佐证；其离站说法与门禁记录存在明确冲突。'},
+   {id:'server',label:'追问管理员账号',question:'服务器审计显示，关键时段有人使用你的专属管理员账号打开原始数据，你怎么解释？',reply:'管理员账号的确分配给我，但我没有操作那份文件。你应该检查登录来源和本地控制台记录，不能只看账号名称就下结论。',keyword:'管理员账号操作',memory:'已回应服务器审计问题',detail:'贺知远否认操作文件，要求核对登录来源；服务器审计与其他记录需要交叉验证。'},
+   {id:'motive',label:'追问旧预警记录',question:'沈闻准备提交未经改写的预警数据，你为什么反对他提前提交？',reply:'那份数据当时还没有完成复核。我担心未经确认就对外发送会引发误解。至于旧报告为什么相差二十二分钟，我认为应该走正式审计程序。',keyword:'阻止外发的理由',memory:'已询问旧报告与外发材料',detail:'贺知远以数据未完成复核解释反对外发；这是否为真实理由，需要结合取消发送记录和旧报告核实。'}
+  ];
+  else if(caseIdx()===0&&i===2)qs=[
+   {id:'argument',label:'追问争执声',question:'你说21:10左右听见资料室有争执，当时听见了什么？',reply:'我没听清完整对话，只听到声音明显比平常大。现在回想，那段时间很可能很重要，但我不想把猜测写成原话。',keyword:'21:10争执声',memory:'已补充争执时间范围',detail:'罗骁报告约21:10听见争执，但无法复述具体内容；需要与门禁和现场时间线对照。'},
+   {id:'stairs',label:'追问东侧楼梯目击',question:'你为什么没有把看见贺知远从档案区出来写进巡查记录？',reply:'我当时怕自己惹上麻烦。他让我不要登记，我就把这件事漏掉了。这是我的失职，但我现在愿意说明自己实际看见的部分。',keyword:'巡查记录遗漏',memory:'已说明未登记的原因',detail:'罗骁承认遗漏了关键目击，解释为担心承担责任；其说法仍需与门禁时间相互印证。'},
+   {id:'exacttime',label:'核对巡查时间',question:'你能把听见争执、看见贺知远离开的先后顺序说清楚吗？',reply:'先听见资料室方向有争执，之后才在东侧楼梯附近看见他。我不能保证精确到分钟，最好查值班巡查表来校准。',keyword:'争执与离开顺序',memory:'已梳理目击先后顺序',detail:'罗骁给出事件先后顺序，但精确时间仍待巡查表核对。'}
+  ];
+  else qs=[
    {id:'detail',label:'追问具体细节',question:'请把你刚才的说法说得更具体一些。',reply:(original&&original.text||'我只能说明自己亲历的部分。')+' 具体时间和细节还需要其他记录佐证。',keyword:'补充证词',memory:'已要求补充具体细节',detail:'人物被要求补充亲历细节，仍需独立核实。'},
    {id:'time',label:'核对时间线',question:'你能确定当时的时间吗？',reply:Object.keys(gameState.revealed||{}).length?'我只能按记忆估计。现在有现场记录可以对照，我愿意再核对一次。':'我不敢给出精确时间，最好先查看现场记录，避免把记忆当成事实。',keyword:'时间待核实',memory:'已询问时间依据',detail:'人物对时间的记忆需要与现场记录核对。'},
    {id:'relation',label:'追问与沈闻的关系',question:'你和沈闻之前是否谈过这份档案？',reply:(original&&original.text||'我们有工作上的接触。')+' 我只会补充自己确实知道的部分，不猜测别人的想法。',keyword:'人物关系',memory:'已询问双方关系',detail:'记录人物与沈闻的工作接触，不将推测当作事实。'}
   ];
   qs.forEach(function(q){var b=node('button','iv17-choice',q.label+(mem.asked[q.id]?' · 已问过':''));b.type='button';b.onclick=function(){ask(q);};choices.appendChild(b);});
-  var cross=node('button','iv17-choice','用已发现的证据对质');cross.type='button';cross.onclick=function(){var available=c.evidence.map(function(ev,n){return gameState.revealed&&gameState.revealed[n]?{ev:ev,n:n}:null;}).filter(Boolean);if(!available.length){alert('请先返回现场调查，查看至少一条证据。');return;}var choice=window.prompt('输入要对质的证据编号：\n'+available.map(function(v){return (v.n+1)+' · '+v.ev.title;}).join('\n'));var n=Number(choice)-1,v=available.find(function(a){return a.n===n;});if(!v){alert('没有选择有效的已发现证据。');return;}var reply='我看到了这条记录：《'+v.ev.title+'》。它需要和其他记录一起核对；单凭这一项，还不能直接认定谁在说谎。';if(caseIdx()===0&&i===1&&n===0)reply='这张门禁记录确实需要解释。我说没看清刷卡人的脸，并不等于我没看见门禁提示。记录能证明这张卡在那个时间开启了门，但还需要核对实际使用人。';mem.turns.push({q:'请解释证据：《'+v.ev.title+'》',a:reply,id:'cross'+n,at:new Date().toISOString()});mem.memory.push('已被出示证据：'+v.ev.title);line('调查员','请解释证据：《'+v.ev.title+'》',true);line(p.name,reply,false);addRecord('证据对质：'+p.name+' · '+v.ev.title,reply,'人物问询 · 已出示现场证据','iv17-cross|'+c.title+'|'+i+'|'+n+'|'+mem.turns.length);if(!st.interviewKeywords.some(function(k){return k.caseTitle===c.title&&k.personIndex===i&&k.word==='证据对质：'+v.ev.title;}))st.interviewKeywords.push({caseTitle:c.title,personIndex:i,person:p.name,word:'证据对质：'+v.ev.title,status:'待交叉核实',detail:reply,at:new Date().toISOString()});save();drawKeywords();meta.textContent='已问 '+mem.turns.length+' 次 · 记忆 '+mem.memory.length+' 条';};
+  var cross=node('button','iv17-choice','用已发现的证据对质');cross.type='button';cross.onclick=function(){var available=c.evidence.map(function(ev,n){return gameState.revealed&&gameState.revealed[n]?{ev:ev,n:n}:null;}).filter(Boolean);if(!available.length){alert('请先返回现场调查，查看至少一条证据。');return;}var choice=window.prompt('输入要对质的证据编号：\n'+available.map(function(v){return (v.n+1)+' · '+v.ev.title;}).join('\n'));var n=Number(choice)-1,v=available.find(function(a){return a.n===n;});if(!v){alert('没有选择有效的已发现证据。');return;}var reply='我看到了这条记录：《'+v.ev.title+'》。它需要和其他记录一起核对；单凭这一项，还不能直接认定谁在说谎。';if(caseIdx()===0&&i===1&&n===0)reply='这张门禁记录需要解释。我仍然声称20:40已经离开，但HY-02登记在我名下。你还需要核对实际刷卡人以及其他独立记录，才能判断我是否在说谎。';mem.turns.push({q:'请解释证据：《'+v.ev.title+'》',a:reply,id:'cross'+n,at:new Date().toISOString()});mem.memory.push('已被出示证据：'+v.ev.title);line('调查员','请解释证据：《'+v.ev.title+'》',true);line(p.name,reply,false);addRecord('证据对质：'+p.name+' · '+v.ev.title,reply,'人物问询 · 已出示现场证据','iv17-cross|'+c.title+'|'+i+'|'+n+'|'+mem.turns.length);if(!st.interviewKeywords.some(function(k){return k.caseTitle===c.title&&k.personIndex===i&&k.word==='证据对质：'+v.ev.title;}))st.interviewKeywords.push({caseTitle:c.title,personIndex:i,person:p.name,word:'证据对质：'+v.ev.title,status:'待交叉核实',detail:reply,at:new Date().toISOString()});save();drawKeywords();meta.textContent='已问 '+mem.turns.length+' 次 · 记忆 '+mem.memory.length+' 条';};
   choices.appendChild(cross);
  }
  body.append(meta,chat,label,choices,kwlabel,keywords,node('div','iv17-note','每次追问都会保存到本案记录簿。人物记忆与关键词按案件和人物分别保存；未经证据核实的信息会标记为“待核实”。'));
