@@ -365,8 +365,10 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
 .meta-item:first-child{padding-left:0;border-left:0}
 .meta-number{font-size:19px!important}
 .meta-label{font-size:9px!important}
-.game-tabs{display:none!important}
+.game-tabs{display:flex!important}
 .gtab-panel,.gtab-panel.active{display:block!important}
+#lobbyView .gtab-panel[data-gtab-panel="partner"]{display:block!important;visibility:visible!important;opacity:1!important}
+#lobbyView .gtab-panel[data-gtab-panel="partner"] .role-area{display:block!important}
 .gtab-panel .spotlight{margin:0 0 16px!important}
 .spotlight{padding:13px 14px 12px!important;background:#f7f7f6!important;color:#171717!important;border:0!important;border-top:1px solid #171717!important;border-bottom:1px solid #dedede!important;cursor:pointer}
 .spotlight-top{font-size:8px!important;color:#8c8c8c!important;letter-spacing:.14em!important}
@@ -700,7 +702,14 @@ function showGame(id){
 }
 function returnLobby(){
   reactionSequence++;
-  activeGame='';byId('gameView').style.display='none';byId('lobbyView').style.display='block';renderRoles();window.scrollTo({top:0,behavior:'smooth'});
+  activeGame='';
+  document.body.classList.remove('detective-case-mode','case-modal-open');
+  document.body.removeAttribute('data-case-theme');
+  var modal=byId('caseInterrogationModal');if(modal)modal.remove();
+  byId('gameView').style.display='none';
+  byId('lobbyView').style.display='block';
+  renderRoles();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function restartGame(){roundNumber++;reactionSequence++;if(activeGame==='word')startWord();else if(activeGame==='detective')startCase();else if(activeGame==='tic')startTic();else if(activeGame==='memory')startMemory();else if(activeGame==='code')startCode();else if(activeGame==='quiz')startQuiz();}
 function setRoundLabel(){byId('roundLabel').textContent='ROUND '+pad(roundNumber);}
@@ -1264,6 +1273,15 @@ byId('backLobby').addEventListener('click',returnLobby);
 byId('toLobbyFromGame').addEventListener('click',returnLobby);
 byId('restartGame').addEventListener('click',restartGame);
 document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(e){if(b.classList.contains('spotlight')&&e.target.closest('button'))return;showGame(b.getAttribute('data-game'));});b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showGame(b.getAttribute('data-game'));}});});
+/* 推荐入口显式绑定，确保移动端点击 CTA 也能启动侦探游戏 */
+var detectiveSpotlight=document.querySelector('.spotlight[data-game="detective"]');
+if(detectiveSpotlight){
+  detectiveSpotlight.style.cursor='pointer';
+  detectiveSpotlight.setAttribute('role','button');
+  detectiveSpotlight.setAttribute('tabindex','0');
+  var detectiveCta=detectiveSpotlight.querySelector('.spotlight-cta');
+  if(detectiveCta){detectiveCta.style.pointerEvents='auto';detectiveCta.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();showGame('detective');});}
+}
 
 /* 大厅 Tab 互斥切换：仅当前面板显示，其余彻底隐藏 */
 var lobbyTab='featured';
