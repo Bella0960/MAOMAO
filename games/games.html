@@ -1289,6 +1289,12 @@ function setLobbyTab(t){
   lobbyTab=t;
   document.querySelectorAll('[data-gtab]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-gtab')===t);});
   document.querySelectorAll('.gtab-panel').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-gtab-panel')===t);});
+  /* 大厅采用连续杂志式长页：栏目按钮定位到对应区域，而不是只改变下划线 */
+  var target=document.querySelector('#lobbyView [data-gtab-panel="'+t+'"]');
+  if(target){
+    var top=target.getBoundingClientRect().top+(window.pageYOffset||document.documentElement.scrollTop)-12;
+    window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  }
 }
 document.querySelectorAll('[data-gtab]').forEach(function(b){b.addEventListener('click',function(){setLobbyTab(b.getAttribute('data-gtab'));});});
 
