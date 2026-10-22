@@ -1841,9 +1841,9 @@ function showCaseClosedCelebration(caseTitle,onDismiss){
  art.appendChild(en);art.appendChild(cn);art.appendChild(name);art.appendChild(year);stage.appendChild(art);
  var dismiss=document.createElement('button');dismiss.className='closed-dismiss';dismiss.type='button';dismiss.textContent='查看案件档案 →';
  overlay.appendChild(stage);overlay.appendChild(dismiss);document.body.appendChild(overlay);
- function close(){overlay.remove();document.removeEventListener('keydown',onKey);if(typeof onDismiss==='function')onDismiss();}
- function onKey(e){if(e.key==='Escape'||e.key==='Enter'){close();}}
- dismiss.addEventListener('click',close);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',onKey);dismiss.focus();
+ function close(showArchive){overlay.remove();document.removeEventListener('keydown',onKey);if(showArchive&&typeof onDismiss==='function')onDismiss();}
+ function onKey(e){if(e.key==='Escape')close(false);}
+ dismiss.addEventListener('click',function(){close(true);});overlay.addEventListener('click',function(e){if(e.target===overlay)close(false);});document.addEventListener('keydown',onKey);dismiss.focus();
 }
 (function(){
  function refreshArchiveStatuses(){
