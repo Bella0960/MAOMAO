@@ -180,6 +180,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .quiz-result-caption{font-size:11px;color:#777;margin:9px 0 14px}
 @media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.games-list{gap:8px}.game-row{padding:12px 11px 0}.game-name{font-size:17px}.game-desc{font-size:9px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
 
+
+/* Free-form investigation, generated NPCs and persistent campaign clues */
+.npc-note{font-size:10px;color:#777;line-height:1.7;margin:8px 0 0}
+.investigation-console{border:1px solid #deded9;padding:14px;margin:16px 0;background:#fafaf8}
+.investigation-log{display:grid;gap:10px;margin:12px 0}
+.investigation-entry{border-left:2px solid #b8b8b1;padding:7px 10px;background:#fff}
+.investigation-entry strong{font-size:11px}
+.investigation-entry p{font-size:11px;line-height:1.8;color:#555;margin:5px 0 0;white-space:pre-wrap}
+.investigation-entry small{font-size:9px;color:#999}
+.investigation-actions{display:grid;grid-template-columns:1fr auto;gap:7px}
+.investigation-actions input{min-width:0;height:42px;border:1px solid #ddd;background:#fff;padding:0 10px;font-size:12px}
+
 </style>
 
 <style id="maomao-editorial-controls">
@@ -658,6 +670,20 @@ var detectiveGeneratedCasesLoaded=false;
 function loadGeneratedDetectiveCases(){if(detectiveGeneratedCasesLoaded)return;detectiveGeneratedCasesLoaded=true;try{var saved=JSON.parse(localStorage.getItem('maomao_detective_generated_cases_v1')||'[]');if(Array.isArray(saved))saved.forEach(function(c){if(c&&c.title&&Array.isArray(c.evidence)&&Array.isArray(c.suspects)&&!CASES.some(function(x){return x.title===c.title;}))CASES.push(c);});}catch(e){}}
 function detectiveTeamRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_team_v1')||'[]');}catch(e){return [];}}
 function detectiveTeam(){var saved=detectiveTeamRoot().map(String),team=roleList.filter(function(r){return saved.indexOf(String(r.id))>=0;});if(!team.length)team=[activeRole||roleList[0]||defaultRole];return team;}
+var DETECTIVE_NPCS=[
+ {id:'npc_archive',name:'沈砚',job:'档案顾问',personality:'谨慎、重视细节，不轻信口供',bio:'擅长查阅旧档案、核对日期和文书记录。'},
+ {id:'npc_field',name:'林见秋',job:'现场调查员',personality:'敏锐、行动派，容易注意到环境细节',bio:'擅长观察现场痕迹、空间关系与人物反应。'},
+ {id:'npc_mediator',name:'周予安',job:'访谈顾问',personality:'温和、善于倾听，对话中能察觉回避',bio:'擅长梳理人物关系、矛盾说法和情绪变化。'}
+];
+function detectiveParty(customTeam){
+ var team=(customTeam||detectiveTeam()).slice(),npcs=[];
+ for(var i=0;team.length+npcs.length<3;i++)npcs.push(DETECTIVE_NPCS[i%DETECTIVE_NPCS.length]);
+ return team.concat(npcs);
+}
+function detectivePersona(r){
+ if(r&&String(r.id).indexOf('npc_')===0)return r.name+'，身份：'+r.job+'；性格：'+r.personality+'；擅长：'+r.bio;
+ return roleName(r)+'；性格：'+String(r.personality||r.description||r.bio||'待从角色资料中理解').slice(0,160)+'；说话方式：'+String(r.speechStyle||r.speech||'遵循原角色说话习惯').slice(0,100);
+}
 function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=String(id);if(ids.indexOf(key)>=0)ids=ids.filter(function(x){return x!==key;});else ids.push(key);if(!ids.length)ids=[String(activeRole&&activeRole.id||roleList[0].id)];localStorage.setItem('maomao_detective_team_v1',JSON.stringify(ids));startCase();}
 function startCase(){
  loadGeneratedDetectiveCases();setRoundLabel();var progress=caseProgress(),team=detectiveTeam();
@@ -685,22 +711,58 @@ function openCase(index){
  var progress=caseProgress();if(index>0&&progress.completed.indexOf(index-1)<0){showToast('先完成上一宗案件。');return;}
  var c=CASES[index];if(!c)return;
  gameState={caseIndex:index,item:c,revealed:{},interviewed:{},ended:false,phase:'evidence'};
- var investigators=detectiveTeam(),interviews=CASE_INTERVIEWS[index]||c.suspects.map(function(x){return {title:x.name+' · '+x.job,text:'我只知道自己负责的部分，其他情况需要更多证据才能判断。'};});
- byId('gameContent').innerHTML='<div class="case-nav-line"><button class="back-text" id="caseArchiveBack">← 案件档案</button><span class="game-code">CASE / '+String(index+1).padStart(2,'0')+'</span></div><div class="board-panel"><div class="panel-kicker">INVESTIGATION / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div><div class="case-team-presence"><span class="panel-kicker">YOUR INVESTIGATION TEAM</span><div class="case-team-avatars">'+investigators.map(function(r){return '<span class="case-team-member">'+avatarMarkup(r,'')+'<small>'+esc(roleName(r))+'</small></span>';}).join('')+'</div><p>小队成员会结合各自人设参与讨论。结论仍必须由证据支持。</p><button type="button" class="secondary-btn" id="teamDiscussionButton">听取小队讨论</button><div id="teamDiscussionPanel" class="team-discussion-panel" aria-live="polite"></div></div><div class="case-phase-track"><span class="active" data-phase-mark="evidence">01 现场取证</span><span data-phase-mark="interview">02 询问证词</span><span data-phase-mark="accuse">03 最终指认</span></div><div class="case-progress-strip"><span id="caseStepText">现场线索</span><strong id="caseStepCount">0 / '+c.evidence.length+' 已查看</strong></div><div class="divider-label">现场证据 · 点击展开</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">点击查看这条证据。</span></span><span class="evidence-mark">+</span></button>';}).join('')+'</div><div class="divider-label">人物证词 · 逐一询问</div><div class="interview-list" id="interviewList">'+c.suspects.map(function(x,i){return '<button class="interview-item" data-interview="'+i+'"><span class="interview-number">0'+(i+1)+'</span><span><strong>'+esc(x.name)+'</strong><small>'+esc(x.job)+'</small><span class="interview-text" id="interviewText'+i+'">尚未询问</span></span><span class="interview-mark">+</span></button>';}).join('')+'</div><div class="divider-label">最终指认 · 调查材料齐全后开放</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(x,i){return '<button class="suspect" data-suspect="'+i+'" disabled><div class="suspect-name">'+esc(x.name)+'</div><div class="suspect-role">'+esc(x.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看所有现场证据，并询问三位相关人物。</div><div class="btn-row"><button class="secondary-btn" id="caseTimeline">整理时间线</button><button class="secondary-btn" id="newCase">返回档案室</button></div><div id="timelinePanel"></div></div>';
+ var investigators=detectiveParty(detectiveTeam()),interviews=CASE_INTERVIEWS[index]||c.suspects.map(function(x){return {title:x.name+' · '+x.job,text:'我只知道自己负责的部分，其他情况需要更多证据才能判断。'};});
+ byId('gameContent').innerHTML='<div class="case-nav-line"><button class="back-text" id="caseArchiveBack">← 案件档案</button><span class="game-code">CASE / '+String(index+1).padStart(2,'0')+'</span></div><div class="board-panel"><div class="panel-kicker">INVESTIGATION / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div><div class="case-team-presence"><span class="panel-kicker">YOUR INVESTIGATION TEAM</span><div class="case-team-avatars">'+investigators.map(function(r){return '<span class="case-team-member">'+avatarMarkup(r,'')+'<small>'+esc(roleName(r))+'</small></span>';}).join('')+'</div><p>小队成员会结合各自人设参与讨论。结论仍必须由证据支持。</p><button type="button" class="secondary-btn" id="teamDiscussionButton">听取小队讨论</button><div id="teamDiscussionPanel" class="team-discussion-panel" aria-live="polite"></div></div><div class="investigation-console"><div class="panel-kicker">OPEN INVESTIGATION / 自由调查</div><div class="prompt-copy">不必只按下面的按钮行动。你可以写下想追问的细节、想对质的人、想重新检查的物件，调查队会根据当前案情回应。NPC 会自动补齐小队空位。</div><div id="investigationLog" class="investigation-log"><div class="investigation-entry"><strong>调查记录</strong><p>现场已经封存。你想先从哪里查起？</p><small>第 01 条记录</small></div></div><div class="investigation-actions"><input id="investigationInput" maxlength="500" placeholder="例如：我想核对所有人的时间说法……"><button class="primary-btn" id="investigationSubmit">调查</button></div><p class="npc-note">自由调查需要配置角色 API 才能动态生成新回应；无 API 时会提供基础调查反馈。关键证据仍会保存在本案记录中。</p></div><div class="case-phase-track"><span class="active" data-phase-mark="evidence">01 现场取证</span><span data-phase-mark="interview">02 询问证词</span><span data-phase-mark="accuse">03 最终指认</span></div><div class="case-progress-strip"><span id="caseStepText">现场线索</span><strong id="caseStepCount">0 / '+c.evidence.length+' 已查看</strong></div><div class="divider-label">现场证据 · 点击展开</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">点击查看这条证据。</span></span><span class="evidence-mark">+</span></button>';}).join('')+'</div><div class="divider-label">人物证词 · 逐一询问</div><div class="interview-list" id="interviewList">'+c.suspects.map(function(x,i){return '<button class="interview-item" data-interview="'+i+'"><span class="interview-number">0'+(i+1)+'</span><span><strong>'+esc(x.name)+'</strong><small>'+esc(x.job)+'</small><span class="interview-text" id="interviewText'+i+'">尚未询问</span></span><span class="interview-mark">+</span></button>';}).join('')+'</div><div class="divider-label">最终指认 · 调查材料齐全后开放</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(x,i){return '<button class="suspect" data-suspect="'+i+'" disabled><div class="suspect-name">'+esc(x.name)+'</div><div class="suspect-role">'+esc(x.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看所有现场证据，并询问三位相关人物。</div><div class="btn-row"><button class="secondary-btn" id="caseTimeline">整理时间线</button><button class="secondary-btn" id="newCase">返回档案室</button></div><div id="timelinePanel"></div></div>';
  byId('caseArchiveBack').addEventListener('click',startCase);byId('newCase').addEventListener('click',startCase);
  byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;gameState.revealed[i]=true;byId('evidenceDetail'+i).textContent=c.evidence[i].detail;btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='✓';updateCaseProgress();});});
  byId('interviewList').querySelectorAll('[data-interview]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-interview'));if(gameState.ended)return;gameState.interviewed[i]=true;byId('interviewText'+i).textContent=interviews[i].text;btn.classList.add('revealed');btn.querySelector('.interview-mark').textContent='✓';updateCaseProgress();});});
  byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(btn){btn.addEventListener('click',function(){chooseSuspect(Number(btn.getAttribute('data-suspect')));});});
  byId('caseTimeline').addEventListener('click',function(){var lines=c.evidence.map(function(ev,i){return '<div class="timeline-row"><span>证据 0'+(i+1)+'</span><strong>'+esc(ev.title)+'</strong><p>'+esc(gameState.revealed[i]?ev.detail:'尚未查看，时间线信息不完整。')+'</p></div>';}).join('');byId('timelinePanel').innerHTML='<div class="case-timeline"><div class="panel-kicker">EVIDENCE TIMELINE / WORKING NOTES</div>'+lines+'</div>';});
  byId('teamDiscussionButton').addEventListener('click',function(){generateTeamDiscussion(c,investigators);});
+ byId('investigationSubmit').addEventListener('click',submitFreeformInvestigation);
+ byId('investigationInput').addEventListener('keydown',function(e){if(e.key==='Enter')submitFreeformInvestigation();});
  roleLine('侦探小队调查案件“'+c.title+'”。案情：'+c.intro+'。队员：'+investigators.map(function(r){return roleName(r)+'，性格：'+String(r.personality||r.description||'').slice(0,80);}).join('；')+'。请以队员不同个性给出一句讨论。','先不急着判断。我们把现场和每个人的说法都收进档案，再交叉核对。');
+}
+function submitFreeformInvestigation(){
+ var input=byId('investigationInput'),log=byId('investigationLog');
+ if(!input||!log||gameState.ended)return;
+ var question=input.value.trim();if(!question){showToast('先写下你想调查的方向。');return;}
+ input.value='';var c=gameState.item,team=detectiveParty(detectiveTeam());
+ gameState.freeActions=gameState.freeActions||[];
+ gameState.freeActions.push({question:question,at:new Date().toISOString()});
+ var entry=document.createElement('div');entry.className='investigation-entry';
+ entry.innerHTML='<strong>你提出的调查方向</strong><p></p><small>自由调查 · '+String(gameState.freeActions.length).padStart(2,'0')+'</small>';
+ entry.querySelector('p').textContent=question;log.appendChild(entry);
+ var answer=document.createElement('div');answer.className='investigation-entry';answer.innerHTML='<strong>调查队回应</strong><p>正在分析案情与现有证据……</p>';log.appendChild(answer);
+ var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+ var apiReady=cfg&&String(cfg.apiKey||'').trim()&&window.PhoneAPI&&typeof window.PhoneAPI.complete==='function';
+ var evidence=c.evidence.map(function(e,i){return (gameState.revealed[i]?'[已查看] ':'[未查看] ')+e.title+': '+(gameState.revealed[i]?e.detail:'内容尚未公开');}).join('\n');
+ var interviews=c.suspects.map(function(p,i){return p.name+'（'+p.job+'）：'+(gameState.interviewed[i]?(CASE_INTERVIEWS[gameState.caseIndex]||[])[i]&&((CASE_INTERVIEWS[gameState.caseIndex]||[])[i].text)||'已询问，证词已记录':'尚未询问');}).join('\n');
+ function showAnswer(text,who){
+  answer.querySelector('p').textContent=text;
+  if(who)answer.querySelector('strong').textContent=who;
+  var progress=caseProgress();progress.notes[c.title]=progress.notes[c.title]||{result:'investigating',actions:[]};
+  if(!progress.notes[c.title].actions)progress.notes[c.title].actions=[];
+  progress.notes[c.title].actions.push({question:question,answer:text,at:new Date().toISOString()});
+  saveCaseProgress(progress);
+ }
+ if(!apiReady){
+  var opened=Object.keys(gameState.revealed).map(Number),hint=opened.length?c.evidence[opened[opened.length-1]].detail:'目前公开证据还不够，先选择一条现场证据展开。';
+  showAnswer('档案顾问沈砚：先把问题拆成可核对的事实。现场调查员林见秋：目前能确认的线索是「'+hint+'」。访谈顾问周予安：可以继续询问人物，找出说法之间的矛盾。此为基础反馈；配置 API 后才能对你的自由提问生成动态回应。','自动 NPC · 调查建议');return;
+ }
+ var system='你是开放式推理游戏的调查引擎。基于给定案情、已经公开的证据和角色人设，回应玩家的自由调查行动。必须保持案件既定真相和时间线一致；不得凭空宣布新事实为已证实，不得直接泄露未查看证据的细节；可以建议下一步调查、提出追问、安排NPC回应或指出矛盾。让最多三位不同队员各说一小段，性格和表达不同。若玩家行动合理，可产生新的可调查方向；明确区分“事实”“推测”“下一步”。输出简体中文纯文本，不要JSON，不超过500字。';
+ var user='案件：'+c.title+'\n案情：'+c.intro+'\n既有证据：\n'+evidence+'\n人物证词：\n'+interviews+'\n调查队：\n'+team.map(detectivePersona).join('\n')+'\n玩家现在想做的事：'+question+'\n请根据当前信息给出实际回应，不要重复固定台词。';
+ byId('investigationSubmit').disabled=true;
+ window.PhoneAPI.complete({system:system,user:user,temperature:0.75,timeoutMs:40000}).then(function(raw){
+  var text=String(raw||'').trim();if(!text)throw new Error('empty response');showAnswer(text,'调查队 · 动态回应');
+ }).catch(function(){showAnswer('这次没有连上剧情引擎，调查记录已保留。你可以换个问法重试，也可以先查看证据或询问人物。','调查引擎暂时不可用');}).finally(function(){var b=byId('investigationSubmit');if(b)b.disabled=false;});
 }
 function generateTeamDiscussion(c,team){
  var panel=byId('teamDiscussionPanel');if(!panel)return;panel.innerHTML='<p class="team-discussion-loading">正在整理每位队员的调查意见……</p>';
  var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
  if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function'){
   panel.innerHTML=team.map(function(r,i){var trait=String(r.personality||r.description||r.bio||'').toLowerCase(),line=trait.indexOf('冷')>=0?'先核对时间和记录，不要急着相信口头证词。':trait.indexOf('活泼')>=0||trait.indexOf('开朗')>=0?'我觉得有个细节不太对，我们再把线索翻一遍！':trait.indexOf('聪明')>=0||trait.indexOf('理性')>=0?'把每条证据放到同一条时间线上，矛盾就会显出来。':'我们先检查现场，再听完每个人的说法。';return '<div class="team-discussion-line"><span class="team-discussion-index">0'+(i+1)+'</span><div><strong>'+esc(roleName(r))+'</strong><p>'+esc(line)+'</p></div></div>';}).join('')+'<p class="team-discussion-note">配置 AI API 后，可生成更贴合角色人设的专属讨论。</p>';return;}
- var system='你是多角色推理游戏编剧。请让每位调查队员按照自己的原有人设提出不同的调查意见。只输出 JSON 数组，每项包含 name 和 line 两个字符串。每人一句，简体中文，每句不超过45字；不允许提前揭晓真凶，不同角色意见不能完全重复。';
+ var system='你是多角色推理游戏编剧。NPC 与用户自建角色都要参与，必须保持每个人设一致。请让每位调查队员按照自己的原有人设提出不同的调查意见。只输出 JSON 数组，每项包含 name 和 line 两个字符串。每人一句，简体中文，每句不超过45字；不允许提前揭晓真凶，不同角色意见不能完全重复。';
  var user='案件：'+c.title+'。案情：'+c.intro+'。调查队角色：'+team.map(function(r){return {name:roleName(r),bio:String(r.description||r.bio||r.background||''),personality:String(r.personality||r.character||r.profile||''),speech:String(r.speechStyle||r.speech||'')};}).map(function(x){return x.name+'；简介 '+x.bio+'；性格 '+x.personality+'；说话方式 '+x.speech;}).join('\n')+'。请严格按队员顺序每人给一句独立的调查意见。';
  window.PhoneAPI.complete({system:system,user:user,temperature:0.8,timeoutMs:30000}).then(function(raw){var txt=String(raw||'').trim().replace(/^\x60{3}(?:json)?\s*/i,'').replace(/\s*\x60{3}$/,'');var a=txt.indexOf('['),z=txt.lastIndexOf(']');if(a>=0&&z>a)txt=txt.slice(a,z+1);var arr=JSON.parse(txt);if(!Array.isArray(arr)||!arr.length)throw new Error('invalid discussion');panel.innerHTML=team.map(function(r,i){var item=arr.find(function(x){return x&&x.name===roleName(r);})||arr[i]||{};return '<div class="team-discussion-line"><span class="team-discussion-index">0'+(i+1)+'</span><div><strong>'+esc(roleName(r))+'</strong><p>'+esc(String(item.line||'我想再检查一下现有线索。').slice(0,120))+'</p></div></div>';}).join('');}).catch(function(){panel.innerHTML='<p class="team-discussion-note">这次没能生成角色讨论，请检查 API 配置后重试。</p>';});
 }
