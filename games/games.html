@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.16';
-  badge.setAttribute('aria-label','侦探游戏版本 V.16');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.17';
+  badge.setAttribute('aria-label','侦探游戏版本 V.17');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -2094,5 +2094,6 @@ body.detective-case-mode .case-modal-sheet{max-height:88dvh;overflow:auto}
 }
 @media(prefers-reduced-motion:reduce){body.detective-case-mode .evidence{transition:none}}
 </style>
+<script src="js/interrogation-v17.js?v=17"></script>
 </body>
 </html>
