@@ -286,6 +286,44 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
 }
 @media(prefers-reduced-motion:reduce){.game-row,.spotlight,.role-chip{transition:none!important}}
 </style>
+<style id="game-partner-editorial-style">
+/* No avatar carousel: the current companion is an editorial feature; alternatives stay hidden until requested. */
+.role-area{margin-bottom:15px!important}
+.role-rail{display:block!important;overflow:visible!important;padding:0!important;gap:0!important}
+.partner-feature{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:14px;align-items:stretch;padding:10px 0 12px;border-top:1px solid #171717;border-bottom:1px solid #dedede}
+.partner-feature-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.partner-feature-kicker{font-size:7px;letter-spacing:.15em;color:#999;margin:2px 0 10px}
+.partner-feature-name{font:400 clamp(23px,6vw,29px)/1.12 var(--serif);letter-spacing:-.05em;overflow-wrap:anywhere;color:#171717}
+.partner-feature-bio{font-size:9px;line-height:1.65;color:#777;margin-top:6px;max-width:240px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.partner-feature-record{display:flex;align-items:center;gap:7px;margin-top:auto;padding-top:8px;font-size:8px;color:#8a8a8a}
+.partner-feature-sep{color:#d1d1d1}
+.partner-feature-portrait{width:78px;min-height:91px;background:#f4f4f3;display:flex;align-items:stretch;justify-content:center;overflow:hidden;align-self:stretch}
+.partner-feature-portrait .role-avatar{width:100%!important;height:100%!important;min-height:91px!important;flex:1 1 auto!important;display:grid!important;place-items:center;border-radius:0!important;outline:0!important;background:#f1f1f0!important;color:#777!important;font:400 32px/1 var(--serif)!important}
+.partner-feature-portrait .role-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);display:block}
+.partner-picker-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 10px}
+.partner-picker-hint{font-size:8px;color:#aaa}
+.partner-picker-toggle{border:0;border-bottom:1px solid #a5a5a5;border-radius:0;background:transparent;color:#555;font:italic 13px/1.2 var(--serif);padding:2px 0 5px;white-space:nowrap}
+.partner-picker-panel{border-top:1px solid #e5e5e5;padding:9px 0 3px;animation:partnerPanelIn .18s ease}
+.partner-picker-panel[hidden]{display:none!important}
+@keyframes partnerPanelIn{from{opacity:.35;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.partner-picker-panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px;color:#555;font-size:10px}
+.partner-picker-panel-head span+span{font-size:7px;letter-spacing:.14em;color:#aaa}
+.partner-picker-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:13px}
+.partner-picker-option{display:grid;grid-template-columns:17px 34px minmax(0,1fr);gap:7px;align-items:center;min-width:0;padding:9px 0;border:0;border-bottom:1px solid #e8e8e8;background:transparent;text-align:left;color:#222}
+.partner-picker-number{align-self:start;padding-top:4px;color:#b0b0b0;font:9px/1 var(--serif)}
+.partner-picker-portrait{width:34px;height:41px;background:#f1f1f0;display:block;overflow:hidden}
+.partner-picker-portrait .role-avatar{width:100%!important;height:100%!important;min-height:0!important;flex:1 1 auto!important;border-radius:0!important;outline:0!important;background:#f1f1f0!important;color:#777!important;font:400 15px/1 var(--serif)!important}
+.partner-picker-portrait .role-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.partner-picker-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
+.partner-picker-copy strong{font-size:10px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.partner-picker-copy small{font-size:8px;color:#999}
+.partner-picker-option.selected .partner-picker-copy strong{font-weight:700}
+.partner-picker-option.selected .partner-picker-copy small{color:#222}
+.partner-picker-option.selected .partner-picker-number{color:#222}
+.partner-picker-option:active{background:#f8f8f7}
+@media(max-width:360px){.partner-feature{grid-template-columns:minmax(0,1fr) 66px;gap:10px}.partner-feature-portrait{width:66px}.partner-picker-grid{column-gap:9px}.partner-picker-option{grid-template-columns:14px 30px minmax(0,1fr);gap:5px}.partner-picker-portrait{width:30px;height:37px}.partner-picker-copy strong{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.partner-picker-panel{animation:none!important}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -408,6 +446,7 @@ var byId=function(id){return document.getElementById(id);};
 var esc=function(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
 var roleList=[];
 var activeRole=null;
+var rolePickerOpen=false;
 var activeGame='';
 var roundNumber=1;
 var reactionSequence=0;
@@ -434,14 +473,23 @@ function avatarMarkup(r,extraClass){
   return '<span class="role-avatar '+(extraClass||'')+'" style="background:'+esc(roleColor(r))+'">'+(src?'<img src="'+esc(src)+'" alt="">':esc(roleName(r).slice(0,1) || '伴'))+'</span>';
 }
 function renderRoles(){
-  var html='';
-  roleList.forEach(function(r){
-    var isActive=String(r.id)===String(activeRole.id);
-    html+='<button class="role-chip '+(isActive?'active':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(isActive?'true':'false')+'">'+avatarMarkup(r,'')+'<span class="role-chip-name">'+esc(roleName(r))+'</span></button>';
-  });
-  byId('roleRail').innerHTML=html;
-  byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
   var st=statsFor(activeRole);
+  var currentIndex=Math.max(0,roleList.findIndex(function(r){return String(r.id)===String(activeRole&&activeRole.id);}));
+  var currentName=roleName(activeRole);
+  var currentBio=String((activeRole&&(activeRole.description||activeRole.bio||activeRole.personality||activeRole.character))||'一位陪你思考、合作和挑战的游戏搭档。').replace(/\\s+/g,' ').slice(0,56);
+  var summary='<span class="partner-feature-stat">'+pad(st.plays||0)+' 局</span><span class="partner-feature-sep">/</span><span class="partner-feature-stat">'+pad(st.wins||0)+' 胜</span>';
+  var html='<div class="partner-feature" id="game-partner-editorial"><div class="partner-feature-copy"><div class="partner-feature-kicker">CURRENT PARTNER / '+pad(currentIndex+1)+'</div><div class="partner-feature-name">'+esc(currentName)+'</div><div class="partner-feature-bio">'+esc(currentBio)+'</div><div class="partner-feature-record">'+summary+'</div></div><div class="partner-feature-portrait">'+avatarMarkup(activeRole,'')+'</div></div>';
+  html+='<div class="partner-picker-actions"><span class="partner-picker-hint">对局记录按角色分别保存</span><button type="button" class="partner-picker-toggle" id="togglePartnerPicker" aria-expanded="'+(rolePickerOpen?'true':'false')+'">'+(rolePickerOpen?'收起 −':'更换搭档 +')+'</button></div>';
+  html+='<div class="partner-picker-panel" '+(rolePickerOpen?'':'hidden')+'><div class="partner-picker-panel-head"><span>选择一位搭档</span><span>'+String(roleList.length).padStart(2,'0')+' CHARACTERS</span></div><div class="partner-picker-grid">';
+  roleList.forEach(function(r,i){
+    var selected=String(r.id)===String(activeRole&&activeRole.id);
+    html+='<button type="button" class="partner-picker-option '+(selected?'selected':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(selected?'true':'false')+'"><span class="partner-picker-number">'+String(i+1).padStart(2,'0')+'</span><span class="partner-picker-portrait">'+avatarMarkup(r,'')+'</span><span class="partner-picker-copy"><strong>'+esc(roleName(r))+'</strong><small>'+(selected?'当前搭档':'选择角色')+'</small></span></button>';
+  });
+  html+='</div></div>';
+  byId('roleRail').innerHTML=html;
+  var toggle=byId('togglePartnerPicker');
+  if(toggle)toggle.addEventListener('click',function(){rolePickerOpen=!rolePickerOpen;renderRoles();});
+  byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
   byId('totalRounds').textContent=pad(st.plays||0);
   byId('totalWins').textContent=pad(st.wins||0);
   byId('wordRecord').textContent='已猜中 '+(st.wordWins||0)+' 题';
