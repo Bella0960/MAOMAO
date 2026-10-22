@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.09';
-  badge.setAttribute('aria-label','侦探游戏版本 V.09');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.10';
+  badge.setAttribute('aria-label','侦探游戏版本 V.10');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1725,6 +1725,78 @@ body.detective-case-mode .detective-live-modal .detective-livefeed{display:grid!
  document.addEventListener('click',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar, #detectiveLiveStatus, [data-open-live-log]'):null;if(!bar)return;var liveBar=bar.closest('.detective-livebar')||bar;if(!document.getElementById('detectiveLiveFeed'))return;e.preventDefault();e.stopPropagation();open();},true);
  document.addEventListener('keydown',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar'):null;if(!bar||!(e.key==='Enter'||e.key===' '))return;e.preventDefault();open();},true);
  document.addEventListener('DOMContentLoaded',function(){var bar=document.querySelector('.detective-livebar');if(bar){bar.setAttribute('role','button');bar.setAttribute('tabindex','0');bar.setAttribute('aria-label','打开实时调查动态');}});
+})();
+</script>
+
+
+<style id="maomao-notebook-v10-style">
+.case-notebook .investigation-entry{cursor:pointer;position:relative;transition:background .18s,border-color .18s;padding-right:28px}
+.case-notebook .investigation-entry:after{content:'查看档案 ↗';position:absolute;right:8px;bottom:10px;font-size:10px;letter-spacing:.04em;color:#777}
+.case-notebook .investigation-entry:focus-visible{outline:2px solid #555;outline-offset:2px}
+.case-notebook .investigation-entry:hover{background:rgba(0,0,0,.025)}
+.notebook-detail-overlay{position:fixed;inset:0;z-index:10080;background:rgba(20,20,20,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px}
+.notebook-detail-card{width:min(100%,440px);max-height:78vh;overflow:auto;background:#fff;color:#222;border:1px solid #d8d8d8;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:20px;animation:teamDiscussionRise .18s ease-out}
+.notebook-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid #ddd;margin-bottom:14px}
+.notebook-detail-head small{display:block;color:#888;font-size:10px;letter-spacing:.14em;margin-bottom:7px}
+.notebook-detail-head h3{margin:0;font-size:22px;font-weight:500}
+.notebook-detail-close{width:36px;height:36px;background:#fff;border:1px solid #ccc;font-size:23px;flex:none}
+.notebook-detail-body{font-size:14px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere;color:#444}
+.notebook-detail-meta{margin-top:16px;padding-top:12px;border-top:1px dashed #ccc;color:#888;font-size:11px;line-height:1.8}
+</style>
+<script id="maomao-notebook-v10-script">
+(function(){
+ if(window.__maomaoNotebookV10)return;window.__maomaoNotebookV10=true;
+ var recordCount={};
+ function byId(id){return document.getElementById(id);}
+ function addRecord(kind,title,body,meta,key){
+  var log=byId('investigationLog');if(!log||!body)return;
+  var token=key||kind+'|'+title+'|'+body;
+  if(recordCount[token])return;recordCount[token]=true;
+  var n=log.querySelectorAll('.investigation-entry').length+1;
+  var row=document.createElement('article');row.className='investigation-entry';row.dataset.recordKind=kind;
+  var index=document.createElement('span');index.className='record-index';index.textContent='记录 '+String(n).padStart(2,'0');
+  var h=document.createElement('strong');h.textContent=title;
+  var p=document.createElement('p');p.textContent=body.length>170?body.slice(0,167)+'…':body;
+  var small=document.createElement('small');small.textContent=meta||'调查过程中 · 已记录';
+  row.appendChild(index);row.appendChild(h);row.appendChild(p);row.appendChild(small);
+  row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','查看档案：'+title);
+  row.dataset.detailTitle=title;row.dataset.detailBody=body;row.dataset.detailMeta=small.textContent;
+  log.appendChild(row);
+ }
+ function openDetail(row){
+  var overlay=document.createElement('div');overlay.className='notebook-detail-overlay';
+  var card=document.createElement('section');card.className='notebook-detail-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','调查记录详情');
+  var head=document.createElement('div');head.className='notebook-detail-head';
+  var titleBox=document.createElement('div'),k=document.createElement('small'),h=document.createElement('h3'),close=document.createElement('button');
+  k.textContent='CASE NOTE / 调查档案';h.textContent=row.dataset.detailTitle||'调查记录';titleBox.appendChild(k);titleBox.appendChild(h);
+  close.type='button';close.className='notebook-detail-close';close.textContent='×';close.setAttribute('aria-label','关闭详情');head.appendChild(titleBox);head.appendChild(close);
+  var body=document.createElement('div');body.className='notebook-detail-body';body.textContent=row.dataset.detailBody||row.querySelector('p')?.textContent||'暂无详细内容。';
+  var meta=document.createElement('div');meta.className='notebook-detail-meta';meta.textContent=(row.dataset.detailMeta||'调查过程中 · 已记录')+'\n此条记录仅整理已发生的调查行为与已公开信息；分析意见不等同于最终定案。';
+  card.appendChild(head);card.appendChild(body);card.appendChild(meta);overlay.appendChild(card);document.body.appendChild(overlay);
+  function done(){overlay.remove();document.removeEventListener('keydown',key);}
+  function key(e){if(e.key==='Escape')done();}
+  close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});document.addEventListener('keydown',key);close.focus();
+ }
+ document.addEventListener('click',function(e){
+  var row=e.target&&e.target.closest?e.target.closest('.case-notebook .investigation-entry'):null;
+  if(!row)return;
+  e.preventDefault();openDetail(row);
+ });
+ document.addEventListener('keydown',function(e){var row=e.target&&e.target.closest?e.target.closest('.case-notebook .investigation-entry'):null;if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDetail(row);}});
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-evidence]'):null;
+  if(!b)return;var i=Number(b.getAttribute('data-evidence'));var c=window.gameState&&gameState.item;
+  if(!c||!c.evidence||!c.evidence[i])return;
+  var ev=c.evidence[i];addRecord('action','现场证据：'+ev.title,ev.detail,'现场取证 · 证据 '+String(i+1).padStart(2,'0'),'evidence|'+(c.title||'')+'|'+i);
+ },false);
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-interview]'):null;
+  if(!b)return;var i=Number(b.getAttribute('data-interview'));var c=window.gameState&&gameState.item;
+  if(!c||!c.suspects||!c.suspects[i])return;
+  var ss=c.suspects[i],list=window.CASE_INTERVIEWS||[],interviews=list[gameState.caseIndex]||[],it=interviews[i];
+  if(!it||!it.text)return;
+  addRecord('analysis','人物证词：'+ss.name,it.text,'人物询问 · '+(ss.job||'在场人员'),'interview|'+(c.title||'')+'|'+i);
+ },false);
 })();
 </script>
 
