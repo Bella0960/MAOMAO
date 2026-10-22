@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.10';
-  badge.setAttribute('aria-label','侦探游戏版本 V.10');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.11';
+  badge.setAttribute('aria-label','侦探游戏版本 V.11');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1072,7 +1072,7 @@ function chooseSuspect(i){
  if(Object.keys(gameState.revealed).length<Math.min(2,c.evidence.length)||Object.keys(gameState.interviewed).length<Math.min(2,c.suspects.length)){showToast('先查看至少两条线索，并听取至少两位人物的证词，就可以尝试指认。');return;}
  gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
  var correct=i===c.answer;var campaign=progress.campaign||(progress.campaign={trust:{},flags:[],threads:[],choices:[]});campaign.trust=campaign.trust||{};var trustKey='investigation-team';campaign.trust[trustKey]=Math.max(-5,Math.min(5,Number(campaign.trust[trustKey]||0)+(correct?1:-1)));
- if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ if(correct){buttons[i].classList.add('correct');var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
  else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'误判后进入复盘；队员会在后续调查中提醒你重新核对证据。');saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
  buttons.forEach(function(b){b.disabled=true;});
  var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
@@ -1799,6 +1799,18 @@ body.detective-case-mode .detective-live-modal .detective-livefeed{display:grid!
  },false);
 })();
 </script>
+
+
+<style id="maomao-case-closed-stamp-v11">
+.case-notebook .notebook-cover{position:relative;overflow:hidden}
+.case-notebook .case-closed-stamp{position:absolute;right:18px;top:50%;transform:translateY(-50%) rotate(-12deg);width:112px;min-height:82px;border:3px double #333;color:#292929;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;opacity:.92;pointer-events:none;background:rgba(250,248,241,.82);box-shadow:0 0 0 2px rgba(45,45,45,.06),inset 0 0 0 1px rgba(45,45,45,.08);animation:caseStampIn .42s cubic-bezier(.2,.8,.2,1) both}
+.case-notebook .case-closed-stamp span{font-size:9px;letter-spacing:.12em;font-weight:700}
+.case-notebook .case-closed-stamp strong{font-family:Georgia,'Noto Serif SC',serif;font-size:22px;letter-spacing:.12em;line-height:1.25}
+.case-notebook .case-closed-stamp small{font-size:7px;letter-spacing:.1em}
+@keyframes caseStampIn{0%{opacity:0;transform:translateY(-50%) rotate(-12deg) scale(1.35)}65%{opacity:1;transform:translateY(-50%) rotate(-10deg) scale(.96)}100%{opacity:.92;transform:translateY(-50%) rotate(-12deg) scale(1)}}
+@media(max-width:420px){.case-notebook .case-closed-stamp{right:10px;width:88px;min-height:68px}.case-notebook .case-closed-stamp strong{font-size:18px}.case-notebook .case-closed-stamp span{font-size:7px}.case-notebook .notebook-cover strong{max-width:62%;display:block}}
+@media(prefers-reduced-motion:reduce){.case-notebook .case-closed-stamp{animation:none}}
+</style>
 
 </body>
 </html>
