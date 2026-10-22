@@ -1,11 +1,13 @@
 /* 小手机 PWA Service Worker
  * 页面与静态资源均采用缓存优先+后台更新，断网/慢网时秒开。
  */
-const CACHE_NAME = 'phone-app-pwa-v24';
+const CACHE_NAME = 'phone-app-pwa-v25';
 const APP_SHELL = [
   './',
   './index.html',
   './games/games.html',
+  './games/js/interrogation-v18.js?v=18',
+  './games/assets/tidal-archive-room-v18.webp',
   './cafe/cafe.html',
   './diary/diary.html',
   './travel/dream-travel.html',
