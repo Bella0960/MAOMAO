@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.11';
-  badge.setAttribute('aria-label','侦探游戏版本 V.11');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.12';
+  badge.setAttribute('aria-label','侦探游戏版本 V.12');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1072,7 +1072,7 @@ function chooseSuspect(i){
  if(Object.keys(gameState.revealed).length<Math.min(2,c.evidence.length)||Object.keys(gameState.interviewed).length<Math.min(2,c.suspects.length)){showToast('先查看至少两条线索，并听取至少两位人物的证词，就可以尝试指认。');return;}
  gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
  var correct=i===c.answer;var campaign=progress.campaign||(progress.campaign={trust:{},flags:[],threads:[],choices:[]});campaign.trust=campaign.trust||{};var trustKey='investigation-team';campaign.trust[trustKey]=Math.max(-5,Math.min(5,Number(campaign.trust[trustKey]||0)+(correct?1:-1)));
- if(correct){buttons[i].classList.add('correct');var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ if(correct){buttons[i].classList.add('correct');showCaseClosedCelebration(c.title);var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
  else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'误判后进入复盘；队员会在后续调查中提醒你重新核对证据。');saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
  buttons.forEach(function(b){b.disabled=true;});
  var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
@@ -1812,5 +1812,59 @@ body.detective-case-mode .detective-live-modal .detective-livefeed{display:grid!
 @media(prefers-reduced-motion:reduce){.case-notebook .case-closed-stamp{animation:none}}
 </style>
 
-</body>
+
+<style id="maomao-case-closed-fullscreen-v12">
+.case-closed-celebration{position:fixed;inset:0;z-index:10150;background:rgba(12,12,12,.76);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;animation:caseClosedVeil .25s ease-out forwards;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.case-closed-celebration .closed-stamp-stage{width:min(88vw,430px);aspect-ratio:1.22;display:flex;align-items:center;justify-content:center;transform:scale(1.7) rotate(-9deg);opacity:0;animation:caseClosedSlam .68s cubic-bezier(.16,.85,.25,1.25) .12s forwards}
+.case-closed-celebration .closed-stamp-art{width:100%;padding:25px 16px;border:7px double #fff;color:#fff;text-align:center;outline:1px solid rgba(255,255,255,.7);outline-offset:-14px;box-shadow:0 0 0 2px rgba(255,255,255,.3),0 16px 45px rgba(0,0,0,.28);position:relative}
+.case-closed-celebration .closed-stamp-art:before,.case-closed-celebration .closed-stamp-art:after{content:'';position:absolute;left:12%;right:12%;height:1px;background:rgba(255,255,255,.7)}
+.case-closed-celebration .closed-stamp-art:before{top:15px}.case-closed-celebration .closed-stamp-art:after{bottom:15px}
+.case-closed-celebration .closed-stamp-art .closed-en{font-size:clamp(12px,3vw,17px);font-weight:700;letter-spacing:.22em}
+.case-closed-celebration .closed-stamp-art strong{display:block;font-family:Georgia,'Noto Serif SC',serif;font-size:clamp(48px,13vw,78px);line-height:1.3;letter-spacing:.12em}
+.case-closed-celebration .closed-stamp-art .closed-case-name{font-size:12px;letter-spacing:.12em;margin-top:7px;max-width:100%;overflow-wrap:anywhere}
+.case-closed-celebration .closed-stamp-art .closed-year{font-size:10px;letter-spacing:.2em;margin-top:12px}
+.case-closed-celebration .closed-dismiss{position:absolute;bottom:max(30px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);border:1px solid rgba(255,255,255,.75);background:transparent;color:#fff;padding:11px 24px;letter-spacing:.08em;font-size:13px;white-space:nowrap}
+@keyframes caseClosedVeil{to{opacity:1}}
+@keyframes caseClosedSlam{0%{opacity:0;transform:scale(1.7) rotate(-9deg)}58%{opacity:1;transform:scale(.94) rotate(-12deg)}72%{transform:scale(1.04) rotate(-11deg)}100%{opacity:1;transform:scale(1) rotate(-11deg)}}
+@media(prefers-reduced-motion:reduce){.case-closed-celebration,.case-closed-celebration .closed-stamp-stage{animation:none;opacity:1;transform:none}}
+</style>
+<script id="maomao-case-closed-fullscreen-v12-script">
+function showCaseClosedCelebration(caseTitle){
+ if(document.querySelector('.case-closed-celebration'))return;
+ var overlay=document.createElement('div');overlay.className='case-closed-celebration';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','案件已结案');
+ var stage=document.createElement('div');stage.className='closed-stamp-stage';
+ var art=document.createElement('div');art.className='closed-stamp-art';
+ var en=document.createElement('div');en.className='closed-en';en.textContent='CASE CLOSED';
+ var cn=document.createElement('strong');cn.textContent='已结案';
+ var name=document.createElement('div');name.className='closed-case-name';name.textContent=caseTitle||'案件档案';
+ var year=document.createElement('div');year.className='closed-year';year.textContent='OFFICIALLY ARCHIVED · '+new Date().getFullYear();
+ art.appendChild(en);art.appendChild(cn);art.appendChild(name);art.appendChild(year);stage.appendChild(art);
+ var dismiss=document.createElement('button');dismiss.className='closed-dismiss';dismiss.type='button';dismiss.textContent='查看案件档案 →';
+ overlay.appendChild(stage);overlay.appendChild(dismiss);document.body.appendChild(overlay);
+ function close(){overlay.remove();document.removeEventListener('keydown',onKey);}
+ function onKey(e){if(e.key==='Escape'||e.key==='Enter'){close();}}
+ dismiss.addEventListener('click',close);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',onKey);dismiss.focus();
+}
+(function(){
+ function refreshArchiveStatuses(){
+  var done=[];try{var p=caseProgress();done=p.completed||[];}catch(e){}
+  document.querySelectorAll('[data-open-case]').forEach(function(b){
+   var i=Number(b.getAttribute('data-open-case')),status=b.querySelector('.case-archive-status');
+   if(done.indexOf(i)>=0){b.classList.add('is-archived');if(status)status.textContent='✓ 已结案 · CASE CLOSED';}
+  });
+ }
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseResultArchive'))setTimeout(refreshArchiveStatuses,0);});
+ var oldStart=window.startCase;
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseArchiveBack'))setTimeout(refreshArchiveStatuses,0);});
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseArchiveMore'))setTimeout(refreshArchiveStatuses,0);});
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseResultArchive'))setTimeout(refreshArchiveStatuses,80);});
+ var observer=new MutationObserver(function(){refreshArchiveStatuses();});
+ observer.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="maomao-case-archive-closed-v12">
+.case-archive-item.is-archived{border-color:#555;background:#f7f7f7}
+.case-archive-item.is-archived .case-archive-status{font-weight:700;letter-spacing:.03em}
+</style></body>
 </html>
