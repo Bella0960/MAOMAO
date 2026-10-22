@@ -504,7 +504,7 @@ function selectRole(id){
   reactionSequence++;
   var next=roleList.find(function(r){return String(r.id)===String(id);});
   if(!next)return;
-  activeRole=next;localStorage.setItem('maomao_game_role',String(next.id));
+  activeRole=next;rolePickerOpen=false;localStorage.setItem('maomao_game_role',String(next.id));
   renderRoles();showToast('已切换搭档：'+roleName(activeRole));
   if(activeGame) renderPartner();
 }
