@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.19';
-  badge.setAttribute('aria-label','侦探游戏版本 V.19');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.20';
+  badge.setAttribute('aria-label','侦探游戏版本 V.20');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -2095,6 +2095,6 @@ body.detective-case-mode .case-modal-sheet{max-height:88dvh;overflow:auto}
 @media(prefers-reduced-motion:reduce){body.detective-case-mode .evidence{transition:none}}
 </style>
 <style id="maomao-detective-v18-scene">.scene-art-tidal{height:auto;aspect-ratio:280/348;min-height:350px;max-height:520px;background:#171715}.scene-art-tidal .scene-real-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.scene-art-tidal>:not(.scene-hotspot):not(.scene-real-image){display:none!important}.scene-art-tidal .scene-hotspot{z-index:5}@media(max-width:360px){.scene-art-tidal{min-height:320px}}</style>
-<!-- V.19: use the page-native interrogation modal; direct-open in ask mode -->
+<script src="js/interrogation-v20.js?v=20"></script>
 </body>
 </html>
