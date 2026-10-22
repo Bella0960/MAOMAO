@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Appearance · 外观</title>
-<script src="../shared/js/font-loader.js"></script>
+<script src="../shared/js/font-loader.js?v=20261022v1"></script>
 <script src="../shared/js/native-feel.js"></script>
 <script src="../shared/js/statusbar-control.js"></script>
 <style>
@@ -345,13 +345,11 @@
   }
   rowGlass.addEventListener('click', function () {
     applyStyle('glass');
-    try { localStorage.setItem(ICON_BG_KEY, 'rgba(255, 255, 255, 0.6)'); } catch (e) {}
-    showToast('已切换为毛玻璃');
+    showToast('已切换为毛玻璃（图标底色保持你选的色卡）');
   });
   rowClean.addEventListener('click', function () {
     applyStyle('clean');
-    try { localStorage.setItem(ICON_BG_KEY, '#F2F2F7'); } catch (e) {}
-    showToast('已切换为纯净');
+    showToast('已切换为纯净（图标底色保持你选的色卡）');
   });
   applyStyle(localStorage.getItem(ICON_STYLE_KEY) || 'glass');
 
