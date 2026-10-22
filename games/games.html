@@ -878,7 +878,7 @@ function openCase(index){document.body.classList.add("detective-case-mode");
  var views={scene:sceneEls,testimony:[interviewHead,byId('interviewList')],notes:[notebook,actionDesk,feedback,suspectHead,suspectList,timelineButton,timelinePanel]};
  function setCaseView(view){Object.keys(views).forEach(function(k){(views[k]||[]).forEach(function(el){if(el)el.style.display=k===view?'':'none';});});if(phaseTrack)phaseTrack.style.display='none';caseNav.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-case-view')===view);});}
  caseNav.addEventListener('click',function(e){var b=e.target.closest('[data-case-view]');if(b){setCaseView(b.getAttribute('data-case-view'));window.scrollTo({top:0,behavior:'smooth'});}});setCaseView('scene');
- var modal=document.createElement('div');modal.className='case-interrogation-modal';modal.id='caseInterrogationModal';modal.hidden=true;modal.innerHTML='<div class="case-modal-scrim" data-modal-close></div><section class="case-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle"><header class="case-modal-head"><div><span class="panel-kicker">INTERROGATION ROOM</span><h2 id="caseModalTitle">证词对质</h2></div><button type="button" class="case-modal-close" data-modal-close aria-label="关闭">×</button></header><div class="case-modal-columns"><section class="case-modal-testimony"><span class="case-modal-label">嫌疑人证词</span><h3 id="caseModalSuspect"></h3><p id="caseModalQuote"></p></section><section class="case-modal-evidence"><span class="case-modal-label">选择一条已发现的线索</span><div id="caseModalEvidenceList"></div></section></div><div id="caseModalFeedback" class="case-modal-feedback">选择证据，与证词逐项核对。</div><footer class="case-modal-foot"><button type="button" class="secondary-btn" data-modal-close>返回案件</button><button type="button" class="primary-btn" id="caseModalSubmit">提交对质</button></footer></section>';
+ var modal=document.createElement('div');modal.className='case-interrogation-modal';modal.id='caseInterrogationModal';modal.hidden=true;modal.innerHTML='<div class="case-modal-scrim" data-modal-close></div><section class="case-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle"><header class="case-modal-head"><div><span class="panel-kicker">INTERROGATION ROOM</span><h2 id="caseModalTitle">证词对质</h2></div><button type="button" class="case-modal-close" data-modal-close aria-label="关闭">×</button></header><div class="case-modal-columns"><section class="case-modal-testimony"><span class="case-modal-label">嫌疑人证词</span><h3 id="caseModalSuspect"></h3><p id="caseModalQuote"></p></section><section class="case-modal-evidence"><span class="case-modal-label">选择一条已发现的线索</span><div id="caseModalEvidenceList"></div></section></div><div id="caseModalQuestionBox" class="case-modal-question-box"><span class="case-modal-label">你想具体问什么？</span><div id="caseModalQuestionPrompts" class="case-modal-question-prompts"></div><textarea id="caseModalQuestion" rows="2" maxlength="180" placeholder="也可以自己输入问题，例如：你说离开了，具体几点？"></textarea><p class="case-modal-hint">追问会记录在本案调查笔录中；未被案件资料支持的细节不会自动当作事实。</p></div><div id="caseModalFeedback" class="case-modal-feedback">选择证据，与证词逐项核对。</div><footer class="case-modal-foot"><button type="button" class="secondary-btn" data-modal-close>返回案件</button><button type="button" class="primary-btn" id="caseModalSubmit">提交对质</button></footer></section>';
  byId('gameContent').appendChild(modal);
  function closeCaseModal(){modal.hidden=true;document.body.classList.remove('case-modal-open');}
  modal.addEventListener('click',function(e){if(e.target.closest('[data-modal-close]'))closeCaseModal();});
@@ -886,6 +886,9 @@ function openCase(index){document.body.classList.add("detective-case-mode");
  var selectedEvidenceIndex=null;
  function openInterrogation(index,mode){var suspect=c.suspects[index],statement=interviews[index];selectedEvidenceIndex=null;if(!suspect||!statement)return;modal.dataset.suspectIndex=String(index);modal.dataset.mode=mode;
  byId('caseModalTitle').textContent=mode==='ask'?'深入追问':'证据对质';byId('caseModalSuspect').textContent=suspect.name+' · '+suspect.job;byId('caseModalQuote').textContent=statement.text;
+ var questionBox=byId('caseModalQuestionBox'),questionInput=byId('caseModalQuestion'),promptList=byId('caseModalQuestionPrompts');questionBox.style.display=mode==='ask'?'block':'none';questionInput.value='';
+ var prompts=['你能把当时的时间说得更具体吗？','你说的这件事，有什么记录可以核对？','你当时在哪里？之后去了哪里？'];
+ promptList.innerHTML=prompts.map(function(q){return '<button type="button" class="case-question-chip">'+esc(q)+'</button>';}).join('');promptList.querySelectorAll('.case-question-chip').forEach(function(b){b.addEventListener('click',function(){questionInput.value=b.textContent;questionInput.focus();promptList.querySelectorAll('.case-question-chip').forEach(function(x){x.classList.toggle('active',x===b);});});});
  var list=byId('caseModalEvidenceList');var available=c.evidence.map(function(ev,i){return {ev:ev,i:i};}).filter(function(x){return !!gameState.revealed[x.i];});
  list.innerHTML=available.length?available.map(function(x){return '<button type="button" class="case-modal-evidence-card" data-modal-evidence="'+x.i+'"><span>证据 '+String(x.i+1).padStart(2,'0')+'</span><strong>'+esc(x.ev.title)+'</strong><small>'+esc(x.ev.detail)+'</small></button>';}).join(''):'<p class="case-modal-empty">还没有已确认的现场线索。先回到「线索板」查看证据。</p>';
  byId('caseModalFeedback').textContent=mode==='ask'?'选择一条已知信息，围绕证词里的时间、地点或行为继续追问。':'选择你认为能反驳这段证词的线索。系统会把双方内容并列，供你核对。';
@@ -897,10 +900,12 @@ function openCase(index){document.body.classList.add("detective-case-mode");
   var suspectIndex=Number(modal.dataset.suspectIndex),mode=modal.dataset.mode,caseIndex=Number(gameState.caseIndex);
   var supportMap={0:{0:[1],1:[2],2:[3]},1:{0:[],1:[],2:[2,3]},2:{0:[2],1:[],2:[0,1,3]},3:{0:[2],1:[],2:[]},4:{0:[1],1:[2,3],2:[]},5:{0:[1,3],1:[0],2:[2]}};
   var supporting=((supportMap[caseIndex]||{})[suspectIndex]||[]).indexOf(selectedEvidenceIndex)>=0;
-  var ev=c.evidence[selectedEvidenceIndex],resultTitle=mode==='ask'?(supporting?'这条信息可以继续追问':'这条信息暂时无法回答关键问题'):(supporting?'找到值得核对的关联':'目前还不足以形成有效对质');
-  var resultText=mode==='ask'?(supporting?'这条线索与此人的说法存在可继续核实的关联。试着围绕具体时间、地点或行为追问，不要把关联直接当成定论。':'这条线索与当前证词的联系还不够直接。可以换一条更贴近对方说法的证据，再提出具体问题。'):(supporting?'这条线索能支持进一步核实此人的说法，但不能单独证明对方就是作案者。请结合其他证据与时间线判断。':'这条线索暂时不能直接支持对该人物的质疑。可以换一条更相关的证据，或继续调查。');
-  byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>'+resultTitle+'</strong><p>'+esc(ev.title)+'：'+esc(resultText)+'</p></div>';
-  gameState.crossExaminations=gameState.crossExaminations||[];gameState.crossExaminations.push({suspect:suspectIndex,evidence:selectedEvidenceIndex,mode:mode,result:supporting?'relevant':'insufficient',at:new Date().toISOString()});persistDetectiveCaseState();
+  var ev=c.evidence[selectedEvidenceIndex],question=byId('caseModalQuestion').value.trim();
+  if(mode==='ask'&&!question){byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>先提出一个具体问题</strong><p>可以点选上方问题，也可以自己写。围绕时间、地点、行为或可核对的记录追问，会比泛泛地问“为什么”更有用。</p></div>';byId('caseModalQuestion').focus();return;}
+  var resultTitle=mode==='ask'?(supporting?'追问方向成立，值得继续核实':'这次追问还没有足够依据'):(supporting?'发现一处值得核对的关联':'目前还不能形成有效对质');
+  var resultText=mode==='ask'?(supporting?'你问的是：“'+question+'” 这条线索「'+ev.title+'」与此人的说法有核对价值。对方的回答目前只能作为补充陈述；还需要时间记录、目击或其他证据来验证。':'你问的是：“'+question+'” 现有的「'+ev.title+'」还不能直接验证这个问题。可以把问题缩小到一个具体时间点或可查记录，再继续调查。'):(supporting?'「'+ev.title+'」与此人的证词存在可继续核实的关联，但关联不等于证明。请再寻找一条独立证据，确认时间线或实际行为。':'「'+ev.title+'」暂时不能直接反驳这段证词。建议先记录这项说法，再寻找能核对同一时间、地点或行为的证据。');
+  byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>'+resultTitle+'</strong><p>'+esc(resultText)+'</p><p class="case-result-note">调查判断 · '+(supporting?'有核对价值':'证据不足')+' · 不直接等同于定案</p></div>';
+  gameState.crossExaminations=gameState.crossExaminations||[];gameState.crossExaminations.push({suspect:suspectIndex,evidence:selectedEvidenceIndex,mode:mode,question:question,result:supporting?'relevant':'insufficient',at:new Date().toISOString()});persistDetectiveCaseState();
   if(mode==='cross')detectivePulse(supporting?'对质找到关联线索':'这条线索还不能证明矛盾',supporting?'这条证据值得继续核对，但仍需要其他信息。':'队员建议继续找能直接核对时间、地点或行为的证据。');
  });
  byId('caseArchiveBack').addEventListener('click',startCase);byId('newCase').addEventListener('click',startCase);
@@ -1485,5 +1490,16 @@ body.detective-case-mode .case-modal-evidence-card{border-radius:0!important;box
 }
 </style>
 
+<style id="maomao-detective-depth-v02">
+.case-modal-question-box{margin:15px 0;padding:13px 0;border-top:1px solid var(--case-line,#ddd);border-bottom:1px solid var(--case-line,#ddd)}
+.case-modal-question-prompts{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.case-question-chip{border:1px solid #d8d8d3;background:transparent;color:#555;padding:8px 10px;font-size:11px;border-radius:0;text-align:left}
+.case-question-chip.active{background:#191919;color:#fff;border-color:#191919}
+#caseModalQuestion{display:block;box-sizing:border-box;width:100%;resize:vertical;min-height:66px;padding:11px;border:1px solid #d7d7d2;border-radius:0;background:#fafaf8;color:#222;font:inherit;font-size:12px;line-height:1.7}
+.case-modal-hint{font-size:10px;line-height:1.7;color:#888;margin:7px 0 0}
+.case-result-note{border-top:1px solid #e4e4df;padding-top:8px!important;color:#777;font-size:10px!important;letter-spacing:.04em}
+.case-modal-question-box[hidden]{display:none!important}
+body.detective-case-mode #gameContent:after{content:"V.02";display:block;text-align:right;color:#a0a09a;font-size:9px;letter-spacing:.16em;margin:14px 2px 5px;padding-top:8px}
+</style>
 </body>
 </html>
