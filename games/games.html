@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.05';
-  badge.setAttribute('aria-label','侦探游戏版本 V.05');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.06';
+  badge.setAttribute('aria-label','侦探游戏版本 V.06');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1626,5 +1626,68 @@ body.floating-tools-open{overflow:hidden}
 @media(max-width:340px){.floating-tools-modal{padding:12px}.floating-tools-dialog{padding:17px 14px}.floating-tools-grid button{min-height:96px;padding:10px}}
 </style>
 <style id="maomao-detective-v05-version">#detectiveVersionBadge{bottom:calc(env(safe-area-inset-bottom) + 74px)}#detectiveVersionBadge:after{content:"";}</style>
+
+<style id="maomao-detective-v06-discussion-modal">
+.team-discussion-panel{display:grid;gap:8px}
+.team-discussion-launch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:11px 13px;border:1px solid #deded9;background:#fff;color:#222;text-align:left;width:100%;font-size:12px}
+.team-discussion-launch small{font-size:10px;color:#888}
+.team-discussion-overlay{position:fixed;inset:0;z-index:10040;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(18,18,18,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);animation:teamDiscussionFade .18s ease-out}
+.team-discussion-dialog{width:min(100%,460px);max-height:min(78vh,680px);overflow:auto;background:#fff;color:#222;border:1px solid #ddd;box-shadow:0 24px 70px rgba(0,0,0,.2);padding:18px;animation:teamDiscussionRise .22s ease-out}
+.team-discussion-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:13px;border-bottom:1px solid #ddd;margin-bottom:8px}
+.team-discussion-dialog-head small{display:block;font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}
+.team-discussion-dialog-head h3{margin:0;font-size:20px;font-weight:500;letter-spacing:-.04em}
+.team-discussion-close{width:34px;height:34px;border:1px solid #ddd;background:#fff;color:#222;font-size:20px;flex:0 0 auto}
+.team-discussion-dialog .team-discussion-panel{margin-top:0}
+.team-discussion-dialog .team-discussion-line{grid-template-columns:30px 1fr;gap:10px;padding:12px 0}
+.team-discussion-dialog .team-discussion-index{font-size:16px}
+.team-discussion-dialog .team-discussion-line strong{font-size:12px}
+.team-discussion-dialog .team-discussion-line p{font-size:12px;line-height:1.8;color:#555}
+.team-discussion-dialog .team-discussion-note{padding-top:8px;border-top:1px solid #eee;font-size:10px;line-height:1.7}
+.team-discussion-dialog .team-discussion-loading{font-size:12px;padding:12px 0}
+.team-discussion-refresh{margin-top:12px;width:100%;padding:12px;border:1px solid #222;background:#222;color:#fff;font-size:12px}
+@keyframes teamDiscussionFade{from{opacity:0}to{opacity:1}}
+@keyframes teamDiscussionRise{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.team-discussion-overlay,.team-discussion-dialog{animation:none}}
+</style>
+<script id="maomao-detective-v06-discussion-modal-script">
+(function(){
+ if(window.__maomaoTeamDiscussionV06)return;window.__maomaoTeamDiscussionV06=true;
+ var overlay=null,originalParent=null,originalNext=null,panel=null,activeCase=null;
+ function close(){
+  if(!overlay)return;
+  if(panel&&originalParent){if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(panel,originalNext);else originalParent.appendChild(panel);panel.style.display='none';}
+  overlay.remove();overlay=null;panel=null;activeCase=null;
+ }
+ function open(){
+  var button=document.getElementById('teamDiscussionButton'),p=document.getElementById('teamDiscussionPanel');
+  if(!button||!p||!window.gameState||!gameState.item)return;
+  close();panel=p;originalParent=p.parentNode;originalNext=p.nextSibling;activeCase=gameState.item;
+  overlay=document.createElement('div');overlay.className='team-discussion-overlay';overlay.setAttribute('role','presentation');
+  var dialog=document.createElement('section');dialog.className='team-discussion-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','小队讨论');
+  var head=document.createElement('div');head.className='team-discussion-dialog-head';head.innerHTML='<div><small>TEAM BRIEFING / CASE NOTES</small><h3>小队讨论</h3></div><button type="button" class="team-discussion-close" aria-label="关闭讨论">×</button>';
+  var hint=document.createElement('p');hint.className='team-discussion-note';hint.textContent='队员只根据目前已公开的证据与证词讨论；尚未确认的内容会保留为推测。';
+  var refresh=document.createElement('button');refresh.type='button';refresh.className='team-discussion-refresh';refresh.textContent='重新听取讨论';
+  dialog.appendChild(head);dialog.appendChild(hint);dialog.appendChild(panel);dialog.appendChild(refresh);overlay.appendChild(dialog);document.body.appendChild(overlay);
+  panel.style.display='grid';
+  head.querySelector('button').addEventListener('click',close);refresh.addEventListener('click',function(){if(window.gameState&&gameState.item===activeCase&&typeof generateTeamDiscussion==='function'){generateTeamDiscussion(activeCase,detectiveParty(detectiveTeam()));}});
+  overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
+  document.addEventListener('keydown',onKey);
+  function onKey(e){if(e.key==='Escape'&&overlay){close();document.removeEventListener('keydown',onKey);}}
+  if(typeof generateTeamDiscussion==='function')generateTeamDiscussion(activeCase,detectiveParty(detectiveTeam()));
+ }
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('#teamDiscussionButton'):null;if(!b)return;
+  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();open();
+ },true);
+ document.addEventListener('click',function(e){
+  var p=e.target&&e.target.closest?e.target.closest('#teamDiscussionPanel'):null;
+  if(p&&p.querySelector('.team-discussion-note')&&!p.querySelector('.team-discussion-line')){
+   var note=p.querySelector('.team-discussion-note');
+   if(note&&/配置 AI API/.test(note.textContent)){note.textContent='当前未连接 AI API：以下是基础调查建议，不是根据本轮案情实时生成的角色对话。';}
+  }
+ },false);
+})();
+</script>
+
 </body>
 </html>
