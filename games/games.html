@@ -723,7 +723,7 @@ function roleLine(context,fallback){
   }).catch(function(){});
 }
 function showGame(id){
-  activeGame=id;gameState={};roundNumber=1;
+  activeGame=id;gameState={};roundNumber=1;setDetectiveVersionBadge(id==='detective');
   byId('lobbyView').style.display='none';byId('gameView').style.display='block';
   renderPartner();
   reactionSequence++;
@@ -736,7 +736,7 @@ function showGame(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function returnLobby(){
-  reactionSequence++;
+  reactionSequence++;setDetectiveVersionBadge(false);
   activeGame='';
   document.body.classList.remove('detective-case-mode','case-modal-open');
   document.body.removeAttribute('data-case-theme');
@@ -837,8 +837,17 @@ function detectivePersona(r){
  return roleName(r)+'；性格：'+String(r.personality||r.description||r.bio||'待从角色资料中理解').slice(0,160)+'；说话方式：'+String(r.speechStyle||r.speech||'遵循原角色说话习惯').slice(0,100);
 }
 function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=String(id);if(ids.indexOf(key)>=0)ids=ids.filter(function(x){return x!==key;});else ids.push(key);if(!ids.length)ids=[String(activeRole&&activeRole.id||roleList[0].id)];localStorage.setItem('maomao_detective_team_v1',JSON.stringify(ids));startCase();}
+function setDetectiveVersionBadge(visible){
+ var badge=document.getElementById('detectiveVersionBadge');
+ if(!badge){
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.04';
+  badge.setAttribute('aria-label','侦探游戏版本 V.04');
+  document.body.appendChild(badge);
+ }
+ badge.style.display=visible?'block':'none';
+}
 function startCase(){
- document.body.classList.remove('detective-case-mode','case-modal-open');document.body.removeAttribute('data-case-theme');
+ document.body.classList.remove('detective-case-mode','case-modal-open');document.body.removeAttribute('data-case-theme');setDetectiveVersionBadge(true);
  loadGeneratedDetectiveCases();setRoundLabel();var progress=caseProgress(),team=detectiveTeam();
  byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">DETECTIVE BUREAU / CASE ARCHIVE</div><div class="prompt-title">长线案件档案室</div><div class="prompt-copy">组建你的 AI 角色调查小队，从独立案件逐步追踪同一条暗线。证据、证词和时间线都会影响结案判断。</div><div class="case-progress-strip"><span>已结案件</span><strong>'+progress.completed.length+' / '+CASES.length+'</strong></div><div class="divider-label">调查小队 · 可同时加入多位角色</div><div class="detective-team-picker">'+roleList.map(function(r){var chosen=team.some(function(x){return String(x.id)===String(r.id);});return '<button type="button" class="detective-team-chip '+(chosen?'selected':'')+'" data-team-role="'+esc(r.id)+'" aria-pressed="'+chosen+'">'+avatarMarkup(r,'')+'<span>'+esc(roleName(r))+'</span><small>'+(chosen?'已加入小队':'点击加入')+'</small></button>';}).join('')+'</div><div class="team-caption">当前队伍：'+esc(team.map(roleName).join('、'))+'。不同角色将以各自的人设参与调查讨论。</div><div class="case-ai-create"><div><strong>AI SERIAL CASE / 连载案件生成</strong><p>需要已配置的角色 API 来生成新剧情、证据、证词和后续主线；未配置时仍可游玩内置案件。</p></div><button type="button" class="secondary-btn" id="generateDetectiveCase">生成新案</button></div><div class="case-archive-heading"><span class="panel-kicker">AVAILABLE FILES / 内置案件</span><span class="case-archive-count">先展示 3 宗 · 共 '+CASES.length+' 宗</span></div><div class="case-archive-list" id="caseArchiveList">'+CASES.map(function(c,i){var done=progress.completed.indexOf(i)>=0,locked=i>0&&progress.completed.indexOf(i-1)<0;return '<button class="case-archive-item '+(i>=3?'case-archive-hidden':'')+'" data-open-case="'+i+'" '+(locked?'disabled':'')+'><span class="case-archive-no">CASE / '+String(i+1).padStart(2,'0')+'</span><strong>'+esc(c.title)+'</strong><span class="case-archive-desc">'+esc(c.intro)+'</span><span class="case-archive-status">'+(done?'✓ 已结案':locked?'完成上一案后解锁':i===0?'可调查':'待调查')+'</span></button>';}).join('')+'</div><button type="button" class="case-archive-more" id="caseArchiveMore" aria-expanded="false">展开全部案件 <span>＋</span></button></div>';
  var archiveMore=byId('caseArchiveMore'),archiveList=byId('caseArchiveList');if(archiveMore&&archiveList){archiveMore.addEventListener('click',function(){var expanded=archiveMore.getAttribute('aria-expanded')==='true';archiveMore.setAttribute('aria-expanded',String(!expanded));archiveList.classList.toggle('expanded',!expanded);archiveMore.innerHTML=expanded?'展开全部案件 <span>＋</span>':'收起案件列表 <span>−</span>';});}
@@ -861,7 +870,7 @@ function generateDetectiveCase(){
   var saved=JSON.parse(localStorage.getItem('maomao_detective_generated_cases_v1')||'[]');saved.push(c);localStorage.setItem('maomao_detective_generated_cases_v1',JSON.stringify(saved));CASES.push(c);showToast('新案件已加入档案室');startCase();
  }).catch(function(){showToast('生成失败，请检查 API 配置或稍后重试。');}).finally(function(){var b=byId('generateDetectiveCase');if(b){b.disabled=false;b.textContent='生成新案';}});
 }
-function openCase(index){document.body.classList.add("detective-case-mode");
+function openCase(index){document.body.classList.add("detective-case-mode");setDetectiveVersionBadge(true);
  var progress=caseProgress();if(index>0&&progress.completed.indexOf(index-1)<0){showToast('先完成上一宗案件。');return;}
  var c=CASES[index];if(!c)return;
  var savedCaseStates=progress.caseStates||{},savedCaseState=savedCaseStates[c.title]||{};gameState={caseIndex:index,item:c,revealed:Object.assign({},savedCaseState.revealed||{}),interviewed:Object.assign({},savedCaseState.interviewed||{}),ended:false,phase:'evidence'};
@@ -896,17 +905,54 @@ function openCase(index){document.body.classList.add("detective-case-mode");
  modal.hidden=false;document.body.classList.add('case-modal-open');
  }
  byId('caseModalSubmit').addEventListener('click',function(){
+  var submitButton=byId('caseModalSubmit');
   if(selectedEvidenceIndex===null){byId('caseModalFeedback').innerHTML='<div class="case-cross-result">请先选择一条已发现的证据，再提交。</div>';return;}
   var suspectIndex=Number(modal.dataset.suspectIndex),mode=modal.dataset.mode,caseIndex=Number(gameState.caseIndex);
+  var suspect=c.suspects[suspectIndex],statement=interviews[suspectIndex];
   var supportMap={0:{0:[1],1:[2],2:[3]},1:{0:[],1:[],2:[2,3]},2:{0:[2],1:[],2:[0,1,3]},3:{0:[2],1:[],2:[]},4:{0:[1],1:[2,3],2:[]},5:{0:[1,3],1:[0],2:[2]}};
   var supporting=((supportMap[caseIndex]||{})[suspectIndex]||[]).indexOf(selectedEvidenceIndex)>=0;
   var ev=c.evidence[selectedEvidenceIndex],question=byId('caseModalQuestion').value.trim();
   if(mode==='ask'&&!question){byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>先提出一个具体问题</strong><p>可以点选上方问题，也可以自己写。围绕时间、地点、行为或可核对的记录追问，会比泛泛地问“为什么”更有用。</p></div>';byId('caseModalQuestion').focus();return;}
-  var resultTitle=mode==='ask'?(supporting?'追问方向成立，值得继续核实':'这次追问还没有足够依据'):(supporting?'发现一处值得核对的关联':'目前还不能形成有效对质');
-  var resultText=mode==='ask'?(supporting?'你问的是：“'+question+'” 这条线索「'+ev.title+'」与此人的说法有核对价值。对方的回答目前只能作为补充陈述；还需要时间记录、目击或其他证据来验证。':'你问的是：“'+question+'” 现有的「'+ev.title+'」还不能直接验证这个问题。可以把问题缩小到一个具体时间点或可查记录，再继续调查。'):(supporting?'「'+ev.title+'」与此人的证词存在可继续核实的关联，但关联不等于证明。请再寻找一条独立证据，确认时间线或实际行为。':'「'+ev.title+'」暂时不能直接反驳这段证词。建议先记录这项说法，再寻找能核对同一时间、地点或行为的证据。');
-  byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>'+resultTitle+'</strong><p>'+esc(resultText)+'</p><p class="case-result-note">调查判断 · '+(supporting?'有核对价值':'证据不足')+' · 不直接等同于定案</p></div>';
-  gameState.crossExaminations=gameState.crossExaminations||[];gameState.crossExaminations.push({suspect:suspectIndex,evidence:selectedEvidenceIndex,mode:mode,question:question,result:supporting?'relevant':'insufficient',at:new Date().toISOString()});persistDetectiveCaseState();
-  if(mode==='cross')detectivePulse(supporting?'对质找到关联线索':'这条线索还不能证明矛盾',supporting?'这条证据值得继续核对，但仍需要其他信息。':'队员建议继续找能直接核对时间、地点或行为的证据。');
+  function saveInterrogationRecord(reply,resultCode){
+   gameState.crossExaminations=gameState.crossExaminations||[];
+   gameState.crossExaminations.push({suspect:suspectIndex,evidence:selectedEvidenceIndex,mode:mode,question:question,reply:reply||'',result:resultCode,at:new Date().toISOString()});
+   persistDetectiveCaseState();
+  }
+  function showResult(title,body,status){
+   byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>'+esc(title)+'</strong><p>'+esc(body)+'</p><p class="case-result-note">调查判断 · '+esc(status)+' · 不直接等同于定案</p></div>';
+  }
+  if(mode==='ask'){
+   var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+   var apiReady=cfg&&String(cfg.apiKey||'').trim()&&window.PhoneAPI&&typeof window.PhoneAPI.complete==='function';
+   if(apiReady){
+    submitButton.disabled=true;submitButton.textContent='正在追问…';
+    byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>正在核对这段证词</strong><p>调查队正在结合人物当前说法和你选中的公开线索整理回应……</p></div>';
+    var system='你是互动推理故事里的被询问人物。你必须只根据给定的角色身份、原始证词、案件公开背景和玩家刚选中的一条已公开证据回答。不要读取或猜测未公开证据，不要知道自己不可能知道的事，不要发明新物证、新目击者或新记录。可以自然、谨慎、略有防备，也可以承认记不清；如果材料不足，就明确说无法确认。不要直接坦白真相，除非给定公开材料已经足以让角色合理承认。用简体中文，以第一人称角色口吻回答2至4句，最多180字，不要输出分析或旁白。';
+    var user='案件：'+String(c.title||'未命名案件')+'\n公开案情：'+String(c.intro||'')+'\n被询问人物：'+String(suspect.name)+'，身份：'+String(suspect.job)+'\n此人此前的证词：'+String(statement&&statement.text||'暂无明确证词')+'\n玩家已查看并选择的线索：'+String(ev.title)+'——'+String(ev.detail)+'\n玩家追问：'+question+'\n请只生成这个人物此刻合理的回答。不得引用其他未出示的证据，也不得凭空补写时间、动作或物证。';
+    window.PhoneAPI.complete({system:system,user:user,temperature:0.72,timeoutMs:30000}).then(function(raw){
+     var reply=String(raw||'').trim().replace(/^[\"“”']+|[\"“”']+$/g,'').slice(0,700);
+     if(!reply)throw new Error('empty response');
+     var evidenceNote=supporting?'当前线索与此人的说法有核对价值，但仍需要另一条独立材料验证。':'当前线索还不能直接验证这个问题；可以继续查找具体时间、地点或行为记录。';
+     showResult('对方回应 · '+suspect.name,'你问：“'+question+'” '+suspect.name+' 回答：“'+reply+'” 调查提示：'+evidenceNote,supporting?'有核对价值':'证据仍不足');
+     saveInterrogationRecord(reply,supporting?'relevant':'insufficient');
+     detectivePulse('追问已记录：'+suspect.name,String(reply).slice(0,130));
+    }).catch(function(){
+     var fallback='当前剧情引擎没有成功返回新回答。这条追问已保留，你可以稍后重试；先不要把未得到回答的内容视为事实。';
+     showResult('这次没有取得新口供',fallback,'等待重新询问');
+     saveInterrogationRecord('', 'request_failed');
+    }).finally(function(){submitButton.disabled=false;submitButton.textContent='提交对质';});
+    return;
+   }
+   var noApi='当前没有可用的 AI API，暂时无法生成这名人物的新回答。你问的是：“'+question+'” 已记录所选线索「'+ev.title+'」，可以先依据已知材料核对，或在配置 API 后再继续追问。';
+   showResult('追问已记录，但暂无动态口供',noApi,supporting?'有核对价值':'证据仍不足');
+   saveInterrogationRecord('', 'api_unavailable');
+   return;
+  }
+  var resultTitle=supporting?'发现一处值得核对的关联':'目前还不能形成有效对质';
+  var resultText=supporting?'「'+ev.title+'」与此人的证词存在可继续核实的关联，但关联不等于证明。请再寻找一条独立证据，确认时间线或实际行为。':'「'+ev.title+'」暂时不能直接反驳这段证词。建议先记录这项说法，再寻找能核对同一时间、地点或行为的证据。';
+  showResult(resultTitle,resultText,supporting?'有核对价值':'证据不足');
+  saveInterrogationRecord('',supporting?'relevant':'insufficient');
+  detectivePulse(supporting?'对质找到关联线索':'这条线索还不能证明矛盾',supporting?'这条证据值得继续核对，但仍需要其他信息。':'队员建议继续找能直接核对时间、地点或行为的证据。');
  });
  byId('caseArchiveBack').addEventListener('click',startCase);byId('newCase').addEventListener('click',startCase);
  byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;var wasKnown=!!gameState.revealed[i];gameState.revealed[i]=true;byId('evidenceDetail'+i).textContent=c.evidence[i].detail;btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='✓';persistDetectiveCaseState();if(!wasKnown){detectivePulse('发现新线索：'+c.evidence[i].title,detectiveEvidenceReaction(c.evidence[i],i));}updateCaseProgress();});});
@@ -1499,7 +1545,6 @@ body.detective-case-mode .case-modal-evidence-card{border-radius:0!important;box
 .case-modal-hint{font-size:10px;line-height:1.7;color:#888;margin:7px 0 0}
 .case-result-note{border-top:1px solid #e4e4df;padding-top:8px!important;color:#777;font-size:10px!important;letter-spacing:.04em}
 .case-modal-question-box[hidden]{display:none!important}
-body.detective-case-mode #gameContent:after{content:"V.02";display:block;text-align:right;color:#a0a09a;font-size:9px;letter-spacing:.16em;margin:14px 2px 5px;padding-top:8px}
 </style>
 <style id="maomao-detective-popup-v03">
 body.detective-case-mode .interview-list{border-top:1px solid #d9d9d5;margin-bottom:24px}
@@ -1517,7 +1562,21 @@ body.detective-case-mode .interview-followups{display:none!important}
 .case-modal-evidence-card{border-radius:0;padding:10px 11px}
 .case-modal-evidence-card small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media(min-width:600px){.case-modal-sheet{border-radius:18px;align-self:center;max-height:84dvh}.case-interrogation-modal{align-items:center;padding:18px}}
-body.detective-case-mode #gameContent:after{content:"V.03";display:block;text-align:right;color:#a0a09a;font-size:9px;letter-spacing:.16em;margin:14px 2px 5px;padding-top:8px}
+</style>
+<style id="maomao-detective-v04-fixed-version">
+#detectiveVersionBadge{
+ position:fixed;z-index:9998;display:none;right:max(9px,calc((100vw - 460px)/2 + 9px));
+ bottom:calc(env(safe-area-inset-bottom) + 74px);padding:5px 7px;
+ border:1px solid rgba(255,255,255,.18);background:#202020;color:#fff;
+ font-size:9px;line-height:1;letter-spacing:.14em;font-variant-numeric:tabular-nums;
+ opacity:.76;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.08)
+}
+.case-modal-question-box{border-top:1px solid #e1e1dc;border-bottom:1px solid #e1e1dc}
+.case-modal-question-prompts{display:flex;flex-wrap:wrap;gap:6px}
+.case-question-chip{max-width:100%;line-height:1.5;padding:7px 9px;font-size:10px}
+.case-modal-view-actions button:active,.case-question-chip:active{transform:scale(.98)}
+.case-modal-feedback{overflow-wrap:anywhere}
+@media(max-width:360px){#detectiveVersionBadge{right:6px;bottom:calc(env(safe-area-inset-bottom) + 72px);font-size:8px;padding:4px 5px}}
 </style>
 </body>
 </html>
