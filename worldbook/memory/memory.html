@@ -701,6 +701,71 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
 @media(max-width:480px){body{background:#fff!important}.phone-mockup{width:100vw!important}.mem-header{padding-left:23px!important;padding-right:23px!important}.mem-scroll-area{padding-left:23px!important;padding-right:23px!important}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
+<style id="memory-compact-navigation">
+/* Compact, viewport-first layout: no arrow icons, no long stacks of settings. */
+.mem-page{position:relative!important;overflow:hidden!important}
+.mem-header{padding-top:calc(37px + env(safe-area-inset-top,0px))!important;padding-bottom:12px!important}
+.mem-header:before{margin-bottom:13px!important}
+.mem-back{left:23px!important;right:auto!important;top:calc(10px + env(safe-area-inset-top,0px))!important;width:auto!important;height:24px!important;display:flex!important;justify-content:flex-start!important}
+.mem-back:before{content:"返回"!important;font:9px/1 var(--sans)!important;letter-spacing:.06em!important;color:#888!important}
+.mem-title{font-size:clamp(51px,13vw,61px)!important}
+.mem-header:after{margin-top:12px!important;padding-bottom:12px!important}
+.mem-scroll-area{padding-bottom:84px!important;overflow-y:auto!important}
+.mem-scroll-area>.mem-section-title:first-child{margin-top:14px!important}
+.mem-card-glass:has(#charPicker){padding:4px 0 10px!important;margin-bottom:8px!important;border-bottom:0!important}
+.char-avatar{border-radius:50%!important;width:39px!important;height:39px!important}
+.mem-card-glass:has(.mem-mood-text){margin:0 0 14px!important;padding:10px 0 11px 13px!important;border-left:1px solid #171717!important;border-bottom:0!important}
+.mem-mood-text{font-size:18px!important}
+.mem-section-title{margin-top:17px!important;margin-bottom:8px!important}
+.mem-main-preview{padding:2px 0 4px!important;margin:0 0 12px!important}
+.mem-preview-line{display:grid;grid-template-columns:35px minmax(0,1fr);column-gap:10px;padding:8px 0;border-bottom:1px solid #efefef}
+.mem-preview-time{font:9px/1.6 var(--sans);color:#aaa;font-variant-numeric:tabular-nums}
+.mem-preview-copy{font:10px/1.8 var(--sans);color:#444;overflow-wrap:anywhere}
+.mem-preview-empty{font:10px/1.8 var(--sans);color:#999;padding:6px 0 12px}
+.mem-preview-open{display:inline-block;margin-top:9px;padding:3px 0 5px;border:0;border-bottom:1px solid #999;background:transparent;color:#555;font:italic 13px/1 var(--serif)}
+.mem-corner-bar{position:absolute;z-index:30;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:14px;padding:12px 23px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid #e4e4e4;background:rgba(255,255,255,.97)}
+.mem-corner-bar button,.mem-tools-corner{border:0;border-bottom:1px solid #b8b8b8;border-radius:0;background:transparent;color:#444;padding:4px 0 6px;font:italic 14px/1 var(--serif);white-space:nowrap}
+.mem-corner-bar button:active,.mem-tools-corner:active{color:#aaa}
+.mem-tools-corner{position:absolute;top:calc(9px + env(safe-area-inset-top,0px));right:23px;z-index:65;font-size:13px}
+.mem-tools-drawer,.mem-stream-drawer{position:absolute;inset:0;z-index:100;display:none;align-items:flex-end;background:rgba(0,0,0,.22);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.mem-tools-drawer.open,.mem-stream-drawer.open{display:flex;animation:memFadeIn .16s ease}
+@keyframes memFadeIn{from{opacity:0}to{opacity:1}}
+.mem-drawer-panel{position:relative;width:100%;max-height:88%;min-height:300px;display:flex;flex-direction:column;background:#fff;padding:17px 22px calc(15px + env(safe-area-inset-bottom,0px));animation:memPanelUp .22s ease-out}
+@keyframes memPanelUp{from{transform:translateY(15px);opacity:.7}to{transform:translateY(0);opacity:1}}
+.mem-drawer-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #171717}
+.mem-drawer-eyebrow{font:600 8px/1.4 var(--sans);letter-spacing:.18em;color:#888}
+.mem-drawer-close{border:0;border-bottom:1px solid #bbb;background:transparent;color:#555;padding:4px 0;font:italic 13px/1 var(--serif)}
+.mem-drawer-tabs{display:flex;gap:17px;overflow-x:auto;flex-shrink:0;padding:12px 0 10px;border-bottom:1px solid #e8e8e8}
+.mem-drawer-tabs button{position:relative;flex-shrink:0;border:0;background:transparent;padding:3px 0 6px;color:#999;font:10px/1.4 var(--sans)}
+.mem-drawer-tabs button.active{color:#171717;font-weight:650}
+.mem-drawer-tabs button.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:#171717}
+.mem-drawer-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-top:1px}
+.mem-drawer-content::-webkit-scrollbar{display:none}
+.mem-tool-view{display:none!important}
+.mem-tool-view.active{display:block!important}
+.mem-tool-view>.mem-section-title{margin-top:14px!important}
+.mem-tool-view>.mem-card-glass{margin-bottom:0!important}
+.mem-tool-view #summarySettingsCard{display:block!important}
+.mem-tool-view #summarySettingsCard:not(.settings-show){display:none!important}
+.mem-summary-heading{display:flex!important}
+.mem-tool-view .mem-summary-heading{padding-top:3px!important}
+.mem-inline-toggle{display:inline-block!important}
+.mem-tool-view .fold-card{margin-top:0!important}
+.mem-tool-view .fold-card.open .fold-body{max-height:60vh!important;overflow-y:auto!important}
+.mem-stream-panel{min-height:45vh}
+.mem-stream-panel .mem-list-container{overflow-y:auto;min-height:0;max-height:65vh;padding-bottom:18px!important}
+.mem-stream-panel .mem-group-date{font-size:16px!important}
+.mem-stream-heading{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid #171717}
+.mem-stream-heading strong{font:400 26px/1 var(--serif);letter-spacing:-.05em}
+.mem-stream-heading span{font:8px/1 var(--sans);color:#999;letter-spacing:.15em}
+.mem-stream-panel .mem-group-more{cursor:pointer}
+@media(max-width:480px){
+  .mem-drawer-panel{max-height:90%;padding-left:22px;padding-right:22px}
+  .mem-tools-corner{right:23px}
+  .mem-scroll-area{padding-left:23px!important;padding-right:23px!important}
+}
+@media(prefers-reduced-motion:reduce){.mem-tools-drawer,.mem-stream-drawer,.mem-drawer-panel{animation:none!important}}
+</style>
 </head>
 <body>
 <div class="phone-mockup">
@@ -1481,17 +1546,136 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
     setInterval(updateStatusBarTime, 30000);
 </script>
 <script src="../../shared/js/statusbar-control.js"></script>
-<script id="memory-editorial-controls">
+
+<script id="memory-compact-navigation">
 (function(){
-  const toggle=document.getElementById('summarySettingsToggle');
-  const panel=document.getElementById('summarySettingsCard');
-  if(!toggle||!panel)return;
-  toggle.addEventListener('click',function(){
-    const opened=panel.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded',String(opened));
-    toggle.textContent=opened?'收起 −':'调节 +';
-    if(opened)panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const page=document.getElementById('memory-page');
+  const scroll=document.querySelector('.mem-scroll-area');
+  const list=document.getElementById('mem-list');
+  if(!page||!scroll||!list)return;
+  const mk=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+
+  // Move the live memory stream into a short bottom sheet; the same list node keeps its ID.
+  const streamTitle=[...scroll.children].find(el=>el.classList&&el.classList.contains('mem-section-title')&&el.textContent.trim()==='记忆流');
+  const preview=mk('div','mem-main-preview');
+  preview.id='mem-main-preview';
+  const previewLines=mk('div','mem-preview-lines');
+  const allBtn=mk('button','mem-preview-open','全部记忆 +');
+  allBtn.type='button';
+  preview.append(previewLines,allBtn);
+  if(streamTitle)streamTitle.insertAdjacentElement('afterend',preview);
+
+  const streamDrawer=mk('div','mem-stream-drawer');
+  streamDrawer.id='mem-stream-drawer';
+  const streamPanel=mk('section','mem-drawer-panel mem-stream-panel');
+  streamPanel.setAttribute('role','dialog');streamPanel.setAttribute('aria-label','全部记忆');
+  const streamHead=mk('div','mem-stream-heading');
+  const streamHeadTitle=mk('strong','','Memory');
+  const streamEyebrow=mk('span','','PERSONAL NOTES');
+  const streamClose=mk('button','mem-drawer-close','关闭');
+  streamClose.type='button';
+  const streamTop=mk('div','mem-drawer-top');
+  const streamBrand=mk('span','mem-drawer-eyebrow','MEMORY / ARCHIVE');
+  streamTop.append(streamBrand,streamClose);streamHead.append(streamHeadTitle,streamEyebrow);
+  streamPanel.append(streamTop,streamHead,list);streamDrawer.append(streamPanel);page.append(streamDrawer);
+
+  // Group the original feature nodes into separate views, so each opens on its own.
+  const children=[...scroll.children];
+  const getTitle=label=>children.find(el=>el.classList&&el.classList.contains('mem-section-title')&&el.textContent.trim().toUpperCase()===label);
+  const summaryTitle=children.find(el=>el.classList&&el.classList.contains('mem-summary-heading'));
+  const autoTitle=getTitle('AUTO SUMMARY');
+  const libraryTitle=getTitle('MEMORY BANK');
+  const toolTitle=getTitle('MEMORY TOOLS');
+  const summaryCard=document.getElementById('summarySettingsCard');
+  const autoCard=document.getElementById('autoCard');
+  const manualCard=document.getElementById('manualCard');
+  const libraryCard=document.getElementById('libCard');
+  const toolCard=document.getElementById('toolCard');
+
+  // Remove original settings nodes from the main page before re-housing them.
+  [summaryTitle,summaryCard,autoTitle,autoCard,manualCard,libraryTitle,libraryCard,toolTitle,toolCard].forEach(el=>{if(el&&el.parentNode)el.parentNode.removeChild(el);});
+
+  const defs=[
+    {key:'settings',label:'参数',nodes:[summaryTitle,summaryCard]},
+    {key:'auto',label:'自动',nodes:[autoTitle,autoCard]},
+    {key:'manual',label:'手动',nodes:[manualCard]},
+    {key:'library',label:'记忆库',nodes:[libraryTitle,libraryCard]},
+    {key:'tools',label:'工具',nodes:[toolTitle,toolCard]}
+  ];
+  const toolsDrawer=mk('div','mem-tools-drawer');
+  toolsDrawer.id='mem-tools-drawer';
+  const toolsPanel=mk('section','mem-drawer-panel');
+  toolsPanel.setAttribute('role','dialog');toolsPanel.setAttribute('aria-label','记忆功能');
+  const top=mk('div','mem-drawer-top');
+  top.append(mk('span','mem-drawer-eyebrow','MEMORY / STUDIO'));
+  const close=mk('button','mem-drawer-close','关闭');close.type='button';top.append(close);
+  const tabs=mk('nav','mem-drawer-tabs');tabs.setAttribute('aria-label','记忆功能分类');
+  const content=mk('div','mem-drawer-content');
+  const views={};
+  defs.forEach(def=>{
+    const tab=mk('button','',def.label);tab.type='button';tab.dataset.view=def.key;tabs.append(tab);
+    const view=mk('section','mem-tool-view');view.dataset.view=def.key;
+    def.nodes.filter(Boolean).forEach(node=>view.append(node));
+    if(def.key==='manual'&&manualCard){const title=mk('div','mem-section-title','MANUAL SUMMARY');view.insertBefore(title,manualCard);}
+    content.append(view);views[def.key]=view;
   });
+  toolsPanel.append(top,tabs,content);toolsDrawer.append(toolsPanel);page.append(toolsDrawer);
+
+  function setView(key){
+    Object.keys(views).forEach(k=>{views[k].classList.toggle('active',k===key);});
+    tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.view===key));
+  }
+  function openTools(key){
+    setView(key||'settings');
+    toolsDrawer.classList.add('open');toolsDrawer.setAttribute('aria-hidden','false');
+  }
+  function closeTools(){toolsDrawer.classList.remove('open');toolsDrawer.setAttribute('aria-hidden','true');}
+  function openStream(){streamDrawer.classList.add('open');streamDrawer.setAttribute('aria-hidden','false');}
+  function closeStream(){streamDrawer.classList.remove('open');streamDrawer.setAttribute('aria-hidden','true');}
+  tabs.addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)setView(b.dataset.view);});
+  close.addEventListener('click',closeTools);streamClose.addEventListener('click',closeStream);
+  toolsDrawer.addEventListener('click',e=>{if(e.target===toolsDrawer)closeTools();});
+  streamDrawer.addEventListener('click',e=>{if(e.target===streamDrawer)closeStream();});
+  allBtn.addEventListener('click',openStream);
+
+  const back=document.querySelector('.mem-back');
+  if(back){back.innerHTML='';back.setAttribute('aria-label','返回首页');back.style.left='23px';}
+  const corner=mk('button','mem-tools-corner','功能 +');corner.type='button';corner.addEventListener('click',()=>openTools('settings'));page.append(corner);
+  const bar=mk('nav','mem-corner-bar');bar.setAttribute('aria-label','记忆快捷入口');
+  const memoryBtn=mk('button','','记忆 +');memoryBtn.type='button';memoryBtn.addEventListener('click',openStream);
+  const summaryBtn=mk('button','','总结 +');summaryBtn.type='button';summaryBtn.addEventListener('click',()=>openTools('manual'));
+  const manageBtn=mk('button','','管理 +');manageBtn.type='button';manageBtn.addEventListener('click',()=>openTools('library'));
+  bar.append(memoryBtn,summaryBtn,manageBtn);page.append(bar);
+
+  function updatePreview(){
+    previewLines.innerHTML='';
+    const lines=list.querySelectorAll('.mem-line');
+    let visible=0;
+    lines.forEach(line=>{
+      if(visible>=2)return;
+      const time=line.querySelector('.mem-line-time')?.textContent||'';
+      const copy=line.querySelector('.mem-line-content')?.textContent||'';
+      const row=mk('div','mem-preview-line');
+      row.append(mk('span','mem-preview-time',time),mk('span','mem-preview-copy',copy));
+      previewLines.append(row);visible++;
+    });
+    if(!visible)previewLines.append(mk('div','mem-preview-empty','聊天里留下的重要片段，会安静地收在这里。'));
+    const total=list.querySelectorAll('.mem-line').length;
+    allBtn.textContent=total?'全部记忆 · '+total+' 条 +':'打开记忆流 +';
+  }
+  const observer=new MutationObserver(updatePreview);observer.observe(list,{childList:true,subtree:true,characterData:true});
+  updatePreview();
+
+  // Keep the seven summary values editable, but hidden until the small inline control is opened.
+  const sumToggle=document.getElementById('summarySettingsToggle');
+  if(sumToggle&&summaryCard){
+    sumToggle.addEventListener('click',()=>{
+      const opened=summaryCard.classList.toggle('settings-show');
+      sumToggle.setAttribute('aria-expanded',String(opened));
+      sumToggle.textContent=opened?'收起 −':'调节 +';
+    });
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTools();closeStream();}});
 })();
 </script>
 </body>
