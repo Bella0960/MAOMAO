@@ -682,8 +682,6 @@ function renderOverview(){
  if(st.report&&st.report.day<st.day)html+='<button type="button" class="compact-goal-link" data-open-daily-report><strong>上一日经营复盘 · DAY '+String(st.report.day).padStart(2,'0')+'</strong><span>查看账单 +</span></button>';
  html+='<div class="compact-statline"><div class="compact-stat"><span>店铺经验</span><strong>'+st.xp+' / '+needed()+'</strong><small>LV.'+st.level+'</small></div><div class="compact-stat"><span>口碑指数</span><strong>'+st.rep+'</strong><small>熟客与新客</small></div><div class="compact-stat"><span>满意度</span><strong>'+st.sat+'</strong><small>服务体验</small></div></div>';
  html+=renderCompactEvent()+renderCompactControls();
- var goal=currentGoal(),goalInfo=goalDef(goal.id);
- html+='<button type="button" class="compact-goal-link" data-open-cafe="records" data-focus-record="goal"><strong>今日目标 · '+esc(goalInfo.title)+'</strong><span>查看 +</span></button>';
  $('view-overview').innerHTML=html;
  document.querySelectorAll('#view-overview [data-event]').forEach(function(b){b.disabled=st.businessStatus==='operating';b.addEventListener('click',function(){if(st.businessStatus==='operating'){toast('营业中不能更改今日事件。');return;}chooseEvent(Number(b.getAttribute('data-event')));});});
  document.querySelectorAll('#view-overview [data-ad]').forEach(function(b){b.disabled=st.businessStatus==='operating';b.addEventListener('click',function(){if(st.businessStatus==='operating')return;var max=Math.max(0,Math.min(100,Math.floor(st.cash/20)*20));st.ad=clamp(st.ad+Number(b.getAttribute('data-ad')),0,max);save();renderOverview();});});
