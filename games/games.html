@@ -319,6 +319,20 @@ body.detective-case-mode .case-modal-evidence-card span,body.detective-case-mode
 body.detective-case-mode .case-modal-evidence-card strong{font-size:13px;font-weight:600}
 .case-cross-result{margin-top:10px;padding:11px;border-left:2px solid #777;background:#f5f5f3;font-size:12px;line-height:1.8}
 @media(prefers-reduced-motion:reduce){body.detective-case-mode .case-modal-sheet{animation:none}}
+
+/* Detective dossier: readable portraits, evidence-first interaction */
+body.detective-case-mode .role-avatar,body.detective-case-mode .case-team-member .role-avatar{width:36px;height:36px;min-width:36px;flex:0 0 36px;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:#e7e7e3;outline:1px solid #d6d6d1;outline-offset:2px}
+body.detective-case-mode .role-avatar img{width:100%;height:100%;aspect-ratio:1/1;object-fit:cover;object-position:center;display:block}
+body.detective-case-mode .case-team-avatars{gap:15px;align-items:flex-start}
+body.detective-case-mode .case-team-member{gap:8px}
+body.detective-case-mode .case-modal-columns{gap:10px}
+body.detective-case-mode .case-modal-testimony,body.detective-case-mode .case-modal-evidence{min-width:0;border:1px solid #deded9;background:#fff;padding:12px;border-radius:6px}
+body.detective-case-mode .case-modal-testimony p{font-size:12px;line-height:1.85;color:#383833}
+body.detective-case-mode .case-modal-evidence-card{transition:background .18s,border-color .18s,transform .18s}
+body.detective-case-mode .case-modal-evidence-card:active{transform:scale(.99)}
+body.detective-case-mode .case-modal-evidence-card.selected{background:#f1f1ee;border-color:#333}
+body.detective-case-mode .case-modal-feedback{font-size:12px;line-height:1.8;color:#555}
+@media(max-width:420px){body.detective-case-mode .case-modal-columns{grid-template-columns:1fr}body.detective-case-mode .case-team-avatars{gap:12px}}
 </style>
 
 <style id="maomao-editorial-controls">
@@ -979,7 +993,7 @@ function generateTeamDiscussion(c,team){
 function detectivePulse(title,detail){var feed=byId('detectiveLiveFeed'),status=byId('detectiveLiveStatus');if(!feed)return;if(status)status.textContent=title;var item=document.createElement('div');item.className='livefeed-item livefeed-enter';var time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});var t=document.createElement('span');t.className='livefeed-time';t.textContent=time;var p=document.createElement('p');p.textContent=detail||'调查队正在整理信息。';item.appendChild(t);item.appendChild(p);feed.insertBefore(item,feed.firstChild);while(feed.children.length>4)feed.removeChild(feed.lastChild);}
 function detectiveEvidenceReaction(e,i){var reactions=['沈砚把记录重新排了一遍：先记下能确认的部分，别急着下结论。','林见秋凑近看了看：这条线索值得继续查，先别忽略它的细节。','周予安提醒：线索本身不会说谎，但我们对它的解释仍可能出错。'];return reactions[i%reactions.length]+'【'+e.title+'】已加入公开调查材料。';}
 function detectiveInterviewReaction(p,it,i){var reactions=['沈砚低声补充：把这段证词和记录上的时间再对一下。','林见秋记下了现场细节：说法先保留，等其他线索来验证。','周予安没有急着评价：先听完每个人，再判断谁在回避问题。'];return p.name+'：'+String(it&&it.text||'证词已记录').slice(0,95)+'\\n'+reactions[i%reactions.length];}
-function updateCaseProgress(){var c=gameState.item,ec=Object.keys(gameState.revealed).length,ic=Object.keys(gameState.interviewed).length,minEvidence=Math.min(2,c.evidence.length),minInterviews=Math.min(2,c.suspects.length),ready=ec>=minEvidence&&ic>=minInterviews;byId('caseStepCount').textContent=ec+' 条线索 · '+ic+' 份证词';byId('caseStepText').textContent=ready?'可以尝试指认，也可以继续调查':'至少查看 '+minEvidence+' 条线索、询问 '+minInterviews+' 位人物';byId('caseFeedback').textContent=ready?'所有证据与证词已归档。现在根据矛盾点作出最终指认。':'现场证据 '+ec+'/'+c.evidence.length+' · 证词 '+ic+'/'+c.suspects.length+'。';var meter=byId('detectiveProgressFill'),label=byId('detectiveProgressLabel');if(meter)meter.style.width=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'%';if(label)label.textContent=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'% 已完成';byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(b){b.disabled=!ready;});if(ready){document.querySelectorAll('[data-phase-mark]').forEach(function(n){n.classList.add('complete');});byId('detectiveLiveStatus').textContent='材料齐全 · 可以推理指认';}}
+function updateCaseProgress(){var c=gameState.item,ec=Object.keys(gameState.revealed).length,ic=Object.keys(gameState.interviewed).length,minEvidence=Math.min(2,c.evidence.length),minInterviews=Math.min(2,c.suspects.length),ready=ec>=minEvidence&&ic>=minInterviews;byId('caseStepCount').textContent=ec+' 条线索 · '+ic+' 份证词';byId('caseStepText').textContent=ready?'可以尝试指认，也可以继续调查':'至少查看 '+minEvidence+' 条线索、询问 '+minInterviews+' 位人物';byId('caseFeedback').textContent=ready?'已达到基本调查条件，可以尝试指认；若还不确定，可以继续查看线索和询问人物。':'先查看至少 '+minEvidence+' 条线索，再听取至少 '+minInterviews+' 位人物的证词，就能开始判断。';var meter=byId('detectiveProgressFill'),label=byId('detectiveProgressLabel');if(meter)meter.style.width=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'%';if(label)label.textContent=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'% 已完成';byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(b){b.disabled=!ready;});if(ready){document.querySelectorAll('[data-phase-mark]').forEach(function(n){n.classList.add('complete');});byId('detectiveLiveStatus').textContent='材料齐全 · 可以推理指认';}}
 function chooseSuspect(i){
  if(gameState.ended)return;
  var c=gameState.item,buttons=byId('suspectList').querySelectorAll('[data-suspect]'),progress=caseProgress();
