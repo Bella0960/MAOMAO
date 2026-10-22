@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>游戏 · MAOMAO</title>
+<title>游戏大厅</title>
 <script src="../shared/js/native-feel.js"></script>
 <script src="../shared/js/phone/phone_storage.js"></script>
 <script src="../shared/js/phone/phone_api.js"></script>
@@ -227,6 +227,65 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
 .gtab-panel.active{display:block}
 .gtab-panel .spotlight{margin:0 0 33px}
 </style>
+<style id="compact-game-hall">
+/* Compact lobby: recommendation, partner and all six playable games share one page. */
+.shell{padding:calc(8px + env(safe-area-inset-top)) 19px calc(20px + env(safe-area-inset-bottom))!important}
+.topline{margin-bottom:13px!important}
+.wordmark{font-size:10px!important;letter-spacing:.13em!important;color:#777!important;font-weight:500!important}
+.header-kicker{font-size:8px!important;letter-spacing:.15em!important;margin-bottom:7px!important}
+.hero-title{font-size:clamp(31px,8.5vw,40px)!important;line-height:1!important;letter-spacing:-.065em!important;max-width:none!important}
+.hero-title br{display:none}
+.hero-copy{display:none!important}
+.hero-meta{gap:0!important;padding:11px 0!important;margin:12px 0 15px!important}
+.meta-item{flex:1;padding-left:12px;border-left:1px solid #e5e5e5}
+.meta-item:first-child{padding-left:0;border-left:0}
+.meta-number{font-size:19px!important}
+.meta-label{font-size:9px!important}
+.game-tabs{display:none!important}
+.gtab-panel,.gtab-panel.active{display:block!important}
+.gtab-panel .spotlight{margin:0 0 16px!important}
+.spotlight{padding:13px 14px 12px!important;background:#f7f7f6!important;color:#171717!important;border:0!important;border-top:1px solid #171717!important;border-bottom:1px solid #dedede!important;cursor:pointer}
+.spotlight-top{font-size:8px!important;color:#8c8c8c!important;letter-spacing:.14em!important}
+.spotlight-status{color:#686868!important;font-size:9px}
+.spotlight-status i{background:#777!important}
+.spotlight-title{font-size:clamp(22px,6.3vw,27px)!important;line-height:1.15!important;letter-spacing:-.05em!important;margin:12px 0 5px!important;max-width:none!important;color:#171717!important}
+.spotlight-copy{font-size:10px!important;line-height:1.6!important;color:#737373!important;max-width:none!important;margin:0 0 10px!important}
+.spotlight-bottom{border-top:1px solid #e0e0e0!important;padding-top:9px!important;font-size:9px!important;color:#666!important}
+.spotlight-bottom b{color:#aaa!important}
+.spotlight-cta{font-size:10px!important;color:#222!important;border-bottom:1px solid #aaa;padding-bottom:3px}
+.spotlight-cta span{display:none!important}
+.role-area{margin-bottom:17px!important}
+.section-head{align-items:center!important;margin-bottom:7px!important}
+.section-eyebrow{font-size:8px!important;letter-spacing:.15em!important;margin-bottom:3px!important}
+.section-title{font-size:14px!important;letter-spacing:-.025em!important}
+.micro-note{font-size:9px!important;white-space:nowrap}
+.role-rail{gap:14px!important;padding:4px 1px 7px!important}
+.role-chip{width:48px!important;gap:5px!important}
+.role-chip .role-avatar{width:36px!important;height:36px!important;flex-basis:36px!important;outline-offset:2px!important}
+.role-chip-name{max-width:48px!important;font-size:9px!important}
+.gtab-panel[data-gtab-panel="games"] .section-head{padding-top:8px;margin-bottom:5px!important;border-top:1px solid #171717}
+.gtab-panel[data-gtab-panel="games"] .section-eyebrow{margin-top:9px}
+.games-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 14px!important;padding-top:0!important;border-top:0!important}
+.game-row{padding:9px 0 8px!important;border:0!important;border-bottom:1px solid #e5e5e5!important;background:transparent!important;min-height:0!important;cursor:pointer}
+.game-row:active{background:#fafafa!important}
+.game-topline{margin-bottom:6px!important;height:16px}
+.game-symbol svg{width:17px!important;height:17px!important}
+.game-index{font-size:8px!important}
+.game-tag{font-size:7px!important;letter-spacing:.13em!important;margin-bottom:4px!important;color:#999!important}
+.game-name{font-size:16px!important;letter-spacing:-.025em!important;margin-bottom:4px!important}
+.game-desc{-webkit-line-clamp:1!important;font-size:9px!important;line-height:1.45!important;margin:0 0 2px!important;color:#7c7c7c!important}
+.game-record{padding:4px 0 0!important;margin-top:3px!important;border-top:0!important;font-size:8px!important;color:#aaa!important}
+.bottom-note{margin-top:14px!important;padding-top:10px!important;font-size:8px!important}
+@media(max-width:380px){
+ .shell{padding-left:16px!important;padding-right:16px!important}
+ .spotlight{padding:11px 12px 10px!important}
+ .spotlight-title{font-size:22px!important}
+ .games-list{gap:0 10px!important}
+ .game-name{font-size:15px!important}
+ .game-desc{font-size:8px!important}
+}
+@media(prefers-reduced-motion:reduce){.game-row,.spotlight,.role-chip{transition:none!important}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -234,7 +293,7 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
     <button class="back" id="backHome" aria-label="返回首页">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="wordmark">MAOMAO / PLAYROOM</div>
+    <div class="wordmark">游戏空间</div>
     <div style="width:36px"></div>
   </div>
 
