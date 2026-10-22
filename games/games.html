@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.06';
-  badge.setAttribute('aria-label','侦探游戏版本 V.06');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.07';
+  badge.setAttribute('aria-label','侦探游戏版本 V.07');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1686,6 +1686,43 @@ body.floating-tools-open{overflow:hidden}
    if(note&&/配置 AI API/.test(note.textContent)){note.textContent='当前未连接 AI API：以下是基础调查建议，不是根据本轮案情实时生成的角色对话。';}
   }
  },false);
+})();
+</script>
+
+
+<style id="maomao-detective-v07-live-evidence-layout">
+body.detective-case-mode .detective-livebar{position:sticky;top:8px;z-index:18;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;margin:10px 0 14px;background:rgba(255,255,255,.97);border:1px solid #deded9;box-shadow:0 5px 18px rgba(0,0,0,.045);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer}
+body.detective-case-mode .detective-livebar:after{content:'查看动态 ↗';font-size:10px;color:#777;white-space:nowrap}
+body.detective-case-mode .detective-livebar strong{font-size:12px}
+body.detective-case-mode .detective-livefeed{display:none!important}
+.detective-live-modal{position:fixed;inset:0;z-index:10060;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(18,18,18,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.detective-live-modal[hidden]{display:none!important}
+.detective-live-modal-card{width:min(100%,440px);max-height:min(75vh,600px);overflow:auto;background:#fff;border:1px solid #ddd;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.2);animation:teamDiscussionRise .2s ease-out}
+.detective-live-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #ddd;margin-bottom:10px}
+.detective-live-modal-head small{display:block;font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}
+.detective-live-modal-head h3{margin:0;font-size:20px;font-weight:500}
+.detective-live-modal-close{width:34px;height:34px;border:1px solid #ddd;background:#fff;color:#222;font-size:20px}
+.detective-live-modal .detective-livefeed{display:grid!important;gap:0!important}
+.detective-live-modal .livefeed-item{padding:12px 0;border-top:1px solid #eee}
+.detective-live-modal .livefeed-item p{font-size:12px;line-height:1.8;color:#555}
+@media(prefers-reduced-motion:reduce){.detective-live-modal-card{animation:none}}
+</style>
+<script id="maomao-detective-v07-live-evidence-script">
+(function(){
+ if(window.__maomaoDetectiveLiveV07)return;window.__maomaoDetectiveLiveV07=true;
+ var modal=null,feed=null,home=null,next=null;
+ function close(){if(!modal)return;if(feed&&home){if(next&&next.parentNode===home)home.insertBefore(feed,next);else home.appendChild(feed);feed.style.display='none';}modal.remove();modal=null;feed=null;home=null;next=null;document.removeEventListener('keydown',keyHandler);}
+ function keyHandler(e){if(e.key==='Escape')close();}
+ function open(){
+  var bar=document.getElementById('detectiveLiveStatus');var live=document.getElementById('detectiveLiveFeed');if(!bar||!live)return;
+  close();feed=live;home=feed.parentNode;next=feed.nextSibling;
+  modal=document.createElement('div');modal.className='detective-live-modal';modal.setAttribute('role','presentation');
+  var card=document.createElement('section');card.className='detective-live-modal-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','实时调查动态');
+  var head=document.createElement('div');head.className='detective-live-modal-head';head.innerHTML='<div><small>CASE ACTIVITY / LIVE LOG</small><h3>实时调查动态</h3></div><button type="button" class="detective-live-modal-close" aria-label="关闭">×</button>';
+  card.appendChild(head);card.appendChild(feed);modal.appendChild(card);document.body.appendChild(modal);feed.style.display='grid';
+  head.querySelector('button').addEventListener('click',close);modal.addEventListener('click',function(e){if(e.target===modal)close();});document.addEventListener('keydown',keyHandler);
+ }
+ document.addEventListener('click',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar'):null;if(!bar)return;e.preventDefault();open();});
 })();
 </script>
 
