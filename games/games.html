@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.08';
-  badge.setAttribute('aria-label','侦探游戏版本 V.08');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.09';
+  badge.setAttribute('aria-label','侦探游戏版本 V.09');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1702,7 +1702,7 @@ body.detective-case-mode .detective-livefeed{display:none!important}
 .detective-live-modal-head small{display:block;font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}
 .detective-live-modal-head h3{margin:0;font-size:20px;font-weight:500}
 .detective-live-modal-close{width:34px;height:34px;border:1px solid #ddd;background:#fff;color:#222;font-size:20px}
-.detective-live-modal .detective-livefeed{display:grid!important;gap:0!important}
+body.detective-case-mode .detective-live-modal .detective-livefeed{display:grid!important;visibility:visible!important;opacity:1!important;gap:0!important}
 .detective-live-modal .livefeed-item{padding:12px 0;border-top:1px solid #eee}
 .detective-live-modal .livefeed-item p{font-size:12px;line-height:1.8;color:#555}
 @media(prefers-reduced-motion:reduce){.detective-live-modal-card{animation:none}}
