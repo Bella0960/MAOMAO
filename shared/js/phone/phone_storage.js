@@ -239,6 +239,31 @@
         NS.rawSet('api_settings', cfg || {});
     };
 
+    // ===== API 多方案（profiles）=====
+    // 结构：api_profiles_v1 = [{id, name, provider, baseUrl, apiKey, model, temperature,
+    //                          maxTokens, topP, prompt, createdAt, updatedAt }]
+    //       api_active_profile = 激活方案 id
+    //       api_settings = 激活方案的镜像（由 settings.js 双写维护）——
+    //       chat-detail / forum / memory 等全站读取方继续直接读镜像，零改动兼容。
+    NS.getApiProfiles = function () {
+        var v = NS.rawGet('api_profiles_v1', null);
+        return Array.isArray(v) ? v : [];
+    };
+
+    NS.saveApiProfiles = function (list) {
+        NS.rawSet('api_profiles_v1', Array.isArray(list) ? list : []);
+    };
+
+    NS.getActiveProfileId = function () {
+        var v = NS.rawGet('api_active_profile', '');
+        return v ? String(v) : '';
+    };
+
+    NS.setActiveProfileId = function (id) {
+        if (id) NS.rawSet('api_active_profile', String(id));
+        else NS.rawRemove('api_active_profile');
+    };
+
     // API 调用日志
     NS.getApiLogs = function () {
         var v = NS.rawGet('api_call_logs', null);

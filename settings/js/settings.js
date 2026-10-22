@@ -24,6 +24,122 @@ const API_STORAGE_KEY = 'api_settings';
     }
 })();
 
+// ========== API 多方案（profiles）：一次性迁移 + 数据层 + 镜像双写 ==========
+// 结构：api_profiles_v1 = [{id, name, provider, baseUrl, apiKey, model, temperature,
+//                          maxTokens, topP, prompt, createdAt, updatedAt }]
+//       api_active_profile = 激活方案 id
+//       api_settings = 激活方案的镜像 —— chat-detail / forum / memory 等全站消费者
+//       继续直接读镜像，零改动兼容；本页保存/切换时由 saveActiveProfile 同步重写。
+(function migrateApiProfiles() {
+    try {
+        if (localStorage.getItem('api_profiles_v1')) return; // 已迁移
+        var legacy = null;
+        try { legacy = JSON.parse(localStorage.getItem('api_settings') || 'null'); } catch (e) {}
+        legacy = (legacy && typeof legacy === 'object') ? legacy : {};
+        var now = Date.now();
+        var profile = {
+            id: 'p' + now.toString(36),
+            name: legacy.name || '默认配置',
+            provider: legacy.provider || 'openai',
+            baseUrl: legacy.baseUrl || 'https://api.openai.com/v1',
+            apiKey: legacy.apiKey || '',
+            model: legacy.model || 'gpt-3.5-turbo',
+            temperature: legacy.temperature != null ? legacy.temperature : 0.7,
+            maxTokens: legacy.maxTokens != null ? legacy.maxTokens : '',
+            topP: legacy.topP != null ? legacy.topP : '',
+            prompt: legacy.prompt || '',
+            createdAt: now,
+            updatedAt: now
+        };
+        localStorage.setItem('api_profiles_v1', JSON.stringify([profile]));
+        localStorage.setItem('api_active_profile', profile.id);
+        console.log('[API 设置] 旧配置已迁移到多方案结构');
+    } catch (e) {
+        console.error('[API 设置] 多方案迁移失败:', e);
+    }
+})();
+
+function getProfiles() {
+    if (window.PhoneStorage) return PhoneStorage.getApiProfiles();
+    try {
+        var v = JSON.parse(localStorage.getItem('api_profiles_v1'));
+        return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+}
+function saveProfiles(list) {
+    if (window.PhoneStorage) { PhoneStorage.saveApiProfiles(list); return true; }
+    try { localStorage.setItem('api_profiles_v1', JSON.stringify(list || [])); return true; }
+    catch (e) { return false; }
+}
+function getActiveProfile() {
+    var list = getProfiles();
+    var activeId = '';
+    try {
+        activeId = window.PhoneStorage ? PhoneStorage.getActiveProfileId()
+                                       : (localStorage.getItem('api_active_profile') || '');
+    } catch (e) {}
+    for (var i = 0; i < list.length; i++) {
+        if (String(list[i].id) === String(activeId)) return list[i];
+    }
+    return list[0] || null;   // 指针丢失时自愈到第一个方案
+}
+// 收集当前表单为一份字段集（保存/切换/新建共用；apiKey 允许为空——切换场景不做强校验）
+function collectFormFields() {
+    return {
+        name: apiNameInput.value.trim() || '默认配置',
+        provider: apiProviderSelect.value,
+        baseUrl: (apiUrlInput.value || '').trim() || 'https://api.openai.com/v1',
+        apiKey: (apiKeyInput.value || '').trim(),
+        model: (apiModelInput.value || '').trim() || 'gpt-3.5-turbo',
+        prompt: apiPromptInput ? apiPromptInput.value.trim() : (window.__loadedPrompt || ''),
+        temperature: parseFloat(apiTemperatureInput.value) || 0.7,
+        maxTokens: apiMaxTokensInput ? apiMaxTokensInput.value.trim() : '',
+        topP: apiTopPInput && apiTopPInput.value !== '' ? Number(apiTopPInput.value) : '',
+        memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
+        timeAware: apiTimeAwareInput.checked
+    };
+}
+
+// 把方案对象写成 api_settings 镜像（extra 可覆盖 memoryCount/timeAware 等聊天行为项）
+function writeMirrorFromProfile(profile, extra) {
+    profile = profile || {};
+    var mirror = {
+        name: profile.name || '',
+        provider: profile.provider || 'custom',
+        baseUrl: profile.baseUrl || 'https://api.openai.com/v1',
+        apiKey: profile.apiKey || '',
+        model: profile.model || '',
+        prompt: profile.prompt || '',
+        temperature: profile.temperature != null ? profile.temperature : 0.7,
+        maxTokens: profile.maxTokens != null ? profile.maxTokens : '',
+        topP: profile.topP != null ? profile.topP : '',
+        memoryCount: (extra && extra.memoryCount != null) ? extra.memoryCount : 20,
+        timeAware: !(extra && extra.timeAware === false)
+    };
+    try { localStorage.setItem(API_STORAGE_KEY, JSON.stringify(mirror)); return true; }
+    catch (e) { return false; }
+}
+
+// 把表单字段写入激活方案，并重写 api_settings 镜像；memoryCount/timeAware 是聊天行为项，仅进镜像不进方案
+function saveActiveProfile(fields) {
+    try {
+        var list = getProfiles();
+        var active = getActiveProfile();
+        if (!active) {
+            active = { id: 'p' + Date.now().toString(36), createdAt: Date.now() };
+            list.push(active);
+        }
+        for (var k in fields) active[k] = fields[k];
+        active.updatedAt = Date.now();
+        if (!saveProfiles(list)) return false;
+        if (window.PhoneStorage) PhoneStorage.setActiveProfileId(active.id);
+        else try { localStorage.setItem('api_active_profile', active.id); } catch (e) {}
+        return writeMirrorFromProfile(active, fields);
+    } catch (e) {
+        return false;
+    }
+}
+
 let allModels = null;
 const apiUrlInput = document.getElementById('api-url');
 const apiKeyInput = document.getElementById('api-key');
@@ -38,13 +154,17 @@ const apiMemoryInput = document.getElementById('api-memory');
 const apiTemperatureInput = document.getElementById('api-temperature');
 const apiTimeAwareInput = document.getElementById('api-time-aware');
 
-// 服务商预设 Base URL 映射
+// 服务商预设（url + 默认模型）——快捷预设与下拉联动共用
 const PROVIDER_PRESETS = {
-    openai: 'https://api.openai.com/v1',
-    deepseek: 'https://api.deepseek.com/v1',
-    moonshot: 'https://api.moonshot.cn/v1',
-    zhipu: 'https://open.bigmodel.cn/api/paas/v4',
-    siliconflow: 'https://api.siliconflow.cn/v1'
+    openai:      { url: 'https://api.openai.com/v1',            model: 'gpt-4o-mini' },
+    deepseek:    { url: 'https://api.deepseek.com/v1',          model: 'deepseek-chat' },
+    moonshot:    { url: 'https://api.moonshot.cn/v1',           model: 'moonshot-v1-8k' },
+    zhipu:       { url: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+    siliconflow: { url: 'https://api.siliconflow.cn/v1',        model: 'deepseek-ai/DeepSeek-V3' }
+};
+const PRESET_LABELS = {
+    openai: 'OpenAI', deepseek: 'DeepSeek', moonshot: 'Moonshot',
+    zhipu: '智谱 GLM', siliconflow: '硅基流动'
 };
 
 function showToast(text) {
@@ -58,14 +178,166 @@ function toggleKeyVisibility() {
     apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
 }
 
-// 服务商下拉联动 → 自动填 Base URL
+// 服务商下拉联动 → 自动填 Base URL + 默认模型
 if (apiProviderSelect) {
     apiProviderSelect.addEventListener('change', function() {
-        const url = PROVIDER_PRESETS[this.value];
-        if (url && apiUrlInput) {
-            apiUrlInput.value = url;
+        const preset = PROVIDER_PRESETS[this.value];
+        if (preset && apiUrlInput) {
+            apiUrlInput.value = preset.url;
+            if (preset.model && apiModelInput) apiModelInput.value = preset.model;
         }
     });
+}
+
+// ======================= 方案条 / 快捷预设 / 参数滑块（API 面板升级） =======================
+const apiMaxTokensInput = document.getElementById('api-max-tokens');
+const apiTopPInput = document.getElementById('api-top-p');
+const temperatureValEl = document.getElementById('api-temperature-val');
+const topPValEl = document.getElementById('api-top-p-val');
+const btnProfileNew = document.getElementById('btnProfileNew');
+const btnProfileDelete = document.getElementById('btnProfileDelete');
+
+// 滑块数值实时显示
+function syncParamLabels() {
+    if (temperatureValEl && apiTemperatureInput) temperatureValEl.textContent = apiTemperatureInput.value;
+    if (topPValEl && apiTopPInput) topPValEl.textContent = apiTopPInput.value;
+}
+
+// 方案胶囊：渲染 + 点击切换（切走前静默自动保存当前表单，不弹确认）
+function renderProfilePills() {
+    var box = document.getElementById('profilePills');
+    if (!box) return;
+    var list = getProfiles();
+    var active = getActiveProfile() || {};
+    box.innerHTML = '';
+    list.forEach(function (p) {
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'profile-pill' + (String(p.id) === String(active.id) ? ' on' : '');
+        pill.textContent = p.name || '未命名';
+        pill.addEventListener('click', function () { switchProfile(p.id); });
+        box.appendChild(pill);
+    });
+}
+
+function switchProfile(id) {
+    var current = getActiveProfile();
+    if (!id || (current && String(current.id) === String(id))) return;
+    // 静默自动保存：当前表单写回当前方案，改动不丢
+    saveActiveProfile(collectFormFields());
+    // 切换指针 → 重写镜像 → 回填表单
+    if (window.PhoneStorage) PhoneStorage.setActiveProfileId(id);
+    else try { localStorage.setItem('api_active_profile', id); } catch (e) {}
+    var next = getActiveProfile();
+    if (next) {
+        writeMirrorFromProfile(next, {
+            memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
+            timeAware: apiTimeAwareInput.checked
+        });
+    }
+    loadConfig();
+    syncParamLabels();
+    renderProfilePills();
+    resetTestMsg();
+    showToast('已切换到「' + (next && next.name ? next.name : '方案') + '」');
+}
+
+// 快捷预设：一键填地址 + 模型 + 服务商，绝不动 API Key
+function renderPresetChips() {
+    var box = document.getElementById('presetChips');
+    if (!box) return;
+    box.innerHTML = '';
+    Object.keys(PROVIDER_PRESETS).forEach(function (key) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'preset-chip';
+        chip.textContent = PRESET_LABELS[key] || key;
+        chip.addEventListener('click', function () {
+            var preset = PROVIDER_PRESETS[key];
+            if (apiProviderSelect) apiProviderSelect.value = key;
+            if (apiUrlInput) apiUrlInput.value = preset.url;
+            if (apiModelInput && preset.model) apiModelInput.value = preset.model;
+            showToast('已填入 ' + (PRESET_LABELS[key] || key) + ' 预设，Key 请自行填写');
+        });
+        box.appendChild(chip);
+    });
+}
+
+// 新建方案：以当前表单为模板复制一份，自动切换过去
+function createProfile() {
+    var fields = collectFormFields();
+    var list = getProfiles();
+    var now = Date.now();
+    var p = {
+        id: 'p' + now.toString(36),
+        name: (fields.name || '方案') + ' 副本',
+        provider: fields.provider,
+        baseUrl: fields.baseUrl,
+        apiKey: fields.apiKey,
+        model: fields.model,
+        temperature: fields.temperature,
+        maxTokens: fields.maxTokens,
+        topP: fields.topP,
+        prompt: fields.prompt,
+        createdAt: now,
+        updatedAt: now
+    };
+    list.push(p);
+    if (!saveProfiles(list)) { showToast('新建失败：存储空间不足'); return; }
+    if (window.PhoneStorage) PhoneStorage.setActiveProfileId(p.id);
+    else try { localStorage.setItem('api_active_profile', p.id); } catch (e) {}
+    writeMirrorFromProfile(p, { memoryCount: fields.memoryCount, timeAware: fields.timeAware });
+    loadConfig();
+    syncParamLabels();
+    renderProfilePills();
+    showToast('已新建「' + p.name + '」');
+}
+
+function deleteActiveProfile() {
+    var list = getProfiles();
+    if (list.length <= 1) { showToast('至少保留一个方案'); return; }
+    var active = getActiveProfile();
+    if (!active) return;
+    if (!confirm('确定删除方案「' + (active.name || '未命名') + '」？不可恢复。')) return;
+    var rest = list.filter(function (p) { return String(p.id) !== String(active.id); });
+    saveProfiles(rest);
+    var next = rest[0] || null;
+    if (window.PhoneStorage) PhoneStorage.setActiveProfileId(next ? next.id : '');
+    else try { localStorage.setItem('api_active_profile', next ? next.id : ''); } catch (e) {}
+    if (next) {
+        writeMirrorFromProfile(next, {
+            memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
+            timeAware: apiTimeAwareInput.checked
+        });
+    }
+    loadConfig();
+    syncParamLabels();
+    renderProfilePills();
+    resetTestMsg();
+    showToast('方案已删除');
+}
+
+function resetTestMsg() {
+    var msgEl = document.getElementById('test-msg');
+    if (msgEl) msgEl.innerText = '';
+}
+
+// ========== HTTP 状态码 → 友好中文提示（与 chat-detail 的同名函数语义一致） ==========
+function friendlyHttpError(status, detail) {
+    var map = {
+        400: '请求格式有误',
+        401: 'API Key 错误或已失效',
+        403: '没有访问权限',
+        404: 'API 地址或模型名不存在',
+        429: '请求太频繁或额度已用尽',
+        500: '服务器繁忙，请稍后再试',
+        502: '服务器繁忙（网关错误）',
+        503: '服务暂不可用',
+        504: '服务器响应超时'
+    };
+    var tip = map[status] || ('HTTP ' + status);
+    detail = String(detail || '').trim();
+    return detail ? (tip + '｜' + detail.slice(0, 100)) : tip;
 }
 
 // ========== 测试连接 ==========
@@ -83,6 +355,7 @@ async function testConnection() {
 
     if (!baseUrl.endsWith('/')) baseUrl += '/';
     const testUrl = baseUrl + 'chat/completions';
+    const t0 = Date.now();
 
     msgEl.innerText = '⏳ 正在测试连接...';
     msgEl.style.color = '#007aff';
@@ -107,7 +380,7 @@ async function testConnection() {
         clearTimeout(timeoutId);
 
         if (response.status === 200) {
-            msgEl.innerText = '✅ 连接成功！';
+            msgEl.innerText = '✅ 连接成功 · ' + (Date.now() - t0) + 'ms · ' + model;
             msgEl.style.color = '#34c759';
             return;
         }
@@ -121,12 +394,7 @@ async function testConnection() {
             detail = response.statusText;
         }
 
-        let label = 'HTTP ' + response.status;
-        if (response.status === 401) label = '❌ Key 无效或余额不足';
-        else if (response.status === 404) label = '❌ API 地址错误';
-        else label = '❌ HTTP ' + response.status + ' (' + detail + ')';
-
-        msgEl.innerText = label;
+        msgEl.innerText = '❌ ' + friendlyHttpError(response.status, detail);
         msgEl.style.color = '#ff3b30';
     } catch (error) {
         clearTimeout(timeoutId);
@@ -262,12 +530,14 @@ function loadConfig() {
                 if (apiPromptInput) apiPromptInput.value = parsed.prompt || '';
                 apiMemoryInput.value = parsed.memoryCount != null ? parsed.memoryCount : 20;
                 apiTemperatureInput.value = parsed.temperature != null ? parsed.temperature : 0.7;
+                if (apiMaxTokensInput) apiMaxTokensInput.value = parsed.maxTokens != null ? parsed.maxTokens : '';
+                if (apiTopPInput) apiTopPInput.value = (parsed.topP != null && parsed.topP !== '') ? Number(parsed.topP) : 1;
                 apiTimeAwareInput.checked = parsed.timeAware !== false;
                 // 根据 baseUrl 反推服务商
                 let matchedProvider = 'custom';
                 if (parsed.baseUrl) {
                     for (const key in PROVIDER_PRESETS) {
-                        if (PROVIDER_PRESETS[key] === parsed.baseUrl) { matchedProvider = key; break; }
+                        if (PROVIDER_PRESETS[key].url === parsed.baseUrl) { matchedProvider = key; break; }
                     }
                 }
                 apiProviderSelect.value = parsed.provider || matchedProvider;
@@ -286,6 +556,8 @@ function loadConfig() {
     if (apiPromptInput) apiPromptInput.value = '';
     apiMemoryInput.value = 20;
     apiTemperatureInput.value = 0.7;
+    if (apiMaxTokensInput) apiMaxTokensInput.value = '';
+    if (apiTopPInput) apiTopPInput.value = 1;
     apiTimeAwareInput.checked = true;
 }
 
@@ -298,6 +570,18 @@ settingsForm.addEventListener('submit', function(e) {
     }
     keyError.style.display = 'none';
 
+    // Max Tokens 校验：填了必须是正整数，留空 = 不限制（不发送该参数）
+    var maxTokRaw = apiMaxTokensInput ? apiMaxTokensInput.value.trim() : '';
+    var maxTokVal = '';
+    if (maxTokRaw !== '') {
+        var mtNum = Number(maxTokRaw);
+        if (!isFinite(mtNum) || mtNum <= 0) {
+            showToast('Max Tokens 需为正整数，或留空表示不限制');
+            return;
+        }
+        maxTokVal = Math.floor(mtNum);
+    }
+
     const config = {
         name: apiNameInput.value.trim() || '默认配置',
         provider: apiProviderSelect.value,
@@ -305,16 +589,15 @@ settingsForm.addEventListener('submit', function(e) {
         apiKey: apiKey,
         model: apiModelInput.value.trim() || 'gpt-3.5-turbo',
         prompt: apiPromptInput ? apiPromptInput.value.trim() : (window.__loadedPrompt || ''),
-        memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
         temperature: parseFloat(apiTemperatureInput.value) || 0.7,
+        maxTokens: maxTokVal,
+        topP: apiTopPInput && apiTopPInput.value !== '' ? Number(apiTopPInput.value) : '',
+        memoryCount: parseInt(apiMemoryInput.value, 10) || 20,
         timeAware: apiTimeAwareInput.checked
     };
-    try {
-        localStorage.setItem(API_STORAGE_KEY, JSON.stringify(config));
-        showToast('保存成功');
-    } catch (err) {
-        showToast('保存失败');
-    }
+    // 双写：写入激活方案 + 重写 api_settings 镜像（chat-detail / forum 等读取方零改动）
+    var ok = saveActiveProfile(config);
+    showToast(ok === false ? '保存失败' : '保存成功');
 });
 
 // ======================= 模型选择弹窗逻辑 =======================
@@ -369,212 +652,13 @@ if (modelModalClose) {
 }
 
 loadConfig();
+syncParamLabels();
+renderProfilePills();
+renderPresetChips();
 
-// ======================= 美化设置面板逻辑 =======================
-const WALLPAPER_KEY = 'home_custom_wallpaper';
-const ICON_BG_KEY = 'home_custom_icon_bg';
-
-const openCustomizeBtn = document.getElementById('openCustomizeBtn');
-const closeCustomizeBtn = document.getElementById('closeCustomizeBtn');
-const customizePanel = document.getElementById('customizePanel');
-
-const wallpaperInput = document.getElementById('wallpaperInput');
-const resetWallpaperBtn = document.getElementById('resetWallpaperBtn');
-const wallpaperPreviewBox = document.getElementById('wallpaperPreviewBox');
-const wallpaperEmptyText = document.getElementById('wallpaperEmptyText');
-const colorChips = document.querySelectorAll('.color-chip');
-
-// 打开/关闭面板
-if (openCustomizeBtn && customizePanel) {
-    openCustomizeBtn.addEventListener('click', () => {
-        customizePanel.style.display = 'flex';
-        initCustomizeUI();
-    });
-}
-
-if (closeCustomizeBtn && customizePanel) {
-    closeCustomizeBtn.addEventListener('click', () => {
-        customizePanel.style.display = 'none';
-    });
-}
-
-// 压缩图片并转为 Base64 (Canvas 压缩到最大 720px，质量 0.82 保证适配 localStorage)
-function compressImage(file, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 640;
-            const MAX_HEIGHT = 1136;
-            let width = img.width;
-            let height = img.height;
-
-            if (width > height) {
-                if (width > MAX_WIDTH) {
-                    height = Math.round((height * MAX_WIDTH) / width);
-                    width = MAX_WIDTH;
-                }
-            } else {
-                if (height > MAX_HEIGHT) {
-                    width = Math.round((width * MAX_HEIGHT) / height);
-                    height = MAX_HEIGHT;
-                }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
-            callback(compressedBase64);
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-// 初始化美化 UI 状态
-function initCustomizeUI() {
-    // 1. 初始化壁纸预览
-    const savedWallpaper = localStorage.getItem(WALLPAPER_KEY);
-    if (savedWallpaper) {
-        wallpaperPreviewBox.style.backgroundImage = `url("${savedWallpaper}")`;
-        wallpaperEmptyText.style.display = 'none';
-    } else {
-        wallpaperPreviewBox.style.backgroundImage = 'none';
-        wallpaperEmptyText.style.display = 'block';
-    }
-
-    // 2. 初始化图标底色选中态
-    const savedColor = localStorage.getItem(ICON_BG_KEY) || 'rgba(255, 255, 255, 0.6)';
-    colorChips.forEach(chip => {
-        if (chip.dataset.color === savedColor) {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
-    });
-}
-
-// 上传壁纸事件
-if (wallpaperInput) {
-    wallpaperInput.addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-
-        compressImage(file, (base64) => {
-            try {
-                localStorage.setItem(WALLPAPER_KEY, base64);
-                wallpaperPreviewBox.style.backgroundImage = `url("${base64}")`;
-                wallpaperEmptyText.style.display = 'none';
-                showToast('壁纸已更新');
-            } catch (err) {
-                console.error('存储壁纸失败:', err);
-                showToast('壁纸保存失败，图片过大');
-            }
-        });
-        wallpaperInput.value = '';
-    });
-}
-
-// 恢复默认纯白壁纸
-if (resetWallpaperBtn) {
-    resetWallpaperBtn.addEventListener('click', () => {
-        localStorage.removeItem(WALLPAPER_KEY);
-        wallpaperPreviewBox.style.backgroundImage = 'none';
-        wallpaperEmptyText.style.display = 'block';
-        showToast('已恢复纯白壁纸');
-    });
-}
-
-// 图标底色切换
-colorChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-        colorChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-
-        const color = chip.dataset.color;
-        try {
-            localStorage.setItem(ICON_BG_KEY, color);
-            showToast('图标底色已更新');
-        } catch (err) {
-            console.error(err);
-        }
-    });
-});
-
-// ======================= 图标底色切换 (毛玻璃 / 纯净) =======================
-const ICON_STYLE_STORAGE_KEY = 'home_icon_style';
-const openIconStyleBtn = document.getElementById('openIconStyleBtn');
-const iconStyleModal = document.getElementById('iconStyleModal');
-const iconStyleBackdrop = document.getElementById('iconStyleBackdrop');
-const btnCloseIconModal = document.getElementById('btnCloseIconModal');
-const btnChoiceGlass = document.getElementById('btnChoiceGlass');
-const btnChoiceClean = document.getElementById('btnChoiceClean');
-const iconStyleStatus = document.getElementById('iconStyleStatus');
-
-function applyIconStyle(style) {
-    const isGlass = style !== 'clean';
-    const bg = isGlass ? 'rgba(255, 255, 255, 0.6)' : '#F2F2F7';
-    const blur = isGlass ? 'blur(12px)' : 'none';
-
-    document.documentElement.style.setProperty('--icon-bg', bg);
-    document.documentElement.style.setProperty('--icon-blur', blur);
-
-    if (iconStyleStatus) {
-        iconStyleStatus.textContent = isGlass ? '毛玻璃' : '纯净';
-    }
-    if (btnChoiceGlass) {
-        btnChoiceGlass.classList.toggle('active', isGlass);
-    }
-    if (btnChoiceClean) {
-        btnChoiceClean.classList.toggle('active', !isGlass);
-    }
-}
-
-function setIconStyle(style) {
-    try {
-        localStorage.setItem(ICON_STYLE_STORAGE_KEY, style);
-        // 同步兼顾原桌面 ICON_BG_KEY 变量
-        const bg = style === 'clean' ? '#F2F2F7' : 'rgba(255, 255, 255, 0.6)';
-        localStorage.setItem(ICON_BG_KEY, bg);
-    } catch (e) {
-        console.error(e);
-    }
-    applyIconStyle(style);
-    if (iconStyleModal) iconStyleModal.style.display = 'none';
-    showToast(style === 'clean' ? '已设置为纯净图标' : '已设置为毛玻璃图标');
-}
-
-// 初始化加载图标底色
-const savedIconStyle = localStorage.getItem(ICON_STYLE_STORAGE_KEY) || 'glass';
-applyIconStyle(savedIconStyle);
-
-if (openIconStyleBtn && iconStyleModal) {
-    openIconStyleBtn.addEventListener('click', () => {
-        iconStyleModal.style.display = 'flex';
-    });
-}
-
-if (btnCloseIconModal && iconStyleModal) {
-    btnCloseIconModal.addEventListener('click', () => {
-        iconStyleModal.style.display = 'none';
-    });
-}
-
-if (iconStyleBackdrop && iconStyleModal) {
-    iconStyleBackdrop.addEventListener('click', () => {
-        iconStyleModal.style.display = 'none';
-    });
-}
-
-if (btnChoiceGlass) {
-    btnChoiceGlass.addEventListener('click', () => setIconStyle('glass'));
-}
-
-if (btnChoiceClean) {
-    btnChoiceClean.addEventListener('click', () => setIconStyle('clean'));
-}
+// 滑块实时数值 + 方案条按钮
+if (apiTemperatureInput) apiTemperatureInput.addEventListener('input', syncParamLabels);
+if (apiTopPInput) apiTopPInput.addEventListener('input', syncParamLabels);
+if (btnProfileNew) btnProfileNew.addEventListener('click', createProfile);
+if (btnProfileDelete) btnProfileDelete.addEventListener('click', deleteActiveProfile);
 

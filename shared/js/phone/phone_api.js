@@ -51,6 +51,11 @@
             temperature: temperature,
             stream: false
         };
+        // 高级参数（API 设置多方案升级）：仅在明确设置时发送，留空 = 用服务商默认值
+        var maxTokens = Number(config.maxTokens);
+        if (maxTokens > 0) body.max_tokens = Math.floor(maxTokens);
+        var topP = Number(config.topP);
+        if (topP > 0 && topP < 1) body.top_p = topP;
 
         var start = Date.now();
         var controller = new AbortController();

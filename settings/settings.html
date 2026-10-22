@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings · 设置</title>
-    <script src="../shared/js/font-loader.js"></script>
+    <script src="../shared/js/font-loader.js?v=20261022v1"></script>
     <script src="../shared/js/native-feel.js"></script>
     <script src="../shared/js/phone/phone_storage.js"></script>
     <script src="../shared/js/statusbar-control.js"></script>
@@ -148,6 +148,22 @@
                 </div>
             </section>
 
+            <!-- 数据管理：全量备份与恢复 -->
+            <div class="group-title">DATA</div>
+            <section class="card">
+                <div class="menu-row" id="rowExportData" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">导出全量数据</span><span class="t-en">Backup</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+                <div class="menu-row" id="rowImportData" role="button" tabindex="0">
+                    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                    <div class="menu-title"><span class="t-cn">导入数据</span><span class="t-en">Restore</span></div>
+                    <div class="menu-arrow">›</div>
+                </div>
+            </section>
+            <input type="file" id="importFileInput" accept=".json,application/json" style="display:none;">
+
             <div class="footnote">极简黑白灰 · Monochrome Minimal</div>
         </main>
 
@@ -169,6 +185,22 @@
                 </div>
             </header>
             <main class="content">
+                <!-- 方案条：横向滚动胶囊（当前方案黑底白字），切走前静默自动保存当前表单 -->
+                <div class="api-row profile-row">
+                    <label>配置方案</label>
+                    <div class="profile-pills" id="profilePills"></div>
+                    <div class="profile-actions">
+                        <button type="button" class="profile-mini-btn" id="btnProfileNew">＋ 新建方案</button>
+                        <button type="button" class="profile-mini-btn" id="btnProfileDelete">删除当前</button>
+                    </div>
+                </div>
+
+                <!-- 快捷预设：一键填地址与模型，绝不动 API Key -->
+                <div class="api-row">
+                    <label>快捷预设</label>
+                    <div class="preset-chips" id="presetChips"></div>
+                </div>
+
                 <form id="settingsForm" class="card">
                     <div class="api-row">
                         <label for="api-name">配置名称</label>
@@ -213,16 +245,29 @@
                         <div id="model-fetch-msg" class="model-fetch-msg">输入 API Key 后点击拉取</div>
                     </div>
 
-                    <h3 class="api-section-title">高级设置</h3>
+                    <h3 class="api-section-title">高级参数</h3>
+
+                    <div class="api-row">
+                        <label for="api-temperature">温度 Temperature<span class="param-val" id="api-temperature-val">0.7</span></label>
+                        <input id="api-temperature" type="range" min="0" max="2" step="0.1" value="0.7">
+                        <div class="param-hint">0 = 精准稳定 · 1 = 均衡（默认） · 2 = 天马行空</div>
+                    </div>
+
+                    <div class="api-row">
+                        <label for="api-max-tokens">最大回复 Tokens</label>
+                        <input id="api-max-tokens" type="number" min="1" step="1" placeholder="留空 = 不限制">
+                        <div class="param-hint">限制单次回复长度；留空则使用服务商默认上限</div>
+                    </div>
+
+                    <div class="api-row">
+                        <label for="api-top-p">Top P 核采样<span class="param-val" id="api-top-p-val">1</span></label>
+                        <input id="api-top-p" type="range" min="0.05" max="1" step="0.05" value="1">
+                        <div class="param-hint">1 = 不干预（默认）；调低后只从高概率词中挑选，与温度二选一调整</div>
+                    </div>
 
                     <div class="api-row">
                         <label for="api-memory">记忆条数（历史条数）</label>
                         <input id="api-memory" type="number" min="1" max="100" value="20" placeholder="20">
-                    </div>
-
-                    <div class="api-row">
-                        <label for="api-temperature">温度 (0 - 2)</label>
-                        <input id="api-temperature" type="number" min="0" max="2" step="0.1" value="0.7" placeholder="0.7">
                     </div>
 
                     <div class="api-row api-row-switch">
@@ -256,6 +301,7 @@
         <div class="toast-msg" id="toastMsg">已保存设置</div>
     </div>
     <script src="js/settings.js"></script>
+    <script src="js/backup.js"></script>
     <script>
     // 设置页用户卡片 + 深色模式开关
     (function () {
