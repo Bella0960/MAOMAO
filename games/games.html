@@ -664,7 +664,9 @@ var CASE_INTERVIEWS={
 5:[{title:'编辑唐 · 负责审稿',text:'我凌晨就离开了工作室，那张咖啡收据可能是别人代签的。'},{title:'邻居许 · 住在隔壁',text:'我听到过电话声，但隔着墙无法判断来自哪间房。'},{title:'作家本人 · 手稿所有者',text:'我说是匿名电话，是因为不想让别人知道工作室内部线路出了问题。'}]
 };
 function caseProgressRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_progress_v1')||'{}')||{};}catch(e){return {};}}
-function caseProgress(){var all=caseProgressRoot(),key=String(activeRole&&activeRole.id||'default-partner');if(!all[key])all[key]={completed:[],attempts:{},notes:{}};return all[key];}
+function caseProgress(){var all=caseProgressRoot(),key=String(activeRole&&activeRole.id||'default-partner');if(!all[key])all[key]={completed:[],attempts:{},notes:{},campaign:{trust:{},flags:[],threads:[],choices:[]}};if(!all[key].campaign)all[key].campaign={trust:{},flags:[],threads:[],choices:[]};if(!all[key].campaign.trust)all[key].campaign.trust={};if(!Array.isArray(all[key].campaign.flags))all[key].campaign.flags=[];if(!Array.isArray(all[key].campaign.threads))all[key].campaign.threads=[];if(!Array.isArray(all[key].campaign.choices))all[key].campaign.choices=[];return all[key];}
+function saveCampaignChoice(caseTitle,choice,result){var p=caseProgress(),c=p.campaign;c.choices.push({caseTitle:caseTitle,choice:choice,result:result,at:new Date().toISOString()});var flag='choice:'+caseTitle+':'+choice;if(c.flags.indexOf(flag)<0)c.flags.push(flag);c.threads.push({caseTitle:caseTitle,summary:result,choice:choice});saveCaseProgress(p);}
+function campaignBrief(){var c=caseProgress().campaign;return '过往选择：'+(c.choices.slice(-8).map(function(x){return x.caseTitle+'：选择 '+x.choice+'；结果 '+x.result;}).join('；')||'暂无')+'。持续伏笔：'+(c.threads.slice(-8).map(function(x){return x.caseTitle+'留下：'+x.summary;}).join('；')||'暂无')+'。';}
 function saveCaseProgress(progress){var all=caseProgressRoot();all[String(activeRole&&activeRole.id||'default-partner')]=progress||caseProgress();localStorage.setItem('maomao_detective_progress_v1',JSON.stringify(all));}
 var detectiveGeneratedCasesLoaded=false;
 function loadGeneratedDetectiveCases(){if(detectiveGeneratedCasesLoaded)return;detectiveGeneratedCasesLoaded=true;try{var saved=JSON.parse(localStorage.getItem('maomao_detective_generated_cases_v1')||'[]');if(Array.isArray(saved))saved.forEach(function(c){if(c&&c.title&&Array.isArray(c.evidence)&&Array.isArray(c.suspects)&&!CASES.some(function(x){return x.title===c.title;}))CASES.push(c);});}catch(e){}}
@@ -699,7 +701,7 @@ function generateDetectiveCase(){
  var button=byId('generateDetectiveCase');if(button){button.disabled=true;button.textContent='正在构思…';}
  var team=detectiveTeam(),history=CASES.slice(-5).map(function(c){return c.title;}).join('、');
  var system='你是悬疑推理游戏编剧。创作适合青少年的非血腥推理案件，必须有可验证线索、逻辑闭环，不能靠猜测或超自然力量定案。只返回严格 JSON，不要 Markdown。结构：{"title":"标题","intro":"案情","evidence":[{"title":"证据名称","detail":"可核验线索"}],"suspects":[{"name":"人物","job":"身份"},{"name":"人物","job":"身份"},{"name":"人物","job":"身份"}],"answer":0,"explain":"逐条解释线索如何支持结论并排除其他人","chapter":"本案留下的主线伏笔"}。至少4条证据，恰好3名嫌疑人，answer是0到2整数。';
- var user='为 MAOMAO 长线侦探游戏生成新案件。调查队成员：'+team.map(function(r){return roleName(r)+'；人设：'+String(r.description||r.bio||r.personality||'').slice(0,100);}).join('。')+'。不要重复这些已有案件：'+history+'。加入一条未来章节可以回收的主线伏笔。';
+ var user='为 MAOMAO 长线侦探游戏生成新案件。调查队成员：'+team.map(detectivePersona).join('。')+'。不要重复这些已有案件：'+history+'。必须有唯一且逻辑闭合的真相，证据至少4条且至少两条能独立支持结论，三名嫌疑人都要有合理动机或机会，证词中至少一处可被已公开证据验证的矛盾。案件需与既有主线相连但不能改写旧案真相。跨案记忆：'+campaignBrief()+'。加入一条未来章节可以回收的主线伏笔。';
  window.PhoneAPI.complete({system:system,user:user,temperature:0.75,timeoutMs:45000}).then(function(raw){
   var txt=String(raw||'').trim().replace(/^```(?:json)?s*/i,'').replace(/s*```$/,'');var a=txt.indexOf('{'),z=txt.lastIndexOf('}');if(a>=0&&z>a)txt=txt.slice(a,z+1);
   var c=JSON.parse(txt);if(!c.title||!c.intro||!Array.isArray(c.evidence)||c.evidence.length<4||!Array.isArray(c.suspects)||c.suspects.length!==3||![0,1,2].includes(Number(c.answer))||!c.explain)throw new Error('invalid case');
@@ -751,7 +753,7 @@ function submitFreeformInvestigation(){
   showAnswer('档案顾问沈砚：先把问题拆成可核对的事实。现场调查员林见秋：目前能确认的线索是「'+hint+'」。访谈顾问周予安：可以继续询问人物，找出说法之间的矛盾。此为基础反馈；配置 API 后才能对你的自由提问生成动态回应。','自动 NPC · 调查建议');return;
  }
  var system='你是开放式推理游戏的调查引擎。基于给定案情、已经公开的证据和角色人设，回应玩家的自由调查行动。必须保持案件既定真相和时间线一致；不得凭空宣布新事实为已证实，不得直接泄露未查看证据的细节；可以建议下一步调查、提出追问、安排NPC回应或指出矛盾。让最多三位不同队员各说一小段，性格和表达不同。若玩家行动合理，可产生新的可调查方向；明确区分“事实”“推测”“下一步”。输出简体中文纯文本，不要JSON，不超过500字。';
- var user='案件：'+c.title+'\n案情：'+c.intro+'\n既有证据：\n'+evidence+'\n人物证词：\n'+interviews+'\n调查队：\n'+team.map(detectivePersona).join('\n')+'\n玩家现在想做的事：'+question+'\n请根据当前信息给出实际回应，不要重复固定台词。';
+ var user='案件：'+c.title+'\n案情：'+c.intro+'\n既有证据：\n'+evidence+'\n人物证词：\n'+interviews+'\n调查队：\n'+team.map(detectivePersona).join('\n')+'\n跨案记忆：'+campaignBrief()+'\n玩家现在想做的事：'+question+'\n案件真相已在游戏内预先固定。不得改写真相，不得将未公开证据说成已发现，不得创造新的确定事实、证物或嫌疑人。只能给出角色推测、追问建议或调查方向；若有新方向，只能作为“待核实线索”，不能自动加入已确认证据。请根据当前状态给出实际回应。';
  byId('investigationSubmit').disabled=true;
  window.PhoneAPI.complete({system:system,user:user,temperature:0.75,timeoutMs:40000}).then(function(raw){
   var text=String(raw||'').trim();if(!text)throw new Error('empty response');showAnswer(text,'调查队 · 动态回应');
@@ -773,8 +775,8 @@ function chooseSuspect(i){
  if(Object.keys(gameState.revealed).length<c.evidence.length||Object.keys(gameState.interviewed).length<c.suspects.length){showToast('先完成现场取证和人物询问。');return;}
  gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
  var correct=i===c.answer;
- if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
- else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
+ if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'误判后进入复盘；队员会在后续调查中提醒你重新核对证据。');saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
  buttons.forEach(function(b){b.disabled=true;});
  var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
  var extra=byId('gameContent').querySelector('.case-result-actions');if(!extra){extra=document.createElement('div');extra.className='btn-row case-result-actions';byId('gameContent').querySelector('.board-panel').appendChild(extra);}
