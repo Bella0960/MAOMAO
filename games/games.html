@@ -840,8 +840,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.07';
-  badge.setAttribute('aria-label','侦探游戏版本 V.07');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.08';
+  badge.setAttribute('aria-label','侦探游戏版本 V.08');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1722,7 +1722,9 @@ body.detective-case-mode .detective-livefeed{display:none!important}
   card.appendChild(head);card.appendChild(feed);modal.appendChild(card);document.body.appendChild(modal);feed.style.display='grid';
   head.querySelector('button').addEventListener('click',close);modal.addEventListener('click',function(e){if(e.target===modal)close();});document.addEventListener('keydown',keyHandler);
  }
- document.addEventListener('click',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar'):null;if(!bar)return;e.preventDefault();open();});
+ document.addEventListener('click',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar, #detectiveLiveStatus, [data-open-live-log]'):null;if(!bar)return;var liveBar=bar.closest('.detective-livebar')||bar;if(!document.getElementById('detectiveLiveFeed'))return;e.preventDefault();e.stopPropagation();open();},true);
+ document.addEventListener('keydown',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar'):null;if(!bar||!(e.key==='Enter'||e.key===' '))return;e.preventDefault();open();},true);
+ document.addEventListener('DOMContentLoaded',function(){var bar=document.querySelector('.detective-livebar');if(bar){bar.setAttribute('role','button');bar.setAttribute('tabindex','0');bar.setAttribute('aria-label','打开实时调查动态');}});
 })();
 </script>
 
