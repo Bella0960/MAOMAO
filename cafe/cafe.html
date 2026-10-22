@@ -496,7 +496,27 @@ var REGULAR_POOL=[
 {id:'xu',name:'许同学',initial:'许',favorite:'鲜榨柠檬水',line:'喜欢尝试季节饮品，天气热时来得更勤。'},
 {id:'chen',name:'陈女士',initial:'陈',favorite:'茶香奶饮',line:'喜欢安静看书，对店里的小变化很敏锐。'}
 ];
-function currentStory(){var idx=Math.floor((st.day-2)/2);return idx>=0&&idx<STORY_ARCS.length?{idx:idx,arc:STORY_ARCS[idx]}:null;}
+function currentStory(){
+ var idx=Math.floor((st.day-2)/2);
+ if(idx<0||idx>=STORY_ARCS.length)return null;
+ /* 口碑章节需要先建立熟客关系，避免单纯按天数自动解锁 */
+ if(idx>=3&&(st.regulars||[]).length<2)return null;
+ if(idx>=4&&(st.regulars||[]).length<3)return null;
+ return {idx:idx,arc:STORY_ARCS[idx]};
+}
+function galleryStoryReady(){return st.decorUnlocked.indexOf('gallery')>=0&&!st.galleryStoryChoice;}
+function renderGalleryStory(){
+ if(!galleryStoryReady())return '';
+ var chosen=st.galleryStoryChoice;
+ if(chosen)return '<div class="story-card"><div class="story-top"><span class="story-kicker">STORE EVENT / GALLERY</span><span class="story-stamp">已记录</span></div><div class="story-title">画廊里的第一张照片</div><p class="story-copy">'+esc(st.galleryStoryLog||'黑白画廊成为小店的新记忆。')+'</p></div>';
+ return '<div class="story-card gallery-event"><div class="story-top"><span class="story-kicker">STORE EVENT / UNLOCKED</span><span class="story-stamp">新装修事件</span></div><div class="story-title">画廊里的第一张照片</div><p class="story-copy">黑白画廊刚刚布置完成。一位常来的客人停在新挂上的照片前，说这让她想起一段特别的回忆。搭档转过头问你，要不要让这张照片成为店里的故事。</p><div class="story-choices"><button class="story-choice" data-gallery-story="memory"><strong>A · 写下照片背后的故事</strong><span>让空间多一份属于小店的记忆，口碑 +3。</span></button><button class="story-choice" data-gallery-story="exhibit"><strong>B · 做成每月主题展</strong><span>邀请熟客参与选片，满意度 +3，并获得少量经营经验。</span></button></div></div>';
+}
+function chooseGalleryStory(which){
+ if(!galleryStoryReady())return;
+ if(which==='memory'){stat('rep',3);st.galleryStoryLog='你把照片背后的故事写进了小店手记。后来有客人停下脚步读完它，也开始分享自己的故事。';}
+ else{stat('sat',3);st.xp+=12;st.galleryStoryLog='你邀请熟客一起挑选下一期主题。画廊从装饰变成了大家共同参与的小小展览。';}
+ st.galleryStoryChoice=which;st.storyLog.unshift({key:'gallery-'+st.day,day:st.day,title:'画廊里的第一张照片',text:st.galleryStoryLog,choice:which==='memory'?'写下照片背后的故事':'做成每月主题展',roleName:nameOf(role)});st.storyLog=st.storyLog.slice(0,8);checkAchievements();save();renderAll();toast('画廊事件已记录，新的店铺回忆已加入档案。');
+}
 function renderStory(){
  var s=currentStory();if(!s)return '';
  var key=String(s.idx),chosen=st.storyChoices[key],arc=s.arc;
@@ -672,11 +692,12 @@ function renderOverview(){
  renderCafeDetails();
 }
 function renderPartnerTab(){
- var html='<div class="head-row"><div><div class="kicker">PARTNER / MEMORIES</div><div class="section-title">伙伴与回忆</div></div><span class="aside">第 '+st.day+' 天</span></div>'+renderActiveDecor()+renderPartnerProfile()+renderPartnerEpisode();
+ var html='<div class="head-row"><div><div class="kicker">PARTNER / MEMORIES</div><div class="section-title">伙伴与回忆</div></div><span class="aside">第 '+st.day+' 天</span></div>'+renderActiveDecor()+renderPartnerProfile()+renderPartnerEpisode()+renderGalleryStory();
  var storyHtml=renderStory();if(storyHtml)html+=accWrap('story','CHAPTER STORY','熟客与剧情','',storyHtml);
  html+=accWrap('regulars','PEOPLE WHO COME BACK','慢慢熟悉的客人',st.regulars.length+' 位熟客',renderRegulars());
  $('view-partner').innerHTML=html;
  document.querySelectorAll('[data-story]').forEach(function(b){b.addEventListener('click',function(){chooseStory(b.getAttribute('data-story'));});});
+ document.querySelectorAll('[data-gallery-story]').forEach(function(b){b.addEventListener('click',function(){chooseGalleryStory(b.getAttribute('data-gallery-story'));});});
  document.querySelectorAll('[data-partner-episode]').forEach(function(b){b.addEventListener('click',function(){choosePartnerEpisode(Number(b.getAttribute('data-partner-episode')));});});
 }
 function chooseEvent(i){var ev=eventNow(),o=ev.options[i];if(!o)return;if(st.cash<o.cost){toast('资金不足，换一个应对方案吧。');return;}var e=o.e||{};st.cash-=Number(e.cash||0);if(e.stock)Object.keys(e.stock).forEach(function(k){st.stock[k]=(st.stock[k]||0)+e.stock[k];});if(e.rep)stat('rep',e.rep);if(e.sat)stat('sat',e.sat);st.eventFx={customers:e.customers||0,priceFactor:e.priceFactor||1};st.eventChoice=i;save();renderOverview();toast('已选择：'+o.title);}
