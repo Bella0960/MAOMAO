@@ -651,15 +651,15 @@ var CASE_INTERVIEWS={
 };
 function caseProgressRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_progress_v1')||'{}')||{};}catch(e){return {};}}
 function caseProgress(){var all=caseProgressRoot(),key=String(activeRole&&activeRole.id||'default-partner');if(!all[key])all[key]={completed:[],attempts:{},notes:{}};return all[key];}
-function saveCaseProgress(){var all=caseProgressRoot();all[String(activeRole&&activeRole.id||'default-partner')]=caseProgress();localStorage.setItem('maomao_detective_progress_v1',JSON.stringify(all));}
+function saveCaseProgress(progress){var all=caseProgressRoot();all[String(activeRole&&activeRole.id||'default-partner')]=progress||caseProgress();localStorage.setItem('maomao_detective_progress_v1',JSON.stringify(all));}
 function chooseSuspect(i){
  if(gameState.ended)return;
  var c=gameState.item,buttons=byId('suspectList').querySelectorAll('[data-suspect]'),progress=caseProgress();
  if(Object.keys(gameState.revealed).length<c.evidence.length||Object.keys(gameState.interviewed).length<c.suspects.length){showToast('先完成现场取证和人物询问。');return;}
  gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
  var correct=i===c.answer;
- if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress();saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
- else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress();saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
+ if(correct){buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
  buttons.forEach(function(b){b.disabled=true;});
  var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
  var extra=byId('gameContent').querySelector('.case-result-actions');if(!extra){extra=document.createElement('div');extra.className='btn-row case-result-actions';byId('gameContent').querySelector('.board-panel').appendChild(extra);}
