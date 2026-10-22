@@ -77,6 +77,11 @@ document.addEventListener('click',function(e){
  var card=e.target&&e.target.closest?e.target.closest('[data-interview]'):null;if(!card)return;
  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();var idx=Number(card.getAttribute('data-interview'));card.classList.add('revealed');var tx=card.querySelector('.interview-text');if(tx)tx.textContent='已询问 · 点击继续对话';var mark=card.querySelector('.interview-mark');if(mark)mark.textContent='✓';open(idx);
 },true);
+function restoreRecords(){
+ var log=document.getElementById('investigationLog');if(!log||!window.gameState||!gameState.item)return;
+ var st=dataState();(st.interviewLog||[]).forEach(function(rec){var found=false;Array.prototype.forEach.call(log.querySelectorAll('.investigation-entry'),function(row){if(row.dataset.interviewKey===rec.key)found=true;});if(found)return;var row=node('article','investigation-entry');row.dataset.recordKind='analysis';row.dataset.interviewKey=rec.key;row.append(node('span','record-index','问询归档'),node('strong','',rec.title),node('p','',rec.body.length>170?rec.body.slice(0,167)+'…':rec.body),node('small','',rec.meta));log.appendChild(row);});
+}
+if(window.MutationObserver){var mo=new MutationObserver(function(){restoreRecords();});mo.observe(document.body,{childList:true,subtree:true});}
 var oldVersion=window.setDetectiveVersionBadge;if(typeof oldVersion==='function')window.setDetectiveVersionBadge=function(v){oldVersion(v);var b=document.getElementById('detectiveVersionBadge');if(b){b.textContent='V.17';b.setAttribute('aria-label','侦探游戏版本 V.17');}};
 var badge=document.getElementById('detectiveVersionBadge');if(badge){badge.textContent='V.17';badge.setAttribute('aria-label','侦探游戏版本 V.17');}
 })();
