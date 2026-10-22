@@ -894,7 +894,7 @@ function openCase(index){document.body.classList.add("detective-case-mode");setD
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeCaseModal();});
  var selectedEvidenceIndex=null;
  function openInterrogation(index,mode){var suspect=c.suspects[index],statement=interviews[index];selectedEvidenceIndex=null;if(!suspect||!statement)return;modal.dataset.suspectIndex=String(index);modal.dataset.mode=mode;
- byId('caseModalViewActions').style.display=mode==='view'?'block':'none';byId('caseModalEvidenceList').parentElement.style.display=mode==='view'?'none':'grid';byId('caseModalSubmit').style.display=mode==='view'?'none':'inline-flex';byId('caseModalTitle').textContent=mode==='view'?'人物证词':(mode==='ask'?'深入追问':'证据对质');byId('caseModalSuspect').textContent=suspect.name+' · '+suspect.job;byId('caseModalQuote').textContent=statement.text;
+ byId('caseModalViewActions').style.display=mode==='view'?'block':'none';byId('caseModalEvidenceList').parentElement.style.display=mode==='view'?'none':'grid';byId('caseModalSubmit').style.display=mode==='view'?'none':'inline-flex';byId('caseModalSubmit').textContent=mode==='ask'?'提交追问':'提交对质';byId('caseModalTitle').textContent=mode==='view'?'人物证词':(mode==='ask'?'深入追问':'证据对质');byId('caseModalSuspect').textContent=suspect.name+' · '+suspect.job;byId('caseModalQuote').textContent=statement.text;
  var questionBox=byId('caseModalQuestionBox'),questionInput=byId('caseModalQuestion'),promptList=byId('caseModalQuestionPrompts');questionBox.style.display=mode==='ask'?'block':'none';questionInput.value='';
  var prompts=['你能把当时的时间说得更具体吗？','你说的这件事，有什么记录可以核对？','你当时在哪里？之后去了哪里？'];
  promptList.innerHTML=prompts.map(function(q){return '<button type="button" class="case-question-chip">'+esc(q)+'</button>';}).join('');promptList.querySelectorAll('.case-question-chip').forEach(function(b){b.addEventListener('click',function(){questionInput.value=b.textContent;questionInput.focus();promptList.querySelectorAll('.case-question-chip').forEach(function(x){x.classList.toggle('active',x===b);});});});
@@ -940,7 +940,7 @@ function openCase(index){document.body.classList.add("detective-case-mode");setD
      var fallback='当前剧情引擎没有成功返回新回答。这条追问已保留，你可以稍后重试；先不要把未得到回答的内容视为事实。';
      showResult('这次没有取得新口供',fallback,'等待重新询问');
      saveInterrogationRecord('', 'request_failed');
-    }).finally(function(){submitButton.disabled=false;submitButton.textContent='提交对质';});
+    }).finally(function(){submitButton.disabled=false;submitButton.textContent=modal.dataset.mode==='ask'?'提交追问':'提交对质';});
     return;
    }
    var noApi='当前没有可用的 AI API，暂时无法生成这名人物的新回答。你问的是：“'+question+'” 已记录所选线索「'+ev.title+'」，可以先依据已知材料核对，或在配置 API 后再继续追问。';
