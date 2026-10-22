@@ -798,7 +798,8 @@ function nextHint(){
   gameState.hintIndex++;byId('wordFeedback').textContent='提示 '+gameState.hintIndex+' / 3 · 继续猜猜看。';
 }
 var CASES=[
- {title:'消失的草莓蛋糕',intro:'咖啡馆打烊前，展示柜里最后一块草莓蛋糕不见了。三个人都说自己没碰过它。',evidence:[{title:'柜台记录',detail:'蛋糕在 16:10 被放进展示柜，16:25 清点时已经不见。'},{title:'围裙上的奶油',detail:'只有主厨小禾的蓝围裙上沾着新鲜奶油，她说那是试做时留下的。'},{title:'订单时间',detail:'阿泽在 16:10 到 16:30 一直处理连续订单，收银记录可以对上。'},{title:'客人去向',detail:'米粒在 16:20 取走外带咖啡后就离开了，店内监控拍到了她出门。'}],suspects:[{name:'小禾',job:'主厨'},{name:'阿泽',job:'收银员'},{name:'米粒',job:'顾客'}],answer:0,explain:'小禾说奶油来自试做，但蛋糕失踪的时间就在展示柜清点之间；她是唯一能接触后厨和展示柜的人，另外两人的时间线都有记录佐证。'},
+ {title:'消失的草莓蛋糕',storyTitle:'最后一块草莓蛋糕的秘密',story:'这家小咖啡馆准备在周末推出新菜单。主厨小禾连续试做了几天草莓蛋糕，想把它做成店里的招牌甜点。偏偏当天，店主告诉她：如果这次试做仍然卖不出去，下周就要撤掉甜点菜单，还要把她调去做后厨杂务。小禾把最后一块蛋糕放进展示柜，本想等店主下班前亲自试吃、给它最后一次机会。',motive:'小禾不是为了贪吃才拿走蛋糕。她发现蛋糕表面的草莓装饰在运输时歪了，担心店主看到失败品后立刻撤掉菜单。她一时慌了，把蛋糕从展示柜拿回后厨，想修整好再端出来，却听见店主提前回来的声音。她把蛋糕藏了起来，并谎称一直在后厨。她的动机是害怕失去自己投入了许多心血的工作机会，但害怕并不能让隐瞒变成正确的选择。',aftermath:'证据摆在面前后，小禾终于承认拿走蛋糕的经过，也解释了她为什么说谎。店主没有立刻原谅她，但愿意先尝尝修整后的蛋糕。蛋糕最终没有成为当天的新品，却成了咖啡馆第一次认真讨论工作压力和沟通方式的契机。小禾向同事道歉，也答应以后遇到问题先开口，而不是擅自把东西藏起来。',truth:'完整真相：小禾在 16:10 后把蛋糕从展示柜拿回后厨，原本想修复歪掉的装饰，后来因害怕被责备而藏起蛋糕并撒谎。奶油、她能接触展示柜的工作权限和不完整的说法共同指向她；阿泽忙于订单、米粒按时离店，分别有记录佐证。',
+intro:'咖啡馆打烊前，展示柜里最后一块草莓蛋糕不见了。三个人都说自己没碰过它。',evidence:[{title:'柜台记录',detail:'蛋糕在 16:10 被放进展示柜，16:25 清点时已经不见。'},{title:'围裙上的奶油',detail:'只有主厨小禾的蓝围裙上沾着新鲜奶油，她说那是试做时留下的。'},{title:'订单时间',detail:'阿泽在 16:10 到 16:30 一直处理连续订单，收银记录可以对上。'},{title:'客人去向',detail:'米粒在 16:20 取走外带咖啡后就离开了，店内监控拍到了她出门。'}],suspects:[{name:'小禾',job:'主厨'},{name:'阿泽',job:'收银员'},{name:'米粒',job:'顾客'}],answer:0,explain:'小禾说奶油来自试做，但蛋糕失踪的时间就在展示柜清点之间；她是唯一能接触后厨和展示柜的人，另外两人的时间线都有记录佐证。'},
  {title:'图书馆的借书卡',intro:'一本稀有旧书的借书卡从柜台失踪。管理员只记得三位访客来过。',evidence:[{title:'值班表',detail:'管理员在 14:00—14:15 去书库归还书籍，柜台当时无人。'},{title:'纸张碎屑',detail:'柜台旁发现的纸屑边缘带有蓝色墨水，与访客留下的蓝色便签颜色相同。'},{title:'访客留言',detail:'林同学留下的便签使用蓝色墨水，而且他承认自己曾在柜台前找笔。'},{title:'监控画面',detail:'陈女士和小周进入大厅后一直在阅览区，只有林同学在管理员离开时靠近柜台。'}],suspects:[{name:'陈女士',job:'研究者'},{name:'小周',job:'学生'},{name:'林同学',job:'来访读者'}],answer:2,explain:'蓝色墨水碎屑与林同学的便签相符，监控也显示只有他在柜台无人时靠近。线索共同指向林同学。'},
  {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'} ,
  {title:'雨夜的空白车票',intro:'旧车站闭站前，一张盖过章的末班车票从失物招领柜里消失。值班员说那晚只有三个人进过办公室。',evidence:[{title:'站台时刻表',detail:'末班车在 21:18 发车，站台记录显示 21:12 后没有乘客进入办公室。'},{title:'潮湿的鞋印',detail:'办公室门口留下窄底鞋印，方向由档案柜通往后门。'},{title:'交班笔记',detail:'值班员写下 21:05 曾离开柜台三分钟，但口头称整晚没有离岗。'},{title:'车票存根',detail:'存根编号连续，只有失踪车票对应的那一格被提前撕开。'}],suspects:[{name:'许站长',job:'当班负责人'},{name:'小闻',job:'检票员'},{name:'顾客陈',job:'末班车乘客'}],answer:0,explain:'交班笔记与站长的说法矛盾，空白时段正好给了他接近档案柜的机会；鞋印方向也与办公室后门路线吻合。'},
@@ -840,8 +841,8 @@ function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=Str
 function setDetectiveVersionBadge(visible){
  var badge=document.getElementById('detectiveVersionBadge');
  if(!badge){
-  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.13';
-  badge.setAttribute('aria-label','侦探游戏版本 V.13');
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.14';
+  badge.setAttribute('aria-label','侦探游戏版本 V.14');
   document.body.appendChild(badge);
  }
  badge.style.display=visible?'block':'none';
@@ -1072,7 +1073,7 @@ function chooseSuspect(i){
  if(Object.keys(gameState.revealed).length<Math.min(2,c.evidence.length)||Object.keys(gameState.interviewed).length<Math.min(2,c.suspects.length)){showToast('先查看至少两条线索，并听取至少两位人物的证词，就可以尝试指认。');return;}
  gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
  var correct=i===c.answer;var campaign=progress.campaign||(progress.campaign={trust:{},flags:[],threads:[],choices:[]});campaign.trust=campaign.trust||{};var trustKey='investigation-team';campaign.trust[trustKey]=Math.max(-5,Math.min(5,Number(campaign.trust[trustKey]||0)+(correct?1:-1)));
- if(correct){buttons[i].classList.add('correct');showCaseClosedCelebration(c.title);var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ if(correct){buttons[i].classList.add('correct');showCaseClosedCelebration(c.title);setTimeout(function(){showCaseStoryReveal(c);},900);var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
  else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'误判后进入复盘；队员会在后续调查中提醒你重新核对证据。');saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
  buttons.forEach(function(b){b.disabled=true;});
  var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
@@ -1909,6 +1910,32 @@ function showCaseClosedCelebration(caseTitle){
   openDiscussionFallback();
  },true);
 })();
+</script>
+
+<style id="maomao-case-story-v14-style">
+.case-story-overlay{position:fixed;inset:0;z-index:10190;background:rgba(12,12,12,.78);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.case-story-card{width:min(100%,520px);max-height:86vh;overflow:auto;background:#fff;color:#222;padding:22px;border:1px solid #d8d8d8;box-shadow:0 22px 70px rgba(0,0,0,.25);animation:teamDiscussionRise .2s ease-out}
+.case-story-kicker{font-size:10px;letter-spacing:.18em;color:#888;border-bottom:1px solid #ddd;padding-bottom:12px;margin-bottom:14px}
+.case-story-card h2{font-family:Georgia,'Noto Serif SC',serif;font-size:27px;font-weight:500;line-height:1.35;margin:0 0 18px}
+.case-story-section{margin:16px 0}
+.case-story-section small{display:block;font-size:10px;letter-spacing:.14em;color:#777;margin-bottom:6px}
+.case-story-section p{font-size:14px;line-height:1.95;color:#444;margin:0;white-space:pre-wrap}
+.case-story-close{width:100%;margin-top:18px;padding:13px;background:#222;color:#fff;border:1px solid #222;font-size:13px;letter-spacing:.08em}
+</style>
+<script id="maomao-case-story-v14-script">
+function showCaseStoryReveal(c){
+ if(!c||!c.storyTitle||document.querySelector('.case-story-overlay'))return;
+ var overlay=document.createElement('div');overlay.className='case-story-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','案件完整真相');
+ var card=document.createElement('article');card.className='case-story-card';
+ var kicker=document.createElement('div');kicker.className='case-story-kicker';kicker.textContent='CASE FILE / FULL STORY · 完整案情';
+ var title=document.createElement('h2');title.textContent=c.storyTitle;
+ card.appendChild(kicker);card.appendChild(title);
+ [['起因 / BEFORE',c.story],['作案动机 / MOTIVE',c.motive],['经过与后续 / AFTERMATH',c.aftermath],['证据如何串起真相 / THE TRUTH',c.truth]].forEach(function(item){var section=document.createElement('section');section.className='case-story-section';var small=document.createElement('small');small.textContent=item[0];var p=document.createElement('p');p.textContent=item[1];section.appendChild(small);section.appendChild(p);card.appendChild(section);});
+ var close=document.createElement('button');close.className='case-story-close';close.type='button';close.textContent='读完档案 · 返回案件';card.appendChild(close);overlay.appendChild(card);document.body.appendChild(overlay);
+ function done(){overlay.remove();document.removeEventListener('keydown',key);}
+ function key(e){if(e.key==='Escape')done();}
+ close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});document.addEventListener('keydown',key);close.focus();
+}
 </script>
 </body>
 </html>
