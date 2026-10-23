@@ -6,7 +6,7 @@
 <title>Appearance · 外观</title>
 <script src="../shared/js/font-loader.js?v=20261022v1"></script>
 <script src="../shared/js/wallpaper-store.js?v=20261023v1"></script>
-<script src="../shared/js/native-feel.js?v=20261023v11"></script>
+<script src="../shared/js/native-feel.js?v=20261023v12"></script>
 <script src="../shared/js/statusbar-control.js?v=20261023v2"></script>
 <style>
   :root {
@@ -433,6 +433,16 @@
           <span class="home-indicator-switch-track"></span>
         </label>
       </div>
+      <div class="home-indicator-setting">
+        <div class="home-indicator-copy">
+          <strong>桌面导航栏</strong>
+          <span>显示底部快捷应用栏；没有应用时自动收起，让桌面铺满</span>
+        </div>
+        <label class="home-indicator-switch" aria-label="显示桌面导航栏">
+          <input type="checkbox" id="dockNavigationToggle" checked>
+          <span class="home-indicator-switch-track"></span>
+        </label>
+      </div>
     </section>
 
     <div class="footnote">Appearance</div>
@@ -660,6 +670,20 @@
       try { localStorage.setItem(HOME_INDICATOR_KEY, homeIndicatorToggle.checked ? '1' : '0'); } catch (error) {}
       if (typeof window.__statusbarControlApply === 'function') window.__statusbarControlApply();
       showToast(homeIndicatorToggle.checked ? '已显示桌面底部小横条' : '已隐藏桌面底部小横条');
+    });
+  }
+
+  /* ---- 桌面 Dock / 导航栏开关 ---- */
+  var dockNavigationToggle = document.getElementById('dockNavigationToggle');
+  var DOCK_NAV_KEY = 'settings_dock_nav_visible';
+  if (dockNavigationToggle) {
+    try { dockNavigationToggle.checked = localStorage.getItem(DOCK_NAV_KEY) !== '0'; }
+    catch (error) { dockNavigationToggle.checked = true; }
+    dockNavigationToggle.addEventListener('change', function () {
+      try { localStorage.setItem(DOCK_NAV_KEY, dockNavigationToggle.checked ? '1' : '0'); } catch (error) {}
+      try { window.dispatchEvent(new Event('maomao:dock-visibility-change')); } catch (error) {}
+      if (typeof window.MAOMAOApplyDockVisibility === 'function') window.MAOMAOApplyDockVisibility();
+      showToast(dockNavigationToggle.checked ? '已显示桌面导航栏' : '已隐藏桌面导航栏');
     });
   }
 
