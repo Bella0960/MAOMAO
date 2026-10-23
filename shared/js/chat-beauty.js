@@ -39,8 +39,24 @@
         partnerBubbleBg: '#FFFFFF',
         partnerBubbleColor: '#111111',
         partnerBubbleRadius: '15px 15px 15px 4px',
-        chatBg: '',              // Base64 dataURL，空 = 默认渐变
-        chatBgDim: 0             // 背景压暗遮罩 0-0.85（仅自定义背景时生效）
+        myBubbleBorderColor: '#111111', myBubbleBorderWidth: 0,
+        partnerBubbleBorderColor: '#DADAE0', partnerBubbleBorderWidth: 1,
+        myBubbleRadiusSize: 15, partnerBubbleRadiusSize: 15,
+        myBubbleFontSize: 12, partnerBubbleFontSize: 12,
+        myBubbleFontFamily: 'system', partnerBubbleFontFamily: 'system',
+        myBubbleTailSize: 0, myBubbleTailX: 0, myBubbleTailY: 12,
+        partnerBubbleTailSize: 0, partnerBubbleTailX: 0, partnerBubbleTailY: 12,
+        myBubbleDecorations: [], partnerBubbleDecorations: [],
+        avatarBorderColor: '#FFFFFF', avatarBorderWidth: 1,
+        messageTimeVisible: true, messageTimeColor: '#999999', messageTimeSize: 8,
+        imageBubbleOpacity: 100, imageBubbleRadius: 16,
+        redPacketBg: '#111111', redPacketBgOpacity: 100, redPacketImage: '', redPacketImageOpacity: 100,
+        redPacketBorderColor: '#111111', redPacketBorderWidth: 0, redPacketRadius: 10,
+        redPacketShowStatus: true, redPacketTextColor: '#FFFFFF', redPacketFontSize: 12,
+        redPacketTitle: '', redPacketTitleColor: '#8E8E93', redPacketAmountTemplate: '', redPacketAmountColor: '#FFFFFF',
+        transferBg: '#FFFFFF', transferBorderColor: '#E5E5EA', transferBorderWidth: 1, transferTextColor: '#111111',
+        chatBg: '',
+        chatBgDim: 0
     };
     NS.DEFAULTS = DEFAULTS;
 
@@ -67,6 +83,103 @@
         var key = scope === 'global' ? GLOBAL_KEY : ROLE_PREFIX + scope;
         var cfg = readJSON(key, null);
         return (cfg && cfg.vars && typeof cfg.vars === 'object') ? cfg.vars : {};
+    }
+
+    function fontFamily(key) {
+        if (key === 'serif') return 'Georgia, "Songti SC", serif';
+        if (key === 'mono') return '"SF Mono", Menlo, monospace';
+        return '-apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    }
+
+    function colorWithAlpha(color, alpha) {
+        var m = /^#([0-9a-f]{6})$/i.exec(String(color || ''));
+        if (!m) return 'rgba(17,17,17,' + Math.max(0, Math.min(1, alpha)) + ')';
+        var hex = m[1];
+        return 'rgba(' + parseInt(hex.slice(0, 2), 16) + ',' + parseInt(hex.slice(2, 4), 16) + ',' +
+            parseInt(hex.slice(4, 6), 16) + ',' + Math.max(0, Math.min(1, alpha)) + ')';
+    }
+
+    function sideForBubble(bubble) {
+        var row = bubble.closest('.vbp-row, .msg-row');
+        return row && (row.classList.contains('me') || row.classList.contains('sent') || row.classList.contains('right')) ? 'my' : 'partner';
+    }
+
+    function renderDecorations(layer, list) {
+        var signature;
+        try { signature = JSON.stringify(Array.isArray(list) ? list : []); } catch (e) { signature = '[]'; }
+        if (layer.getAttribute('data-signature') === signature) return;
+        layer.setAttribute('data-signature', signature);
+        layer.textContent = '';
+        (Array.isArray(list) ? list : []).slice(0, 8).forEach(function (item) {
+            if (!item || !item.url) return;
+            var img = document.createElement('img');
+            img.className = 'chat-beauty-decoration';
+            img.alt = '';
+            img.draggable = false;
+            img.src = String(item.url);
+            img.style.left = Math.max(0, Math.min(100, num(item.x, 62))) + '%';
+            img.style.top = Math.max(0, Math.min(100, num(item.y, 8))) + '%';
+            img.style.width = Math.max(8, Math.min(100, num(item.width, 30))) + '%';
+            img.style.opacity = String(Math.max(0, Math.min(1, num(item.opacity, 0.82))));
+            layer.appendChild(img);
+        });
+    }
+
+    function applyBubbleDecorations(rootEl, v) {
+        if (!rootEl || !rootEl.querySelectorAll) return;
+        var bubbles = [];
+        if (rootEl.matches && rootEl.matches('.msg-bubble, .vbp-bubble')) bubbles.push(rootEl);
+        rootEl.querySelectorAll('.msg-bubble, .vbp-bubble').forEach(function (b) { bubbles.push(b); });
+        bubbles.forEach(function (bubble) {
+            var side = sideForBubble(bubble);
+            var list = v[side === 'my' ? 'myBubbleDecorations' : 'partnerBubbleDecorations'];
+            var layer = bubble.querySelector(':scope > .chat-beauty-decoration-layer');
+            var content = bubble.querySelector(':scope > .chat-beauty-content');
+            if (!layer || !content) {
+                var nodes = Array.prototype.slice.call(bubble.childNodes);
+                layer = document.createElement('span');
+                layer.className = 'chat-beauty-decoration-layer';
+                layer.setAttribute('aria-hidden', 'true');
+                content = document.createElement('span');
+                content.className = 'chat-beauty-content';
+                nodes.forEach(function (node) { content.appendChild(node); });
+                bubble.textContent = '';
+                bubble.appendChild(layer);
+                bubble.appendChild(content);
+            }
+            renderDecorations(layer, list);
+        });
+    }
+
+    function applyPaymentText(rootEl, v) {
+        if (!rootEl || !rootEl.querySelectorAll) return;
+        rootEl.querySelectorAll('.pay-card-red .pay-card-label').forEach(function (label) {
+            if (!label.hasAttribute('data-chat-beauty-original')) label.setAttribute('data-chat-beauty-original', label.textContent || '');
+            label.textContent = String(v.redPacketTitle || '').trim() || label.getAttribute('data-chat-beauty-original') || '红包';
+        });
+        rootEl.querySelectorAll('.pay-card-red .pay-card-amount').forEach(function (amount) {
+            if (!amount.hasAttribute('data-chat-beauty-original')) amount.setAttribute('data-chat-beauty-original', amount.textContent || '');
+            var template = String(v.redPacketAmountTemplate || '');
+            if (!template) {
+                amount.textContent = amount.getAttribute('data-chat-beauty-original') || '';
+                return;
+            }
+            var raw = (amount.getAttribute('data-chat-beauty-original') || '').replace(/^[¥￥]\s*/, '');
+            amount.textContent = template.replace(/\{amount\}/g, raw).replace(/\{currency\}/g, '¥');
+        });
+    }
+
+    function applyDynamic(rootEl, v) {
+        applyBubbleDecorations(rootEl, v);
+        applyPaymentText(rootEl, v);
+    }
+
+    function observeDynamic(rootEl) {
+        if (!rootEl || rootEl.__chatBeautyObserver || !global.MutationObserver) return;
+        rootEl.__chatBeautyObserver = new MutationObserver(function () {
+            if (rootEl.__chatBeautyVars) applyDynamic(rootEl, rootEl.__chatBeautyVars);
+        });
+        rootEl.__chatBeautyObserver.observe(rootEl, { childList: true, subtree: true });
     }
 
     /* ========== 读取与合并 ========== */
@@ -107,6 +220,46 @@
         s.setProperty('--chat-bubble-ta-color', v.partnerBubbleColor);
         s.setProperty('--chat-bubble-ta-radius', v.partnerBubbleRadius);
 
+        s.setProperty('--chat-bubble-my-border-color', v.myBubbleBorderColor || '#111111');
+        s.setProperty('--chat-bubble-my-border-width', num(v.myBubbleBorderWidth, 0) + 'px');
+        s.setProperty('--chat-bubble-ta-border-color', v.partnerBubbleBorderColor || '#DADAE0');
+        s.setProperty('--chat-bubble-ta-border-width', num(v.partnerBubbleBorderWidth, 1) + 'px');
+        s.setProperty('--chat-bubble-my-radius-size', num(v.myBubbleRadiusSize, 15) + 'px');
+        s.setProperty('--chat-bubble-ta-radius-size', num(v.partnerBubbleRadiusSize, 15) + 'px');
+        s.setProperty('--chat-bubble-my-font-size', num(v.myBubbleFontSize, 12) + 'px');
+        s.setProperty('--chat-bubble-ta-font-size', num(v.partnerBubbleFontSize, 12) + 'px');
+        s.setProperty('--chat-bubble-my-font-family', fontFamily(v.myBubbleFontFamily));
+        s.setProperty('--chat-bubble-ta-font-family', fontFamily(v.partnerBubbleFontFamily));
+        s.setProperty('--chat-bubble-my-tail-size', num(v.myBubbleTailSize, 0) + 'px');
+        s.setProperty('--chat-bubble-my-tail-x', num(v.myBubbleTailX, 0) + 'px');
+        s.setProperty('--chat-bubble-my-tail-y', num(v.myBubbleTailY, 12) + 'px');
+        s.setProperty('--chat-bubble-ta-tail-size', num(v.partnerBubbleTailSize, 0) + 'px');
+        s.setProperty('--chat-bubble-ta-tail-x', num(v.partnerBubbleTailX, 0) + 'px');
+        s.setProperty('--chat-bubble-ta-tail-y', num(v.partnerBubbleTailY, 12) + 'px');
+        s.setProperty('--chat-avatar-border-color', v.avatarBorderColor || '#FFFFFF');
+        s.setProperty('--chat-avatar-border-width', num(v.avatarBorderWidth, 1) + 'px');
+        s.setProperty('--chat-time-color', v.messageTimeColor || '#999999');
+        s.setProperty('--chat-time-size', num(v.messageTimeSize, 8) + 'px');
+        s.setProperty('--chat-time-display', v.messageTimeVisible === false ? 'none' : 'block');
+        s.setProperty('--chat-image-opacity', (num(v.imageBubbleOpacity, 100) / 100).toFixed(2));
+        s.setProperty('--chat-image-radius', num(v.imageBubbleRadius, 16) + 'px');
+        s.setProperty('--chat-redpacket-bg', v.redPacketBg || '#111111');
+        s.setProperty('--chat-redpacket-bg-rgba', colorWithAlpha(v.redPacketBg || '#111111', num(v.redPacketBgOpacity, 100) / 100));
+        s.setProperty('--chat-redpacket-image', v.redPacketImage ? 'url("' + String(v.redPacketImage).replace(/["\\]/g, '') + '")' : 'none');
+        s.setProperty('--chat-redpacket-image-opacity', (num(v.redPacketImageOpacity, 100) / 100).toFixed(2));
+        s.setProperty('--chat-redpacket-border-color', v.redPacketBorderColor || '#111111');
+        s.setProperty('--chat-redpacket-border-width', num(v.redPacketBorderWidth, 0) + 'px');
+        s.setProperty('--chat-redpacket-radius', num(v.redPacketRadius, 10) + 'px');
+        s.setProperty('--chat-redpacket-status-display', v.redPacketShowStatus === false ? 'none' : 'block');
+        s.setProperty('--chat-redpacket-text-color', v.redPacketTextColor || '#FFFFFF');
+        s.setProperty('--chat-redpacket-font-size', num(v.redPacketFontSize, 12) + 'px');
+        s.setProperty('--chat-redpacket-title-color', v.redPacketTitleColor || '#8E8E93');
+        s.setProperty('--chat-redpacket-amount-color', v.redPacketAmountColor || '#FFFFFF');
+        s.setProperty('--chat-transfer-bg', v.transferBg || '#FFFFFF');
+        s.setProperty('--chat-transfer-border-color', v.transferBorderColor || '#E5E5EA');
+        s.setProperty('--chat-transfer-border-width', num(v.transferBorderWidth, 1) + 'px');
+        s.setProperty('--chat-transfer-text-color', v.transferTextColor || '#111111');
+
         // 过渡期双写：chat-detail 现有 CSS 仍消费这批旧变量名
         s.setProperty('--avatar-size', num(v.avatarSize, 30) + 'px');
         s.setProperty('--avatar-radius', num(v.avatarRadius, 50) + '%');
@@ -128,6 +281,9 @@
         } else {
             s.removeProperty('--chat-bg-image');
         }
+        rootEl.__chatBeautyVars = v;
+        applyDynamic(rootEl, v);
+        observeDynamic(rootEl);
         return v;
     };
 
