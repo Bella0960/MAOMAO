@@ -261,8 +261,8 @@ html[data-theme="liquid-glass"] .toast {
 
 /* ===== iOS 26-style home-screen glass: intentionally scoped to the mobile desktop ===== */
 html[data-theme="liquid-glass"] {
-  --lg-glass-alpha: .26;
-  --lg-glass-blur: 28px;
+  --lg-glass-alpha: .16;
+  --lg-glass-blur: 32px;
   --lg-glass-tint-rgb: 214,215,222;
 }
 html[data-theme="liquid-glass"] body.maomao-home {
@@ -285,8 +285,8 @@ html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.d
   background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
   background-image: linear-gradient(
     142deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .32)) 0%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .06)) 37%,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .14)) 0%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .02)) 37%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .66)) 100%
   ) !important;
   border: 1px solid rgba(255,255,255,.78) !important;
@@ -326,7 +326,7 @@ html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image {
   background-image:
     linear-gradient(
       138deg,
-      rgba(255,255,255,calc(var(--lg-glass-alpha) + .19)) 0%,
+      rgba(255,255,255,calc(var(--lg-glass-alpha) + .12)) 0%,
       rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .72)) 47%,
       rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .22)) 100%
     ),
@@ -369,7 +369,7 @@ html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon {
   background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .58)) !important;
   background-image: linear-gradient(
     146deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .34)) 0%,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .22)) 0%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .68)) 54%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .42)) 100%
   ) !important;
@@ -406,7 +406,7 @@ html[data-theme="liquid-glass"] body.maomao-home .dock-bar {
   background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .7)) !important;
   background-image: linear-gradient(
     150deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .36)) 0%,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .24)) 0%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .76)) 46%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .64)) 100%
   ) !important;
@@ -859,7 +859,7 @@ html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily {
   border: 1px solid rgba(255,255,255,.88);
   background: linear-gradient(
     140deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .34)),
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .20)),
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .08)) 60%,
     rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .5))
   );
@@ -923,4 +923,55 @@ html[data-theme="liquid-glass"] body.maomao-home .lg-hero-now {
   html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy span {
     font-size: 8px;
   }
+}
+
+
+/* Reliable, always-visible entry point to the Liquid Glass control sheet. */
+html[data-theme="liquid-glass"] body.maomao-home .lg-quick-trigger,
+body.maomao-home .lg-quick-trigger {
+  display: inline-flex !important;
+  flex: 0 0 27px;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  margin-left: 3px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  color: #3b3b42 !important;
+  background: rgba(255,255,255,.46) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.72), rgba(220,220,228,.25)) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.7) !important;
+  backdrop-filter: blur(18px) saturate(1.7) !important;
+  box-shadow: 0 3px 10px rgba(28,28,34,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  position: relative;
+  z-index: 60;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+}
+body.maomao-home .lg-quick-trigger:active {
+  transform: scale(.94);
+}
+body.lg-controls-open {
+  overflow: hidden !important;
+}
+.lg-controls-backdrop {
+  isolation: isolate;
+  touch-action: auto;
+}
+.lg-controls-backdrop.open {
+  display: flex !important;
+  pointer-events: auto !important;
+}
+.lg-controls-backdrop:not(.open) {
+  display: none !important;
+  pointer-events: none !important;
+}
+.lg-controls-sheet,
+.lg-controls-sheet * {
+  pointer-events: auto;
 }

@@ -4,7 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { opacity: 26, blur: 28, tint: 'silver' };
+  var DEFAULTS = { opacity: 16, blur: 32, tint: 'silver' };
   var TINTS = [
     { key: 'clear', label: '晶透白', rgb: '255,255,255', swatch: '#FFFFFF' },
     { key: 'ice', label: '冰雾白', rgb: '241,242,246', swatch: '#F1F2F6' },
@@ -141,6 +141,8 @@
         '</footer>' +
       '</section>';
 
+    panel.style.display = 'none';
+    panel.style.pointerEvents = 'none';
     document.body.appendChild(panel);
 
     panel.addEventListener('click', function (event) {
@@ -178,6 +180,8 @@
     applySettings(false);
     var panel = document.getElementById('liquidGlassControls');
     if (!panel) return;
+    panel.style.display = 'flex';
+    panel.style.pointerEvents = 'auto';
     panel.classList.add('open');
     panel.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lg-controls-open');
@@ -188,15 +192,30 @@
     if (!panel) return;
     panel.classList.remove('open');
     panel.setAttribute('aria-hidden', 'true');
+    panel.style.pointerEvents = 'none';
+    panel.style.display = 'none';
     document.body.classList.remove('lg-controls-open');
   }
 
   document.addEventListener('click', function (event) {
-    var trigger = event.target.closest('#editGlassBtn, #customizeLiquidGlassBtn, [data-open-liquid-glass]');
-    if (!trigger) return;
-    event.preventDefault();
-    event.stopPropagation();
-    openPanel();
+    var target = event.target && event.target.closest ? event.target : null;
+    if (!target) return;
+
+    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn, #liquidGlassQuickButton, [data-open-liquid-glass]');
+    if (trigger) {
+      event.preventDefault();
+      event.stopPropagation();
+      openPanel();
+      return;
+    }
+
+    /* Reliability fallback for the existing Settings app tile: keep its original URL. */
+    var settingsTile = target.closest('.app-tile[data-name="设置"], .app-tile[data-href="settings/settings.html"]');
+    if (settingsTile) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.location.href = settingsTile.getAttribute('data-href') || 'settings/settings.html';
+    }
   }, true);
 
   document.addEventListener('keydown', function (event) {

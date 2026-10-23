@@ -18,29 +18,40 @@
         catch (err) { return 'classic'; }
     }
     function ensureMaoMaoThemeStylesheet() {
-        if (maomaoThemeLink && maomaoThemeLink.isConnected) return maomaoThemeLink;
         maomaoThemeLink = document.getElementById('maomao-liquid-glass-theme');
-        if (maomaoThemeLink) return maomaoThemeLink;
-        var current = document.currentScript;
-        if (!current || !current.src) return null;
-        try {
-            maomaoThemeLink = document.createElement('link');
-            maomaoThemeLink.id = 'maomao-liquid-glass-theme';
-            maomaoThemeLink.rel = 'stylesheet';
-            var themeCssUrl = new URL('../css/liquid-glass-theme.css', current.src);
-            themeCssUrl.searchParams.set('v', '20261023v2');
-            maomaoThemeLink.href = themeCssUrl.href;
-            /* Load once while classic remains visually unchanged; the CSS only activates via data-theme. */
-            maomaoThemeLink.media = 'all';
-            document.head.appendChild(maomaoThemeLink);
-            return maomaoThemeLink;
-        } catch (err) {
-            maomaoThemeLink = null;
-            return null;
+        if (!maomaoThemeLink) {
+            var current = document.currentScript ||
+                document.querySelector('script[src*="shared/js/native-feel.js"]');
+            if (!current || !current.src) return null;
+            try {
+                maomaoThemeLink = document.createElement('link');
+                maomaoThemeLink.id = 'maomao-liquid-glass-theme';
+                maomaoThemeLink.rel = 'stylesheet';
+                var themeCssUrl = new URL('../css/liquid-glass-theme.css', current.src);
+                themeCssUrl.searchParams.set('v', '20261023v3');
+                maomaoThemeLink.href = themeCssUrl.href;
+                maomaoThemeLink.media = 'all';
+            } catch (err) {
+                maomaoThemeLink = null;
+                return null;
+            }
         }
+
+        /* Keep the theme layer after all page CSS so its higher-specificity glass rules win. */
+        if (document.head && maomaoThemeLink.parentNode !== document.head) {
+            document.head.appendChild(maomaoThemeLink);
+        } else if (document.head && document.readyState !== 'loading' &&
+                   document.head.lastElementChild !== maomaoThemeLink) {
+            document.head.appendChild(maomaoThemeLink);
+        }
+        return maomaoThemeLink;
     }
     maomaoThemeRoot.setAttribute('data-theme', readMaoMaoTheme());
     ensureMaoMaoThemeStylesheet();
+    /* The parser adds page styles after this early script; move glass CSS to the end once parsing is done. */
+    document.addEventListener('DOMContentLoaded', function () {
+        if (readMaoMaoTheme() === 'liquid-glass') ensureMaoMaoThemeStylesheet();
+    }, { once: true });
     window.MAOMAOTheme = {
         key: MAOMAO_THEME_KEY,
         get: readMaoMaoTheme,
