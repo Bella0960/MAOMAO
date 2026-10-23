@@ -216,6 +216,46 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+
+  /* 主题选择缩略预览：始终使用黑白灰，不依赖当前所选主题 */
+  .theme-picker { padding: 4px 12px; }
+  .theme-row { gap: 12px; padding: 12px 0; }
+  .theme-row.selected .row-check { opacity: 1; }
+  .theme-row.selected .theme-thumb { border-color: rgba(20,20,24,.46); box-shadow: 0 0 0 1px rgba(20,20,24,.08); }
+  .theme-thumb {
+    position: relative; flex: 0 0 48px; width: 48px; height: 43px;
+    overflow: hidden; border-radius: 12px; border: 1px solid #E3E3E8;
+    background: #F0F0F3; transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .theme-thumb::before {
+    content: ""; position: absolute; top: 6px; left: 6px; width: 20px; height: 3px;
+    border-radius: 3px; background: rgba(55,55,60,.58);
+  }
+  .theme-thumb::after {
+    content: ""; position: absolute; left: 6px; right: 6px; bottom: 5px; height: 9px;
+    border-radius: 7px; background: rgba(255,255,255,.92); border: 1px solid rgba(190,190,198,.58);
+  }
+  .theme-thumb i { position: absolute; display: block; width: 9px; height: 9px; top: 15px; border-radius: 3px; }
+  .theme-thumb i:nth-child(1) { left: 7px; }
+  .theme-thumb i:nth-child(2) { left: 19px; }
+  .theme-thumb i:nth-child(3) { left: 31px; }
+  .theme-thumb-classic i { background: #FFFFFF; border: 1px solid #DADAE0; box-shadow: 0 1px 2px rgba(0,0,0,.035); }
+  .theme-thumb-classic::after { background: #FFFFFF; }
+  .theme-thumb-liquid {
+    background: linear-gradient(135deg, #FDFDFE 0%, #E4E4E9 100%);
+    border-color: rgba(255,255,255,.96);
+    box-shadow: inset 0 1px 0 #fff, 0 2px 5px rgba(0,0,0,.05);
+  }
+  .theme-thumb-liquid i {
+    background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(255,255,255,.44));
+    border: 1px solid rgba(255,255,255,.98);
+    box-shadow: 0 2px 4px rgba(0,0,0,.06), inset 0 1px 0 #fff;
+  }
+  .theme-thumb-liquid::after {
+    height: 10px; background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,255,255,.5));
+    border-color: rgba(255,255,255,.96); box-shadow: 0 2px 4px rgba(0,0,0,.07), inset 0 1px 0 #fff;
+  }
+
   .footnote {
     text-align: center;
     font-size: 11px;
@@ -261,6 +301,27 @@
         <div class="row-main">
           <div class="row-title">纯净</div>
           <div class="row-sub">纯色无模糊图标底</div>
+        </div>
+        <span class="row-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+    </section>
+
+    <!-- 独立主题切换：不影响图标、壁纸等原有外观配置 -->
+    <div class="group-title">INTERFACE THEME</div>
+    <section class="card theme-picker" aria-label="界面主题">
+      <div class="row theme-row" id="themeClassicOption" data-theme-value="classic" role="button" tabindex="0" aria-label="切换经典极简主题">
+        <div class="theme-thumb theme-thumb-classic" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="row-main">
+          <div class="row-title">经典极简</div>
+          <div class="row-sub">保留原来的黑白灰界面</div>
+        </div>
+        <span class="row-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+      <div class="row theme-row" id="themeLiquidOption" data-theme-value="liquid-glass" role="button" tabindex="0" aria-label="切换 iOS 26 液态玻璃主题">
+        <div class="theme-thumb theme-thumb-liquid" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="row-main">
+          <div class="row-title">iOS 26 · Liquid Glass</div>
+          <div class="row-sub">半透明折射、悬浮玻璃与柔和高光</div>
         </div>
         <span class="row-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
       </div>
@@ -322,7 +383,45 @@
 (function () {
   var WALLPAPER_KEY = 'home_custom_wallpaper';
   var ICON_BG_KEY = 'home_custom_icon_bg';
-  var ICON_STYLE_KEY = 'home_icon_style';
+var ICON_STYLE_KEY = 'home_icon_style';
+
+  /* ---- 全站主题：独立保存，不覆盖壁纸与图标外观设置 ---- */
+  var classicThemeOption = document.getElementById('themeClassicOption');
+  var liquidThemeOption = document.getElementById('themeLiquidOption');
+
+  function reflectThemeChoice(theme) {
+    var isLiquid = theme === 'liquid-glass';
+    if (classicThemeOption) classicThemeOption.classList.toggle('selected', !isLiquid);
+    if (liquidThemeOption) liquidThemeOption.classList.toggle('selected', isLiquid);
+  }
+
+  function applyTheme(theme, announce) {
+    theme = theme === 'liquid-glass' ? 'liquid-glass' : 'classic';
+    if (window.MAOMAOTheme && typeof window.MAOMAOTheme.set === 'function') {
+      window.MAOMAOTheme.set(theme);
+    } else {
+      try { localStorage.setItem('maomao_theme', theme); } catch (e) {}
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    reflectThemeChoice(theme);
+    if (announce) showToast(theme === 'liquid-glass' ? '已切换为 iOS 26 液态玻璃主题' : '已恢复经典极简主题');
+  }
+
+  function bindThemeOption(element, theme) {
+    if (!element) return;
+    element.addEventListener('click', function () { applyTheme(theme, true); });
+    element.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        applyTheme(theme, true);
+      }
+    });
+  }
+
+  bindThemeOption(classicThemeOption, 'classic');
+  bindThemeOption(liquidThemeOption, 'liquid-glass');
+  reflectThemeChoice(window.MAOMAOTheme ? window.MAOMAOTheme.get() : (localStorage.getItem('maomao_theme') || 'classic'));
+
 
   var toastEl = document.getElementById('toast');
   var toastTimer = null;
