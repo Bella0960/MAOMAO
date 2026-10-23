@@ -4,7 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { style: 'clear', hue: 218, tone: 9, appearance: 'auto', blur: 24 };
+  var DEFAULTS = { style: 'clear', hue: 180, tone: 9, appearance: 'light', blur: 24 };
   var STYLES = [
     { key: 'default', label: '默认', note: 'Default' },
     { key: 'dark', label: '深色', note: 'Dark' },
