@@ -164,12 +164,10 @@
 
     panel.querySelector('[data-lg-opacity]').addEventListener('input', function (event) {
       state.opacity = clamp(event.target.value, 8, 65);
-      activateGlassTheme();
       applySettings(true);
     });
     panel.querySelector('[data-lg-blur]').addEventListener('input', function (event) {
       state.blur = clamp(event.target.value, 8, 40);
-      activateGlassTheme();
       applySettings(true);
     });
   }
