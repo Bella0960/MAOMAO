@@ -258,3 +258,462 @@ html[data-theme="liquid-glass"] .toast {
     transition: none !important;
   }
 }
+
+/* ===== iOS 26-style home-screen glass: intentionally scoped to the mobile desktop ===== */
+html[data-theme="liquid-glass"] {
+  --lg-glass-alpha: .26;
+  --lg-glass-blur: 28px;
+  --lg-glass-tint-rgb: 214,215,222;
+}
+html[data-theme="liquid-glass"] body.maomao-home {
+  background: #dedee3 !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .phone-screen,
+html[data-theme="liquid-glass"] body.maomao-home .pages-container,
+html[data-theme="liquid-glass"] body.maomao-home .home-page,
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid,
+html[data-theme="liquid-glass"] body.maomao-home .dock-wrapper {
+  background-color: transparent !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .phone-screen {
+  isolation: isolate;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) {
+  position: relative;
+  overflow: hidden;
+  color: rgba(31,31,36,.92) !important;
+  background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
+  background-image: linear-gradient(
+    142deg,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .32)) 0%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .06)) 37%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .66)) 100%
+  ) !important;
+  border: 1px solid rgba(255,255,255,.78) !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.07) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.07) !important;
+  box-shadow:
+    0 12px 27px rgba(22,22,28,.085),
+    0 2px 5px rgba(22,22,28,.04),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    inset 0 -1px 0 rgba(255,255,255,.42) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.08) 24%, transparent 48%),
+    radial-gradient(ellipse at 8% 0%, rgba(255,255,255,.34), transparent 52%);
+  pointer-events: none;
+  z-index: 0;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) > * {
+  position: relative;
+  z-index: 1;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) .ds-del {
+  z-index: 5;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image {
+  background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
+  border: 1px solid rgba(255,255,255,.82) !important;
+  border-radius: 23px !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.7) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.7) !important;
+  box-shadow:
+    0 14px 30px rgba(22,22,28,.095),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    inset 0 -1px 0 rgba(255,255,255,.42) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(138deg, rgba(255,255,255,.31), transparent 35%, transparent 72%, rgba(255,255,255,.10));
+  border: 1px solid rgba(255,255,255,.3);
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-time,
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-date,
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-week,
+html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-title,
+html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-song,
+html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-artist,
+html[data-theme="liquid-glass"] body.maomao-home .ds-dialog .dl-bubble,
+html[data-theme="liquid-glass"] body.maomao-home .po-wrapper .po-text {
+  color: rgba(34,34,39,.88) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .58)) !important;
+  background-image: linear-gradient(
+    146deg,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .34)) 0%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .68)) 54%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .42)) 100%
+  ) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
+  box-shadow:
+    0 7px 16px rgba(23,23,29,.10),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    inset 0 -1px 0 rgba(255,255,255,.44) !important;
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, background .28s ease !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon::before,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,.4), transparent 43%, rgba(255,255,255,.07));
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon svg,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,.4));
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-name {
+  color: rgba(28,28,33,.9) !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.6);
+}
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar {
+  background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .7)) !important;
+  background-image: linear-gradient(
+    150deg,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .36)) 0%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .76)) 46%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .64)) 100%
+  ) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  border-radius: 31px !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.85) contrast(1.06) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.85) contrast(1.06) !important;
+  box-shadow: 0 16px 34px rgba(21,21,27,.13), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.48) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .gesture-bar {
+  background: rgba(28,28,32,.62) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.45);
+}
+html[data-theme="liquid-glass"] body.maomao-home .status-bar {
+  text-shadow: 0 1px 1px rgba(255,255,255,.4);
+}
+html[data-theme="liquid-glass"] body.maomao-home .edit-done-btn {
+  background: rgba(248,248,251,.56) !important;
+  color: #222226 !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
+  box-shadow: 0 5px 15px rgba(20,20,26,.10), inset 0 1px 0 white !important;
+}
+
+/* ===== Pop-up Liquid Glass control sheet ===== */
+.lg-controls-backdrop {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: rgba(22,22,28,.20);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.lg-controls-backdrop.open {
+  display: flex;
+  animation: lgBackdropIn .22s ease both;
+}
+.lg-controls-sheet {
+  width: min(100%, 460px);
+  max-height: min(86dvh, 780px);
+  overflow-y: auto;
+  border-radius: 30px;
+  padding: 10px 20px 18px;
+  color: #29292E;
+  background: rgba(246,246,250,.78);
+  background-image: linear-gradient(145deg, rgba(255,255,255,.91), rgba(241,241,246,.68) 58%, rgba(231,231,237,.64));
+  border: 1px solid rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(34px) saturate(1.7) contrast(1.04);
+  backdrop-filter: blur(34px) saturate(1.7) contrast(1.04);
+  box-shadow: 0 24px 80px rgba(16,16,22,.24), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.5);
+  animation: lgSheetRise .34s cubic-bezier(.2,.8,.2,1) both;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+.lg-sheet-grabber {
+  width: 37px;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(75,75,83,.23);
+  margin: 2px auto 15px;
+}
+.lg-controls-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.lg-eyebrow {
+  font-size: 9px;
+  letter-spacing: .18em;
+  font-weight: 650;
+  color: #8A8A92;
+  margin-bottom: 5px;
+}
+.lg-controls-header h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  margin: 0;
+}
+.lg-controls-header p {
+  font-size: 12px;
+  color: #777780;
+  margin: 7px 0 0;
+}
+.lg-close-button {
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(255,255,255,.96);
+  border-radius: 50%;
+  background: rgba(255,255,255,.58);
+  color: #404047;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex: 0 0 auto;
+  box-shadow: 0 2px 8px rgba(20,20,26,.06), inset 0 1px 0 #fff;
+}
+.lg-glass-preview {
+  --preview-glass-alpha: .26;
+  --preview-glass-blur: 28px;
+  --preview-glass-tint-rgb: 214,215,222;
+  position: relative;
+  height: 126px;
+  overflow: hidden;
+  border-radius: 23px;
+  margin: 0 0 19px;
+  background:
+    radial-gradient(ellipse at 14% 10%, rgba(255,255,255,.94), transparent 40%),
+    radial-gradient(ellipse at 84% 74%, rgba(178,179,188,.92), transparent 32%),
+    linear-gradient(135deg, #d6d6dc, #f8f8fa 43%, #aeb0b8);
+  border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 8px 18px rgba(30,30,36,.10), inset 0 1px 0 #fff;
+}
+.lg-preview-wallpaper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 1px, transparent 1px 7px),
+    radial-gradient(circle at 18% 70%, rgba(255,255,255,.75), transparent 26%),
+    linear-gradient(135deg, #d8d8de 0%, #f9f9fb 46%, #b4b5bd 100%);
+}
+.lg-preview-orb {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.52);
+}
+.lg-preview-orb-a {
+  width: 118px; height: 118px; right: -7px; top: -37px;
+  background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.9), rgba(184,185,194,.3) 57%, rgba(255,255,255,.1));
+  box-shadow: inset 0 2px 5px rgba(255,255,255,.76), 0 9px 25px rgba(50,50,58,.12);
+}
+.lg-preview-orb-b {
+  width: 76px; height: 76px; left: 28px; bottom: -33px;
+  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.9), rgba(190,190,198,.12) 70%);
+  box-shadow: inset 0 1px 4px #fff;
+}
+.lg-preview-line {
+  position: absolute; left: 0; right: 0; top: 56%;
+  border-top: 1px solid rgba(255,255,255,.55);
+  transform: rotate(-8deg);
+}
+.lg-preview-type {
+  position: absolute; left: 14px; top: 13px;
+  color: rgba(40,40,46,.38);
+  font-size: 9px; line-height: 1.25; letter-spacing: .2em;
+}
+.lg-preview-type b { font-size: 26px; letter-spacing: -.06em; }
+.lg-preview-surface {
+  position: absolute;
+  left: 15%;
+  right: 8%;
+  bottom: 13px;
+  min-height: 49px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 13px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.94);
+  background: linear-gradient(145deg, rgba(255,255,255,calc(var(--preview-glass-alpha) + .34)), rgba(var(--preview-glass-tint-rgb),var(--preview-glass-alpha)) 55%, rgba(var(--preview-glass-tint-rgb),calc(var(--preview-glass-alpha) * .65)));
+  -webkit-backdrop-filter: blur(var(--preview-glass-blur)) saturate(1.8) contrast(1.08);
+  backdrop-filter: blur(var(--preview-glass-blur)) saturate(1.8) contrast(1.08);
+  box-shadow: 0 8px 17px rgba(20,20,26,.1), inset 0 1px 0 rgba(255,255,255,.99), inset 0 -1px 0 rgba(255,255,255,.38);
+}
+.lg-preview-surface span { font-size: 8px; letter-spacing: .21em; color: rgba(45,45,51,.58); }
+.lg-preview-surface strong { font-size: 14px; font-weight: 550; color: rgba(38,38,44,.9); letter-spacing: -.02em; }
+.lg-preview-surface i {
+  position: absolute; top: 2px; left: 20%; right: 20%;
+  height: 1px; border-radius: 50%; background: rgba(255,255,255,.98);
+  box-shadow: 0 0 8px rgba(255,255,255,.4);
+}
+.lg-control-group {
+  padding: 0 1px;
+  margin: 0 0 17px;
+}
+.lg-control-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  color: #3C3C43;
+  font-size: 13px;
+  font-weight: 560;
+}
+.lg-control-label output {
+  color: #777780;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.lg-muted-label { color: #9999A1; font-size: 9px; letter-spacing: .14em; font-weight: 600; }
+.lg-range {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  height: 25px;
+  margin: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+  touch-action: pan-y;
+}
+.lg-range::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #34343A 0%, #A3A3AB 48%, #E0E0E6 100%);
+  box-shadow: inset 0 1px 1px rgba(20,20,26,.12);
+}
+.lg-range::-moz-range-track {
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #34343A 0%, #A3A3AB 48%, #E0E0E6 100%);
+}
+.lg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 19px; height: 19px;
+  margin-top: -7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.98);
+  background: radial-gradient(circle at 32% 24%, #fff, #f4f4f7 56%, #d5d5dc);
+  box-shadow: 0 2px 6px rgba(25,25,31,.2), inset 0 1px 0 #fff;
+}
+.lg-range::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.98);
+  background: radial-gradient(circle at 32% 24%, #fff, #f4f4f7 56%, #d5d5dc);
+  box-shadow: 0 2px 6px rgba(25,25,31,.2), inset 0 1px 0 #fff;
+}
+.lg-range-captions {
+  display: flex;
+  justify-content: space-between;
+  color: #9A9AA2;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.lg-tint-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.lg-tint-option {
+  min-width: 0;
+  padding: 7px 1px 8px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #65656D;
+  font-size: 9px;
+  white-space: nowrap;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.lg-tint-option.selected {
+  background: rgba(255,255,255,.64);
+  border-color: rgba(255,255,255,.98);
+  box-shadow: 0 3px 9px rgba(22,22,28,.055), inset 0 1px 0 #fff;
+  color: #25252A;
+}
+.lg-tint-option:active { transform: scale(.96); }
+.lg-tint-swatch {
+  width: 29px; height: 29px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 28% 22%, #fff, var(--lg-swatch) 65%, #B8B8C0 100%);
+  border: 1px solid rgba(255,255,255,.98);
+  box-shadow: 0 2px 5px rgba(25,25,31,.12), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.lg-controls-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.lg-reset-button,
+.lg-done-button {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.94);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform .16s ease;
+}
+.lg-reset-button:active,
+.lg-done-button:active { transform: scale(.98); }
+.lg-reset-button {
+  color: #55555D;
+  background: rgba(255,255,255,.48);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.lg-done-button {
+  color: #fff;
+  background: linear-gradient(145deg, #414148, #19191E);
+  box-shadow: 0 5px 13px rgba(27,27,33,.14), inset 0 1px 0 rgba(255,255,255,.2);
+}
+@keyframes lgBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lgSheetRise {
+  from { opacity: .5; transform: translateY(34px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 480px) {
+  .lg-controls-backdrop { padding-left: 0; padding-right: 0; }
+  .lg-controls-sheet { border-radius: 30px 30px 0 0; padding-bottom: calc(17px + env(safe-area-inset-bottom, 0px)); max-height: 88dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lg-controls-backdrop.open, .lg-controls-sheet { animation: none !important; }
+}
