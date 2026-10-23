@@ -892,7 +892,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
 // ====================== Tab 1：可视化调节 ======================
 // 数据链路：draft（内存）--input 事件--> applyVars 到预览区（零延迟）；点保存才 ChatBeauty.save 落盘
 (function () {
-  var VISUAL_FIELDS = ['avatarSize', 'avatarRadius', 'bubbleGap', 'bubbleGapX', 'bubbleMaxWidth', 'bubblePadding', 'myBubbleBg', 'myBubbleColor', 'partnerBubbleBg', 'partnerBubbleColor', 'chatBg'];
+  var VISUAL_FIELDS = ['avatarSize','avatarRadius','bubbleGap','bubbleGapX','bubbleMaxWidth','bubblePadding','myBubbleBg','myBubbleColor','partnerBubbleBg','partnerBubbleColor','myBubbleBorderColor','myBubbleBorderWidth','partnerBubbleBorderColor','partnerBubbleBorderWidth','myBubbleRadiusSize','partnerBubbleRadiusSize','myBubblePadding','partnerBubblePadding','myBubbleFontSize','partnerBubbleFontSize','myBubbleFontFamily','partnerBubbleFontFamily','myBubbleTailSize','myBubbleTailX','myBubbleTailY','partnerBubbleTailSize','partnerBubbleTailX','partnerBubbleTailY','myBubbleDecorations','partnerBubbleDecorations','avatarBorderColor','avatarBorderWidth','messageTimeVisible','messageTimeColor','messageTimeSize','imageBubbleOpacity','imageBubbleRadius','redPacketBg','redPacketBgOpacity','redPacketImage','redPacketImageOpacity','redPacketBorderColor','redPacketBorderWidth','redPacketRadius','redPacketShowStatus','redPacketTextColor','redPacketFontSize','redPacketTitle','redPacketTitleColor','redPacketAmountTemplate','redPacketAmountColor','transferBg','transferBorderColor','transferBorderWidth','transferTextColor','chatBg','chatBgDim'];
   var previewEl = document.getElementById('vbPreview');
   var scopeSel = document.getElementById('vbScope');
   var currentScope = 'global';
@@ -958,6 +958,328 @@ document.getElementById('importFile').addEventListener('change', function(e){
     document.getElementById(id + 'Hex').textContent = hex;
   }
 
+
+  // ---- 高级聊天美化：同一 draft 驱动预览与落盘，左右分区独立 ----
+  function applyPreviewDraft() {
+    if (!draft) return;
+    ChatBeauty.applyVars(draft, previewEl);
+    updatePreviewSamples();
+  }
+
+  function getSidePrefix() {
+    return document.getElementById('vbEditSide').value === 'partner' ? 'partnerBubble' : 'myBubble';
+  }
+
+  function setAdvRange(id, value, unit, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var n = value === '' || value === null || value === undefined ? fallback : Number(value);
+    if (isNaN(n)) n = fallback;
+    el.value = String(n);
+    var out = document.getElementById(id + 'Val');
+    if (out) out.textContent = n + unit;
+  }
+
+  function setAdvColor(id, value, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var hex = toHex(value, fallback || '#111111');
+    el.value = hex;
+    var out = document.getElementById(id + 'Hex');
+    if (out) out.textContent = hex.toUpperCase();
+  }
+
+  function loadSideControls() {
+    if (!draft) return;
+    var prefix = getSidePrefix();
+    setAdvColor('vbSideBorderColor', draft[prefix + 'BorderColor'], prefix === 'myBubble' ? '#111111' : '#DADAE0');
+    setAdvRange('vbSideBorderWidth', draft[prefix + 'BorderWidth'], 'px', prefix === 'myBubble' ? 0 : 1);
+    setAdvRange('vbSideRadius', draft[prefix + 'RadiusSize'], 'px', 15);
+    setAdvRange('vbSidePadding', draft[prefix + 'Padding'], 'px', numOr(draft.bubblePadding, 10));
+    setAdvRange('vbSideFontSize', draft[prefix + 'FontSize'], 'px', 12);
+    document.getElementById('vbSideFontFamily').value = draft[prefix + 'FontFamily'] || 'system';
+    setAdvRange('vbSideTailSize', draft[prefix + 'TailSize'], 'px', 0);
+    setAdvRange('vbSideTailX', draft[prefix + 'TailX'], 'px', 0);
+    setAdvRange('vbSideTailY', draft[prefix + 'TailY'], 'px', 12);
+    renderDecorations();
+  }
+
+  function loadAdvancedControls() {
+    setAdvColor('vbAvatarBorderColor', draft.avatarBorderColor, '#FFFFFF');
+    setAdvRange('vbAvatarBorderWidth', draft.avatarBorderWidth, 'px', 1);
+    document.getElementById('vbTimeVisible').checked = draft.messageTimeVisible !== false;
+    setAdvColor('vbTimeColor', draft.messageTimeColor, '#999999');
+    setAdvRange('vbTimeSize', draft.messageTimeSize, 'px', 8);
+    setAdvRange('vbImageOpacity', draft.imageBubbleOpacity, '%', 100);
+    setAdvRange('vbImageRadius', draft.imageBubbleRadius, 'px', 16);
+
+    setAdvColor('vbRpBg', draft.redPacketBg, '#111111');
+    setAdvRange('vbRpBgOpacity', draft.redPacketBgOpacity, '%', 100);
+    document.getElementById('vbRpImageUrl').value = draft.redPacketImage || '';
+    setAdvRange('vbRpImageOpacity', draft.redPacketImageOpacity, '%', 100);
+    setAdvColor('vbRpBorderColor', draft.redPacketBorderColor, '#111111');
+    setAdvRange('vbRpBorderWidth', draft.redPacketBorderWidth, 'px', 0);
+    setAdvRange('vbRpRadius', draft.redPacketRadius, 'px', 10);
+    document.getElementById('vbRpShowStatus').checked = draft.redPacketShowStatus !== false;
+    setAdvColor('vbRpTextColor', draft.redPacketTextColor, '#FFFFFF');
+    setAdvRange('vbRpFontSize', draft.redPacketFontSize, 'px', 12);
+    document.getElementById('vbRpTitle').value = draft.redPacketTitle || '';
+    setAdvColor('vbRpTitleColor', draft.redPacketTitleColor, '#8E8E93');
+    document.getElementById('vbRpAmountTemplate').value = draft.redPacketAmountTemplate || '';
+    setAdvColor('vbRpAmountColor', draft.redPacketAmountColor, '#FFFFFF');
+
+    setAdvColor('vbTransferBg', draft.transferBg, '#FFFFFF');
+    setAdvColor('vbTransferBorderColor', draft.transferBorderColor, '#E5E5EA');
+    setAdvRange('vbTransferBorderWidth', draft.transferBorderWidth, 'px', 1);
+    setAdvColor('vbTransferTextColor', draft.transferTextColor, '#111111');
+    loadSideControls();
+    updatePreviewSamples();
+  }
+
+  function updatePreviewSamples() {
+    if (!draft) return;
+    var title = document.getElementById('vbPreviewRedPacketTitle');
+    var amount = document.getElementById('vbPreviewRedPacketAmount');
+    var status = document.getElementById('vbPreviewRedPacketStatus');
+    if (title) title.textContent = String(draft.redPacketTitle || '').trim() || '红包';
+    if (amount) {
+      var fmt = String(draft.redPacketAmountTemplate || '');
+      amount.textContent = fmt ? fmt.replace(/\{amount\}/g, '88.00').replace(/\{currency\}/g, '¥') : '¥88.00';
+    }
+    if (status) status.textContent = '未领取';
+  }
+
+  function bindAdvancedRange(id, field, unit) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = Number(this.value);
+      var output = document.getElementById(id + 'Val');
+      if (output) output.textContent = this.value + unit;
+      applyPreviewDraft();
+    });
+  }
+
+  function bindAdvancedColor(id, field) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = this.value.toUpperCase();
+      var output = document.getElementById(id + 'Hex');
+      if (output) output.textContent = this.value.toUpperCase();
+      applyPreviewDraft();
+    });
+  }
+
+  function bindAdvancedText(id, field) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = this.value;
+      applyPreviewDraft();
+    });
+  }
+
+  function isImageUrl(raw) {
+    var value = String(raw || '').trim();
+    return /^https?:\/\/\S+$/i.test(value) || /^data:image\/(?:png|jpe?g|gif|webp|svg\+xml);base64,/i.test(value);
+  }
+
+  function renderDecorations() {
+    var host = document.getElementById('vbDecorList');
+    if (!host || !draft) return;
+    host.textContent = '';
+    var prefix = getSidePrefix();
+    var list = Array.isArray(draft[prefix + 'Decorations']) ? draft[prefix + 'Decorations'] : [];
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'vb-empty-note';
+      empty.textContent = '尚未添加装饰图片';
+      host.appendChild(empty);
+      return;
+    }
+    list.forEach(function (item, index) {
+      var card = document.createElement('div');
+      card.className = 'vb-decor-item';
+      var thumb = document.createElement('img');
+      thumb.className = 'vb-decor-thumb';
+      thumb.src = item.url;
+      thumb.alt = '';
+      var body = document.createElement('div');
+      body.className = 'vb-decor-item-body';
+      var url = document.createElement('div');
+      url.className = 'vb-decor-url';
+      url.textContent = item.url;
+      body.appendChild(url);
+      var controls = document.createElement('div');
+      controls.className = 'vb-decor-item-controls';
+      [
+        {field:'x',label:'水平 X',min:0,max:100,step:1,value:numOr(item.x,65),suffix:'%'},
+        {field:'y',label:'垂直 Y',min:0,max:100,step:1,value:numOr(item.y,18),suffix:'%'},
+        {field:'width',label:'大小',min:8,max:100,step:1,value:numOr(item.width,24),suffix:'%'},
+        {field:'opacity',label:'透明度',min:0,max:100,step:1,value:Math.round(numOr(item.opacity,0.85)*100),suffix:'%'}
+      ].forEach(function (cfg) {
+        var label = document.createElement('label');
+        label.textContent = cfg.label;
+        var range = document.createElement('input');
+        range.type = 'range';
+        range.min = cfg.min;
+        range.max = cfg.max;
+        range.step = cfg.step;
+        range.value = cfg.value;
+        range.setAttribute('data-decor-index', String(index));
+        range.setAttribute('data-decor-field', cfg.field);
+        var value = document.createElement('span');
+        value.textContent = cfg.value + cfg.suffix;
+        range.setAttribute('aria-label', cfg.label);
+        range.addEventListener('input', function () { value.textContent = range.value + cfg.suffix; });
+        label.appendChild(range);
+        label.appendChild(value);
+        controls.appendChild(label);
+      });
+      body.appendChild(controls);
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'vb-decor-remove';
+      remove.textContent = '×';
+      remove.title = '移除装饰';
+      remove.setAttribute('data-remove-decor', String(index));
+      card.appendChild(thumb);
+      card.appendChild(body);
+      card.appendChild(remove);
+      host.appendChild(card);
+    });
+  }
+
+  // 选侧后切换的是同一份 draft 的对应字段；颜色/范围变化会立即进入共同预览。
+  document.getElementById('vbEditSide').addEventListener('change', loadSideControls);
+  document.getElementById('vbSideBorderColor').addEventListener('input', function () {
+    draft[getSidePrefix() + 'BorderColor'] = this.value.toUpperCase();
+    document.getElementById('vbSideBorderColorHex').textContent = this.value.toUpperCase();
+    applyPreviewDraft();
+  });
+  [
+    ['vbSideBorderWidth','BorderWidth','px'],
+    ['vbSideRadius','RadiusSize','px'],
+    ['vbSidePadding','Padding','px'],
+    ['vbSideFontSize','FontSize','px'],
+    ['vbSideTailSize','TailSize','px'],
+    ['vbSideTailX','TailX','px'],
+    ['vbSideTailY','TailY','px']
+  ].forEach(function (spec) {
+    var el = document.getElementById(spec[0]);
+    el.addEventListener('input', function () {
+      draft[getSidePrefix() + spec[1]] = Number(this.value);
+      document.getElementById(spec[0] + 'Val').textContent = this.value + spec[2];
+      applyPreviewDraft();
+    });
+  });
+  document.getElementById('vbSideFontFamily').addEventListener('change', function () {
+    draft[getSidePrefix() + 'FontFamily'] = this.value;
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbCopySideBtn').addEventListener('click', function () {
+    var source = getSidePrefix();
+    var sourceShort = source === 'myBubble' ? 'my' : 'partner';
+    var target = source === 'myBubble' ? 'partnerBubble' : 'myBubble';
+    ['Bg','Color','Radius','BorderColor','BorderWidth','RadiusSize','Padding','FontSize','FontFamily','TailSize','TailX','TailY','Decorations'].forEach(function (suffix) {
+      var value = draft[source + suffix];
+      try { value = JSON.parse(JSON.stringify(value)); } catch (e) {}
+      draft[target + suffix] = value;
+    });
+    setColor('vbMyBg',draft.myBubbleBg,'#111111');
+    setColor('vbMyColor',draft.myBubbleColor,'#FFFFFF');
+    setColor('vbPartnerBg',draft.partnerBubbleBg,'#FFFFFF');
+    setColor('vbPartnerColor',draft.partnerBubbleColor,'#111111');
+    loadSideControls();
+    applyPreviewDraft();
+    showToast(sourceShort === 'my' ? '已将我的气泡完整复制到对方一侧' : '已将对方气泡完整复制到我的一侧');
+  });
+
+  var fixedRanges = [
+    ['vbAvatarBorderWidth','avatarBorderWidth','px'],
+    ['vbTimeSize','messageTimeSize','px'],
+    ['vbImageOpacity','imageBubbleOpacity','%'],
+    ['vbImageRadius','imageBubbleRadius','px'],
+    ['vbRpBgOpacity','redPacketBgOpacity','%'],
+    ['vbRpImageOpacity','redPacketImageOpacity','%'],
+    ['vbRpBorderWidth','redPacketBorderWidth','px'],
+    ['vbRpRadius','redPacketRadius','px'],
+    ['vbRpFontSize','redPacketFontSize','px'],
+    ['vbTransferBorderWidth','transferBorderWidth','px']
+  ];
+  fixedRanges.forEach(function (item) { bindAdvancedRange(item[0],item[1],item[2]); });
+
+  [
+    ['vbAvatarBorderColor','avatarBorderColor'],
+    ['vbTimeColor','messageTimeColor'],
+    ['vbRpBg','redPacketBg'],
+    ['vbRpBorderColor','redPacketBorderColor'],
+    ['vbRpTextColor','redPacketTextColor'],
+    ['vbRpTitleColor','redPacketTitleColor'],
+    ['vbRpAmountColor','redPacketAmountColor'],
+    ['vbTransferBg','transferBg'],
+    ['vbTransferBorderColor','transferBorderColor'],
+    ['vbTransferTextColor','transferTextColor']
+  ].forEach(function (item) { bindAdvancedColor(item[0],item[1]); });
+
+  [
+    ['vbRpTitle','redPacketTitle'],
+    ['vbRpAmountTemplate','redPacketAmountTemplate']
+  ].forEach(function (item) { bindAdvancedText(item[0],item[1]); });
+
+  document.getElementById('vbTimeVisible').addEventListener('change',function () {
+    draft.messageTimeVisible = this.checked;
+    applyPreviewDraft();
+  });
+  document.getElementById('vbRpShowStatus').addEventListener('change',function () {
+    draft.redPacketShowStatus = this.checked;
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbRpImageApply').addEventListener('click',function () {
+    var url = document.getElementById('vbRpImageUrl').value.trim();
+    if (url && !isImageUrl(url)) { showToast('请输入有效的图片链接（https 或图片 data URL）'); return; }
+    draft.redPacketImage = url;
+    applyPreviewDraft();
+    showToast(url ? '红包背景图已应用到预览' : '已移除红包背景图');
+  });
+
+  document.getElementById('vbAddDecor').addEventListener('click',function () {
+    var url = document.getElementById('vbDecorUrl').value.trim();
+    if (!isImageUrl(url)) { showToast('请填写有效的图片链接（https 或图片 data URL）'); return; }
+    var prefix = getSidePrefix();
+    if (!Array.isArray(draft[prefix + 'Decorations'])) draft[prefix + 'Decorations'] = [];
+    if (draft[prefix + 'Decorations'].length >= 8) { showToast('每侧最多叠加 8 张装饰图'); return; }
+    draft[prefix + 'Decorations'].push({url:url,x:65,y:18,width:24,opacity:0.85});
+    document.getElementById('vbDecorUrl').value = '';
+    renderDecorations();
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbDecorList').addEventListener('input',function (event) {
+    var input = event.target.closest('[data-decor-index][data-decor-field]');
+    if (!input) return;
+    var prefix = getSidePrefix();
+    var list = draft[prefix + 'Decorations'] || [];
+    var item = list[Number(input.getAttribute('data-decor-index'))];
+    if (!item) return;
+    var field = input.getAttribute('data-decor-field');
+    var value = Number(input.value);
+    item[field] = field === 'opacity' ? value / 100 : value;
+    applyPreviewDraft();
+  });
+  document.getElementById('vbDecorList').addEventListener('click',function (event) {
+    var button = event.target.closest('[data-remove-decor]');
+    if (!button) return;
+    var prefix = getSidePrefix();
+    var list = draft[prefix + 'Decorations'] || [];
+    list.splice(Number(button.getAttribute('data-remove-decor')),1);
+    renderDecorations();
+    applyPreviewDraft();
+  });
+
   function loadVisualScope(scope) {
     currentScope = scope;
     draft = ChatBeauty.resolve(scope === 'global' ? null : scope);
@@ -971,9 +1293,10 @@ document.getElementById('importFile').addEventListener('change', function(e){
     setColor('vbMyColor', draft.myBubbleColor, '#FFFFFF');
     setColor('vbPartnerBg', draft.partnerBubbleBg, '#FFFFFF');
     setColor('vbPartnerColor', draft.partnerBubbleColor, '#111111');
+    loadAdvancedControls();
     updateBgHint();
     updateScopeHint();
-    ChatBeauty.applyVars(draft, previewEl);
+    applyPreviewDraft();
   }
 
   function updateBgHint() {
@@ -987,14 +1310,14 @@ document.getElementById('importFile').addEventListener('change', function(e){
     document.getElementById(id).addEventListener('input', function () {
       draft[field] = Number(this.value);
       document.getElementById(id + 'Val').textContent = this.value + unit;
-      ChatBeauty.applyVars(draft, previewEl);
+      applyPreviewDraft();
     });
   }
   function bindColor(id, field) {
     document.getElementById(id).addEventListener('input', function () {
       draft[field] = this.value;
       document.getElementById(id + 'Hex').textContent = this.value;
-      ChatBeauty.applyVars(draft, previewEl);
+      applyPreviewDraft();
     });
   }
   bindRange('vbAvatarSize', 'avatarSize', 'px');
@@ -1002,7 +1325,14 @@ document.getElementById('importFile').addEventListener('change', function(e){
   bindRange('vbBubbleGap', 'bubbleGap', 'px');
   bindRange('vbBubbleGapX', 'bubbleGapX', 'px');
   bindRange('vbBubbleMaxWidth', 'bubbleMaxWidth', '%');
-  bindRange('vbBubblePadding', 'bubblePadding', 'px');
+  document.getElementById('vbBubblePadding').addEventListener('input', function () {
+    var value = Number(this.value);
+    draft.bubblePadding = value;
+    draft.myBubblePadding = value;
+    draft.partnerBubblePadding = value;
+    document.getElementById('vbBubblePaddingVal').textContent = value + 'px';
+    applyPreviewDraft();
+  });
   bindColor('vbMyBg', 'myBubbleBg');
   bindColor('vbMyColor', 'myBubbleColor');
   bindColor('vbPartnerBg', 'partnerBubbleBg');
@@ -1026,7 +1356,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
         c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
         draft.chatBg = c.toDataURL('image/jpeg', 0.8);
-        ChatBeauty.applyVars(draft, previewEl);
+        applyPreviewDraft();
         updateBgHint();
         showToast('背景已加载到预览，点右下角「保存配置」生效');
       };
@@ -1038,7 +1368,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
 
   function clearVisualBg() {
     draft.chatBg = '';
-    ChatBeauty.applyVars(draft, previewEl);
+    applyPreviewDraft();
     updateBgHint();
   }
 
@@ -1053,7 +1383,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
       VISUAL_FIELDS.forEach(function (k) {
         var same = (k === 'chatBg')
           ? (!payload.chatBg || payload.chatBg === g.chatBg)
-          : (String(payload[k]) === String(g[k]));
+          : (JSON.stringify(payload[k]) === JSON.stringify(g[k]));
         payload[k] = same ? null : payload[k];
       });
       var hasDiff = VISUAL_FIELDS.some(function (k) { return payload[k] !== null; });
