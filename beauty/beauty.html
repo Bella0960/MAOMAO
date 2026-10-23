@@ -215,6 +215,66 @@
   .vb-color-hex{font-family:"SF Mono",Menlo,monospace;font-size:11px;color:#555}
   .vb-bg-actions{display:flex;gap:24px;align-items:center;margin-bottom:8px}
 
+
+  /* ===== ChatBeauty advanced live editor ===== */
+  .vbp-special-samples{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;align-items:stretch}
+  .vbp-pay{position:relative;display:flex;flex-direction:column;gap:3px;min-height:58px;padding:8px 10px;border-radius:var(--chat-redpacket-radius,10px);background:var(--chat-redpacket-bg-rgba,#111);border:var(--chat-redpacket-border-width,0px) solid var(--chat-redpacket-border-color,#111);color:var(--chat-redpacket-text-color,#fff);overflow:hidden;isolation:isolate}
+  .vbp-pay:before{content:"";position:absolute;z-index:-1;inset:0;background-image:var(--chat-redpacket-image,none);background-size:cover;background-position:center;opacity:var(--chat-redpacket-image-opacity,1);pointer-events:none}
+  .vbp-pay-title{font-size:var(--chat-redpacket-font-size,12px);color:var(--chat-redpacket-title-color,#8E8E93)}
+  .vbp-pay-amount{font-size:calc(var(--chat-redpacket-font-size,12px)*1.3);font-weight:650;color:var(--chat-redpacket-amount-color,#fff)}
+  .vbp-pay-status{font-size:calc(var(--chat-redpacket-font-size,12px)*.72);color:var(--chat-redpacket-text-color,#fff);display:var(--chat-redpacket-status-display,block);opacity:.7}
+  .vbp-pay.is-transfer{background:var(--chat-transfer-bg,#fff);border-color:var(--chat-transfer-border-color,#E5E5EA);border-width:var(--chat-transfer-border-width,1px);color:var(--chat-transfer-text-color,#111)}
+  .vbp-pay.is-transfer .vbp-pay-title,.vbp-pay.is-transfer .vbp-pay-amount,.vbp-pay.is-transfer .vbp-pay-status{color:var(--chat-transfer-text-color,#111)}
+  .vbp-image{position:relative;grid-column:1/-1;justify-self:end;width:155px;height:84px;border-radius:var(--chat-image-radius,16px);background:linear-gradient(135deg,#d9d9df,#f0f0f3);opacity:var(--chat-image-opacity,1);overflow:hidden;display:flex;align-items:flex-end;padding:8px;color:#8e8e93;font-size:8px;letter-spacing:.1em}
+  .vb-advanced{margin-top:19px;border-top:1px solid #dedee3;padding-top:18px}
+  .vb-advanced-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .vb-advanced-kicker{font-size:8px;letter-spacing:.17em;color:#8e8e93}
+  .vb-advanced-heading h3{font-size:17px;font-weight:650;color:#17171b;margin-top:3px;letter-spacing:-.03em}
+  .vb-live-mark{display:flex;align-items:center;gap:6px;font-size:10px;color:#66666f;white-space:nowrap}
+  .vb-live-mark i{display:block;width:6px;height:6px;border-radius:50%;background:#26262b;box-shadow:0 0 0 3px rgba(28,28,35,.08)}
+  .vb-advanced-sides{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end;margin-bottom:12px}
+  .vb-advanced-field{display:flex;flex-direction:column;gap:7px;font-size:11px;color:#66666f}
+  .vb-advanced-field select,.vb-advanced-field input,.vb-decor-add-row input,.vb-advanced-control input[type=text],.vb-advanced-control input[type=url]{width:100%;min-width:0;border:1px solid #e0e0e5;border-radius:10px;background:#fbfbfc;color:#25252b;padding:10px 11px;font-size:12px;outline:none}
+  .vb-advanced-field select:focus,.vb-decor-add-row input:focus,.vb-advanced-control input[type=text]:focus,.vb-advanced-control input[type=url]:focus{border-color:#898992}
+  .vb-copy-side{white-space:nowrap;height:37px!important;padding:0 12px!important;font-size:11px!important}
+  .vb-advanced-card{border:1px solid #e6e6eb;border-radius:14px;background:#fbfbfc;margin-top:9px;overflow:hidden}
+  .vb-advanced-card summary{list-style:none;display:flex;align-items:center;gap:9px;padding:14px 13px;cursor:pointer;user-select:none}
+  .vb-advanced-card summary::-webkit-details-marker{display:none}
+  .vb-card-number{font:italic 12px Georgia,serif;color:#9b9ba3;min-width:17px}
+  .vb-card-title{font-size:12px;font-weight:650;color:#24242b;flex:1}
+  .vb-card-note{font-size:7px;letter-spacing:.13em;color:#a1a1a8}
+  .vb-advanced-card summary:after{content:"＋";font-size:12px;color:#909098}
+  .vb-advanced-card[open] summary:after{content:"−"}
+  .vb-advanced-card[open] summary{border-bottom:1px solid #eaeaf0}
+  .vb-advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px 14px;padding:14px 13px}
+  .vb-advanced-control{min-width:0}
+  .vb-advanced-control-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+  .vb-advanced-control-head label{font-size:10px;color:#66666f}
+  .vb-advanced-control-head output{font:italic 12px Georgia,serif;color:#222229;white-space:nowrap}
+  .vb-advanced-control input[type=range]{width:100%;display:block;accent-color:#24242b}
+  .vb-advanced-control input[type=color]{display:block;width:100%;height:34px;border:1px solid #e1e1e6;border-radius:9px;padding:3px;background:#fff;cursor:pointer}
+  .vb-color-large{width:100%}
+  .vb-control-span{grid-column:1/-1}
+  .vb-advanced-subtitle{margin:0 13px;padding:0 0 9px;border-bottom:1px solid #e9e9ed;font-size:8px;letter-spacing:.15em;color:#9a9aa2}
+  .vb-advanced-help{padding:13px 13px 0;font-size:10px;line-height:1.55;color:#8e8e96}
+  .vb-decor-add-row{display:flex;gap:8px;padding:12px 13px}
+  .vb-decor-add-row input{flex:1}
+  .vb-decor-add-row .btn{flex:0 0 auto;min-width:52px;padding:0 13px!important;font-size:11px!important}
+  .vb-decor-list{display:flex;flex-direction:column;gap:9px;padding:0 13px 14px}
+  .vb-decor-item{border:1px solid #e6e6eb;border-radius:12px;background:#fff;padding:10px;display:grid;grid-template-columns:48px minmax(0,1fr) 28px;gap:9px;align-items:start}
+  .vb-decor-thumb{width:48px;height:48px;border-radius:8px;background:#f1f1f4;object-fit:contain}
+  .vb-decor-item-body{min-width:0}
+  .vb-decor-url{font-size:9px;color:#65656f;overflow-wrap:anywhere;margin:0 0 8px}
+  .vb-decor-item-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .vb-decor-item-controls label{font-size:8px;color:#8d8d95;display:flex;flex-direction:column;gap:4px}
+  .vb-decor-item-controls input{width:100%;accent-color:#34343b}
+  .vb-decor-remove{width:27px;height:27px;border:0;border-radius:50%;background:#f2f2f4;color:#777780;font-size:15px}
+  .vb-empty-note{font-size:10px;color:#a1a1a8;text-align:center;padding:12px;border:1px dashed #dedee4;border-radius:10px}
+  .vb-check-field{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px;color:#5f5f68}
+  .vb-check-field input{accent-color:#25252b;width:15px;height:15px}
+  .vb-mini-hint{display:block;font-size:9px;color:#9a9aa1;margin-top:5px}
+  @media(max-width:360px){.vb-advanced-grid{gap:14px 10px;padding:12px 10px}.vb-advanced-sides{grid-template-columns:1fr}.vb-copy-side{width:100%}.vb-decor-add-row{padding-left:10px;padding-right:10px}}
+
 </style>
 </head>
 <body>
@@ -257,6 +317,19 @@
           <div class="vbp-row ta">
             <div class="vbp-avatar">彼</div>
             <div class="vbp-bubble">那就四点半，我提前把位置占好。</div>
+          </div>
+          <div class="vbp-special-samples">
+            <div class="vbp-pay" id="vbPreviewRedPacket">
+              <span class="vbp-pay-title" id="vbPreviewRedPacketTitle">红包</span>
+              <span class="vbp-pay-amount" id="vbPreviewRedPacketAmount">¥88.00</span>
+              <span class="vbp-pay-status" id="vbPreviewRedPacketStatus">未领取</span>
+            </div>
+            <div class="vbp-pay is-transfer" id="vbPreviewTransfer">
+              <span class="vbp-pay-title">转账</span>
+              <span class="vbp-pay-amount">¥88.00</span>
+              <span class="vbp-pay-status">待收款</span>
+            </div>
+            <div class="vbp-image" id="vbPreviewImage" aria-label="图片消息预览"><span>IMAGE MESSAGE</span></div>
           </div>
         </div>
       </div>
@@ -304,6 +377,187 @@
           <div class="vb-color-row"><input type="color" id="vbPartnerColor" value="#111111"><span class="vb-color-hex" id="vbPartnerColorHex">#111111</span></div>
         </div>
       </div>
+
+      <section class="vb-advanced">
+        <div class="vb-advanced-heading">
+          <div><span class="vb-advanced-kicker">CHAT DETAIL / LIVE STYLE</span><h3>消息细节美化</h3></div>
+          <span class="vb-live-mark"><i></i> 实时预览</span>
+        </div>
+
+        <div class="vb-advanced-sides">
+          <label class="vb-advanced-field"><span>正在编辑</span>
+            <select id="vbEditSide"><option value="my">我的气泡</option><option value="partner">对方气泡</option></select>
+          </label>
+          <button type="button" class="btn btn-secondary vb-copy-side" id="vbCopySideBtn">复制到另一侧 ↗</button>
+        </div>
+
+        <details class="vb-advanced-card" open>
+          <summary><span class="vb-card-number">01</span><span class="vb-card-title">气泡形状与文字</span><span class="vb-card-note">BUBBLE</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideBorderColor">描边颜色</label><output id="vbSideBorderColorHex">#DADAE0</output></div>
+              <input type="color" id="vbSideBorderColor" value="#DADAE0" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideBorderWidth">描边粗细</label><output id="vbSideBorderWidthVal">1px</output></div>
+              <input type="range" id="vbSideBorderWidth" min="0" max="6" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideRadius">圆角大小</label><output id="vbSideRadiusVal">15px</output></div>
+              <input type="range" id="vbSideRadius" min="0" max="36" step="1" value="15">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSidePadding">内边距</label><output id="vbSidePaddingVal">10px</output></div>
+              <input type="range" id="vbSidePadding" min="4" max="28" step="1" value="10">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideFontSize">文字字号</label><output id="vbSideFontSizeVal">12px</output></div>
+              <input type="range" id="vbSideFontSize" min="10" max="24" step="1" value="12">
+            </div>
+            <label class="vb-advanced-field"><span>字体</span>
+              <select id="vbSideFontFamily"><option value="system">系统默认</option><option value="serif">衬线</option><option value="mono">等宽</option></select>
+            </label>
+          </div>
+          <div class="vb-advanced-subtitle">气泡尾巴 · TAIL</div>
+          <div class="vb-advanced-grid vb-tail-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailSize">尾巴大小</label><output id="vbSideTailSizeVal">0px</output></div>
+              <input type="range" id="vbSideTailSize" min="0" max="20" step="1" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailX">水平位置 X</label><output id="vbSideTailXVal">0px</output></div>
+              <input type="range" id="vbSideTailX" min="-16" max="16" step="1" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailY">垂直位置 Y</label><output id="vbSideTailYVal">12px</output></div>
+              <input type="range" id="vbSideTailY" min="0" max="64" step="1" value="12">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">02</span><span class="vb-card-title">装饰图片叠加</span><span class="vb-card-note">DECOR</span></summary>
+          <p class="vb-advanced-help">填写图片链接后添加，可叠加多张图片。每张图片都能独立调整位置、大小与透明度，图片保持原始比例。</p>
+          <div class="vb-decor-add-row">
+            <input type="url" id="vbDecorUrl" placeholder="https://… 图片链接">
+            <button type="button" class="btn btn-secondary" id="vbAddDecor">添加</button>
+          </div>
+          <div class="vb-decor-list" id="vbDecorList"><div class="vb-empty-note">尚未添加装饰图片</div></div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">03</span><span class="vb-card-title">头像、时间与图片</span><span class="vb-card-note">DETAIL</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbAvatarBorderColor">头像描边颜色</label><output id="vbAvatarBorderColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbAvatarBorderColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbAvatarBorderWidth">头像描边粗细</label><output id="vbAvatarBorderWidthVal">1px</output></div>
+              <input type="range" id="vbAvatarBorderWidth" min="0" max="5" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTimeColor">时间颜色</label><output id="vbTimeColorHex">#999999</output></div>
+              <input type="color" id="vbTimeColor" value="#999999" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTimeSize">时间字号</label><output id="vbTimeSizeVal">8px</output></div>
+              <input type="range" id="vbTimeSize" min="7" max="15" step="1" value="8">
+            </div>
+            <label class="vb-check-field"><input type="checkbox" id="vbTimeVisible" checked><span>显示消息时间</span></label>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbImageOpacity">图片透明度</label><output id="vbImageOpacityVal">100%</output></div>
+              <input type="range" id="vbImageOpacity" min="10" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbImageRadius">图片圆角</label><output id="vbImageRadiusVal">16px</output></div>
+              <input type="range" id="vbImageRadius" min="0" max="40" step="1" value="16">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">04</span><span class="vb-card-title">红包样式</span><span class="vb-card-note">RED PACKET</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBg">卡片底色</label><output id="vbRpBgHex">#111111</output></div>
+              <input type="color" id="vbRpBg" value="#111111" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBgOpacity">底色透明度</label><output id="vbRpBgOpacityVal">100%</output></div>
+              <input type="range" id="vbRpBgOpacity" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control vb-control-span">
+              <div class="vb-advanced-control-head"><label for="vbRpImageUrl">红包背景图片</label></div>
+              <div class="vb-decor-add-row"><input type="url" id="vbRpImageUrl" placeholder="https://… 背景图片链接"><button type="button" class="btn btn-secondary" id="vbRpImageApply">应用</button></div>
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpImageOpacity">背景图片透明度</label><output id="vbRpImageOpacityVal">100%</output></div>
+              <input type="range" id="vbRpImageOpacity" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBorderColor">边框颜色</label><output id="vbRpBorderColorHex">#111111</output></div>
+              <input type="color" id="vbRpBorderColor" value="#111111" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBorderWidth">边框粗细</label><output id="vbRpBorderWidthVal">0px</output></div>
+              <input type="range" id="vbRpBorderWidth" min="0" max="6" step="0.5" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpRadius">卡片圆角</label><output id="vbRpRadiusVal">10px</output></div>
+              <input type="range" id="vbRpRadius" min="0" max="30" step="1" value="10">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpFontSize">文案字号</label><output id="vbRpFontSizeVal">12px</output></div>
+              <input type="range" id="vbRpFontSize" min="9" max="18" step="1" value="12">
+            </div>
+            <label class="vb-check-field"><input type="checkbox" id="vbRpShowStatus" checked><span>显示已领取 / 未领取</span></label>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTextColor">文案颜色</label><output id="vbRpTextColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbRpTextColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTitle">标题文案</label></div>
+              <input type="text" id="vbRpTitle" maxlength="24" placeholder="留空则使用原始标题">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTitleColor">标题颜色</label><output id="vbRpTitleColorHex">#8E8E93</output></div>
+              <input type="color" id="vbRpTitleColor" value="#8E8E93" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpAmountTemplate">金额格式</label></div>
+              <input type="text" id="vbRpAmountTemplate" maxlength="40" placeholder="¥{amount}">
+              <small class="vb-mini-hint">可使用 {currency} 与 {amount}</small>
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpAmountColor">金额颜色</label><output id="vbRpAmountColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbRpAmountColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">05</span><span class="vb-card-title">转账卡片</span><span class="vb-card-note">TRANSFER</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBg">卡片底色</label><output id="vbTransferBgHex">#FFFFFF</output></div>
+              <input type="color" id="vbTransferBg" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBorderColor">边框颜色</label><output id="vbTransferBorderColorHex">#E5E5EA</output></div>
+              <input type="color" id="vbTransferBorderColor" value="#E5E5EA" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBorderWidth">边框粗细</label><output id="vbTransferBorderWidthVal">1px</output></div>
+              <input type="range" id="vbTransferBorderWidth" min="0" max="6" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferTextColor">文字颜色</label><output id="vbTransferTextColorHex">#111111</output></div>
+              <input type="color" id="vbTransferTextColor" value="#111111" class="vb-color-large">
+            </div>
+          </div>
+        </details>
+      </section>
 
       <div class="vb-bg">
         <div class="vb-slider-head"><span class="vb-name">聊天背景图</span></div>
