@@ -250,3 +250,16 @@
   background: linear-gradient(135deg,#d8d8dd,#f3f3f5);
   opacity: var(--chat-image-opacity,1);
 }
+
+
+/* Transfer card artwork follows the chosen transfer text colour as well. */
+.chat-stage .pay-card-transfer .pay-ico,
+.chat-stage .pay-card-transfer .pay-card-arrow {
+  color: var(--chat-transfer-text-color, #111111) !important;
+  stroke: var(--chat-transfer-text-color, #111111) !important;
+}
+.chat-stage .bubble-pay > .chat-beauty-content,
+.chat-stage .bubble-media > .chat-beauty-content {
+  display: block;
+  width: 100%;
+}
