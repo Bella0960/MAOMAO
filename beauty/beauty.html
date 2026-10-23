@@ -1404,6 +1404,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
         syncPanelFromInput(input);
         panel.classList.add('show');
         updateTrigger(input);
+        if (ui.preview && typeof ui.preview.scrollIntoView === 'function') ui.preview.scrollIntoView({ block: 'start', behavior: 'smooth' });
       });
       input.addEventListener('input', function () { updateTrigger(input); });
       updateTrigger(input);
