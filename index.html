@@ -29,7 +29,7 @@
     <meta property="og:title" content="手机模拟器" />
     <meta property="og:description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
     <script src="shared/js/font-loader.js?v=20261022v1"></script>
-    <script src="shared/js/native-feel.js?v=20261023v5"></script>
+    <script src="shared/js/native-feel.js?v=20261023v6"></script>
     <link rel="stylesheet" href="desktop/css/styles.css?v=20261022v8">
   <link rel="stylesheet" href="shared/css/mobile-fit.css?v=20261022v4">
   <style>
@@ -663,6 +663,7 @@
       /* iOS-like long-press action menu. It is separate from the icon editor sheet. */
       function showHomeActionMenu() {
         closeHomeActionMenu();
+        document.body.classList.add('home-action-open');
         var menu = document.createElement('div');
         menu.id = 'homeActionMenu';
         menu.className = 'home-action-menu open';
@@ -714,6 +715,7 @@
       function closeHomeActionMenu() {
         var menu = document.getElementById('homeActionMenu');
         if (menu) menu.remove();
+        document.body.classList.remove('home-action-open');
       }
 
       if (editDoneBtn) {
