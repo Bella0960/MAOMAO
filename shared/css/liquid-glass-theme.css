@@ -608,3 +608,31 @@ html[data-theme="liquid-glass"][data-icon-style="default"][data-icon-appearance=
 @media (prefers-reduced-motion: reduce) {
   .home-action-menu { transition: none !important; }
 }
+
+
+/* While the iOS-style action menu is open, show only the top-right Done control. */
+body.maomao-home.home-action-open .edit-mode-indicator {
+  left: auto !important;
+  right: 12px !important;
+  top: 0 !important;
+  transform: none !important;
+  gap: 0 !important;
+}
+body.maomao-home.home-action-open #editAddWidgetBtn,
+body.maomao-home.home-action-open #editGlassBtn {
+  display: none !important;
+}
+body.maomao-home.home-action-open #editDoneBtn {
+  min-width: 34px;
+  width: 34px;
+  height: 30px;
+  padding: 0;
+  border-radius: 14px;
+  font-size: 0;
+}
+body.maomao-home.home-action-open #editDoneBtn::before {
+  content: "✓";
+  display: block;
+  font-size: 16px;
+  line-height: 1;
+}
