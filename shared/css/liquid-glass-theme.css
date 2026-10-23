@@ -134,23 +134,16 @@ html[data-theme="liquid-glass"] body.maomao-home .dock-bar {
     rgba(var(--lg-glass-tint-rgb),var(--lg-dock-fill-alpha)) 56%,
     rgba(var(--lg-glass-tint-rgb),var(--lg-dock-shadow-alpha))
   ) !important;
-  border: 1px solid rgba(255,255,255,.9) !important;
+  border: 0 !important;
+  outline: none !important;
   border-radius: 30px !important;
   -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.9) contrast(1.07) !important;
   backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.9) contrast(1.07) !important;
-  box-shadow: 0 15px 34px rgba(20,20,27,.13), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.42) !important;
+  box-shadow: 0 13px 30px rgba(20,20,27,.12) !important;
 }
 html[data-theme="liquid-glass"] body.maomao-home .dock-bar::before {
-  content: "";
-  position: absolute;
-  top: 1px;
-  left: 9%;
-  right: 9%;
-  height: 1px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 0 8px rgba(255,255,255,.38);
-  pointer-events: none;
+  display: none !important;
+  content: none !important;
 }
 html[data-theme="liquid-glass"] body.maomao-home .gesture-bar {
   background: rgba(32,32,38,.62) !important;
@@ -855,78 +848,11 @@ html[data-theme="liquid-glass"][data-icon-size="large"] body.maomao-home .dock-b
 .lg-size-preview-large { transform: scale(1); }
 .lg-size-option:active { transform: scale(.97); }
 
-/* Glyph colour palette: native colour selector plus quick picks. */
-.lg-glyph-color-section {
-  margin: 0 0 17px;
-}
-.lg-glyph-color-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 9px;
-}
-.lg-native-color-picker {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 10px 5px 6px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 999px;
-  color: rgba(255,255,255,.94);
-  background: rgba(255,255,255,.09);
-  font-size: 11px;
-  touch-action: manipulation;
-}
-.lg-native-color-picker input[type="color"] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: .015;
-  cursor: pointer;
-  border: 0;
-  padding: 0;
-}
-.lg-native-color-preview {
-  display: block;
-  width: 20px;
-  height: 20px;
-  border: 1px solid rgba(255,255,255,.55);
-  border-radius: 50%;
-  background: var(--lg-icon-glyph-color, #292930);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 1px 2px rgba(0,0,0,.12);
-}
-.lg-glyph-swatches {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-}
-.lg-glyph-swatch {
-  appearance: none;
-  -webkit-appearance: none;
-  display: block;
-  flex: 0 0 26px;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.42);
-  background: var(--glyph-swatch);
-  box-shadow: 0 2px 5px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.32);
-  transition: transform .16s ease, box-shadow .16s ease;
-}
-.lg-glyph-swatch.selected {
-  outline: 2px solid rgba(255,255,255,.92);
-  outline-offset: 2px;
-  transform: scale(.92);
-}
-.lg-glyph-swatch:active { transform: scale(.88); }
-@media (max-width: 380px) {
-  .lg-size-option { min-width: 47px; }
-  .lg-glyph-swatches { gap: 5px; }
-  .lg-glyph-swatch { flex-basis: 23px; width: 23px; height: 23px; }
+
+/* Compact helper copy for the two colour sliders. */
+.lg-slider-help {
+  color: rgba(255,255,255,.64);
+  font-size: 10px;
+  text-align: center;
+  margin: -7px 0 10px;
 }
