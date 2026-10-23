@@ -9,6 +9,7 @@
   border-radius: var(--chat-bubble-ta-radius-size, var(--chat-bubble-ta-radius, 15px 15px 15px 4px)) !important;
   font-size: var(--chat-bubble-ta-font-size, 12px) !important;
   font-family: var(--chat-bubble-ta-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  padding: var(--chat-bubble-ta-padding, var(--chat-bubble-padding, 9.5px 13px)) !important;
 }
 .chat-stage .msg-row.sent .msg-bubble:not(.bubble-pay):not(.bubble-media),
 .chat-stage .msg-row.right .msg-bubble:not(.bubble-pay):not(.bubble-media) {
@@ -16,6 +17,7 @@
   border-radius: var(--chat-bubble-my-radius-size, var(--chat-bubble-my-radius, 15px 15px 4px 15px)) !important;
   font-size: var(--chat-bubble-my-font-size, 12px) !important;
   font-family: var(--chat-bubble-my-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  padding: var(--chat-bubble-my-padding, var(--chat-bubble-padding, 9.5px 13px)) !important;
 }
 .chat-stage .msg-avatar {
   border-color: var(--chat-avatar-border-color, #FFFFFF) !important;
