@@ -264,4 +264,16 @@
             } catch (err) { /* 隐私模式等异常场景直接忽略 */ }
         });
     }
+
+    /* ---------- 六、全站底部 Home Indicator：应用内点击返回桌面 ---------- */
+    (function loadMaoMaoHomeIndicator() {
+        if (document.querySelector('script[data-maomao-home-indicator-loader]')) return;
+        var nativeScript = document.currentScript || document.querySelector('script[src*="native-feel.js"]');
+        if (!nativeScript || !nativeScript.src) return;
+        var helper = document.createElement('script');
+        helper.src = new URL('home-indicator.js?v=20261023v1', nativeScript.src).href;
+        helper.async = false;
+        helper.setAttribute('data-maomao-home-indicator-loader', '1');
+        (document.head || document.documentElement).appendChild(helper);
+    })();
 })();
