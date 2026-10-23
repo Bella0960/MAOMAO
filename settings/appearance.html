@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Appearance · 外观</title>
 <script src="../shared/js/font-loader.js?v=20261022v1"></script>
+<script src="../shared/js/wallpaper-store.js?v=20261023v1"></script>
 <script src="../shared/js/native-feel.js?v=20261023v6"></script>
 <script src="../shared/js/statusbar-control.js"></script>
 <style>
@@ -468,68 +469,130 @@
     });
   });
 
-  /* ---- 壁纸 ---- */
+  /* ---- 壁纸：使用共享 IndexedDB，确保设置页上传后能被手机桌面读取 ---- */
   var previewBox = document.getElementById('wallpaperPreviewBox');
   var emptyText = document.getElementById('wallpaperEmptyText');
   var wallpaperInput = document.getElementById('wallpaperInput');
   var resetBtn = document.getElementById('resetWallpaperBtn');
+  var wallpaperStore = window.MAOMAOWallpaperStore;
 
   function renderWallpaper() {
-    var saved = localStorage.getItem(WALLPAPER_KEY);
-    if (saved) {
-      previewBox.style.backgroundImage = 'url("' + saved + '")';
-      emptyText.style.display = 'none';
-    } else {
-      previewBox.style.backgroundImage = 'none';
+    if (!previewBox || !emptyText) return Promise.resolve('');
+    var read = wallpaperStore && typeof wallpaperStore.get === 'function'
+      ? wallpaperStore.get()
+      : Promise.resolve((function () {
+          try { return localStorage.getItem(WALLPAPER_KEY) || ''; } catch (e) { return ''; }
+        })());
+
+    return read.then(function (saved) {
+      if (saved) {
+        previewBox.style.backgroundImage = 'url("' + saved + '")';
+        previewBox.style.backgroundSize = 'cover';
+        previewBox.style.backgroundPosition = 'center';
+        emptyText.style.display = 'none';
+      } else {
+        previewBox.style.backgroundImage = 'none';
+        emptyText.style.display = 'block';
+        emptyText.textContent = '当前：纯白默认';
+      }
+      return saved || '';
+    }).catch(function () {
       emptyText.style.display = 'block';
-    }
+      emptyText.textContent = '壁纸读取失败，请重新上传';
+      return '';
+    });
   }
   renderWallpaper();
 
-  function compressImage(file, cb) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var img = new Image();
-      img.onload = function () {
-        var MAX_W = 800, MAX_H = 1422;
-        var w = img.width, h = img.height;
-        if (w > h) {
-          if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
-        } else {
-          if (h > MAX_H) { w = Math.round(w * MAX_H / h); h = MAX_H; }
-        }
-        var c = document.createElement('canvas');
-        c.width = w; c.height = h;
-        c.getContext('2d').drawImage(img, 0, 0, w, h);
-        cb(c.toDataURL('image/jpeg', 0.8));
+  function compressImage(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !/^image\//i.test(file.type || '')) {
+        reject(new Error('请选择图片文件'));
+        return;
+      }
+      var reader = new FileReader();
+      reader.onerror = function () { reject(new Error('图片读取失败，请重试')); };
+      reader.onload = function (event) {
+        var img = new Image();
+        img.onerror = function () { reject(new Error('图片格式无法读取，请换一张 JPG 或 PNG 图片')); };
+        img.onload = function () {
+          try {
+            var MAX_W = 900, MAX_H = 1600;
+            var w = img.naturalWidth || img.width;
+            var h = img.naturalHeight || img.height;
+            if (!w || !h) throw new Error('图片尺寸无效');
+            var scale = Math.min(1, MAX_W / w, MAX_H / h);
+            w = Math.max(1, Math.round(w * scale));
+            h = Math.max(1, Math.round(h * scale));
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('当前浏览器无法处理图片');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.76));
+          } catch (error) {
+            reject(error);
+          }
+        };
+        img.src = event.target.result;
       };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
-  wallpaperInput.addEventListener('change', function (e) {
-    var file = e.target.files && e.target.files[0];
-    if (!file) return;
-    compressImage(file, function (base64) {
-      try {
-        localStorage.setItem(WALLPAPER_KEY, base64);
-        renderWallpaper();
-        showToast('壁纸已更新');
-      } catch (err) {
-        showToast('壁纸保存失败，图片过大');
-      }
-    });
-    wallpaperInput.value = '';
-  });
+  if (wallpaperInput) {
+    wallpaperInput.addEventListener('change', function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
 
-  resetBtn.addEventListener('click', function () {
-    try { localStorage.removeItem(WALLPAPER_KEY); } catch (e) {}
-    renderWallpaper();
-    showToast('已恢复默认');
-  });
+      emptyText.style.display = 'block';
+      emptyText.textContent = '正在处理壁纸…';
+      wallpaperInput.disabled = true;
+
+      compressImage(file).then(function (dataUrl) {
+        if (wallpaperStore && typeof wallpaperStore.save === 'function') {
+          return wallpaperStore.save(dataUrl).then(function () { return dataUrl; });
+        }
+        try {
+          localStorage.setItem(WALLPAPER_KEY, dataUrl);
+          return dataUrl;
+        } catch (error) {
+          throw new Error('本机存储空间不足，请换一张较小的图片');
+        }
+      }).then(function () {
+        return renderWallpaper();
+      }).then(function () {
+        showToast('壁纸已保存，返回桌面即可查看');
+      }).catch(function (error) {
+        console.error('[MAOMAO wallpaper]', error);
+        emptyText.textContent = '上传失败，请重试';
+        showToast(error && error.message ? error.message : '壁纸上传失败，请重试');
+      }).finally(function () {
+        wallpaperInput.disabled = false;
+        wallpaperInput.value = '';
+      });
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function () {
+      var cleared = wallpaperStore && typeof wallpaperStore.clear === 'function'
+        ? wallpaperStore.clear()
+        : Promise.resolve().then(function () {
+            try { localStorage.removeItem(WALLPAPER_KEY); } catch (e) {}
+          });
+      cleared.then(function () {
+        return renderWallpaper();
+      }).then(function () {
+        showToast('已恢复默认壁纸');
+      }).catch(function () {
+        showToast('恢复失败，请重试');
+      });
+    });
+  }
 })();
 </script>
-<script src="../shared/js/liquid-glass-controls.js?v=20261023v6"></script>
+<script src="../shared/js/liquid-glass-controls.js?v=20261023v7"></script>
 </body>
 </html>
