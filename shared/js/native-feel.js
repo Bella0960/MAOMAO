@@ -27,7 +27,9 @@
             maomaoThemeLink = document.createElement('link');
             maomaoThemeLink.id = 'maomao-liquid-glass-theme';
             maomaoThemeLink.rel = 'stylesheet';
-            maomaoThemeLink.href = new URL('../css/liquid-glass-theme.css', current.src).href;
+            var themeCssUrl = new URL('../css/liquid-glass-theme.css', current.src);
+            themeCssUrl.searchParams.set('v', '20261023v2');
+            maomaoThemeLink.href = themeCssUrl.href;
             /* Load once while classic remains visually unchanged; the CSS only activates via data-theme. */
             maomaoThemeLink.media = 'all';
             document.head.appendChild(maomaoThemeLink);
