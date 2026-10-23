@@ -37,7 +37,7 @@
     .edit-add-btn { margin-right: 8px; }
   </style>
 </head>
-  <body>
+  <body class="maomao-home">
     <main class="simulator-stage">
       <section class="phone" aria-label="手机模拟器">
         <div class="phone-camera" aria-hidden="true"></div>
@@ -47,6 +47,7 @@
             <time id="status-time">09:41</time>
             <div class="edit-mode-indicator" id="editModeIndicator" style="display: none;">
               <button class="edit-done-btn edit-add-btn" id="editAddWidgetBtn" type="button">＋ 挂件</button>
+              <button class="edit-done-btn" id="editGlassBtn" type="button" aria-label="自定义液态玻璃">◐ 玻璃</button>
               <button class="edit-done-btn" id="editDoneBtn" type="button">✓ 完成</button>
             </div>
             <div class="status-icons" aria-label="设备状态">
@@ -1515,5 +1516,6 @@
       //   navigator.serviceWorker.register('sw.js').catch(function () {});
       // }
     </script>
+<script src="shared/js/liquid-glass-controls.js?v=20261023v2"></script>
 </body>
 </html>
