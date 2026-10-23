@@ -50,7 +50,7 @@ html[data-theme="liquid-glass"] .battery-icon {
   border-color: currentColor !important;
 }
 
-/* One shared material for floating controls and content surfaces. */
+/* One shared material for floating glass controls. */
 html[data-theme="liquid-glass"] .glass,
 html[data-theme="liquid-glass"] .time-card,
 html[data-theme="liquid-glass"] .img-card,
@@ -62,14 +62,22 @@ html[data-theme="liquid-glass"] .floating-nav,
 html[data-theme="liquid-glass"] .bottom-nav,
 html[data-theme="liquid-glass"] .nav-bar,
 html[data-theme="liquid-glass"] .tab-bar,
-html[data-theme="liquid-glass"] .chat-input-bar,
+html[data-theme="liquid-glass"] .chat-input-bar {
+  background-color: var(--lg-surface) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.34) 42%, rgba(245,245,249,.22) 100%) !important;
+  border: 1px solid var(--lg-edge) !important;
+  box-shadow: var(--lg-shadow), var(--lg-inset) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
+  backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
+}
+
+/* Generic content panels keep their original background images intact. */
 html[data-theme="liquid-glass"] section.card,
 html[data-theme="liquid-glass"] .card,
 html[data-theme="liquid-glass"] .customize-panel,
 html[data-theme="liquid-glass"] .modal,
 html[data-theme="liquid-glass"] [role="dialog"] {
   background-color: var(--lg-surface) !important;
-  background-image: linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.34) 42%, rgba(245,245,249,.22) 100%) !important;
   border: 1px solid var(--lg-edge) !important;
   box-shadow: var(--lg-shadow), var(--lg-inset) !important;
   -webkit-backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
