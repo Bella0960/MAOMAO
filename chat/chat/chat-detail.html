@@ -6,7 +6,8 @@
     <script src="../../shared/js/font-loader.js?v=20261022v1"></script>
     <script src="../../shared/js/native-feel.js"></script>
     <script src="../../shared/js/custom-css.js"></script>
-    <script src="../../shared/js/chat-beauty.js"></script>
+    <script src="../../shared/js/chat-beauty.js?v=20261024v2"></script>
+    <link rel="stylesheet" href="../../shared/css/chat-beauty-runtime.css?v=20261024v2">
     <script src="../../shared/js/phone/phone_storage.js"></script>
     <script src="../../shared/js/phone/phone_stream.js"></script>
     <style>
@@ -4155,6 +4156,22 @@
 
         renderAllMessages();
         highlightMessageFromUrl();
+
+        // 美化中心保存后，页面从返回缓存恢复时重新读取最新配置。
+        function refreshChatBeautyConfig() {
+            try {
+                if (window.ChatBeauty && currentCharacter && chatMessages) {
+                    ChatBeauty.apply(currentCharacter.id, chatMessages);
+                }
+            } catch (e) {}
+        }
+        window.addEventListener('pageshow', refreshChatBeautyConfig);
+        window.addEventListener('storage', function (event) {
+            if (!event.key || event.key === 'beauty_chat_global_v1' ||
+                (currentCharacter && event.key === 'beauty_chat_' + currentCharacter.id)) {
+                refreshChatBeautyConfig();
+            }
+        });
 
         // ================= 三点图标：直接跳转对话设置页（不再弹出菜单） =================
         const btnMoreMenu = document.getElementById('btn-more-menu');

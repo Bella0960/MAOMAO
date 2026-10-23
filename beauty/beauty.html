@@ -6,7 +6,8 @@
 <title>聊天美化 · 小手机</title>
 <script src="../shared/js/font-loader.js?v=20261022v1"></script>
 <script src="../shared/js/native-feel.js"></script>
-<script src="../shared/js/chat-beauty.js"></script>
+<script src="../shared/js/chat-beauty.js?v=20261024v2"></script>
+<link rel="stylesheet" href="../shared/css/chat-beauty-runtime.css?v=20261024v2">
 <link rel="stylesheet" href="../shared/css/mobile-fit.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
@@ -214,6 +215,80 @@
   .vb-color-hex{font-family:"SF Mono",Menlo,monospace;font-size:11px;color:#555}
   .vb-bg-actions{display:flex;gap:24px;align-items:center;margin-bottom:8px}
 
+
+  .vb-side-color-sliders{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 13px 15px}
+  .vb-side-color-channel{min-width:0;display:flex;flex-direction:column;gap:10px}
+  .vb-color-slider-line{display:grid;grid-template-columns:38px minmax(0,1fr);gap:7px;align-items:center;font-size:8px;color:#92929a}
+  .vb-color-slider-line input{min-width:0}
+  .vb-side-color-head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:9px;color:#66666f}
+  .vb-side-color-head output{font:italic 11px Georgia,serif;color:#222229}
+  .vb-hue-range,.vb-tone-range{appearance:none;-webkit-appearance:none;width:100%;height:20px;margin:0;padding:0;background:transparent;outline:none;cursor:pointer}
+  .vb-hue-range::-webkit-slider-runnable-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#f33 0%,#ffb52e 14%,#f4ee42 25%,#55c66e 39%,#21c8b4 51%,#2797ed 64%,#5852dc 76%,#bd42d8 88%,#f33 100%)}
+  .vb-hue-range::-moz-range-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#f33 0%,#ffb52e 14%,#f4ee42 25%,#55c66e 39%,#21c8b4 51%,#2797ed 64%,#5852dc 76%,#bd42d8 88%,#f33 100%)}
+  .vb-hue-range::-webkit-slider-thumb,.vb-tone-range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-3.5px;border-radius:50%;border:2px solid #fff;background:#42424a;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .vb-hue-range::-moz-range-thumb,.vb-tone-range::-moz-range-thumb{width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:#42424a;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .vb-tone-range::-webkit-slider-runnable-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#fff 0%,var(--vb-tone-hue,hsl(0,72%,50%)) 50%,#111 100%);border:1px solid rgba(0,0,0,.06)}
+  .vb-tone-range::-moz-range-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#fff 0%,var(--vb-tone-hue,hsl(0,72%,50%)) 50%,#111 100%);border:1px solid rgba(0,0,0,.06)}
+  @media(max-width:360px){.vb-side-color-sliders{gap:10px;padding-left:10px;padding-right:10px}}
+  /* ===== ChatBeauty advanced live editor ===== */
+  .vbp-special-samples{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;align-items:stretch}
+  .vbp-pay{position:relative;display:flex;flex-direction:column;gap:3px;min-height:58px;padding:8px 10px;border-radius:var(--chat-redpacket-radius,10px);background:var(--chat-redpacket-bg-rgba,#111);border:var(--chat-redpacket-border-width,0px) solid var(--chat-redpacket-border-color,#111);color:var(--chat-redpacket-text-color,#fff);overflow:hidden;isolation:isolate}
+  .vbp-pay:before{content:"";position:absolute;z-index:-1;inset:0;background-image:var(--chat-redpacket-image,none);background-size:cover;background-position:center;opacity:var(--chat-redpacket-image-opacity,1);pointer-events:none}
+  .vbp-pay-title{font-size:var(--chat-redpacket-font-size,12px);color:var(--chat-redpacket-title-color,#8E8E93)}
+  .vbp-pay-amount{font-size:calc(var(--chat-redpacket-font-size,12px)*1.3);font-weight:650;color:var(--chat-redpacket-amount-color,#fff)}
+  .vbp-pay-status{font-size:calc(var(--chat-redpacket-font-size,12px)*.72);color:var(--chat-redpacket-text-color,#fff);display:var(--chat-redpacket-status-display,block);opacity:.7}
+  .vbp-pay.is-transfer{background:var(--chat-transfer-bg,#fff);border-color:var(--chat-transfer-border-color,#E5E5EA);border-width:var(--chat-transfer-border-width,1px);color:var(--chat-transfer-text-color,#111)}
+  .vbp-pay.is-transfer .vbp-pay-title,.vbp-pay.is-transfer .vbp-pay-amount,.vbp-pay.is-transfer .vbp-pay-status{color:var(--chat-transfer-text-color,#111)}
+  .vbp-image{position:relative;grid-column:1/-1;justify-self:end;width:155px;height:84px;border-radius:var(--chat-image-radius,16px);background:linear-gradient(135deg,#d9d9df,#f0f0f3);opacity:var(--chat-image-opacity,1);overflow:hidden;display:flex;align-items:flex-end;padding:8px;color:#8e8e93;font-size:8px;letter-spacing:.1em}
+  .vb-advanced{margin-top:19px;border-top:1px solid #dedee3;padding-top:18px}
+  .vb-advanced-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .vb-advanced-kicker{font-size:8px;letter-spacing:.17em;color:#8e8e93}
+  .vb-advanced-heading h3{font-size:17px;font-weight:650;color:#17171b;margin-top:3px;letter-spacing:-.03em}
+  .vb-live-mark{display:flex;align-items:center;gap:6px;font-size:10px;color:#66666f;white-space:nowrap}
+  .vb-live-mark i{display:block;width:6px;height:6px;border-radius:50%;background:#26262b;box-shadow:0 0 0 3px rgba(28,28,35,.08)}
+  .vb-advanced-sides{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end;margin-bottom:12px}
+  .vb-advanced-field{display:flex;flex-direction:column;gap:7px;font-size:11px;color:#66666f}
+  .vb-advanced-field select,.vb-advanced-field input,.vb-decor-add-row input,.vb-advanced-control input[type=text],.vb-advanced-control input[type=url]{width:100%;min-width:0;border:1px solid #e0e0e5;border-radius:10px;background:#fbfbfc;color:#25252b;padding:10px 11px;font-size:12px;outline:none}
+  .vb-advanced-field select:focus,.vb-decor-add-row input:focus,.vb-advanced-control input[type=text]:focus,.vb-advanced-control input[type=url]:focus{border-color:#898992}
+  .vb-copy-side{white-space:nowrap;height:37px!important;padding:0 12px!important;font-size:11px!important}
+  .vb-advanced-card{border:1px solid #e6e6eb;border-radius:14px;background:#fbfbfc;margin-top:9px;overflow:hidden}
+  .vb-advanced-card summary{list-style:none;display:flex;align-items:center;gap:9px;padding:14px 13px;cursor:pointer;user-select:none}
+  .vb-advanced-card summary::-webkit-details-marker{display:none}
+  .vb-card-number{font:italic 12px Georgia,serif;color:#9b9ba3;min-width:17px}
+  .vb-card-title{font-size:12px;font-weight:650;color:#24242b;flex:1}
+  .vb-card-note{font-size:7px;letter-spacing:.13em;color:#a1a1a8}
+  .vb-advanced-card summary:after{content:"＋";font-size:12px;color:#909098}
+  .vb-advanced-card[open] summary:after{content:"−"}
+  .vb-advanced-card[open] summary{border-bottom:1px solid #eaeaf0}
+  .vb-advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px 14px;padding:14px 13px}
+  .vb-advanced-control{min-width:0}
+  .vb-advanced-control-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+  .vb-advanced-control-head label{font-size:10px;color:#66666f}
+  .vb-advanced-control-head output{font:italic 12px Georgia,serif;color:#222229;white-space:nowrap}
+  .vb-advanced-control input[type=range]{width:100%;display:block;accent-color:#24242b}
+  .vb-advanced-control input[type=color]{display:block;width:100%;height:34px;border:1px solid #e1e1e6;border-radius:9px;padding:3px;background:#fff;cursor:pointer}
+  .vb-color-large{width:100%}
+  .vb-control-span{grid-column:1/-1}
+  .vb-advanced-subtitle{margin:0 13px;padding:0 0 9px;border-bottom:1px solid #e9e9ed;font-size:8px;letter-spacing:.15em;color:#9a9aa2}
+  .vb-advanced-help{padding:13px 13px 0;font-size:10px;line-height:1.55;color:#8e8e96}
+  .vb-decor-add-row{display:flex;gap:8px;padding:12px 13px}
+  .vb-decor-add-row input{flex:1}
+  .vb-decor-add-row .btn{flex:0 0 auto;min-width:52px;padding:0 13px!important;font-size:11px!important}
+  .vb-decor-list{display:flex;flex-direction:column;gap:9px;padding:0 13px 14px}
+  .vb-decor-item{border:1px solid #e6e6eb;border-radius:12px;background:#fff;padding:10px;display:grid;grid-template-columns:48px minmax(0,1fr) 28px;gap:9px;align-items:start}
+  .vb-decor-thumb{width:48px;height:48px;border-radius:8px;background:#f1f1f4;object-fit:contain}
+  .vb-decor-item-body{min-width:0}
+  .vb-decor-url{font-size:9px;color:#65656f;overflow-wrap:anywhere;margin:0 0 8px}
+  .vb-decor-item-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .vb-decor-item-controls label{font-size:8px;color:#8d8d95;display:flex;flex-direction:column;gap:4px}
+  .vb-decor-item-controls input{width:100%;accent-color:#34343b}
+  .vb-decor-remove{width:27px;height:27px;border:0;border-radius:50%;background:#f2f2f4;color:#777780;font-size:15px}
+  .vb-empty-note{font-size:10px;color:#a1a1a8;text-align:center;padding:12px;border:1px dashed #dedee4;border-radius:10px}
+  .vb-check-field{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px;color:#5f5f68}
+  .vb-check-field input{accent-color:#25252b;width:15px;height:15px}
+  .vb-mini-hint{display:block;font-size:9px;color:#9a9aa1;margin-top:5px}
+  @media(max-width:360px){.vb-advanced-grid{gap:14px 10px;padding:12px 10px}.vb-advanced-sides{grid-template-columns:1fr}.vb-copy-side{width:100%}.vb-decor-add-row{padding-left:10px;padding-right:10px}}
+
 </style>
 </head>
 <body>
@@ -256,6 +331,27 @@
           <div class="vbp-row ta">
             <div class="vbp-avatar">彼</div>
             <div class="vbp-bubble">那就四点半，我提前把位置占好。</div>
+          </div>
+          <div class="vbp-special-samples">
+            <div class="vbp-pay pay-card-red" id="vbPreviewRedPacket">
+              <svg class="pay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5 12 11.6 14.5 8.5M10.6 12.5h2.8M12 12v4"/></svg>
+              <div class="vbp-pay-main">
+                <span class="vbp-pay-title" id="vbPreviewRedPacketTitle">红包</span>
+                <span class="vbp-pay-amount" id="vbPreviewRedPacketAmount">¥88.00</span>
+                <span class="vbp-pay-msg">恭喜发财，大吉大利</span>
+              </div>
+              <span class="vbp-pay-status" id="vbPreviewRedPacketStatus">未领取</span>
+            </div>
+            <div class="vbp-pay is-transfer" id="vbPreviewTransfer">
+              <svg class="pay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-3-3M20 7l-3 3M17 17H4l3 3M4 17l3-3"/></svg>
+              <div class="vbp-pay-main">
+                <span class="vbp-pay-title">转账</span>
+                <span class="vbp-pay-amount">¥88.00</span>
+              </div>
+              <span class="vbp-pay-status">待收款</span>
+              <svg class="pay-card-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="vbp-image" id="vbPreviewImage" aria-label="图片消息预览"><span>IMAGE MESSAGE</span></div>
           </div>
         </div>
       </div>
@@ -303,6 +399,199 @@
           <div class="vb-color-row"><input type="color" id="vbPartnerColor" value="#111111"><span class="vb-color-hex" id="vbPartnerColorHex">#111111</span></div>
         </div>
       </div>
+
+      <section class="vb-advanced">
+        <div class="vb-advanced-heading">
+          <div><span class="vb-advanced-kicker">CHAT DETAIL / LIVE STYLE</span><h3>消息细节美化</h3></div>
+          <span class="vb-live-mark"><i></i> 实时预览</span>
+        </div>
+
+        <div class="vb-advanced-sides">
+          <label class="vb-advanced-field"><span>正在编辑</span>
+            <select id="vbEditSide"><option value="my">我的气泡</option><option value="partner">对方气泡</option></select>
+          </label>
+          <button type="button" class="btn btn-secondary vb-copy-side" id="vbCopySideBtn">复制到另一侧 ↗</button>
+        </div>
+
+        <details class="vb-advanced-card" open>
+          <summary><span class="vb-card-number">01</span><span class="vb-card-title">气泡形状与文字</span><span class="vb-card-note">BUBBLE</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideBorderColor">描边颜色</label><output id="vbSideBorderColorHex">#DADAE0</output></div>
+              <input type="color" id="vbSideBorderColor" value="#DADAE0" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideBorderWidth">描边粗细</label><output id="vbSideBorderWidthVal">1px</output></div>
+              <input type="range" id="vbSideBorderWidth" min="0" max="6" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideRadius">圆角大小</label><output id="vbSideRadiusVal">15px</output></div>
+              <input type="range" id="vbSideRadius" min="0" max="36" step="1" value="15">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSidePadding">内边距</label><output id="vbSidePaddingVal">10px</output></div>
+              <input type="range" id="vbSidePadding" min="4" max="28" step="1" value="10">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideFontSize">文字字号</label><output id="vbSideFontSizeVal">12px</output></div>
+              <input type="range" id="vbSideFontSize" min="10" max="24" step="1" value="12">
+            </div>
+            <label class="vb-advanced-field"><span>字体</span>
+              <select id="vbSideFontFamily"><option value="system">系统默认</option><option value="serif">衬线</option><option value="mono">等宽</option></select>
+            </label>
+          </div>
+          <div class="vb-side-color-sliders">
+            <div class="vb-side-color-channel">
+              <div class="vb-side-color-head"><span>气泡填充色</span><output id="vbSideFillHex">#111111</output></div>
+              <label class="vb-color-slider-line"><span>彩色色调</span><input type="range" id="vbSideFillHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡填充色色调"></label>
+              <label class="vb-color-slider-line"><span>浅 / 深</span><input type="range" id="vbSideFillTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡填充色明暗"></label>
+            </div>
+            <div class="vb-side-color-channel">
+              <div class="vb-side-color-head"><span>气泡描边色</span><output id="vbSideBorderHueHex">#111111</output></div>
+              <label class="vb-color-slider-line"><span>彩色色调</span><input type="range" id="vbSideBorderHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡描边色色调"></label>
+              <label class="vb-color-slider-line"><span>浅 / 深</span><input type="range" id="vbSideBorderTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡描边色明暗"></label>
+            </div>
+          </div>
+          <div class="vb-advanced-subtitle">气泡尾巴 · TAIL</div>
+          <div class="vb-advanced-grid vb-tail-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailSize">尾巴大小</label><output id="vbSideTailSizeVal">0px</output></div>
+              <input type="range" id="vbSideTailSize" min="0" max="20" step="1" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailX">水平位置 X</label><output id="vbSideTailXVal">0px</output></div>
+              <input type="range" id="vbSideTailX" min="-16" max="16" step="1" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbSideTailY">垂直位置 Y</label><output id="vbSideTailYVal">12px</output></div>
+              <input type="range" id="vbSideTailY" min="0" max="64" step="1" value="12">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">02</span><span class="vb-card-title">装饰图片叠加</span><span class="vb-card-note">DECOR</span></summary>
+          <p class="vb-advanced-help">填写图片链接后添加，可叠加多张图片。每张图片都能独立调整位置、大小与透明度，图片保持原始比例。</p>
+          <div class="vb-decor-add-row">
+            <input type="url" id="vbDecorUrl" placeholder="https://… 图片链接">
+            <button type="button" class="btn btn-secondary" id="vbAddDecor">添加</button>
+          </div>
+          <div class="vb-decor-list" id="vbDecorList"><div class="vb-empty-note">尚未添加装饰图片</div></div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">03</span><span class="vb-card-title">头像、时间与图片</span><span class="vb-card-note">DETAIL</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbAvatarBorderColor">头像描边颜色</label><output id="vbAvatarBorderColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbAvatarBorderColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbAvatarBorderWidth">头像描边粗细</label><output id="vbAvatarBorderWidthVal">1px</output></div>
+              <input type="range" id="vbAvatarBorderWidth" min="0" max="5" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTimeColor">时间颜色</label><output id="vbTimeColorHex">#999999</output></div>
+              <input type="color" id="vbTimeColor" value="#999999" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTimeSize">时间字号</label><output id="vbTimeSizeVal">8px</output></div>
+              <input type="range" id="vbTimeSize" min="7" max="15" step="1" value="8">
+            </div>
+            <label class="vb-check-field"><input type="checkbox" id="vbTimeVisible" checked><span>显示消息时间</span></label>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbImageOpacity">图片透明度</label><output id="vbImageOpacityVal">100%</output></div>
+              <input type="range" id="vbImageOpacity" min="10" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbImageRadius">图片圆角</label><output id="vbImageRadiusVal">16px</output></div>
+              <input type="range" id="vbImageRadius" min="0" max="40" step="1" value="16">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">04</span><span class="vb-card-title">红包样式</span><span class="vb-card-note">RED PACKET</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBg">卡片底色</label><output id="vbRpBgHex">#111111</output></div>
+              <input type="color" id="vbRpBg" value="#111111" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBgOpacity">底色透明度</label><output id="vbRpBgOpacityVal">100%</output></div>
+              <input type="range" id="vbRpBgOpacity" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control vb-control-span">
+              <div class="vb-advanced-control-head"><label for="vbRpImageUrl">红包背景图片</label></div>
+              <div class="vb-decor-add-row"><input type="url" id="vbRpImageUrl" placeholder="https://… 背景图片链接"><button type="button" class="btn btn-secondary" id="vbRpImageApply">应用</button></div>
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpImageOpacity">背景图片透明度</label><output id="vbRpImageOpacityVal">100%</output></div>
+              <input type="range" id="vbRpImageOpacity" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBorderColor">边框颜色</label><output id="vbRpBorderColorHex">#111111</output></div>
+              <input type="color" id="vbRpBorderColor" value="#111111" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpBorderWidth">边框粗细</label><output id="vbRpBorderWidthVal">0px</output></div>
+              <input type="range" id="vbRpBorderWidth" min="0" max="6" step="0.5" value="0">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpRadius">卡片圆角</label><output id="vbRpRadiusVal">10px</output></div>
+              <input type="range" id="vbRpRadius" min="0" max="30" step="1" value="10">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpFontSize">文案字号</label><output id="vbRpFontSizeVal">12px</output></div>
+              <input type="range" id="vbRpFontSize" min="9" max="18" step="1" value="12">
+            </div>
+            <label class="vb-check-field"><input type="checkbox" id="vbRpShowStatus" checked><span>显示已领取 / 未领取</span></label>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTextColor">文案颜色</label><output id="vbRpTextColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbRpTextColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTitle">标题文案</label></div>
+              <input type="text" id="vbRpTitle" maxlength="24" placeholder="留空则使用原始标题">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpTitleColor">标题颜色</label><output id="vbRpTitleColorHex">#8E8E93</output></div>
+              <input type="color" id="vbRpTitleColor" value="#8E8E93" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpAmountTemplate">金额格式</label></div>
+              <input type="text" id="vbRpAmountTemplate" maxlength="40" placeholder="¥{amount}">
+              <small class="vb-mini-hint">可使用 {currency} 与 {amount}</small>
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbRpAmountColor">金额颜色</label><output id="vbRpAmountColorHex">#FFFFFF</output></div>
+              <input type="color" id="vbRpAmountColor" value="#FFFFFF" class="vb-color-large">
+            </div>
+          </div>
+        </details>
+
+        <details class="vb-advanced-card">
+          <summary><span class="vb-card-number">05</span><span class="vb-card-title">转账卡片</span><span class="vb-card-note">TRANSFER</span></summary>
+          <div class="vb-advanced-grid">
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBg">卡片底色</label><output id="vbTransferBgHex">#FFFFFF</output></div>
+              <input type="color" id="vbTransferBg" value="#FFFFFF" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBorderColor">边框颜色</label><output id="vbTransferBorderColorHex">#E5E5EA</output></div>
+              <input type="color" id="vbTransferBorderColor" value="#E5E5EA" class="vb-color-large">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferBorderWidth">边框粗细</label><output id="vbTransferBorderWidthVal">1px</output></div>
+              <input type="range" id="vbTransferBorderWidth" min="0" max="6" step="0.5" value="1">
+            </div>
+            <div class="vb-advanced-control">
+              <div class="vb-advanced-control-head"><label for="vbTransferTextColor">文字颜色</label><output id="vbTransferTextColorHex">#111111</output></div>
+              <input type="color" id="vbTransferTextColor" value="#111111" class="vb-color-large">
+            </div>
+          </div>
+        </details>
+      </section>
 
       <div class="vb-bg">
         <div class="vb-slider-head"><span class="vb-name">聊天背景图</span></div>
@@ -637,7 +926,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
 // ====================== Tab 1：可视化调节 ======================
 // 数据链路：draft（内存）--input 事件--> applyVars 到预览区（零延迟）；点保存才 ChatBeauty.save 落盘
 (function () {
-  var VISUAL_FIELDS = ['avatarSize', 'avatarRadius', 'bubbleGap', 'bubbleGapX', 'bubbleMaxWidth', 'bubblePadding', 'myBubbleBg', 'myBubbleColor', 'partnerBubbleBg', 'partnerBubbleColor', 'chatBg'];
+  var VISUAL_FIELDS = ['avatarSize','avatarRadius','bubbleGap','bubbleGapX','bubbleMaxWidth','bubblePadding','myBubbleBg','myBubbleColor','myBubbleRadius','partnerBubbleBg','partnerBubbleColor','partnerBubbleRadius','myBubbleBorderColor','myBubbleBorderWidth','partnerBubbleBorderColor','partnerBubbleBorderWidth','myBubbleRadiusSize','partnerBubbleRadiusSize','myBubblePadding','partnerBubblePadding','myBubbleFontSize','partnerBubbleFontSize','myBubbleFontFamily','partnerBubbleFontFamily','myBubbleTailSize','myBubbleTailX','myBubbleTailY','partnerBubbleTailSize','partnerBubbleTailX','partnerBubbleTailY','myBubbleDecorations','partnerBubbleDecorations','avatarBorderColor','avatarBorderWidth','messageTimeVisible','messageTimeColor','messageTimeSize','imageBubbleOpacity','imageBubbleRadius','redPacketBg','redPacketBgOpacity','redPacketImage','redPacketImageOpacity','redPacketBorderColor','redPacketBorderWidth','redPacketRadius','redPacketShowStatus','redPacketTextColor','redPacketFontSize','redPacketTitle','redPacketTitleColor','redPacketAmountTemplate','redPacketAmountColor','transferBg','transferBorderColor','transferBorderWidth','transferTextColor','chatBg','chatBgDim'];
   var previewEl = document.getElementById('vbPreview');
   var scopeSel = document.getElementById('vbScope');
   var currentScope = 'global';
@@ -703,6 +992,419 @@ document.getElementById('importFile').addEventListener('change', function(e){
     document.getElementById(id + 'Hex').textContent = hex;
   }
 
+
+  // ---- 高级聊天美化：同一 draft 驱动预览与落盘，左右分区独立 ----
+  function applyPreviewDraft() {
+    if (!draft) return;
+    ChatBeauty.applyVars(draft, previewEl);
+    updatePreviewSamples();
+  }
+
+  function getSidePrefix() {
+    return document.getElementById('vbEditSide').value === 'partner' ? 'partnerBubble' : 'myBubble';
+  }
+
+  function setAdvRange(id, value, unit, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var n = value === '' || value === null || value === undefined ? fallback : Number(value);
+    if (isNaN(n)) n = fallback;
+    el.value = String(n);
+    var out = document.getElementById(id + 'Val');
+    if (out) out.textContent = n + unit;
+  }
+
+  function setAdvColor(id, value, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var hex = toHex(value, fallback || '#111111');
+    el.value = hex;
+    var out = document.getElementById(id + 'Hex');
+    if (out) out.textContent = hex.toUpperCase();
+  }
+
+
+  function rgbToHslValue(value) {
+    var hex = toHex(value, '#111111').replace('#', '');
+    var r = parseInt(hex.slice(0, 2), 16) / 255;
+    var g = parseInt(hex.slice(2, 4), 16) / 255;
+    var b = parseInt(hex.slice(4, 6), 16) / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      var delta = max - min;
+      s = delta / (1 - Math.abs(2 * l - 1));
+      if (max === r) h = ((g - b) / delta) % 6;
+      else if (max === g) h = (b - r) / delta + 2;
+      else h = (r - g) / delta + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return { h: Math.round(h), l: Math.round(l * 100) };
+  }
+
+  function hslToHex(hue, lightness) {
+    var h = ((Number(hue) % 360) + 360) % 360;
+    var l = Math.max(0, Math.min(100, Number(lightness))) / 100;
+    var sat = 0.72;
+    var c = (1 - Math.abs(2 * l - 1)) * sat;
+    var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    var m = l - c / 2;
+    var r = 0, g = 0, b = 0;
+    if (h < 60) { r = c; g = x; }
+    else if (h < 120) { r = x; g = c; }
+    else if (h < 180) { g = c; b = x; }
+    else if (h < 240) { g = x; b = c; }
+    else if (h < 300) { r = x; b = c; }
+    else { r = c; b = x; }
+    function hx(v) {
+      var n = Math.round((v + m) * 255).toString(16);
+      return n.length < 2 ? '0' + n : n;
+    }
+    return '#' + hx(r) + hx(g) + hx(b);
+  }
+
+  function syncSideColorSliders() {
+    if (!draft) return;
+    var prefix = getSidePrefix();
+    [
+      { type: 'Fill', value: draft[prefix + 'Bg'] || (prefix === 'myBubble' ? '#111111' : '#FFFFFF') },
+      { type: 'Border', value: draft[prefix + 'BorderColor'] || (prefix === 'myBubble' ? '#111111' : '#DADAE0') }
+    ].forEach(function (item) {
+      var hsl = rgbToHslValue(item.value);
+      var hue = document.getElementById('vbSide' + item.type + 'Hue');
+      var tone = document.getElementById('vbSide' + item.type + 'Tone');
+      var out = document.getElementById(item.type === 'Fill' ? 'vbSideFillHex' : 'vbSideBorderHueHex');
+      hue.value = String(hsl.h);
+      tone.value = String(hsl.l);
+      tone.style.setProperty('--vb-tone-hue', 'hsl(' + hsl.h + ',72%,50%)');
+      if (out) out.textContent = toHex(item.value, '#111111').toUpperCase();
+    });
+  }
+
+  function applySideSliderColor(type) {
+    var prefix = getSidePrefix();
+    var hue = Number(document.getElementById('vbSide' + type + 'Hue').value);
+    var tone = Number(document.getElementById('vbSide' + type + 'Tone').value);
+    var hex = hslToHex(hue, tone);
+    var field = prefix + (type === 'Fill' ? 'Bg' : 'BorderColor');
+    draft[field] = hex;
+    document.getElementById('vbSide' + type + 'Tone').style.setProperty('--vb-tone-hue', 'hsl(' + hue + ',72%,50%)');
+    if (type === 'Fill') {
+      var colorId = prefix === 'myBubble' ? 'vbMyBg' : 'vbPartnerBg';
+      document.getElementById(colorId).value = hex;
+      document.getElementById(colorId + 'Hex').textContent = hex.toUpperCase();
+      document.getElementById('vbSideFillHex').textContent = hex.toUpperCase();
+    } else {
+      document.getElementById('vbSideBorderColor').value = hex;
+      document.getElementById('vbSideBorderColorHex').textContent = hex.toUpperCase();
+      document.getElementById('vbSideBorderHueHex').textContent = hex.toUpperCase();
+    }
+    applyPreviewDraft();
+  }
+
+  ['Fill', 'Border'].forEach(function (type) {
+    document.getElementById('vbSide' + type + 'Hue').addEventListener('input', function () {
+      applySideSliderColor(type);
+    });
+    document.getElementById('vbSide' + type + 'Tone').addEventListener('input', function () {
+      applySideSliderColor(type);
+    });
+  });
+
+  function loadSideControls() {
+    if (!draft) return;
+    var prefix = getSidePrefix();
+    setAdvColor('vbSideBorderColor', draft[prefix + 'BorderColor'], prefix === 'myBubble' ? '#111111' : '#DADAE0');
+    syncSideColorSliders();
+    setAdvRange('vbSideBorderWidth', draft[prefix + 'BorderWidth'], 'px', prefix === 'myBubble' ? 0 : 1);
+    setAdvRange('vbSideRadius', draft[prefix + 'RadiusSize'], 'px', 15);
+    setAdvRange('vbSidePadding', draft[prefix + 'Padding'], 'px', numOr(draft.bubblePadding, 10));
+    setAdvRange('vbSideFontSize', draft[prefix + 'FontSize'], 'px', 12);
+    document.getElementById('vbSideFontFamily').value = draft[prefix + 'FontFamily'] || 'system';
+    setAdvRange('vbSideTailSize', draft[prefix + 'TailSize'], 'px', 0);
+    setAdvRange('vbSideTailX', draft[prefix + 'TailX'], 'px', 0);
+    setAdvRange('vbSideTailY', draft[prefix + 'TailY'], 'px', 12);
+    renderDecorations();
+  }
+
+  function loadAdvancedControls() {
+    setAdvColor('vbAvatarBorderColor', draft.avatarBorderColor, '#FFFFFF');
+    setAdvRange('vbAvatarBorderWidth', draft.avatarBorderWidth, 'px', 1);
+    document.getElementById('vbTimeVisible').checked = draft.messageTimeVisible !== false;
+    setAdvColor('vbTimeColor', draft.messageTimeColor, '#999999');
+    setAdvRange('vbTimeSize', draft.messageTimeSize, 'px', 8);
+    setAdvRange('vbImageOpacity', draft.imageBubbleOpacity, '%', 100);
+    setAdvRange('vbImageRadius', draft.imageBubbleRadius, 'px', 16);
+
+    setAdvColor('vbRpBg', draft.redPacketBg, '#111111');
+    setAdvRange('vbRpBgOpacity', draft.redPacketBgOpacity, '%', 100);
+    document.getElementById('vbRpImageUrl').value = draft.redPacketImage || '';
+    setAdvRange('vbRpImageOpacity', draft.redPacketImageOpacity, '%', 100);
+    setAdvColor('vbRpBorderColor', draft.redPacketBorderColor, '#111111');
+    setAdvRange('vbRpBorderWidth', draft.redPacketBorderWidth, 'px', 0);
+    setAdvRange('vbRpRadius', draft.redPacketRadius, 'px', 10);
+    document.getElementById('vbRpShowStatus').checked = draft.redPacketShowStatus !== false;
+    setAdvColor('vbRpTextColor', draft.redPacketTextColor, '#FFFFFF');
+    setAdvRange('vbRpFontSize', draft.redPacketFontSize, 'px', 12);
+    document.getElementById('vbRpTitle').value = draft.redPacketTitle || '';
+    setAdvColor('vbRpTitleColor', draft.redPacketTitleColor, '#8E8E93');
+    document.getElementById('vbRpAmountTemplate').value = draft.redPacketAmountTemplate || '';
+    setAdvColor('vbRpAmountColor', draft.redPacketAmountColor, '#FFFFFF');
+
+    setAdvColor('vbTransferBg', draft.transferBg, '#FFFFFF');
+    setAdvColor('vbTransferBorderColor', draft.transferBorderColor, '#E5E5EA');
+    setAdvRange('vbTransferBorderWidth', draft.transferBorderWidth, 'px', 1);
+    setAdvColor('vbTransferTextColor', draft.transferTextColor, '#111111');
+    loadSideControls();
+    updatePreviewSamples();
+  }
+
+  function updatePreviewSamples() {
+    if (!draft) return;
+    var title = document.getElementById('vbPreviewRedPacketTitle');
+    var amount = document.getElementById('vbPreviewRedPacketAmount');
+    var status = document.getElementById('vbPreviewRedPacketStatus');
+    if (title) title.textContent = String(draft.redPacketTitle || '').trim() || '红包';
+    if (amount) {
+      var fmt = String(draft.redPacketAmountTemplate || '');
+      amount.textContent = fmt ? fmt.replace(/\{amount\}/g, '88.00').replace(/\{currency\}/g, '¥') : '¥88.00';
+    }
+    if (status) status.textContent = '未领取';
+  }
+
+  function bindAdvancedRange(id, field, unit) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = Number(this.value);
+      var output = document.getElementById(id + 'Val');
+      if (output) output.textContent = this.value + unit;
+      applyPreviewDraft();
+    });
+  }
+
+  function bindAdvancedColor(id, field) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = this.value.toUpperCase();
+      var output = document.getElementById(id + 'Hex');
+      if (output) output.textContent = this.value.toUpperCase();
+      applyPreviewDraft();
+    });
+  }
+
+  function bindAdvancedText(id, field) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      draft[field] = this.value;
+      applyPreviewDraft();
+    });
+  }
+
+  function isImageUrl(raw) {
+    var value = String(raw || '').trim();
+    return /^https?:\/\/\S+$/i.test(value) || /^data:image\/(?:png|jpe?g|gif|webp|svg\+xml);base64,/i.test(value);
+  }
+
+  function renderDecorations() {
+    var host = document.getElementById('vbDecorList');
+    if (!host || !draft) return;
+    host.textContent = '';
+    var prefix = getSidePrefix();
+    var list = Array.isArray(draft[prefix + 'Decorations']) ? draft[prefix + 'Decorations'] : [];
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'vb-empty-note';
+      empty.textContent = '尚未添加装饰图片';
+      host.appendChild(empty);
+      return;
+    }
+    list.forEach(function (item, index) {
+      var card = document.createElement('div');
+      card.className = 'vb-decor-item';
+      var thumb = document.createElement('img');
+      thumb.className = 'vb-decor-thumb';
+      thumb.src = item.url;
+      thumb.alt = '';
+      var body = document.createElement('div');
+      body.className = 'vb-decor-item-body';
+      var url = document.createElement('div');
+      url.className = 'vb-decor-url';
+      url.textContent = item.url;
+      body.appendChild(url);
+      var controls = document.createElement('div');
+      controls.className = 'vb-decor-item-controls';
+      [
+        {field:'x',label:'水平 X',min:0,max:100,step:1,value:numOr(item.x,65),suffix:'%'},
+        {field:'y',label:'垂直 Y',min:0,max:100,step:1,value:numOr(item.y,18),suffix:'%'},
+        {field:'width',label:'大小',min:8,max:100,step:1,value:numOr(item.width,24),suffix:'%'},
+        {field:'opacity',label:'透明度',min:0,max:100,step:1,value:Math.round(numOr(item.opacity,0.85)*100),suffix:'%'}
+      ].forEach(function (cfg) {
+        var label = document.createElement('label');
+        label.textContent = cfg.label;
+        var range = document.createElement('input');
+        range.type = 'range';
+        range.min = cfg.min;
+        range.max = cfg.max;
+        range.step = cfg.step;
+        range.value = cfg.value;
+        range.setAttribute('data-decor-index', String(index));
+        range.setAttribute('data-decor-field', cfg.field);
+        var value = document.createElement('span');
+        value.textContent = cfg.value + cfg.suffix;
+        range.setAttribute('aria-label', cfg.label);
+        range.addEventListener('input', function () { value.textContent = range.value + cfg.suffix; });
+        label.appendChild(range);
+        label.appendChild(value);
+        controls.appendChild(label);
+      });
+      body.appendChild(controls);
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'vb-decor-remove';
+      remove.textContent = '×';
+      remove.title = '移除装饰';
+      remove.setAttribute('data-remove-decor', String(index));
+      card.appendChild(thumb);
+      card.appendChild(body);
+      card.appendChild(remove);
+      host.appendChild(card);
+    });
+  }
+
+  // 选侧后切换的是同一份 draft 的对应字段；颜色/范围变化会立即进入共同预览。
+  document.getElementById('vbEditSide').addEventListener('change', loadSideControls);
+  document.getElementById('vbSideBorderColor').addEventListener('input', function () {
+    draft[getSidePrefix() + 'BorderColor'] = this.value.toUpperCase();
+    document.getElementById('vbSideBorderColorHex').textContent = this.value.toUpperCase();
+    syncSideColorSliders();
+    applyPreviewDraft();
+  });
+  [
+    ['vbSideBorderWidth','BorderWidth','px'],
+    ['vbSideRadius','RadiusSize','px'],
+    ['vbSidePadding','Padding','px'],
+    ['vbSideFontSize','FontSize','px'],
+    ['vbSideTailSize','TailSize','px'],
+    ['vbSideTailX','TailX','px'],
+    ['vbSideTailY','TailY','px']
+  ].forEach(function (spec) {
+    var el = document.getElementById(spec[0]);
+    el.addEventListener('input', function () {
+      draft[getSidePrefix() + spec[1]] = Number(this.value);
+      document.getElementById(spec[0] + 'Val').textContent = this.value + spec[2];
+      applyPreviewDraft();
+    });
+  });
+  document.getElementById('vbSideFontFamily').addEventListener('change', function () {
+    draft[getSidePrefix() + 'FontFamily'] = this.value;
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbCopySideBtn').addEventListener('click', function () {
+    var source = getSidePrefix();
+    var sourceShort = source === 'myBubble' ? 'my' : 'partner';
+    var target = source === 'myBubble' ? 'partnerBubble' : 'myBubble';
+    ['Bg','Color','Radius','BorderColor','BorderWidth','RadiusSize','Padding','FontSize','FontFamily','TailSize','TailX','TailY','Decorations'].forEach(function (suffix) {
+      var value = draft[source + suffix];
+      try { value = JSON.parse(JSON.stringify(value)); } catch (e) {}
+      draft[target + suffix] = value;
+    });
+    setColor('vbMyBg',draft.myBubbleBg,'#111111');
+    setColor('vbMyColor',draft.myBubbleColor,'#FFFFFF');
+    setColor('vbPartnerBg',draft.partnerBubbleBg,'#FFFFFF');
+    setColor('vbPartnerColor',draft.partnerBubbleColor,'#111111');
+    loadSideControls();
+    applyPreviewDraft();
+    showToast(sourceShort === 'my' ? '已将我的气泡完整复制到对方一侧' : '已将对方气泡完整复制到我的一侧');
+  });
+
+  var fixedRanges = [
+    ['vbAvatarBorderWidth','avatarBorderWidth','px'],
+    ['vbTimeSize','messageTimeSize','px'],
+    ['vbImageOpacity','imageBubbleOpacity','%'],
+    ['vbImageRadius','imageBubbleRadius','px'],
+    ['vbRpBgOpacity','redPacketBgOpacity','%'],
+    ['vbRpImageOpacity','redPacketImageOpacity','%'],
+    ['vbRpBorderWidth','redPacketBorderWidth','px'],
+    ['vbRpRadius','redPacketRadius','px'],
+    ['vbRpFontSize','redPacketFontSize','px'],
+    ['vbTransferBorderWidth','transferBorderWidth','px']
+  ];
+  fixedRanges.forEach(function (item) { bindAdvancedRange(item[0],item[1],item[2]); });
+
+  [
+    ['vbAvatarBorderColor','avatarBorderColor'],
+    ['vbTimeColor','messageTimeColor'],
+    ['vbRpBg','redPacketBg'],
+    ['vbRpBorderColor','redPacketBorderColor'],
+    ['vbRpTextColor','redPacketTextColor'],
+    ['vbRpTitleColor','redPacketTitleColor'],
+    ['vbRpAmountColor','redPacketAmountColor'],
+    ['vbTransferBg','transferBg'],
+    ['vbTransferBorderColor','transferBorderColor'],
+    ['vbTransferTextColor','transferTextColor']
+  ].forEach(function (item) { bindAdvancedColor(item[0],item[1]); });
+
+  [
+    ['vbRpTitle','redPacketTitle'],
+    ['vbRpAmountTemplate','redPacketAmountTemplate']
+  ].forEach(function (item) { bindAdvancedText(item[0],item[1]); });
+
+  document.getElementById('vbTimeVisible').addEventListener('change',function () {
+    draft.messageTimeVisible = this.checked;
+    applyPreviewDraft();
+  });
+  document.getElementById('vbRpShowStatus').addEventListener('change',function () {
+    draft.redPacketShowStatus = this.checked;
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbRpImageApply').addEventListener('click',function () {
+    var url = document.getElementById('vbRpImageUrl').value.trim();
+    if (url && !isImageUrl(url)) { showToast('请输入有效的图片链接（https 或图片 data URL）'); return; }
+    draft.redPacketImage = url;
+    applyPreviewDraft();
+    showToast(url ? '红包背景图已应用到预览' : '已移除红包背景图');
+  });
+
+  document.getElementById('vbAddDecor').addEventListener('click',function () {
+    var url = document.getElementById('vbDecorUrl').value.trim();
+    if (!isImageUrl(url)) { showToast('请填写有效的图片链接（https 或图片 data URL）'); return; }
+    var prefix = getSidePrefix();
+    if (!Array.isArray(draft[prefix + 'Decorations'])) draft[prefix + 'Decorations'] = [];
+    if (draft[prefix + 'Decorations'].length >= 8) { showToast('每侧最多叠加 8 张装饰图'); return; }
+    draft[prefix + 'Decorations'].push({url:url,x:65,y:18,width:24,opacity:0.85});
+    document.getElementById('vbDecorUrl').value = '';
+    renderDecorations();
+    applyPreviewDraft();
+  });
+
+  document.getElementById('vbDecorList').addEventListener('input',function (event) {
+    var input = event.target.closest('[data-decor-index][data-decor-field]');
+    if (!input) return;
+    var prefix = getSidePrefix();
+    var list = draft[prefix + 'Decorations'] || [];
+    var item = list[Number(input.getAttribute('data-decor-index'))];
+    if (!item) return;
+    var field = input.getAttribute('data-decor-field');
+    var value = Number(input.value);
+    item[field] = field === 'opacity' ? value / 100 : value;
+    applyPreviewDraft();
+  });
+  document.getElementById('vbDecorList').addEventListener('click',function (event) {
+    var button = event.target.closest('[data-remove-decor]');
+    if (!button) return;
+    var prefix = getSidePrefix();
+    var list = draft[prefix + 'Decorations'] || [];
+    list.splice(Number(button.getAttribute('data-remove-decor')),1);
+    renderDecorations();
+    applyPreviewDraft();
+  });
+
   function loadVisualScope(scope) {
     currentScope = scope;
     draft = ChatBeauty.resolve(scope === 'global' ? null : scope);
@@ -716,9 +1418,10 @@ document.getElementById('importFile').addEventListener('change', function(e){
     setColor('vbMyColor', draft.myBubbleColor, '#FFFFFF');
     setColor('vbPartnerBg', draft.partnerBubbleBg, '#FFFFFF');
     setColor('vbPartnerColor', draft.partnerBubbleColor, '#111111');
+    loadAdvancedControls();
     updateBgHint();
     updateScopeHint();
-    ChatBeauty.applyVars(draft, previewEl);
+    applyPreviewDraft();
   }
 
   function updateBgHint() {
@@ -732,14 +1435,16 @@ document.getElementById('importFile').addEventListener('change', function(e){
     document.getElementById(id).addEventListener('input', function () {
       draft[field] = Number(this.value);
       document.getElementById(id + 'Val').textContent = this.value + unit;
-      ChatBeauty.applyVars(draft, previewEl);
+      applyPreviewDraft();
     });
   }
   function bindColor(id, field) {
     document.getElementById(id).addEventListener('input', function () {
-      draft[field] = this.value;
-      document.getElementById(id + 'Hex').textContent = this.value;
-      ChatBeauty.applyVars(draft, previewEl);
+      draft[field] = this.value.toUpperCase();
+      document.getElementById(id + 'Hex').textContent = this.value.toUpperCase();
+      if ((field === 'myBubbleBg' && getSidePrefix() === 'myBubble') ||
+          (field === 'partnerBubbleBg' && getSidePrefix() === 'partnerBubble')) syncSideColorSliders();
+      applyPreviewDraft();
     });
   }
   bindRange('vbAvatarSize', 'avatarSize', 'px');
@@ -747,7 +1452,14 @@ document.getElementById('importFile').addEventListener('change', function(e){
   bindRange('vbBubbleGap', 'bubbleGap', 'px');
   bindRange('vbBubbleGapX', 'bubbleGapX', 'px');
   bindRange('vbBubbleMaxWidth', 'bubbleMaxWidth', '%');
-  bindRange('vbBubblePadding', 'bubblePadding', 'px');
+  document.getElementById('vbBubblePadding').addEventListener('input', function () {
+    var value = Number(this.value);
+    draft.bubblePadding = value;
+    draft.myBubblePadding = value;
+    draft.partnerBubblePadding = value;
+    document.getElementById('vbBubblePaddingVal').textContent = value + 'px';
+    applyPreviewDraft();
+  });
   bindColor('vbMyBg', 'myBubbleBg');
   bindColor('vbMyColor', 'myBubbleColor');
   bindColor('vbPartnerBg', 'partnerBubbleBg');
@@ -771,7 +1483,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
         c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
         draft.chatBg = c.toDataURL('image/jpeg', 0.8);
-        ChatBeauty.applyVars(draft, previewEl);
+        applyPreviewDraft();
         updateBgHint();
         showToast('背景已加载到预览，点右下角「保存配置」生效');
       };
@@ -783,7 +1495,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
 
   function clearVisualBg() {
     draft.chatBg = '';
-    ChatBeauty.applyVars(draft, previewEl);
+    applyPreviewDraft();
     updateBgHint();
   }
 
@@ -798,7 +1510,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
       VISUAL_FIELDS.forEach(function (k) {
         var same = (k === 'chatBg')
           ? (!payload.chatBg || payload.chatBg === g.chatBg)
-          : (String(payload[k]) === String(g[k]));
+          : (JSON.stringify(payload[k]) === JSON.stringify(g[k]));
         payload[k] = same ? null : payload[k];
       });
       var hasDiff = VISUAL_FIELDS.some(function (k) { return payload[k] !== null; });

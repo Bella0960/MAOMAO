@@ -1,0 +1,354 @@
+/* MAOMAO ChatBeauty live runtime — controlled by shared/js/chat-beauty.js */
+.chat-stage .msg-row .msg-bubble:not(.bubble-pay):not(.bubble-media) {
+  position: relative;
+  overflow: visible;
+}
+.chat-stage .msg-row.received .msg-bubble:not(.bubble-pay):not(.bubble-media),
+.chat-stage .msg-row.left .msg-bubble:not(.bubble-pay):not(.bubble-media) {
+  border: var(--chat-bubble-ta-border-width, 1px) solid var(--chat-bubble-ta-border-color, rgba(20,20,24,.035)) !important;
+  border-radius: var(--chat-bubble-ta-radius-size, var(--chat-bubble-ta-radius, 15px 15px 15px 4px)) !important;
+  font-size: var(--chat-bubble-ta-font-size, 12px) !important;
+  font-family: var(--chat-bubble-ta-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  padding: var(--chat-bubble-ta-padding, var(--chat-bubble-padding, 9.5px 13px)) !important;
+}
+.chat-stage .msg-row.sent .msg-bubble:not(.bubble-pay):not(.bubble-media),
+.chat-stage .msg-row.right .msg-bubble:not(.bubble-pay):not(.bubble-media) {
+  border: var(--chat-bubble-my-border-width, 0px) solid var(--chat-bubble-my-border-color, #111111) !important;
+  border-radius: var(--chat-bubble-my-radius-size, var(--chat-bubble-my-radius, 15px 15px 4px 15px)) !important;
+  font-size: var(--chat-bubble-my-font-size, 12px) !important;
+  font-family: var(--chat-bubble-my-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  padding: var(--chat-bubble-my-padding, var(--chat-bubble-padding, 9.5px 13px)) !important;
+}
+.chat-stage .msg-avatar {
+  border-color: var(--chat-avatar-border-color, #FFFFFF) !important;
+  border-width: var(--chat-avatar-border-width, 1px) !important;
+}
+.chat-stage .message-time {
+  display: var(--chat-time-display, block) !important;
+  color: var(--chat-time-color, #999999) !important;
+  font-size: var(--chat-time-size, 8px) !important;
+}
+.chat-stage .msg-media-img {
+  opacity: var(--chat-image-opacity, 1) !important;
+  border-radius: var(--chat-image-radius, 16px) !important;
+}
+.chat-stage .vimg-box {
+  opacity: var(--chat-image-opacity, 1) !important;
+  border-radius: var(--chat-image-radius, 16px) !important;
+}
+.chat-stage .msg-media-desc {
+  border-radius: var(--chat-image-radius, 16px) !important;
+}
+
+/* Message-tail controls. Tail defaults to 0px to preserve the existing native shape. */
+.chat-stage .msg-row.received .msg-bubble:not(.bubble-pay):not(.bubble-media)::after,
+.chat-stage .msg-row.left .msg-bubble:not(.bubble-pay):not(.bubble-media)::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: var(--chat-bubble-ta-tail-x, -5px);
+  top: var(--chat-bubble-ta-tail-y, 12px);
+  width: var(--chat-bubble-ta-tail-size, 0px);
+  height: var(--chat-bubble-ta-tail-size, 0px);
+  background: var(--chat-bubble-ta-bg, #FFFFFF);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  pointer-events: none;
+}
+.chat-stage .msg-row.sent .msg-bubble:not(.bubble-pay):not(.bubble-media)::after,
+.chat-stage .msg-row.right .msg-bubble:not(.bubble-pay):not(.bubble-media)::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: var(--chat-bubble-my-tail-x, -5px);
+  top: var(--chat-bubble-my-tail-y, 12px);
+  width: var(--chat-bubble-my-tail-size, 0px);
+  height: var(--chat-bubble-my-tail-size, 0px);
+  background: var(--chat-bubble-my-bg, #111111);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+}
+
+#vbPreview .vbp-row.ta .vbp-bubble::after {
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:var(--chat-bubble-ta-tail-x,0px);
+  top:var(--chat-bubble-ta-tail-y,12px);
+  width:var(--chat-bubble-ta-tail-size,0px);
+  height:var(--chat-bubble-ta-tail-size,0px);
+  background:var(--chat-bubble-ta-bg,#fff);
+  clip-path:polygon(0 0,100% 0,100% 100%);
+  pointer-events:none;
+}
+#vbPreview .vbp-row.me .vbp-bubble::after {
+  content:"";
+  position:absolute;
+  z-index:0;
+  right:var(--chat-bubble-my-tail-x,0px);
+  top:var(--chat-bubble-my-tail-y,12px);
+  width:var(--chat-bubble-my-tail-size,0px);
+  height:var(--chat-bubble-my-tail-size,0px);
+  background:var(--chat-bubble-my-bg,#111);
+  clip-path:polygon(0 0,100% 0,0 100%);
+  pointer-events:none;
+}
+
+/* Multi-layer decorative stickers. Original images keep aspect ratio and are placed independently. */
+.chat-stage .msg-bubble,
+#vbPreview .vbp-bubble {
+  position: relative;
+}
+.chat-beauty-decoration-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.chat-beauty-decoration {
+  position: absolute;
+  display: block;
+  height: auto;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+.chat-beauty-content {
+  display: block;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.chat-stage .bubble-pay > .chat-beauty-content,
+.chat-stage .bubble-media > .chat-beauty-content {
+  width: max-content;
+  max-width: 100%;
+}
+.chat-stage .bubble-pay .chat-beauty-decoration-layer { overflow: visible; }
+
+/* Red packet & transfer cards use the same live variables in chat and preview. */
+.chat-stage .pay-card-red {
+  position: relative !important;
+  overflow: hidden !important;
+  background: var(--chat-redpacket-bg-rgba, #111111) !important;
+  border: var(--chat-redpacket-border-width, 0px) solid var(--chat-redpacket-border-color, #111111) !important;
+  border-radius: var(--chat-redpacket-radius, 10px) !important;
+  color: var(--chat-redpacket-text-color, #FFFFFF) !important;
+  font-size: var(--chat-redpacket-font-size, 12px) !important;
+  isolation: isolate;
+}
+.chat-stage .pay-card-red::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--chat-redpacket-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--chat-redpacket-image-opacity, 1);
+  pointer-events: none;
+}
+.chat-stage .pay-card-red .pay-card-label {
+  color: var(--chat-redpacket-title-color, #8E8E93) !important;
+  font-size: var(--chat-redpacket-font-size, 12px) !important;
+}
+.chat-stage .pay-card-red .pay-card-amount {
+  color: var(--chat-redpacket-amount-color, #FFFFFF) !important;
+  font-size: calc(var(--chat-redpacket-font-size, 12px) * 1.35) !important;
+}
+.chat-stage .pay-card-red .pay-card-msg {
+  color: var(--chat-redpacket-text-color, #FFFFFF) !important;
+  font-size: calc(var(--chat-redpacket-font-size, 12px) * .82) !important;
+}
+.chat-stage .pay-card-red .pay-card-status {
+  display: var(--chat-redpacket-status-display, block) !important;
+  color: var(--chat-redpacket-text-color, #FFFFFF) !important;
+  font-size: calc(var(--chat-redpacket-font-size, 12px) * .72) !important;
+}
+.chat-stage .pay-card-transfer {
+  background: var(--chat-transfer-bg, #FFFFFF) !important;
+  border: var(--chat-transfer-border-width, 1px) solid var(--chat-transfer-border-color, #E5E5EA) !important;
+  color: var(--chat-transfer-text-color, #111111) !important;
+}
+.chat-stage .pay-card-transfer .pay-card-label,
+.chat-stage .pay-card-transfer .pay-card-amount { color: var(--chat-transfer-text-color, #111111) !important; }
+
+/* Live preview follows the same variables and uses representative native-style messages. */
+#vbPreview .vbp-stage { gap: var(--chat-bubble-gap,13px); }
+#vbPreview .vbp-row { gap: 8px; }
+#vbPreview .vbp-row .vbp-bubble {
+  position: relative;
+  overflow: visible;
+  padding: var(--chat-bubble-padding, 9.5px 13px);
+  margin-left: var(--chat-bubble-gap-x, 0px);
+  margin-right: var(--chat-bubble-gap-x, 0px);
+  max-width: 100%;
+  line-height: 1.5;
+}
+#vbPreview .vbp-row.ta .vbp-bubble {
+  background: var(--chat-bubble-ta-bg,#FFFFFF) !important;
+  color: var(--chat-bubble-ta-color,#111111) !important;
+  border: var(--chat-bubble-ta-border-width,1px) solid var(--chat-bubble-ta-border-color,rgba(20,20,24,.035)) !important;
+  border-radius: var(--chat-bubble-ta-radius-size, var(--chat-bubble-ta-radius,15px 15px 15px 4px)) !important;
+  font-size: var(--chat-bubble-ta-font-size,12px) !important;
+  font-family: var(--chat-bubble-ta-font-family,-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif) !important;
+}
+#vbPreview .vbp-row.me .vbp-bubble {
+  background: var(--chat-bubble-my-bg,#111111) !important;
+  color: var(--chat-bubble-my-color,#FFFFFF) !important;
+  border: var(--chat-bubble-my-border-width,0px) solid var(--chat-bubble-my-border-color,#111111) !important;
+  border-radius: var(--chat-bubble-my-radius-size, var(--chat-bubble-my-radius,15px 15px 4px 15px)) !important;
+  font-size: var(--chat-bubble-my-font-size,12px) !important;
+  font-family: var(--chat-bubble-my-font-family,-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif) !important;
+}
+#vbPreview .vbp-avatar {
+  border-color: var(--chat-avatar-border-color,#FFFFFF) !important;
+  border-width: var(--chat-avatar-border-width,1px) !important;
+}
+#vbPreview .vbp-time {
+  display: var(--chat-time-display,block) !important;
+  color: var(--chat-time-color,#999999) !important;
+  font-size: var(--chat-time-size,8px) !important;
+}
+#vbPreview .vbp-pay {
+  align-self: flex-start;
+  position: relative;
+  width: 178px;
+  min-height: 60px;
+  padding: 9px 12px;
+  border-radius: var(--chat-redpacket-radius,10px);
+  background: var(--chat-redpacket-bg-rgba,#111111);
+  border: var(--chat-redpacket-border-width,0px) solid var(--chat-redpacket-border-color,#111111);
+  color: var(--chat-redpacket-text-color,#FFFFFF);
+  overflow: hidden;
+  font-size: var(--chat-redpacket-font-size,12px);
+}
+#vbPreview .vbp-pay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--chat-redpacket-image,none);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--chat-redpacket-image-opacity,1);
+  pointer-events: none;
+}
+#vbPreview .vbp-pay > span { position: relative; z-index: 1; display: block; }
+#vbPreview .vbp-pay-title { color: var(--chat-redpacket-title-color,#8E8E93); font-size: var(--chat-redpacket-font-size,12px); }
+#vbPreview .vbp-pay-amount { color: var(--chat-redpacket-amount-color,#FFFFFF); font-size: calc(var(--chat-redpacket-font-size,12px) * 1.35); font-weight: 650; }
+#vbPreview .vbp-pay-status { color: var(--chat-redpacket-text-color,#FFFFFF); font-size: calc(var(--chat-redpacket-font-size,12px) * .72); display: var(--chat-redpacket-status-display,block); }
+#vbPreview .vbp-image {
+  align-self: flex-end;
+  width: 155px;
+  height: 90px;
+  border-radius: var(--chat-image-radius,16px);
+  background: linear-gradient(135deg,#d8d8dd,#f3f3f5);
+  opacity: var(--chat-image-opacity,1);
+}
+
+
+/* Transfer card artwork follows the chosen transfer text colour as well. */
+.chat-stage .pay-card-transfer .pay-ico,
+.chat-stage .pay-card-transfer .pay-card-arrow {
+  color: var(--chat-transfer-text-color, #111111) !important;
+  stroke: var(--chat-transfer-text-color, #111111) !important;
+}
+.chat-stage .bubble-pay > .chat-beauty-content,
+.chat-stage .bubble-media > .chat-beauty-content {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+}
+
+
+/* The transfer sample remains a transfer card even though the preview also contains a red packet. */
+#vbPreview .vbp-pay.is-transfer {
+  background: var(--chat-transfer-bg, #FFFFFF) !important;
+  border-color: var(--chat-transfer-border-color, #E5E5EA) !important;
+  border-width: var(--chat-transfer-border-width, 1px) !important;
+  color: var(--chat-transfer-text-color, #111111) !important;
+}
+#vbPreview .vbp-pay.is-transfer::before { background-image: none !important; }
+#vbPreview .vbp-pay.is-transfer .vbp-pay-title,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-status {
+  color: var(--chat-transfer-text-color, #111111) !important;
+}
+
+
+/* Preview payment cards mirror their native 150px chat-card structure. */
+#vbPreview .vbp-pay {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:8px;
+  width:150px;
+  max-width:100%;
+  min-height:60px;
+  padding:8px 12px;
+  box-sizing:border-box;
+}
+#vbPreview .vbp-pay .pay-ico {
+  flex:0 0 22px;
+  width:22px;
+  height:22px;
+  color:var(--chat-redpacket-text-color,#FFFFFF);
+  stroke:currentColor;
+}
+#vbPreview .vbp-pay-main {
+  display:flex;
+  flex:1;
+  min-width:0;
+  flex-direction:column;
+  gap:0;
+}
+#vbPreview .vbp-pay-title {
+  font-size:var(--chat-redpacket-font-size,12px);
+  line-height:1.2;
+  color:var(--chat-redpacket-title-color,#8E8E93);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#vbPreview .vbp-pay-amount {
+  font-size:calc(var(--chat-redpacket-font-size,12px)*1.35);
+  line-height:1.2;
+  font-weight:650;
+  color:var(--chat-redpacket-amount-color,#FFFFFF);
+  white-space:nowrap;
+}
+#vbPreview .vbp-pay-msg {
+  margin-top:2px;
+  padding-right:18px;
+  color:var(--chat-redpacket-text-color,#FFFFFF);
+  opacity:.65;
+  font-size:calc(var(--chat-redpacket-font-size,12px)*.72);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#vbPreview .vbp-pay-status {
+  position:absolute;
+  right:8px;
+  bottom:6px;
+  font-size:calc(var(--chat-redpacket-font-size,12px)*.68);
+  line-height:1.1;
+}
+#vbPreview .vbp-pay.is-transfer .pay-ico,
+#vbPreview .vbp-pay.is-transfer .pay-card-arrow {
+  flex-shrink:0;
+  color:var(--chat-transfer-text-color,#111111);
+  stroke:currentColor;
+}
+#vbPreview .vbp-pay.is-transfer .vbp-pay-title,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-status {
+  color:var(--chat-transfer-text-color,#111111) !important;
+}
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount { font-size:calc(var(--chat-redpacket-font-size,12px)*1.15); }
