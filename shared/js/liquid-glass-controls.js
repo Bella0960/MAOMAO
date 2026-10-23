@@ -91,6 +91,78 @@
     });
   }
 
+  function syncLiquidGlassIcons() {
+    var root = document.documentElement;
+    var liquidTheme = root.getAttribute('data-theme') === 'liquid-glass';
+    var shouldUseGlass = liquidTheme && state.style !== 'default';
+    var icons = document.querySelectorAll('body.maomao-home .desktop-grid .app-icon, body.maomao-home .dock-bar .app-icon');
+    var addedGlass = false;
+    var rgb = getTintRgb();
+    var toneAmount = state.tone / 100;
+
+    icons.forEach(function (icon) {
+      if (!shouldUseGlass) {
+        if (icon.classList.contains('maomao-liquid-glass-icon')) {
+          icon.classList.remove('glass', 'maomao-liquid-glass-icon');
+          icon.removeAttribute('data-glass');
+          icon.removeAttribute('data-glass-dim');
+          icon.removeAttribute('data-glass-tone');
+          icon.removeAttribute('data-lg-tone');
+          icon.removeAttribute('data-glass-interactive');
+          icon.style.removeProperty('--glass-fill-opacity');
+          icon.style.removeProperty('--glass-fill-opacity-dark');
+          icon.style.removeProperty('--glass-blur');
+          icon.style.removeProperty('--_lg-fill');
+        }
+        return;
+      }
+
+      if (!icon.classList.contains('maomao-liquid-glass-icon')) addedGlass = true;
+      icon.classList.add('glass', 'maomao-liquid-glass-icon');
+      icon.setAttribute('data-glass-interactive', '');
+
+      /* Clear is the intended desktop look: near-zero fill, live iPhone backdrop blur and lens rim. */
+      icon.removeAttribute('data-glass');
+      icon.removeAttribute('data-glass-dim');
+      icon.removeAttribute('data-glass-tone');
+      icon.removeAttribute('data-lg-tone');
+
+      if (state.style === 'clear') {
+        icon.setAttribute('data-glass', 'clear');
+        icon.setAttribute('data-glass-dim', 'none');
+        icon.style.setProperty('--glass-fill-opacity', '0.015');
+        icon.style.setProperty('--glass-fill-opacity-dark', '0.018');
+        icon.style.setProperty('--glass-blur', '3px');
+        icon.style.setProperty('--_lg-fill', 'rgba(255,255,255,0.015)');
+      } else if (state.style === 'dark') {
+        icon.setAttribute('data-glass-tone', 'dark');
+        icon.setAttribute('data-lg-tone', 'dark');
+        icon.style.setProperty('--glass-fill-opacity', '0.12');
+        icon.style.setProperty('--glass-fill-opacity-dark', '0.20');
+        icon.style.setProperty('--glass-blur', '8px');
+        icon.style.setProperty('--_lg-fill', 'rgba(22,22,28,0.38)');
+      } else {
+        var tintAlpha = (0.06 + toneAmount * 0.20).toFixed(3);
+        icon.style.setProperty('--glass-fill-opacity', tintAlpha);
+        icon.style.setProperty('--glass-fill-opacity-dark', (0.10 + toneAmount * 0.22).toFixed(3));
+        icon.style.setProperty('--glass-blur', '6px');
+        icon.style.setProperty('--_lg-fill', 'rgba(' + rgb + ',' + tintAlpha + ')');
+      }
+    });
+
+    /* The selector restricts the vendor runtime to app icons; never upgrades widgets. */
+    if (shouldUseGlass && addedGlass && window.LiquidGlass && typeof window.LiquidGlass.init === 'function' &&
+        window.LiquidGlass.capabilities && window.LiquidGlass.capabilities.engine === 'unknown') {
+      window.LiquidGlass.init({
+        selector: '.maomao-liquid-glass-icon',
+        preset: 'ios26',
+        refraction: 'auto',
+        observe: true,
+        debug: false
+      });
+    }
+  }
+
   function applySettings(shouldPersist) {
     state = normalize(state);
     var root = document.documentElement;
@@ -113,6 +185,8 @@
     root.style.setProperty('--lg-dock-highlight-alpha', state.style === 'clear' ? '.17' : '.30');
     root.style.setProperty('--lg-dock-shadow-alpha', '.055');
     root.style.setProperty('--lg-hue', String(state.hue));
+
+    syncLiquidGlassIcons();
 
     var hue = document.querySelector('[data-lg-hue]');
     var tone = document.querySelector('[data-lg-tone]');
@@ -249,6 +323,13 @@
       openPanel();
     }
   }, true);
+
+  window.addEventListener('maomao:themechange', function () {
+    applySettings(false);
+  });
+  window.addEventListener('pageshow', function () {
+    applySettings(false);
+  });
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') closePanel();
