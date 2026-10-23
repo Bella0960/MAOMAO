@@ -26,7 +26,9 @@
     if (!dockBar || !dockWrapper) return;
 
     /* Hide automatically if empty; the Appearance preference can also hide a populated Dock. */
-    var visible = preferenceEnabled() && hasDockApps();
+    var hasApps = hasDockApps();
+    var editing = document.body.classList.contains('home-editing');
+    var visible = preferenceEnabled() && (hasApps || editing);
     document.body.classList.toggle('maomao-dock-hidden', !visible);
     dockBar.style.display = visible ? '' : 'none';
     dockWrapper.style.paddingBottom = visible ? '' : '0';
@@ -41,6 +43,7 @@
     if (window.MutationObserver) {
       observer = new MutationObserver(apply);
       observer.observe(dockBar, { childList: true });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
     window.addEventListener('pageshow', apply);
     window.addEventListener('storage', function (event) {
