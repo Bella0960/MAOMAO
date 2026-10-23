@@ -8,6 +8,7 @@
     <script src="../../shared/js/custom-css.js"></script>
     <script src="../../shared/js/chat-beauty.js"></script>
     <script src="../../shared/js/phone/phone_storage.js"></script>
+    <script src="../../shared/js/phone/phone_stream.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -1743,6 +1744,10 @@
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><path d="M9 9h.01M15 9h.01"></path></svg></span>
                         <span class="plus-label">表情包</span>
                     </button>
+                    <button class="plus-item" data-feat="date" type="button">
+                        <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m22 7-10 6L2 7"></path></svg></span>
+                        <span class="plus-label">奔赴</span>
+                    </button>
                     <button class="plus-item" data-feat="regenerate" type="button">
                         <span class="plus-icon-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></span>
                         <span class="plus-label">重玩</span>
@@ -3385,61 +3390,25 @@
             // API 调用计时起点（用于调用记录）
             const apiCallStart = Date.now();
 
-            // 超时策略（R1）：
-            //   连接阶段：15s 内未收到响应头 → abort
-            //   流式阶段：响应头到达后解除连接超时，切换为「无数据看门狗」——
-            //   每收到一个 chunk 重置 30s；另有 120s 硬性总上限，防无限流挂死
-            const controller = new AbortController();
-            let abortReason = 'connect';
-            const WATCHDOG_MS = 30000;
-            const STREAM_TOTAL_MS = 120000;
-            let watchdogId = null;
-            let totalTimerId = null;
-            const timeoutId = setTimeout(function () { abortReason = 'connect'; controller.abort(); }, 15000);
-            function armWatchdog() {
-                if (watchdogId) clearTimeout(watchdogId);
-                watchdogId = setTimeout(function () { abortReason = 'watchdog'; controller.abort(); }, WATCHDOG_MS);
-            }
-            function enterStreamMode() {
-                clearTimeout(timeoutId);
-                armWatchdog();
-                totalTimerId = setTimeout(function () { abortReason = 'total'; controller.abort(); }, STREAM_TOTAL_MS);
-            }
-            function clearAllTimers() {
-                clearTimeout(timeoutId);
-                if (watchdogId) clearTimeout(watchdogId);
-                if (totalTimerId) clearTimeout(totalTimerId);
-            }
-
             // 打字机气泡引用（首个 delta 到达时复用现有气泡结构创建）
             let streamBubble = null;
             let fullText = '';
-            let streamEnded = false;    // 流已终结（完成/中断）：用于叫停延迟渲染
-            let paintScheduled = false;
 
-            // R4 渲染节流：delta 只累计文本；正则清洗 + DOM 写入 + 滚动合并到每帧最多一次
-            function scheduleStreamPaint() {
-                if (paintScheduled || streamEnded) return;
-                paintScheduled = true;
-                requestAnimationFrame(function () {
-                    paintScheduled = false;
-                    if (!streamEnded) paintStream();
-                });
-            }
-            function paintStream() {
-                if (!fullText) return;
+            // R4 渲染回调：交给 PhoneStream 每帧节流调用（正则清洗 + DOM 写入 + 滚动）
+            // 引擎已抽离至 shared/js/phone/phone_stream.js（三段式超时/SSE 解析/残留收尾）
+            function paintStreamLive(text) {
                 // 首个增量：移除"正在输入..."，复用现有气泡结构创建 AI 气泡
                 if (!streamBubble) {
                     const loadingEl = document.getElementById(statusId);
                     if (loadingEl) loadingEl.remove();
-                    appendMessageToDOM({ role: 'assistant', text: fullText, name: groupReplyPick ? groupReplyPick.name : undefined });
+                    appendMessageToDOM({ role: 'assistant', text: text, name: groupReplyPick ? groupReplyPick.name : undefined });
                     if (typeof SoundSystem !== 'undefined') SoundSystem.play('receive', currentRoleId || '');
                     const lastRow = chatMessages.lastElementChild;
                     streamBubble = lastRow ? lastRow.querySelector('.msg-bubble') : null;
                 }
                 if (streamBubble) {
                     // 流式实时显示：临时隐藏 think/narratage 标签块（含未闭合的），只展示正文
-                    var tmpText = extractVoiceCallMarker(fullText).text;
+                    var tmpText = extractVoiceCallMarker(text).text;
                     tmpText = tmpText.replace(/<think>[\s\S]*?<\/think>/gi, '')
                         .replace(/<narratage>[\s\S]*?<\/narratage>/gi, '')
                         .replace(/<think>[\s\S]*$/gi, '')   // 未闭合的 <think> 开标签
@@ -3450,139 +3419,52 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            // 高级参数（API 设置多方案升级）：maxTokens/topP 仅在明确设置时发送，留空 = 用服务商默认
-            const apiReqExtra = {};
-            const maxTok = Number(config.maxTokens);
-            if (maxTok > 0) apiReqExtra.max_tokens = Math.floor(maxTok);
-            const topPVal = Number(config.topP);
-            if (topPVal > 0 && topPVal < 1) apiReqExtra.top_p = topPVal;
+            aiSending = true;   // R3：进入请求阶段，到流式结束由收尾统一解锁（此前无 await，不存在并发窗口）
 
-            aiSending = true;   // R3：进入请求阶段，到流式结束由 finally 统一解锁（此前无 await，不存在并发窗口）
+            // 流式请求：核心引擎已抽离至 shared/js/phone/phone_stream.js
+            //（三段式超时 / SSE 半包解析 / 残留收尾 / rAF 节流 / 中断保文，全部内聚在模块内）
+            // 永不 reject：结果对象 { ok, fullText, error }，fullText 中断时 = 已收到的部分
+            const streamResult = await PhoneStream.chat({
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                model: apiModel,
+                messages: apiMessages,
+                temperature: config.temperature != null ? config.temperature : 0.7,
+                maxTokens: config.maxTokens,
+                topP: config.topP,
+                onPaint: paintStreamLive
+            });
+            fullText = streamResult.fullText;
+
+            // 流内一直没出现 loading 移除（零 delta 兜底）
+            const loadingEl2 = document.getElementById(statusId);
+            if (loadingEl2) loadingEl2.remove();
+
+            // 错误分类与日志（成功/失败都记录；文案在下方收尾分支组装成气泡）
+            var errText = '';
+            if (!streamResult.ok) {
+                const e = streamResult.error || {};
+                if (e.kind === 'http') {
+                    errText = friendlyHttpError(e.status, e.detail || '');
+                } else if (e.kind === 'abort') {
+                    errText = e.reason === 'watchdog'
+                        ? '连接中断（30 秒未收到新内容），请检查网络后重试。'
+                        : (e.reason === 'total'
+                            ? '回复超时（120 秒上限），未收到有效内容。'
+                            : '请求超时（15秒未响应），请检查网络或 API 地址。');
+                } else if (e.kind === 'stream') {
+                    errText = '连接失败: ' + (e.detail || '流式响应异常');
+                } else {
+                    errText = '连接失败: ' + (e.detail || '请检查 API 设置是否正确（可能是跨域或地址不正确）');
+                }
+                logApiCall(apiModel, 'error', apiCallStart, errText);
+            } else {
+                logApiCall(apiModel, 'success', apiCallStart);
+            }
 
             try {
-                const response = await fetch(`${baseUrl}/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    signal: controller.signal,
-                    body: JSON.stringify(Object.assign({
-                        model: apiModel,
-                        messages: apiMessages,
-                        temperature: config.temperature != null ? config.temperature : 0.7,
-                        stream: true
-                    }, apiReqExtra))
-                });
-
-                // HTTP 层错误（401/404/500 等）：读文本提取详情后直接报错，不进入流解析
-                if (!response.ok || !response.body) {
-                    clearAllTimers();
-                    const loadingEl = document.getElementById(statusId);
-                    if (loadingEl) loadingEl.remove();
-
-                    const bodyText = await response.text().catch(() => '');
-                    let detail = '';
-                    try {
-                        const parsed = JSON.parse(bodyText);
-                        detail = parsed.error?.message || bodyText;
-                    } catch {
-                        detail = bodyText;
-                    }
-                    const errText = friendlyHttpError(response.status, detail || response.statusText);
-                    const errorMsg = { role: 'system_error', isError: true, text: errText, time: Date.now() };
-                    historyList.push(errorMsg);
-                    saveMessages(historyList);
-                    appendMessageToDOM(errorMsg);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    logApiCall(apiModel, 'error', apiCallStart, errText);
-                    // 恢复 header 名字
-                    if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
-                    return;
-                }
-
-                // SSE 流式读取
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder('utf-8');
-                let buffer = '';
-
-                // 响应头已到达：解除连接超时，切换为「无数据看门狗 + 120s 总上限」
-                enterStreamMode();
-
-                // 处理一行 SSE 数据（主循环与收尾残留共用）
-                var processSseLine = function (rawLine) {
-                    const line = rawLine.trim();
-                    // 过滤空行与 SSE 心跳（: 开头的注释行）
-                    if (!line || line.startsWith(':')) return;
-                    if (line.indexOf('data:') !== 0) return;
-
-                    const payload = line.slice(5).trim();
-                    if (payload === '[DONE]') {
-                        streamEnded = true;
-                        return;
-                    }
-
-                    let json;
-                    try {
-                        json = JSON.parse(payload);
-                    } catch (e) {
-                        return;   // 碎片/非 JSON，忽略
-                    }
-
-                    // 部分网关会在流内返回错误对象
-                    if (json.error) {
-                        throw new Error(json.error.message || JSON.stringify(json.error));
-                    }
-
-                    const delta = json.choices
-                        && json.choices[0]
-                        && json.choices[0].delta
-                        && json.choices[0].delta.content;
-
-                    if (delta) {
-                        fullText += delta;
-                        scheduleStreamPaint();   // R4：正则与 DOM 写入合并到帧
-                    }
-                };
-
-                while (!streamEnded) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    armWatchdog();   // R1：收到新数据，重置 30s 无数据看门狗
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop() || '';   // 最后一段可能不完整，留到下一轮
-
-                    for (const rawLine of lines) {
-                        processSseLine(rawLine);
-                        if (streamEnded) break;
-                    }
-                }
-
-                clearAllTimers();
-
-                // R5：残留 buffer 收尾——服务器最后一条 data 行可能不带换行，不补处理会静默丢字
-                if (buffer) {
-                    buffer.split('\n').forEach(processSseLine);
-                    buffer = '';
-                }
-                streamEnded = true;
-                paintStream();   // 兜底：把最后一段增量刷上屏（后续分支会整体重渲染）
-
-                // 流内一直没出现 loading 移除（零 delta 兜底）
-                const loadingEl2 = document.getElementById(statusId);
-                if (loadingEl2) loadingEl2.remove();
-
-                if (!fullText) {
-                    const errText = '未能获取到有效的模型回复（流式响应为空）';
-                    const errorMsg = { role: 'system_error', isError: true, text: errText, time: Date.now() };
-                    historyList.push(errorMsg);
-                    saveMessages(historyList);
-                    appendMessageToDOM(errorMsg);
-                    // 恢复 header 名字
-                    if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
-                } else {
+                if (fullText) {
+                    // ---- 标记剥离 → 清洗 → 落库 → 重渲染（成功与中断保文共用同一套收尾） ----
                     // 落盘前剥离主动通话标记：气泡展示与聊天记录均不保留标记，避免污染后续上下文
                     const parsedCall = extractVoiceCallMarker(fullText);
                     fullText = parsedCall.text;
@@ -3612,14 +3494,10 @@
                         }
                         // 整体重新渲染：让新消息走 parseReplyContent → 思维链块 + 旁白块 + 多气泡
                         renderAllMessages();
-                        // 恢复 header 名字
-                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
-                    } else if ((parsedCall.wantCall || parsedPay.items.length || parsedHeart.hearts.length || parsedImg.images.length) && streamBubble) {
+                    } else if (streamBubble) {
                         // 模型只输出了标记：移除空白气泡、不落文本（来电卡/红包卡仍会插入）
                         const onlyRow = streamBubble.closest('.msg-row');
                         if (onlyRow) onlyRow.remove();
-                        // 恢复 header 名字（避免只输出标记时页头卡在“对方正在输入…”）
-                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
                     }
                     if (parsedCall.wantCall) {
                         // AI 侧插入黑底「发起语音通话」卡并落库；是否拨号由 chat_auto_call 开关决定
@@ -3636,97 +3514,35 @@
                     if (parsedImg.images.length) {
                         insertVImageCards(historyList, parsedImg.images);
                     }
-                }
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                logApiCall(apiModel, 'success', apiCallStart);
-
-            } catch (error) {
-                clearAllTimers();
-                streamEnded = true;   // 中断后叫停延迟渲染，避免往已移除的气泡上写
-                const loadingEl = document.getElementById(statusId);
-                if (loadingEl) loadingEl.remove();
-
-                // 已吐出部分内容后中断：保留已生成文字并落库，不伪装成错误台词
-                if (fullText) {
-                    // 中断前已收到通话标记：同样剥离并触发呼出
-                    const parsedCall = extractVoiceCallMarker(fullText);
-                    fullText = parsedCall.text;
-                    // 中断前已收到红包/转账标记：同样剥离并生成卡片
-                    const parsedPay = extractPayMarkers(fullText);
-                    fullText = parsedPay.text;
-                    // 中断前已收到记忆标记：同样剥离并存进 user_memory
-                    const parsedMem = extractMemoryMarkers(fullText);
-                    fullText = parsedMem.text;
-                    if (parsedMem.memories.length) saveUserMemories(parsedMem.memories);
-                    // 中断前已收到心声/虚拟图片标记：同样剥离并生成卡片
-                    const parsedHeart = extractHeartMarkers(fullText);
-                    fullText = parsedHeart.text;
-                    const parsedImg = extractVImageMarkers(fullText);
-                    fullText = parsedImg.text;
-                    // AI 回复清洗（与正常分支同一套规则，保护标签）
-                    fullText = cleanupAiReply(fullText);
-                    if (fullText) {
-                        const aiMsg = { role: 'assistant', text: fullText, time: Date.now(), name: groupReplyPick ? groupReplyPick.name : undefined };
-                        historyList.push(aiMsg);
+                    if (!streamResult.ok) {
+                        // 中断提示：放在已收到内容之后（保命语义：以上为已收到的回复）
+                        const e = streamResult.error || {};
+                        var tipText = e.kind === 'abort'
+                            ? (e.reason === 'total'
+                                ? '回复较长已截断（120 秒上限），以上为已收到的内容'
+                                : '连接中断（' + (e.reason === 'watchdog' ? '30 秒未收到新内容' : '连接超时') + '），以上为已收到的回复')
+                            : '连接中断：' + (e.detail || '网络错误');
+                        const tipMsg = { role: 'system_error', isError: true, text: tipText, time: Date.now() };
+                        historyList.push(tipMsg);
                         saveMessages(historyList);
-                        // 删掉流式临时气泡，整体 re-render 让 think/narratage 生效
-                        if (streamBubble) {
-                            var tRow = streamBubble.closest('.msg-row');
-                            if (tRow) tRow.remove();
-                        }
-                        renderAllMessages();
-                        // 恢复 header 名字
-                        if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
+                        appendMessageToDOM(tipMsg);
                     }
-                    const tipText = error.name === 'AbortError'
-                        ? (abortReason === 'total'
-                            ? '回复较长已截断（120 秒上限），以上为已收到的内容'
-                            : '连接中断（' + (abortReason === 'watchdog' ? '30 秒未收到新内容' : '连接超时') + '），以上为已收到的回复')
-                        : `连接中断：${error.message || '网络错误'}`;
-                    const tipMsg = { role: 'system_error', isError: true, text: tipText, time: Date.now() };
-                    historyList.push(tipMsg);
+                } else if (!streamResult.ok) {
+                    // 零内容错误：HTTP/超时/网络 → 错误气泡（文案已在上方按类别组装）
+                    const errorMsg = { role: 'system_error', isError: true, text: errText, time: Date.now() };
+                    historyList.push(errorMsg);
                     saveMessages(historyList);
-                    appendMessageToDOM(tipMsg);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    if (parsedCall.wantCall) {
-                        insertIncomingCallCard(historyList);
-                        maybeAutoIncomingCall();
-                    }
-                    if (parsedPay.items.length) {
-                        insertPayCards(historyList, parsedPay.items);
-                    }
-                    if (parsedHeart.hearts.length) {
-                        insertHeartCards(historyList, parsedHeart.hearts);
-                    }
-                    if (parsedImg.images.length) {
-                        insertVImageCards(historyList, parsedImg.images);
-                    }
-                    logApiCall(apiModel, 'error', apiCallStart, tipText);
-                    return;
+                    appendMessageToDOM(errorMsg);
                 }
-
-                let errorText = '';
-                if (error.name === 'AbortError') {
-                    errorText = abortReason === 'watchdog'
-                        ? '连接中断（30 秒未收到新内容），请检查网络后重试。'
-                        : (abortReason === 'total'
-                            ? '回复超时（120 秒上限），未收到有效内容。'
-                            : '请求超时（15秒未响应），请检查网络或 API 地址。');
-                } else {
-                    errorText = `连接失败: ${error.message || '请检查 API 设置是否正确（可能是跨域或地址不正确）'}`;
-                }
-
-                const errorMsg = { role: 'system_error', isError: true, text: errorText, time: Date.now() };
-                historyList.push(errorMsg);
-                saveMessages(historyList);
-                appendMessageToDOM(errorMsg);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                logApiCall(apiModel, 'error', apiCallStart, errorText);
-                // 恢复 header 名字
-                if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
-            } finally {
-                aiSending = false;   // R3：所有出口统一解锁
+            } catch (postErr) {
+                // 收尾处理自身的异常：仅记录，不伪装成网络错误
+                console.error('[chat-detail] 流式收尾处理异常:', postErr);
             }
+
+            aiSending = false;   // R3：所有出口统一解锁
+            // 恢复 header 名字（所有出口统一恢复）
+            if (chatTitleEl) chatTitleEl.textContent = originalTitleText;
         }
 
         // 暴露给 chat-extras.js：重玩/重新生成

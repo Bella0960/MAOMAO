@@ -71,7 +71,7 @@ apps/settings/          # ⚠️ 孤儿目录：无任何引用的旧样式副�
 | `ai_custom_characters` | 角色列表 `[{id, name, persona, avatar(dataURL), …}]`（全局共享） |
 | `phone_current_contact` | 当前选中角色 id |
 | `phone_data_v2` | 新版统一存储根 `phoneData[contactId][appId]` |
-| `chat_history_<id>` | 消息 `[{role:'user'\|'assistant', text, time}]`，扩展 `type:'call'\|'image'` |
+| `chat_history_<id>` | 消息 `[{role:'user'\|'assistant', text, time}]`，扩展 `type:'call'\|'image'`、`mode:'date'`（赴约·线下剧情消息，含 `scene`；与线上聊天共用同一 key，记忆双向互通） |
 | `chat_memories_<id>` / `chat_last_summary_<id>` / `chat_summary_auto_<id>` / `chat_summary_interval_<id>` | 长期记忆 / 总结时间戳 / 自动总结开关与间隔 |
 | `phone_groups` | 群聊列表（群 id 以 `g` 开头）；`chat_group_alias_` / `chat_group_notice_` 群设置 |
 | `phone_worldbooks` | 世界书（lorebook）条目 |
@@ -99,7 +99,8 @@ apps/settings/          # ⚠️ 孤儿目录：无任何引用的旧样式副�
 | 文件 | 全局名 | 职责 |
 |---|---|---|
 | phone_storage.js | `PhoneStorage` | 统一 localStorage 抽象（规则见上节） |
-| phone_api.js | `PhoneAPI` | OpenAI 兼容 `POST <baseUrl>/chat/completions`（支持流式）、超时、调用写日志 |
+| phone_api.js | `PhoneAPI` | OpenAI 兼容 `POST <baseUrl>/chat/completions`（非流式/JSON 任务）、超时、调用写日志 |
+| phone_stream.js | `PhoneStream` | **流式对话公共引擎**（chat-detail / 赴约 date.html 共用）：三段式超时、SSE 半包解析、残留收尾、rAF 节流、中断保文；结果对象永不 reject |
 | phone_context.js | `PhoneContext` | 组装 system prompt：人设 + 世界书 + 长期记忆 + 近期聊天 + 其他 App 数据 |
 | phone_apps.js | `PHONE_APPS` | App 注册表：`{id, name, icon, page, prompt, jsonSchema, getCount, getData}`；每个 App 的 prompt/jsonSchema 定义 AI 生成规则 |
 | phone_engine.js | `PhoneEngine` | 角色切换、**整机刷新**（为选定角色一次性重新生成全部 App 数据；入口在 chat/moments/moments.html） |
@@ -109,6 +110,7 @@ AI 接口配置存 `api_settings`（默认 `https://api.openai.com/v1`，内置 
 
 ### 聊天主链路健壮性（chat-detail.html sendMsg）
 
+- **流式引擎已抽离**：sendMsg 的流式核心在 `shared/js/phone/phone_stream.js`（`PhoneStream.chat(opts)`，永不 reject，结果对象 `{ok, fullText, error}`，`fullText` 中断时保留部分内容）；chat-detail 只传 `onPaint` 渲染回调与收尾处理。**新页面（如赴约 date.html）直接调 PhoneStream.chat 复用，不要重写流式代码**。
 - **三段式超时**：连接 15s（等响应头）→ 流式「无数据看门狗」30s（每收到 chunk 重置）→ 120s 硬性总上限；中断时已生成内容保留落库，不丢弃。
 - **上下文字符预算 `CTX_CAP`**：人设 5000 / 长期记忆 3000 / 用户记忆 2000 / 世界书 8000 / RP 协议原文 6000（变量替换后整段 16000），超限经 `capText` 静默截断降级，防 400 超长。
 - **流式渲染 rAF 节流**：delta 只累计文本，正则清洗 + DOM 写入合并到每帧一次；流结束后补处理残留 SSE buffer，防丢尾字。
@@ -138,6 +140,7 @@ AI 接口配置存 `api_settings`（默认 `https://api.openai.com/v1`，内置 
 | 挂件 / 元素仓库 | 主屏 `.ds-widget` 小组件；被移除的项目进隐藏仓库，经 desktop/widgets.html 恢复 |
 | 聊天美化中心 | beauty.html 双 Tab：「可视化调节」（ChatBeauty 结构化参数 + Sticky 实时预览）+「深度自定义」（手写 CSS 预设，导入导出 + 校验）；已吸收下线的 bubble-theme 气泡主题 |
 | 咖啡馆经营 / 游戏大厅 / 触梦旅行 | cafe、games（6 款 AI 伴玩小游戏）、travel 三个单页模拟 App |
+| 赴约 / 线下剧情 | chat/date/date.html 独立 App：小说叙事式线下剧情（serif 排版，无气泡），调 `PhoneStream.chat` 流式续写；线上聊天「＋→奔赴」携 `id+scene` 跳入，消息带 `mode:'date'` 写回同一 chat_history，双向记忆互通 |
 | 正则过滤 / RP 协议 | AI 输出正则替换规则 / 角色扮演协议（worldbook/settings/） |
 | 群组 / 贴纸库 | 多角色群聊（群 id 以 `g` 开头）/ chat/sticker/ 表情包管理 |
 | 编辑控制 | forum-editorial 等页面的内容精选控制 |

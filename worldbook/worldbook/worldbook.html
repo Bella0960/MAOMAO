@@ -86,10 +86,11 @@
     flex: 1 !important;
     text-align: left !important;
     margin-left: 8px !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px !important;
-    color: #8E8E93 !important;
+    font-family: "Songti SC", "Noto Serif CJK SC", Georgia, serif !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    color: #171717 !important;
   }
   .wb-circle-btn {
     width: 32px !important;
@@ -111,8 +112,8 @@
     inset: -6px !important;
   }
   .wb-circle-btn:active { transform: scale(0.94); }
-  .wb-circle-btn.is-ghost { background: #F2F2F7; }
-  .wb-circle-btn.is-dark { background: #1C1C1E; }
+  .wb-circle-btn.is-ghost { background: #F6F6F4; }
+  .wb-circle-btn.is-dark { background: #171717; }
   .wb-circle-btn svg { width: 16px !important; height: 16px !important; }
   .wb-circle-btn.is-ghost svg { stroke: #333333; }
   .wb-circle-btn.is-dark svg { stroke: #FFFFFF; }
@@ -131,7 +132,7 @@
     padding: 0 14px !important;
     border: none;
     border-radius: 15px;
-    background: #F2F2F7;
+    background: #F6F6F4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,14 +140,14 @@
     font-size: 0.688rem !important;
     font-weight: 600;
     font-family: inherit;
-    color: #8E8E93;
+    color: #888888;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
   .wb-filter-pill svg { width: 12px !important; height: 12px !important; stroke: currentColor; }
   .wb-filter-pill .wb-pill-count { color: #AEAEB2; font-weight: 500; }
-  .wb-filter-pill.active { background: #1C1C1E; color: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+  .wb-filter-pill.active { background: #171717; color: #FFFFFF; }
   .wb-filter-pill.active .wb-pill-count { color: rgba(255,255,255,0.75); }
 
   /* ===== 列表 ===== */
@@ -170,13 +171,12 @@
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     background: #FFFFFF !important;
-    border-radius: 16px !important;
-    margin-bottom: 8px !important;
-    height: 64px !important;              /* 死锁高度，内容再多也不会被撑高 */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
-    overflow: hidden !important;           /* 溢出直接裁掉，杜绝撑破卡片 */
+    border-radius: 0 !important;
+    margin-bottom: 0 !important;
+    height: auto !important;
+    border-bottom: 1px solid #E5E5E5 !important;
     cursor: pointer;
   }
   .book-icon {
@@ -207,7 +207,7 @@
   }
   .book-desc {
     font-size: 0.75rem !important;
-    color: #8E8E93 !important;
+    color: #888888 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -230,48 +230,51 @@
   .book-edit-btn svg { width: 14px; height: 14px; stroke: #C7C7CC; }
   .book-edit-btn:active svg { stroke: #333333; }
 
-  /* ===== 树形逐级展开：卡片展开态 + 条目子节点 ===== */
-  .book-card.expanded { border-radius: 16px 16px 6px 6px !important; margin-bottom: 2px !important; }
+  /* ===== 树形逐级展开：展开态保持细分隔线；条目子节点紧凑排列 ===== */
+  .book-card.expanded { border-radius: 0 !important; margin-bottom: 0 !important; }
   .book-card.expanded .book-arrow svg { transform: rotate(90deg); }
   .book-children {
-    margin: 0 0 8px 24px;
-    padding: 4px 0 2px 12px;
-    border-left: 2px solid #EDEDF0;
+    margin: 0;
+    padding: 0 0 0 48px;
+    border-left: none;
   }
   .entry-node {
     display: flex; align-items: center; gap: 6px;
-    padding: 8px 10px;
-    background: #FAFAFC;
-    border-radius: 10px;
-    margin-bottom: 4px;
+    padding: 10px 0;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 1px solid #F0F0F0;
+    margin-bottom: 0;
     cursor: pointer;
   }
-  .entry-node:active { background: #F2F2F7; }
+  .entry-node:active { background: transparent; }
   .entry-node.is-disabled { opacity: 0.5; }
   .entry-node-name {
     flex: 1; min-width: 0;
-    font-size: 0.75rem; font-weight: 600; color: #333333;
+    font-size: 0.813rem; font-weight: 500; color: #333333;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .en-tag {
     flex-shrink: 0;
-    font-size: 0.563rem; font-weight: 600;
-    padding: 2px 6px; border-radius: 6px;
+    font-size: 0.625rem; font-weight: 500;
+    padding: 1px 5px; border-radius: 4px;
   }
-  .en-tag.t-text { background: #F2F2F7; color: #666666; }
-  .en-tag.t-regex { background: #FFF2CC; color: #996600; }
-  .en-tag.p-front { background: #E8F5E9; color: #2E7D32; }
-  .en-tag.p-middle { background: #E3F2FD; color: #1565C0; }
-  .en-tag.p-back { background: #FCE4EC; color: #C2185B; }
-  .en-tag.m-mode { background: #F7F7F9; color: #8E8E93; }
-  .wb-children-empty { padding: 2px 10px 6px; font-size: 0.688rem; color: #C7C7CC; }
+  /* 所有标签统一灰阶，不使用彩色 */
+  .en-tag.t-text { background: #F6F6F4; color: #555555; }
+  .en-tag.t-regex { background: #F6F6F4; color: #555555; }
+  .en-tag.p-front { background: #F6F6F4; color: #888888; }
+  .en-tag.p-middle { background: #F6F6F4; color: #888888; }
+  .en-tag.p-back { background: #F6F6F4; color: #888888; }
+  .en-tag.m-mode { background: #F6F6F4; color: #888888; }
+  .wb-children-empty { padding: 8px 0; font-size: 0.688rem; color: #B8B8B8; }
   .wb-add-entry {
     display: flex; align-items: center; gap: 6px;
-    padding: 7px 10px;
-    font-size: 0.75rem; font-weight: 600; color: #8E8E93;
-    border-radius: 10px; cursor: pointer;
+    padding: 10px 0;
+    font-size: 0.813rem; font-weight: 500; color: #888888;
+    border-radius: 0; cursor: pointer;
+    border-bottom: 1px solid #F0F0F0;
   }
-  .wb-add-entry:active { background: #F2F2F7; }
+  .wb-add-entry:active { background: transparent; }
   .wb-add-entry svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
 
   /* ===== 二级折叠：条目独立展开内容区 ===== */
@@ -284,13 +287,14 @@
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
   }
-  .entry-edit-btn svg { width: 13px; height: 13px; stroke: #8E8E93; }
+  .entry-edit-btn svg { width: 13px; height: 13px; stroke: #888888; }
   .entry-edit-btn:active svg { stroke: #333333; }
   .entry-detail {
-    background: #F7F7F9;
-    border-radius: 10px;
+    background: #FAFAF8;
+    border-radius: 0;
     padding: 10px 12px;
     margin: -2px 0 6px;
+    border-left: 2px solid #E5E5E5;
   }
   .entry-detail-content {
     font-size: 0.688rem; color: #555555; line-height: 1.5;
@@ -299,17 +303,17 @@
   }
   .entry-detail-kws { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
   .en-kw {
-    font-size: 0.563rem; font-weight: 600;
-    background: #FFFFFF; color: #666666;
-    padding: 2px 7px; border-radius: 6px;
-    border: 1px solid #EDEDF0;
+    font-size: 0.625rem; font-weight: 500;
+    background: transparent; color: #555555;
+    padding: 2px 6px; border-radius: 0;
+    border: 1px solid #E5E5E5;
   }
-  .entry-detail-meta { margin-top: 6px; font-size: 0.625rem; color: #8E8E93; }
+  .entry-detail-meta { margin-top: 6px; font-size: 0.625rem; color: #888888; }
 
   .wb-empty {
     text-align: center;
     font-size: 0.75rem !important;
-    color: #8E8E93;
+    color: #888888;
     padding: 28px 20px !important;
     height: auto !important;
     flex: none !important;
@@ -324,14 +328,15 @@
     padding: 10px 16px 20px !important;
     display: flex;
     gap: 10px !important;
-    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 30%);
+    background: #FFFFFF;
+    border-top: 1px solid #E5E5E5;
     z-index: 20;
   }
   .wb-footer-btn {
     flex: 1;
     height: 40px !important;
     border: none;
-    border-radius: 20px !important;
+    border-radius: 8px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -344,9 +349,9 @@
   }
   .wb-footer-btn:active { transform: scale(0.98); }
   .wb-footer-btn svg { width: 15px !important; height: 15px !important; }
-  .wb-footer-btn.is-light { background: #F2F2F7; color: #111111; }
-  .wb-footer-btn.is-light svg { stroke: #111111; }
-  .wb-footer-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
+  .wb-footer-btn.is-light { background: #F6F6F4; color: #333333; }
+  .wb-footer-btn.is-light svg { stroke: #333333; }
+  .wb-footer-btn.is-dark { background: #171717; color: #FFFFFF; }
   .wb-footer-btn.is-dark svg { stroke: #FFFFFF; }
 
   /* ===== 通用底部抽屉 ===== */
@@ -359,37 +364,39 @@
     justify-content: center;
   }
   .wb-overlay.show { display: flex; }
-  .wb-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+  .wb-backdrop { position: absolute; inset: 0; background: rgba(23,23,23,0.45); }
   .wb-sheet {
     position: relative;
     width: 100%;
     background: #FFFFFF;
-    border-radius: 20px 20px 0 0;
+    border-radius: 8px 8px 0 0;
     padding: 10px 16px 26px;
-    animation: wbSlideUp 0.25s ease;
+    animation: wbSlideUp 0.22s ease;
     display: flex;
     flex-direction: column;
     max-height: 86%;
     overflow-y: auto;
+    border-top: 1px solid #E5E5E5;
   }
   @keyframes wbSlideUp {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
   }
   .wb-handle {
-    width: 36px; height: 4px; border-radius: 2px;
-    background: #E5E5EA;
+    width: 32px; height: 3px; border-radius: 2px;
+    background: #D0D0D0;
     margin: 0 auto 14px;
     flex-shrink: 0;
   }
   .wb-sheet-title {
     text-align: center;
-    font-size: 0.938rem;
-    font-weight: 700;
-    color: #111111;
+    font-family: "Songti SC", "Noto Serif CJK SC", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #171717;
     margin-bottom: 14px;
   }
-  /* 加号正下方锚定的浮动小菜单（用户死命令：禁止底部抽屉式弹窗） */
+  /* 加号正下方锚定的浮动小菜单 */
   .wb-popover {
     display: none;
     position: absolute;
@@ -397,10 +404,10 @@
     right: 0;
     width: 168px;
     background: #FFFFFF;
-    border-radius: 14px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.14);
-    padding: 6px;
+    border-radius: 4px;
+    padding: 4px;
     z-index: 200;
+    border: 1px solid #E5E5E5;
   }
   .wb-popover.show { display: block; }
   .wb-menu-item {
@@ -413,16 +420,16 @@
     padding: 10px 8px;
     font-size: 0.813rem;
     font-family: inherit;
-    color: #111111;
+    color: #333333;
     cursor: pointer;
     text-align: left;
-    border-radius: 10px;
+    border-radius: 0;
   }
-  .wb-menu-item:active { background: #F2F2F7; }
+  .wb-menu-item:active { background: #F6F6F4; }
   .wb-menu-item .wb-menu-ico {
     width: 28px; height: 28px;
-    border-radius: 8px;
-    background: #F7F7F9;
+    border-radius: 4px;
+    background: #F6F6F4;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
@@ -431,27 +438,27 @@
   /* 二选一/三选一胶囊（条目表单） */
   .wb-seg {
     display: flex;
-    background: #F2F2F7;
-    border-radius: 10px;
-    padding: 3px;
+    background: #F6F6F4;
+    border-radius: 4px;
+    padding: 2px;
     gap: 2px;
   }
   .wb-seg-btn {
     flex: 1;
     height: 34px;
     border: none;
-    border-radius: 8px;
+    border-radius: 3px;
     background: transparent;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: inherit;
-    color: #8E8E93;
+    color: #888888;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     gap: 4px;
     transition: all 0.2s;
   }
-  .wb-seg-btn.active { background: #FFFFFF; color: #111111; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .wb-seg-btn.active { background: #FFFFFF; color: #171717; border: 1px solid #E5E5E5; }
 
   /* 启用开关行 */
   .wb-toggle-row {
@@ -466,7 +473,7 @@
     border-radius: 11px;
     border: none;
     padding: 0;
-    background: #E5E5EA;
+    background: #E5E5E5;
     position: relative;
     transition: background 0.25s ease;
     cursor: pointer;
@@ -482,7 +489,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     transition: transform 0.25s ease;
   }
-  .wb-toggle.on { background: #34C759; }
+  .wb-toggle.on { background: #171717; }
   .wb-toggle.on::after { transform: translateX(18px); }
 
   /* 概率滑块 */
@@ -493,7 +500,7 @@
     -webkit-appearance: none;
     appearance: none;
     height: 2px;
-    background: #E5E5EA;
+    background: #E5E5E5;
     border-radius: 1px;
     outline: none;
   }
@@ -502,24 +509,24 @@
     appearance: none;
     width: 14px; height: 14px;
     border-radius: 50%;
-    background: #1C1C1E;
+    background: #171717;
     border: none;
     cursor: pointer;
   }
   .wb-prob-row input[type=range]::-moz-range-track {
     height: 2px;
-    background: #E5E5EA;
+    background: #E5E5E5;
     border-radius: 1px;
   }
   .wb-prob-row input[type=range]::-moz-range-thumb {
     width: 14px; height: 14px;
     border-radius: 50%;
-    background: #1C1C1E;
+    background: #171717;
     border: none;
     cursor: pointer;
   }
   .wb-prob-val {
-    font-size: 0.813rem; font-weight: 600; color: #111111;
+    font-size: 0.813rem; font-weight: 600; color: #171717;
     min-width: 38px; text-align: right; font-variant-numeric: tabular-nums;
   }
 
@@ -528,15 +535,15 @@
   .wb-field label {
     display: block;
     font-size: 0.75rem;
-    color: #8E8E93;
+    color: #888888;
     margin-bottom: 6px;
   }
   .wb-field input, .wb-field textarea {
     width: 100%;
-    background: #F2F2F7;
-    border: none;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
     outline: none;
-    border-radius: 12px;
+    border-radius: 4px;
     font-size: 0.875rem;
     font-family: inherit;
     color: #333333;
@@ -548,22 +555,22 @@
     line-height: 1.6;
     resize: none;
   }
-  .wb-field input::placeholder, .wb-field textarea::placeholder { color: #B0B0B5; }
+  .wb-field input::placeholder, .wb-field textarea::placeholder { color: #B8B8B8; }
   .wb-sheet-actions { display: flex; gap: 10px; margin-top: 4px; flex-shrink: 0; }
   .wb-btn {
     flex: 1;
     height: 44px;
     border: none;
-    border-radius: 12px;
+    border-radius: 4px;
     font-size: 0.938rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: inherit;
     cursor: pointer;
   }
-  .wb-btn.is-light { background: #F2F2F7; color: #333333; }
-  .wb-btn.is-danger { background: #FFF0F3; color: #C2185B; }
-  .wb-btn.is-dark { background: #1C1C1E; color: #FFFFFF; }
-  .wb-btn:active { opacity: 0.9; }
+  .wb-btn.is-light { background: #F6F6F4; color: #333333; border: 1px solid #E5E5E5; }
+  .wb-btn.is-danger { background: transparent; color: #888888; border: 1px solid #E5E5E5; }
+  .wb-btn.is-dark { background: #171717; color: #FFFFFF; }
+  .wb-btn:active { opacity: 0.85; }
 
   /* Toast */
   .wb-toast {
@@ -604,7 +611,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
         </div>
-        <span class="wb-en">WORLDBOOK</span>
+        <span class="wb-en">世界书</span>
         <div class="wb-top-actions">
           <button class="wb-circle-btn is-dark" id="btnAddTop" type="button" aria-label="导入或导出" title="导入或导出">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

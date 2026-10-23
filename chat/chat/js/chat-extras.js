@@ -527,6 +527,45 @@
     };
   }
 
+  // ============================================================
+  // 功能：奔赴 —— 跳转线下沉浸式剧情模式（chat/date/date.html）
+  // 携带 id + scene；聊天记录与记忆在两边互通（同一 chat_history_<id>）
+  // ============================================================
+  function featDate() {
+    if (typeof currentCharacter === 'undefined' || !currentCharacter || !currentCharacter.id) return;
+    var scenes = ['咖啡馆', '家里', '餐厅', '公园', '电影院', '海边'];
+    var html =
+      '<div class="x-chips" id="dateSceneChips">' +
+      scenes.map(function (s, i) {
+        return '<button class="x-chip' + (i === 0 ? ' active' : '') + '" data-scene="' + s + '" type="button">' + s + '</button>';
+      }).join('') +
+      '</div>' +
+      '<input class="x-input" id="dateSceneInput" placeholder="自定义场景（如：天台、老书店）" value="咖啡馆" />' +
+      '<div class="x-core-muted">将进入线下沉浸式剧情模式：以小说叙事推进你们的故事。聊天记录与记忆双向互通，随时可从剧情页返回本对话。</div>' +
+      '<div class="x-row">' +
+      '<button class="x-btn x-btn-ghost" id="dateCancel">取消</button>' +
+      '<button class="x-btn x-btn-primary" id="dateGo">奔赴</button>' +
+      '</div>';
+    openModal('奔赴 · 线下剧情', html);
+    var chips = document.getElementById('dateSceneChips');
+    if (chips) {
+      chips.querySelectorAll('.x-chip').forEach(function (b) {
+        b.onclick = function () {
+          chips.querySelectorAll('.x-chip').forEach(function (x) { x.classList.remove('active'); });
+          b.classList.add('active');
+          var inp = document.getElementById('dateSceneInput');
+          if (inp) inp.value = b.getAttribute('data-scene');
+        };
+      });
+    }
+    document.getElementById('dateCancel').onclick = closeModal;
+    document.getElementById('dateGo').onclick = function () {
+      var scene = (document.getElementById('dateSceneInput').value || '').trim() || '咖啡馆';
+      closeModal();
+      window.location.href = '../date/date.html?id=' + encodeURIComponent(currentCharacter.id) + '&scene=' + encodeURIComponent(scene);
+    };
+  }
+
   // ---------- 分发 ----------
   function handleFeature(feat) {
     switch (feat) {
@@ -542,6 +581,7 @@
       case 'img': featImage(); break;
       case 'voice-msg': featVoiceMsg(); break;
       case 'card': featCard(); break;
+      case 'date': featDate(); break;
       case 'narration': featureAside(); break;
       case 'sticker':
         var stickerBtn = document.getElementById('stickerOpenBtn');

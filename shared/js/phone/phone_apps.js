@@ -138,6 +138,37 @@
                 if (!Storage) return [];
                 return Storage.getFinanceRecords();
             }
+        },
+
+        /* ----- 赴约 · 线下沉浸式剧情 ----- */
+        date: {
+            id: 'date',
+            name: '赴约',
+            description: '线下沉浸式剧情模式',
+            icon: '✉',
+            page: '/chat/date/date.html',
+            prompt: `根据提供的人物设定、记忆和聊天记录，为「赴约」线下剧情模式生成一段开场场景。
+
+要求：
+1. 场景是用户与该角色的线下面对面相遇（如咖啡馆、家里、公园）。
+2. 以小说叙事体输出：环境、动作、神态、心理描写丰富，300-500 字。
+3. 用第二人称"你"称呼用户，以角色的第一人称视角展开。
+4. 结尾留出用户可以回应的空间，不要一次写完整个约会。`,
+            jsonSchema: `{
+  "items": [
+    {
+      "scene": "咖啡馆",
+      "content": "小说叙事体的开场场景文本",
+      "timestamp": 1714000000000
+    }
+  ]
+}`,
+            getCount: function (data) {
+                return (data && data.items ? data.items : []).length;
+            },
+            getData: function (contactId) {
+                return []; // 赴约剧情与聊天记录共用 chat_history_<id>，无需独立数据
+            }
         }
 
         /* ----- 后续 App 注册示例（未实现，留占位） ----- */

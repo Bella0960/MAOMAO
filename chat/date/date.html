@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>赴约 · 线下剧情</title>
+<script src="../../shared/js/font-loader.js?v=20261022v1"></script>
+<script src="../../shared/js/native-feel.js"></script>
+<script src="../../shared/js/phone/phone_storage.js"></script>
+<script src="../../shared/js/phone/phone_stream.js"></script>
+<style>
+  /* ============================================================
+   * 赴约 · 线下沉浸式剧情 —— 小说沉浸式排版
+   * 纸质浅米底 · 衬线正文 17px/1.8 · 无气泡无头像无时间戳
+   * 一键直达：phone_current_contact → chat_history 最多 → 随机角色
+   * 数据与线上聊天互通：读写同一 chat_history_<id>（mode:'date' 标记）
+   * ============================================================ */
+  :root {
+    --paper: #F8F6F0;
+    --ink: #1C1B18;
+    --sub: #77736A;
+    --weak: #A8A499;
+    --hairline: #E0DCD1;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    display: flex;
+    justify-content: center;
+  }
+  .page {
+    width: 100%;
+    max-width: 560px;
+    min-height: 100%;
+    border-top: 1px solid var(--ink);   /* 顶部 1px 黑色实线 */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== 页眉：刊头 + 返回（极小全大写） ===== */
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 16px 22px 10px;
+    flex-shrink: 0;
+  }
+  .mast-word {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .mast-link {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--sub);
+    text-decoration: none;
+  }
+  .mast-link:active { color: var(--ink); }
+
+  /* ===== 中型衬线标题（不与正文争抢视线） ===== */
+  .title-wrap {
+    padding: 6px 22px 18px;
+    border-bottom: 1px solid var(--hairline);
+    flex-shrink: 0;
+  }
+  .title {
+    font-family: Georgia, "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    font-size: clamp(30px, 8vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: var(--ink);
+    overflow-wrap: break-word;
+  }
+  .title-sub {
+    margin-top: 10px;
+    font-size: 10px;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--weak);
+  }
+
+  /* ===== 叙事正文：小说排版 ===== */
+  .story {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 34px;
+  }
+  .story p { word-break: break-word; }
+
+  /* 用户消息：居中 + 淡化（[你] 开头） */
+  .p-you {
+    text-align: center;
+    color: var(--sub);
+    font-size: 13.5px;
+    font-style: italic;
+    margin: 2.2em 0;
+    line-height: 1.8;
+  }
+  .p-you .you-tag {
+    font-style: normal;
+    letter-spacing: 0.2em;
+    color: var(--weak);
+    margin-right: 4px;
+  }
+
+  /* 角色回复：连贯叙事段落（衬线 17px / 1.8） */
+  .p-ai {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: 1.4em;
+    text-indent: 2em;
+  }
+  .p-ai:first-letter { }
+
+  .p-sys {
+    text-align: center;
+    color: var(--weak);
+    font-size: 12px;
+    font-style: italic;
+    margin: 1.6em 0;
+    line-height: 1.7;
+  }
+
+  /* 流式光标：1px 竖线闪烁 */
+  .p-streaming { min-height: 1.8em; }
+  .p-streaming::after {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    background: var(--ink);
+    vertical-align: -0.15em;
+    margin-left: 4px;
+    animation: caret 1s steps(1) infinite;
+  }
+  @keyframes caret { 50% { opacity: 0; } }
+
+  /* 场景切换章：极小字距拉开的居中提示 */
+  .scene-divider {
+    text-align: center;
+    color: var(--weak);
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    margin: 2.6em 0 2.2em;
+  }
+  .scene-divider::before { content: '——\00a0\00a0'; letter-spacing: 0; }
+  .scene-divider::after  { content: '\00a0\00a0——'; letter-spacing: 0; }
+
+  .story-hint {
+    text-align: center;
+    color: var(--weak);
+    font-size: 13.5px;
+    font-style: italic;
+    line-height: 2.1;
+    margin-top: 3em;
+  }
+  .story-hint a { color: var(--sub); }
+
+  /* ===== 三颗行动钮：悬浮在输入线上方（等宽细线分隔） ===== */
+  .quick-bar {
+    flex-shrink: 0;
+    display: flex;
+    border-top: 1px solid var(--hairline);
+    background: var(--paper);
+  }
+  .quick-bar button {
+    flex: 1;
+    border: none;
+    border-right: 1px solid var(--hairline);
+    background: transparent;
+    font-family: "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--sub);
+    padding: 11px 0;
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+  .quick-bar button:last-child { border-right: none; }
+  .quick-bar button:active:not(:disabled) { color: var(--ink); }
+  .quick-bar button:disabled { opacity: 0.4; cursor: default; }
+
+  /* ===== 底部书写台：一条输入线 + 发送 ===== */
+  .composer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 8px 22px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--paper);
+  }
+  .composer textarea {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+    max-height: 110px;
+    padding: 5px 2px 7px;
+  }
+  .composer textarea::placeholder { color: var(--weak); font-style: italic; }
+  .send-btn {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 5px 0 7px;
+    white-space: nowrap;
+  }
+  .send-btn:disabled { color: var(--weak); cursor: default; }
+  .send-btn:active:not(:disabled) { opacity: 0.5; }
+
+  .date-toast {
+    position: fixed;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 9px 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    max-width: 80%;
+    text-align: center;
+    z-index: 90;
+  }
+  .date-toast.show { opacity: 1; }
+</style>
+<link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <span class="mast-word">MAOMAO&ensp;/&ensp;DATE</span>
+    <a class="mast-link" id="backLink" href="../chat/chat/chat.html">BACK&ensp;↖</a>
+  </header>
+
+  <div class="title-wrap">
+    <h1 class="title" id="dateTitle">赴约</h1>
+    <div class="title-sub" id="dateSub">A QUIET SCENE</div>
+  </div>
+
+  <main class="story" id="story"></main>
+
+  <!-- 三颗行动钮：让 TA 继续 / 重 Roll / 保存 -->
+  <div class="quick-bar" id="quickBar">
+    <button type="button" id="actContinue">让 TA 继续</button>
+    <button type="button" id="actReroll">重 Roll</button>
+    <button type="button" id="actSave">保存</button>
+  </div>
+
+  <form class="composer" id="dateForm">
+    <textarea id="dateInput" rows="1" placeholder="写下你的行动与台词……"></textarea>
+    <button class="send-btn" id="dateSend" type="submit">Send&thinsp;↗</button>
+  </form>
+
+  <div class="date-toast" id="dateToast"></div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ============================================================
+     * 一键直达（智能选角）：
+     *   ① ?id= 显式指定（奔赴入口携带）→ 直接用
+     *   ② 无 id：读 phone_current_contact（全局当前角色）
+     *   ③ 无：遍历 chat_history_<id>，取聊天记录条数最多的角色
+     *   ④ 无任何记录：从现有角色里随机选一个
+     * 群聊（g 开头）一律跳过；选出的 id 必须在角色库中存在。
+     * ============================================================ */
+
+    /* ---------- 路由参数 ---------- */
+    var params = new URLSearchParams(location.search);
+    var roleId = params.get('id') || '';
+    var sceneName = (params.get('scene') || '').trim();
+
+    var storyEl = document.getElementById('story');
+    var input = document.getElementById('dateInput');
+    var sendBtn = document.getElementById('dateSend');
+    var toastEl = document.getElementById('dateToast');
+    var quickBar = document.getElementById('quickBar');
+    var dateTitle = document.getElementById('dateTitle');
+    var dateSub = document.getElementById('dateSub');
+    var backLink = document.getElementById('backLink');
+    var sending = false;
+
+    function toast(msg) {
+        if (!toastEl) return;
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+    }
+
+    function readRoles() {
+        try {
+            var list = JSON.parse(localStorage.getItem('ai_custom_characters') || '[]');
+            return Array.isArray(list) ? list : [];
+        } catch (e) { return []; }
+    }
+    function characterExists(id) {
+        var roles = readRoles();
+        for (var i = 0; i < roles.length; i++) {
+            if (String(roles[i].id) === String(id)) return true;
+        }
+        return false;
+    }
+
+    function resolveRoleId() {
+        /* ① 全局当前角色 */
+        try {
+            var cur = localStorage.getItem('phone_current_contact');
+            if (cur && characterExists(cur) && cur.charAt(0) !== 'g') return cur;
+        } catch (e) {}
+        /* ② 遍历 chat_history_<id>：记录条数最多的角色 */
+        var best = '', bestLen = -1;
+        try {
+            Object.keys(localStorage).forEach(function (k) {
+                var m = /^chat_history_(.+)$/.exec(k);
+                if (!m) return;
+                var id = m[1];
+                if (!characterExists(id) || id.charAt(0) === 'g') return;
+                var len = 0;
+                try {
+                    var a = JSON.parse(localStorage.getItem(k));
+                    if (Array.isArray(a)) len = a.length;
+                } catch (e) {}
+                if (len > bestLen) { best = id; bestLen = len; }
+            });
+        } catch (e) {}
+        if (best) return best;
+        /* ③ 随机一个现有角色 */
+        var ids = readRoles()
+            .filter(function (r) { return r && r.id != null && String(r.id).charAt(0) !== 'g'; })
+            .map(function (r) { return String(r.id); });
+        if (ids.length) return ids[Math.floor(Math.random() * ids.length)];
+        return '';
+    }
+
+    if (!roleId) roleId = resolveRoleId();
+
+    /* ---------- 守卫：一个角色都没有 ---------- */
+    var composer = document.getElementById('dateForm');
+    if (!roleId) {
+        storyEl.innerHTML = '<p class="story-hint">还没有可以赴约的人。<br>先去<a href="../worldbook/characters/characters.html">角色库</a>创建一位，再回来续写你们的故事。</p>';
+        if (composer) composer.style.display = 'none';
+        if (quickBar) quickBar.style.display = 'none';
+        return;
+    }
+    if (roleId.charAt(0) === 'g') {
+        storyEl.innerHTML = '<p class="story-hint">线下剧情模式暂不支持群聊。</p>';
+        if (composer) composer.style.display = 'none';
+        if (quickBar) quickBar.style.display = 'none';
+        return;
+    }
+
+    var character = getCharacter(roleId) || { id: roleId, name: 'TA' };
+    var charName = character.name || 'TA';
+
+    /* ---------- 顶栏 / 标题 / 返回 ---------- */
+    dateTitle.textContent = charName;
+    dateSub.textContent = sceneName ? 'SCENE — ' + sceneName : 'A QUIET SCENE';
+    backLink.href = '../chat/chat-detail.html?id=' + encodeURIComponent(roleId);
+
+    /* ---------- 存取：与线上聊天共用 chat_history_<id> ---------- */
+    var HISTORY_KEY = 'chat_history_' + roleId;
+    var _storage = window.PhoneStorage;
+    function loadHistory() {
+        if (_storage) {
+            var arr = _storage.getChatHistory(roleId);
+            if (arr && arr.length) return arr;
+        }
+        try {
+            var raw = localStorage.getItem(HISTORY_KEY);
+            var parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed) && parsed.length) return parsed;
+        } catch (e) {}
+        return [];
+    }
+    function saveHistory(list) {
+        if (_storage) { _storage.saveChatHistory(roleId, list); return; }
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    /* ---------- 渲染：小说排版（无气泡 / 无头像 / 无时间戳） ---------- */
+    var lastScene = '';
+    function appendSceneDivider(name) {
+        var d = document.createElement('div');
+        d.className = 'scene-divider';
+        d.textContent = name;
+        storyEl.appendChild(d);
+    }
+    function appendYou(text) {
+        var p = document.createElement('p');
+        p.className = 'p-you';
+        var tag = document.createElement('span');
+        tag.className = 'you-tag';
+        tag.textContent = '[你]';
+        p.appendChild(tag);
+        p.appendChild(document.createTextNode(text));
+        storyEl.appendChild(p);
+    }
+    function appendAiParagraphs(text) {
+        String(text || '').replace(/\n{3,}/g, '\n\n').split(/\n\n+/).forEach(function (seg) {
+            var s = seg.trim();
+            if (!s) return;
+            var p = document.createElement('p');
+            p.className = 'p-ai';
+            p.textContent = s;
+            storyEl.appendChild(p);
+        });
+    }
+    function appendSys(text) {
+        var p = document.createElement('p');
+        p.className = 'p-sys';
+        p.textContent = '（' + text + '）';
+        storyEl.appendChild(p);
+    }
+    function appendMessage(msg) {
+        if (!msg) return;
+        var text = String(msg.text || msg.content || '').trim();
+        if (!text) return;   // 线上卡片类消息（红包/位置等）不进小说排版
+        if (msg.isError || msg.role === 'system_error') { appendSys(text); return; }
+        if (msg.mode === 'date' && msg.scene && msg.scene !== lastScene) {
+            appendSceneDivider(msg.scene);
+            lastScene = msg.scene;
+        }
+        if (msg.role === 'user' || msg.role === 'sent') appendYou(text);
+        else if (msg.role === 'assistant' || msg.role === 'received') appendAiParagraphs(text);
+    }
+    function renderAll() {
+        storyEl.innerHTML = '';
+        lastScene = '';
+        var list = loadHistory();
+        list.forEach(appendMessage);
+        if (!list.length) {
+            var hint = document.createElement('p');
+            hint.className = 'story-hint';
+            hint.textContent = sceneName
+                ? '故事从这里开始。写下你抵达「' + sceneName + '」的第一幕。'
+                : '故事从这里开始。写下你们见面的第一幕。';
+            storyEl.appendChild(hint);
+        }
+        storyEl.scrollTop = storyEl.scrollHeight;
+    }
+    function scrollBottom() { storyEl.scrollTop = storyEl.scrollHeight; }
+
+    /* ---------- Prompt 组装（date 模式专属：小说叙事体 + 线下强指令） ---------- */
+    function capText(str, max) {
+        str = String(str || '');
+        if (str.length <= max) return str;
+        if (max > 0) {
+            var code = str.charCodeAt(max - 1);
+            if (code >= 0xD800 && code <= 0xDBFF) max -= 1;
+        }
+        return str.slice(0, max) + '\n…（内容过长，已自动截断）';
+    }
+    function buildSystemPrompt() {
+        var persona = capText((character.persona || character.prompt || '').trim() || '一个真实、有生活气息的人。', 5000);
+        var parts = [];
+
+        parts.push('【线下沉浸式剧情模式 · 最高优先级】');
+        parts.push('当前为线下沉浸式剧情模式' + (sceneName ? '（场景：' + sceneName + '）' : '') + '，对话已从线上微信聊天切换到面对面的剧情时间线。');
+        parts.push('请以长篇幅的小说叙事方式回复：包含丰富的心理描写、动作描写和环境描写，推动剧情发展。');
+        parts.push('写作要求：');
+        parts.push('1. 单次回复 300-600 字：心理、动作、神态、环境四类描写兼备。');
+        parts.push('2. 用第二人称「你」称呼对方；你自己以第一人称思考、说话与行动，台词自然融入叙事。');
+        parts.push('3. 每次回复推动剧情发展：给出具体的事件、对话或细微转折，结尾以角色的动作或提问收束，留出对方回应的空间。不要一次写完整个约会。');
+        parts.push('4. 严禁输出 <think>、<narratage> 等标记；严禁 [红包][转账][发起语音通话] 等线上功能标记——线下场景中这些不存在。');
+        parts.push('5. 保持人设的性格与说话方式；叙事文风可以文学化，但角色的台词要符合人设。');
+
+        parts.push('');
+        parts.push('【你的人设】');
+        parts.push('你是' + charName + '。');
+        parts.push(persona);
+
+        // 世界书：线下剧情的舞台背景
+        try {
+            var wbList = JSON.parse(localStorage.getItem('phone_worldbooks') || '[]');
+            if (Array.isArray(wbList) && wbList.length) {
+                var wbText = wbList.map(function (b) {
+                    return '【' + (b.title || '未命名') + '】\n' + (b.content || '');
+                }).join('\n\n');
+                parts.push('');
+                parts.push('【世界书 · 你生活的世界】');
+                parts.push(capText(wbText, 6000));
+            }
+        } catch (e) {}
+
+        // 长期记忆（精简版：fixed + confirmed，按重要性取前 12 条）
+        var memLines = [];
+        try {
+            var mems = _storage ? _storage.getMemories(roleId) : [];
+            var usable = (Array.isArray(mems) ? mems : []).filter(function (m) {
+                return m && m.content && (m.status === 'fixed' || !m.status || m.status === 'confirmed');
+            });
+            usable.sort(function (a, b) { return (Number(b.importance) || 3) - (Number(a.importance) || 3); });
+            usable.slice(0, 12).forEach(function (m) { memLines.push('· ' + m.content); });
+        } catch (e) {}
+        var oldMem = (character.memory || '').trim();
+        if (oldMem && oldMem !== '暂无记忆') memLines.push('· ' + oldMem);
+        parts.push('');
+        parts.push('【你记得的事】');
+        parts.push(memLines.length ? capText(memLines.join('\n'), 2000) : '暂无');
+
+        // 关于用户
+        try {
+            var myProfile = JSON.parse(localStorage.getItem('myProfile') || '{}') || {};
+            var facts = [];
+            if (myProfile.nickname) facts.push('称呼：' + myProfile.nickname);
+            if (myProfile.age) facts.push('年龄：' + myProfile.age + '岁');
+            if (myProfile.hobbies) facts.push('爱好：' + myProfile.hobbies);
+            if (myProfile.about || myProfile.sign) facts.push('简介：' + (myProfile.about || myProfile.sign));
+            parts.push('');
+            parts.push('【对面这个人】');
+            parts.push(facts.length ? capText(facts.join('\n'), 800) : '（暂无资料，像认识很久的人一样相处）');
+        } catch (e) {}
+
+        // 最近对话（线上线下连贯：直接取 chat_history 最近 12 条）
+        var recent = loadHistory().slice(-12);
+        var dialogLines = [];
+        recent.forEach(function (m) {
+            var t = String(m.text || m.content || '').trim();
+            if (!t) return;
+            t = t.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<narratage>[\s\S]*?<\/narratage>/gi, '').trim();
+            if (!t) return;
+            var who = (m.role === 'user' || m.role === 'sent') ? '你' : charName;
+            dialogLines.push(who + '：' + capText(t, 500));
+        });
+        parts.push('');
+        parts.push('【最近发生的事（线上与线下的连续剧情）】');
+        parts.push(dialogLines.length ? capText(dialogLines.join('\n'), 4000) : '（刚开始）');
+
+        return parts.join('\n');
+    }
+
+    /* ---------- 流式请求（send / continue / reroll 共用） ----------
+     * opts.nudge：瞬态指令（如「(请继续)」）——只进 AI 上下文，不写入聊天记录 */
+    function requestReply(nudge) {
+        var cfg = {};
+        try { cfg = JSON.parse(localStorage.getItem('api_settings') || '{}') || {}; } catch (e) {}
+        if (!(cfg.apiKey || '').trim()) {
+            appendSys('请先到【设置 → API 设置】配置 API Key，再开始这段剧情');
+            setSending(false);
+            scrollBottom();
+            return;
+        }
+
+        var apiMessages = [{ role: 'system', content: buildSystemPrompt() }];
+        history.slice(-12).forEach(function (m) {
+            var t = String(m.text || m.content || '').trim();
+            if (!t) return;
+            t = capText(t, 800);
+            if (m.role === 'user' || m.role === 'sent') apiMessages.push({ role: 'user', content: t });
+            else if (m.role === 'assistant' || m.role === 'received') apiMessages.push({ role: 'assistant', content: t });
+        });
+        if (nudge) apiMessages.push({ role: 'user', content: nudge });
+        // 防呆：末条是 assistant 时补一条 user
+        var last = apiMessages[apiMessages.length - 1];
+        if (last && last.role === 'assistant') apiMessages.push({ role: 'user', content: '(继续)' });
+
+        streamingP = null;
+        PhoneStream.chat({
+            baseUrl: cfg.baseUrl || 'https://api.openai.com/v1',
+            apiKey: cfg.apiKey || '',
+            model: cfg.model || 'gpt-3.5-turbo',
+            messages: apiMessages,
+            temperature: cfg.temperature != null ? cfg.temperature : 0.8,
+            maxTokens: cfg.maxTokens,
+            topP: cfg.topP,
+            onPaint: paintStream
+        }).then(function (result) {
+            var ind = document.getElementById('dateIndicator');
+            if (ind) ind.remove();
+            var fullText = (result.fullText || '').trim();
+
+            if (!result.ok) {
+                var e = result.error || {};
+                var msg = e.kind === 'http'
+                    ? '连接失败（HTTP ' + e.status + '）' + (e.detail ? '：' + e.detail : '')
+                    : e.kind === 'abort'
+                        ? (e.reason === 'total' ? '剧情较长已截断（120 秒上限）' : '连接中断了，稍后再续写这一幕')
+                        : '网络断开了，剧情停在这里等你回来';
+                if (fullText) {
+                    appendSys('连接中断，以上为已写出的内容');
+                    var aiPartial = { role: 'assistant', text: fullText, time: Date.now(), mode: 'date', scene: sceneName || undefined };
+                    history.push(aiPartial);
+                    saveHistory(history);
+                    if (streamingP) streamingP.remove();
+                    appendAiParagraphs(fullText);
+                }
+                appendSys(msg);
+                toast('续写失败，请检查网络或 API 设置');
+                setSending(false);
+                scrollBottom();
+                return;
+            }
+
+            if (!fullText) {
+                appendSys('这一幕没有写出内容，再试一次吧');
+                setSending(false);
+                return;
+            }
+
+            // 清理线上标记（防御：prompt 已禁止，但双保险）
+            fullText = fullText
+                .replace(/\[(?:红包|转账):[^\]]*\]/g, '')
+                .replace(/\[发起语音通话\]/g, '')
+                .replace(/\[记住:[^\]]*\]/g, '')
+                .replace(/\n{3,}/g, '\n\n').trim();
+
+            if (streamingP) streamingP.remove();
+            var aiMsg = { role: 'assistant', text: fullText, time: Date.now(), mode: 'date', scene: sceneName || undefined };
+            history.push(aiMsg);
+            saveHistory(history);
+            appendAiParagraphs(fullText);
+            setSending(false);
+            scrollBottom();
+        });
+    }
+
+    function setSending(on) {
+        sending = on;
+        if (sendBtn) {
+            sendBtn.disabled = on;
+            sendBtn.textContent = on ? 'Writing…' : 'Send ↗';
+        }
+        if (quickBar) {
+            quickBar.querySelectorAll('button').forEach(function (b) { b.disabled = on; });
+        }
+        var indicator = document.getElementById('dateIndicator');
+        if (indicator) indicator.remove();
+        if (on) {
+            var ind = document.createElement('p');
+            ind.className = 'p-sys';
+            ind.id = 'dateIndicator';
+            ind.textContent = charName + ' 正在落笔……';
+            storyEl.appendChild(ind);
+            scrollBottom();
+        }
+    }
+
+    var streamingP = null;
+    function paintStream(fullText) {
+        if (!streamingP) {
+            streamingP = document.createElement('p');
+            streamingP.className = 'p-ai p-streaming';
+            storyEl.appendChild(streamingP);
+        }
+        streamingP.textContent = fullText;
+        scrollBottom();
+    }
+
+    var history = loadHistory();
+
+    function send() {
+        var text = (input.value || '').trim();
+        if (!text || sending) return;
+        setSending(true);
+
+        var userMsg = { role: 'user', text: text, time: Date.now(), mode: 'date', scene: sceneName || undefined };
+        history.push(userMsg);
+        saveHistory(history);
+        appendMessage(userMsg);
+        input.value = '';
+        input.style.height = 'auto';
+
+        requestReply(null);
+    }
+
+    /* ---------- 三颗行动钮 ---------- */
+    // 让 TA 继续：不发用户新消息，以瞬态指令「(请继续)」让角色接着写
+    function actContinue() {
+        if (sending) return;
+        setSending(true);
+        requestReply('(请继续当前剧情，自然地往下写)');
+    }
+    // 重 Roll：删掉最后一条 AI 回复（仅一条），基于之前的行动重新生成
+    function actReroll() {
+        if (sending) return;
+        var last = history[history.length - 1];
+        if (!last || !(last.role === 'assistant' || last.role === 'received')) {
+            toast('没有可以重写的回复');
+            return;
+        }
+        history.pop();
+        saveHistory(history);
+        // 移除 DOM 里该回复渲染出的所有段落（从尾部回溯到上一个非 AI 段）
+        var removed = 0;
+        for (var i = storyEl.children.length - 1; i >= 0; i--) {
+            var el = storyEl.children[i];
+            if (el.classList && (el.classList.contains('p-ai') || el.classList.contains('p-streaming'))) {
+                storyEl.removeChild(el);
+                removed++;
+            } else if (removed > 0) {
+                break;
+            }
+        }
+        setSending(true);
+        requestReply(null);
+    }
+    // 保存：把当前赴约剧情导出为 .txt 文稿下载
+    function actSave() {
+        var lines = ['赴约 · ' + charName, '导出于 ' + new Date().toLocaleString('zh-CN'), ''];
+        var lastSceneSaved = '';
+        history.forEach(function (m) {
+            var t = String(m.text || m.content || '').trim();
+            if (!t) return;
+            if (m.mode === 'date' && m.scene && m.scene !== lastSceneSaved) {
+                lines.push('———— ' + m.scene + ' ————', '');
+                lastSceneSaved = m.scene;
+            }
+            if (m.role === 'user' || m.role === 'sent') lines.push('[你] ' + t, '');
+            else if (m.role === 'assistant' || m.role === 'received') lines.push(t, '');
+        });
+        if (lines.length <= 3) { toast('还没有可保存的剧情'); return; }
+        var blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        var d = new Date();
+        function p2(n) { return n < 10 ? '0' + n : '' + n; }
+        a.href = url;
+        a.download = '赴约-' + charName + '-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+        toast('剧情文稿已保存');
+    }
+
+    /* ---------- 输入框 ---------- */
+    if (input) {
+        input.addEventListener('input', function () {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 110) + 'px';
+        });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+            }
+        });
+    }
+    var form = document.getElementById('dateForm');
+    if (form) form.addEventListener('submit', function (e) { e.preventDefault(); send(); });
+
+    var btnContinue = document.getElementById('actContinue');
+    var btnReroll = document.getElementById('actReroll');
+    var btnSave = document.getElementById('actSave');
+    if (btnContinue) btnContinue.addEventListener('click', actContinue);
+    if (btnReroll) btnReroll.addEventListener('click', actReroll);
+    if (btnSave) btnSave.addEventListener('click', actSave);
+
+    /* ---------- 初始化 ---------- */
+    renderAll();
+    if (sceneName) {
+        // 奔赴入口携带场景：预填开场白（存储时不带 [你] 前缀，由渲染层统一加）
+        input.value = '来到了' + sceneName + '，远远就看到了' + charName + '的身影……';
+        setTimeout(function () { try { input.focus(); } catch (e) {} }, 300);
+    }
+})();
+</script>
+</body>
+</html>
