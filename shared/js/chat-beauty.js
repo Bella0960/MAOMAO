@@ -41,7 +41,7 @@
         partnerBubbleRadius: '15px 15px 15px 4px',
         myBubbleBorderColor: '#111111', myBubbleBorderWidth: 0,
         partnerBubbleBorderColor: '#DADAE0', partnerBubbleBorderWidth: 1,
-        myBubbleRadiusSize: 15, partnerBubbleRadiusSize: 15,
+        myBubbleRadiusSize: '', partnerBubbleRadiusSize: '',
         myBubblePadding: 10, partnerBubblePadding: 10,
         myBubbleFontSize: 12, partnerBubbleFontSize: 12,
         myBubbleFontFamily: 'system', partnerBubbleFontFamily: 'system',
@@ -232,9 +232,11 @@
         s.setProperty('--chat-bubble-my-border-width', num(v.myBubbleBorderWidth, 0) + 'px');
         s.setProperty('--chat-bubble-ta-border-color', v.partnerBubbleBorderColor || '#DADAE0');
         s.setProperty('--chat-bubble-ta-border-width', num(v.partnerBubbleBorderWidth, 1) + 'px');
-        s.setProperty('--chat-bubble-my-radius-size', num(v.myBubbleRadiusSize, 15) + 'px');
+        if (v.myBubbleRadiusSize !== '' && v.myBubbleRadiusSize != null) s.setProperty('--chat-bubble-my-radius-size', num(v.myBubbleRadiusSize, 15) + 'px');
+        else s.removeProperty('--chat-bubble-my-radius-size');
         s.setProperty('--chat-bubble-my-padding', paddingCss(v.myBubblePadding, v.bubblePadding));
-        s.setProperty('--chat-bubble-ta-radius-size', num(v.partnerBubbleRadiusSize, 15) + 'px');
+        if (v.partnerBubbleRadiusSize !== '' && v.partnerBubbleRadiusSize != null) s.setProperty('--chat-bubble-ta-radius-size', num(v.partnerBubbleRadiusSize, 15) + 'px');
+        else s.removeProperty('--chat-bubble-ta-radius-size');
         s.setProperty('--chat-bubble-ta-padding', paddingCss(v.partnerBubblePadding, v.bubblePadding));
         s.setProperty('--chat-bubble-my-font-size', num(v.myBubbleFontSize, 12) + 'px');
         s.setProperty('--chat-bubble-ta-font-size', num(v.partnerBubbleFontSize, 12) + 'px');
