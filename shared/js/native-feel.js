@@ -4,7 +4,69 @@
    3. 点击震动反馈（安卓生效，iOS 自动跳过）
    引入方式：每个页面 <head> 中、font-loader.js 之后同步引入 */
 (function () {
-    'use strict';
+'use strict';
+
+    /* ---------- Theme layer: default stays Classic; glass is strictly opt-in ---------- */
+    var MAOMAO_THEME_KEY = 'maomao_theme';
+    var maomaoThemeRoot = document.documentElement;
+    var maomaoThemeLink = null;
+    function normalizeMaoMaoTheme(value) {
+        return value === 'liquid-glass' ? 'liquid-glass' : 'classic';
+    }
+    function readMaoMaoTheme() {
+        try { return normalizeMaoMaoTheme(window.localStorage.getItem(MAOMAO_THEME_KEY)); }
+        catch (err) { return 'classic'; }
+    }
+    function ensureMaoMaoThemeStylesheet() {
+        maomaoThemeLink = document.getElementById('maomao-liquid-glass-theme');
+        if (!maomaoThemeLink) {
+            var current = document.currentScript ||
+                document.querySelector('script[src*="shared/js/native-feel.js"]');
+            if (!current || !current.src) return null;
+            try {
+                maomaoThemeLink = document.createElement('link');
+                maomaoThemeLink.id = 'maomao-liquid-glass-theme';
+                maomaoThemeLink.rel = 'stylesheet';
+                var themeCssUrl = new URL('../css/liquid-glass-theme.css', current.src);
+                themeCssUrl.searchParams.set('v', '20261023v4');
+                maomaoThemeLink.href = themeCssUrl.href;
+                maomaoThemeLink.media = 'all';
+            } catch (err) {
+                maomaoThemeLink = null;
+                return null;
+            }
+        }
+
+        /* Keep the theme layer after all page CSS so its higher-specificity glass rules win. */
+        if (document.head && maomaoThemeLink.parentNode !== document.head) {
+            document.head.appendChild(maomaoThemeLink);
+        } else if (document.head && document.readyState !== 'loading' &&
+                   document.head.lastElementChild !== maomaoThemeLink) {
+            document.head.appendChild(maomaoThemeLink);
+        }
+        return maomaoThemeLink;
+    }
+    maomaoThemeRoot.setAttribute('data-theme', readMaoMaoTheme());
+    ensureMaoMaoThemeStylesheet();
+    /* The parser adds page styles after this early script; move glass CSS to the end once parsing is done. */
+    document.addEventListener('DOMContentLoaded', function () {
+        if (readMaoMaoTheme() === 'liquid-glass') ensureMaoMaoThemeStylesheet();
+    }, { once: true });
+    window.MAOMAOTheme = {
+        key: MAOMAO_THEME_KEY,
+        get: readMaoMaoTheme,
+        set: function (value) {
+            var theme = normalizeMaoMaoTheme(value);
+            try { window.localStorage.setItem(MAOMAO_THEME_KEY, theme); } catch (err) {}
+            maomaoThemeRoot.setAttribute('data-theme', theme);
+            ensureMaoMaoThemeStylesheet();
+            try {
+                window.dispatchEvent(new CustomEvent('maomao:themechange', { detail: { theme: theme } }));
+            } catch (err) {}
+            return theme;
+        }
+    };
+
 
     /* ---------- 一、全局原生 CSS（脚本在 head 同步执行，先于首屏绘制注入） ---------- */
     var css = [

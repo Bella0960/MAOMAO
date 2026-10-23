@@ -629,6 +629,157 @@
         }
     </style>
 <link rel="stylesheet" href="../../shared/css/mobile-fit.css">
+<style id="memory-editorial-redesign">
+/* Reference-led editorial restyle. Visual-only overrides; feature scripts/storage stay intact. */
+:root{color-scheme:light;--paper:#fff;--ink:#171717;--copy:#555;--muted:#888;--line:#dedede;--serif:"Bodoni MT","Didot","Times New Roman","Songti SC",serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif}
+html,body{margin:0!important;background:#fff!important;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body{min-height:100dvh;align-items:flex-start!important}
+button,input,textarea,select{font:inherit}button{-webkit-tap-highlight-color:transparent;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid #777!important;outline-offset:4px}
+.phone-mockup{position:relative;width:min(440px,100vw)!important;height:100dvh!important;min-height:0!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important;overflow:hidden}
+.status-bar{top:0;height:24px;padding:max(8px,env(safe-area-inset-top,0px)) 24px 2px!important;color:#222!important;font:600 10px/1 var(--sans)!important;letter-spacing:.03em!important;z-index:60}
+.mem-page{min-height:0;background:#fff!important}
+.mem-header{position:relative;flex-shrink:0;padding:calc(41px + env(safe-area-inset-top,0px)) 24px 15px!important;background:#fff!important;border:0!important}
+.mem-header:before{content:"PERSONAL ARCHIVE";display:block;margin:0 0 19px;color:#858585;font:600 8px/1.2 var(--sans);letter-spacing:.19em}
+.mem-header-row{display:block!important;min-height:0!important}
+.mem-title{display:block;width:fit-content;color:#171717!important;font:400 clamp(58px,15vw,72px)/.82 var(--serif)!important;letter-spacing:-.075em!important}
+.mem-header:after{content:"PERSONAL ARCHIVE  ·  私人记忆档案";display:block;margin-top:16px;padding-bottom:15px;border-bottom:1px solid #171717;color:#777;font:9px/1.5 var(--sans);letter-spacing:.09em}
+.mem-back{position:absolute;top:calc(43px + env(safe-area-inset-top,0px));right:22px;display:grid;place-items:center;width:28px!important;height:28px!important;background:transparent!important;border:0!important;border-radius:0!important;color:#444;cursor:pointer}
+.mem-back svg{display:none!important}.mem-back:before{content:"×";font:300 24px/1 var(--sans);color:#777}.mem-back:active{background:transparent!important;transform:scale(.92)}
+.mem-scroll-area{flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:0 24px calc(24px + env(safe-area-inset-bottom,0px))!important;background:#fff!important;-webkit-overflow-scrolling:touch}
+.mem-scroll-area::-webkit-scrollbar{display:none!important}
+.mem-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:23px 0 9px 0!important;padding:0 0 8px!important;border-bottom:1px solid #dedede;color:#888!important;font:600 8px/1.25 var(--sans)!important;letter-spacing:.17em!important;text-transform:uppercase}
+.mem-section-title:first-child{margin-top:17px!important}
+.mem-card-glass{margin:0 0 16px!important;padding:13px 0 16px!important;border:0!important;border-bottom:1px solid #e7e7e7!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.mem-card-glass:has(.mem-mood-text){margin:0 0 19px!important;padding:13px 0 17px 14px!important;border-left:1px solid #171717!important;border-bottom:1px solid #e7e7e7!important;background:transparent!important}
+.mem-label{margin:0 0 9px!important;color:#999!important;font:600 8px/1.4 var(--sans)!important;letter-spacing:.16em!important}
+.mem-mood-text{margin:0 0 6px!important;color:#171717!important;font:400 20px/1.45 var(--sans)!important;letter-spacing:-.035em}
+.mem-event-text{color:#777!important;font:10px/1.85 var(--sans)!important}
+.char-picker{display:flex;gap:15px!important;overflow-x:auto;padding:1px 0 4px!important}.char-picker::-webkit-scrollbar{display:none!important}
+.char-item{display:flex;flex-direction:column;align-items:center;gap:6px!important;padding:2px 0 4px!important;cursor:pointer}
+.char-avatar{width:44px!important;height:44px!important;border:1px solid #e1e1e1!important;border-radius:50%!important;background:#f4f4f3!important;overflow:hidden;transition:border-color .2s,transform .2s}
+.char-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}.char-avatar svg{width:19px;height:19px;stroke:#888!important}
+.char-item.active .char-avatar{border:1px solid #171717!important}.char-item:active .char-avatar{transform:scale(.96)}
+.char-name{max-width:62px!important;color:#888!important;font:9px/1.4 var(--sans)!important}.char-item.active .char-name{color:#171717!important;font-weight:650!important}
+.mem-list-container{display:flex;flex-direction:column;padding:0!important;border-radius:0!important;background:transparent!important}
+.mem-group{padding:13px 0 14px!important}.mem-group+.mem-group{margin-top:0!important;padding-top:14px!important;border-top:1px solid #e7e7e7!important}
+.mem-group-head{margin-bottom:8px!important}.mem-group-date{color:#222!important;font:400 17px/1.1 var(--serif)!important;letter-spacing:-.035em}.mem-group-count{color:#aaa!important;font:8px/1.3 var(--sans)!important;letter-spacing:.1em}
+.mem-line{align-items:flex-start!important;gap:11px!important;padding:8px 0!important;border-bottom:1px solid #f1f1f1}
+.mem-line-time{min-width:35px!important;padding-top:3px;color:#aaa!important;font:9px/1.45 var(--sans)!important;font-variant-numeric:tabular-nums}
+.mem-line-content{color:#424242!important;font:10px/1.8 var(--sans)!important;overflow-wrap:anywhere}
+.mem-line-del{width:22px!important;height:22px!important;margin:-2px -3px 0 0;color:#aaa!important;border:0!important;border-radius:0!important;background:transparent!important;font:16px/1 var(--sans)!important}
+.mem-group-more{padding:8px 0 1px!important;color:#555!important;font:9px/1.5 var(--sans)!important;border-bottom:1px solid #bbb;width:fit-content}
+.mem-empty{text-align:left!important;color:#aaa!important;padding:21px 0!important;font-size:10px!important}
+.mem-summary-heading{border-bottom:1px solid #171717}
+.mem-inline-toggle{padding:2px 0 5px!important;border:0!important;border-bottom:1px solid #999!important;border-radius:0!important;background:transparent!important;color:#555!important;font:italic 13px/1 var(--serif)!important;white-space:nowrap}
+#summarySettingsCard{display:none!important}#summarySettingsCard.is-open{display:block!important}
+.sum-row{gap:12px;margin:13px 0 7px!important}.sum-row:first-child{margin-top:0!important}
+.sum-label{color:#555!important;font:10px/1.5 var(--sans)!important}.sum-value{color:#171717!important;font:600 10px/1.5 var(--sans)!important;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sum-seg{gap:12px!important;padding:0!important;border-radius:0!important;background:transparent!important}
+.sum-seg-btn{position:relative;padding:7px 0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#999!important;font:9px/1.4 var(--sans)!important;box-shadow:none!important}
+.sum-seg-btn.active{color:#171717!important;font-weight:700!important;box-shadow:none!important}.sum-seg-btn.active:after{content:"";position:absolute;left:0;right:0;bottom:1px;height:1px;background:#171717}
+.sum-slider{height:2px!important;margin:4px 0 10px!important;border-radius:0!important;background:#e5e5e5!important}
+.sum-slider::-webkit-slider-thumb{width:12px!important;height:12px!important;border:1px solid #171717!important;border-radius:50%!important;background:#fff!important;box-shadow:none!important}
+.sum-slider::-moz-range-thumb{width:12px!important;height:12px!important;border:1px solid #171717!important;border-radius:50%!important;background:#fff!important;box-shadow:none!important}
+.fold-card{margin:0!important;overflow:hidden;border:0!important;border-top:1px solid #e5e5e5!important;border-radius:0!important;background:transparent!important}
+.fold-card:last-of-type{border-bottom:1px solid #e5e5e5!important}
+.fold-head{position:relative;min-height:51px;gap:10px!important;padding:14px 23px 14px 0!important;cursor:pointer;transition:opacity .2s}
+.fold-head:active{opacity:.6}.fold-title{color:#222!important;font:500 11px/1.5 var(--sans)!important}.fold-sub{color:#999!important;font:9px/1.5 var(--sans)!important;text-align:right}
+.fold-arrow{display:none!important}.fold-head:after{content:"+";position:absolute;right:1px;top:50%;transform:translateY(-50%);color:#777;font:400 17px/1 var(--serif)}.fold-card.open .fold-head:after{content:"−"}
+.fold-body{max-height:0;overflow:hidden;transition:max-height .25s ease}.fold-card.open .fold-body{max-height:3000px!important}.fold-inner{padding:0 0 17px!important}
+.toggle-row{padding:11px 0!important}.toggle-label{color:#222!important;font-size:10px!important}.toggle-hint{color:#999!important;font-size:9px!important;line-height:1.7}
+.mem-toggle{width:37px!important;height:21px!important;border-radius:20px!important;background:#e0e0e0!important}.mem-toggle:after{width:17px!important;height:17px!important;top:2px!important;left:2px!important;background:#fff!important;box-shadow:0 1px 2px rgba(0,0,0,.15)!important}
+.mem-toggle.on{background:#171717!important}.mem-toggle.on:after{left:18px!important}
+.num-input{height:36px!important;border:0!important;border-bottom:1px solid #ccc!important;border-radius:0!important;background:transparent!important;padding:0 2px!important;color:#222!important;font:12px/1.4 var(--sans)!important}
+.field-label{margin:12px 0 6px!important;color:#999!important;font:9px/1.5 var(--sans)!important;letter-spacing:.04em}
+.btn-primary,.btn-ghost{min-height:34px!important;height:auto!important;padding:7px 0!important;border:0!important;border-bottom:1px solid #bbb!important;border-radius:0!important;background:transparent!important;color:#222!important;font:10px/1.4 var(--sans)!important;letter-spacing:.02em}
+.btn-primary{border-bottom-color:#171717!important;font-weight:650!important}.btn-primary:active,.btn-ghost:active{transform:translateY(1px);opacity:.65}
+.manual-banner{margin:0 0 5px!important;padding:12px 0!important;border:0!important;border-top:1px solid #e5e5e5!important;border-bottom:1px solid #e5e5e5!important;border-radius:0!important;background:transparent!important;color:#777!important;font:10px/1.8 var(--sans)!important}
+.manual-banner b{color:#171717!important;font:400 24px/1 var(--serif)!important}
+.cat-grid{gap:6px 13px!important;margin:9px 0 5px!important}
+.cat-chip{padding:5px 0!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;background:transparent!important;color:#888!important;font:9px/1.4 var(--sans)!important}
+.cat-chip.on{border-bottom-color:#171717!important;background:transparent!important;color:#171717!important;font-weight:650!important}
+.lib-item,.dedup-item,.merge-est{display:block;margin-top:8px!important;padding:12px 0!important;border:0!important;border-top:1px solid #e8e8e8!important;border-radius:0!important;background:transparent!important}
+.lib-text{margin-bottom:7px!important;color:#333!important;font:10px/1.85 var(--sans)!important;overflow-wrap:anywhere}
+.lib-meta{margin:7px 0 9px!important;color:#999!important;font-size:8px!important;line-height:1.7}
+.lib-tag{display:inline-block;padding:0!important;margin:0 8px 3px 0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#888!important;font:8px/1.4 var(--sans)!important}
+.lib-tag.fixed{background:transparent!important;color:#171717!important;text-decoration:underline;text-underline-offset:3px}
+.lib-actions{gap:12px!important}
+.lib-btn{min-height:26px!important;height:auto!important;padding:4px 0!important;border:0!important;border-bottom:1px solid #ccc!important;border-radius:0!important;background:transparent!important;color:#555!important;font:9px/1.4 var(--sans)!important}
+.lib-btn.dark{background:transparent!important;border-color:#171717!important;color:#171717!important}.lib-btn.ghost{background:transparent!important;border-color:#ddd!important;color:#777!important}
+.lib-empty{padding:17px 0!important;color:#aaa!important;font:10px/1.8 var(--sans)!important}
+.tool-row{gap:15px!important;margin-top:7px!important}.tool-note{color:#999!important;font:9px/1.8 var(--sans)!important}
+.dedup-check{width:15px!important;height:15px!important;border-radius:50%!important;border-color:#aaa!important}.dedup-check.on{background:#171717!important;border-color:#171717!important}.dedup-check.on:after{width:5px!important;height:5px!important;border-radius:50%!important;background:#fff!important}
+.dedup-text,.merge-est{color:#666!important;font:10px/1.8 var(--sans)!important}.dedup-text b,.merge-est b{color:#222!important}
+.mem-safe-bottom{height:calc(10px + env(safe-area-inset-bottom,0px))!important;flex-shrink:0;background:#fff!important}
+@media(max-width:480px){body{background:#fff!important}.phone-mockup{width:100vw!important}.mem-header{padding-left:23px!important;padding-right:23px!important}.mem-scroll-area{padding-left:23px!important;padding-right:23px!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+<style id="memory-compact-navigation">
+/* Compact, viewport-first layout: no arrow icons, no long stacks of settings. */
+.mem-page{position:relative!important;overflow:hidden!important}
+.mem-header{padding-top:calc(37px + env(safe-area-inset-top,0px))!important;padding-bottom:12px!important}
+.mem-header:before{margin-bottom:13px!important}
+.mem-back{left:23px!important;right:auto!important;top:calc(10px + env(safe-area-inset-top,0px))!important;width:auto!important;height:24px!important;display:flex!important;justify-content:flex-start!important}
+.mem-back:before{content:"返回"!important;font:9px/1 var(--sans)!important;letter-spacing:.06em!important;color:#888!important}
+.mem-title{font-size:clamp(51px,13vw,61px)!important}
+.mem-header:after{margin-top:12px!important;padding-bottom:12px!important}
+.mem-scroll-area{padding-bottom:84px!important;overflow-y:auto!important}
+.mem-scroll-area>.mem-section-title:first-child{margin-top:14px!important}
+.mem-card-glass:has(#charPicker){padding:4px 0 10px!important;margin-bottom:8px!important;border-bottom:0!important}
+.char-avatar{border-radius:50%!important;width:39px!important;height:39px!important}
+.mem-card-glass:has(.mem-mood-text){margin:0 0 14px!important;padding:10px 0 11px 13px!important;border-left:1px solid #171717!important;border-bottom:0!important}
+.mem-mood-text{font-size:18px!important}
+.mem-section-title{margin-top:17px!important;margin-bottom:8px!important}
+.mem-main-preview{padding:2px 0 4px!important;margin:0 0 12px!important}
+.mem-preview-line{display:grid;grid-template-columns:35px minmax(0,1fr);column-gap:10px;padding:8px 0;border-bottom:1px solid #efefef}
+.mem-preview-time{font:9px/1.6 var(--sans);color:#aaa;font-variant-numeric:tabular-nums}
+.mem-preview-copy{font:10px/1.8 var(--sans);color:#444;overflow-wrap:anywhere}
+.mem-preview-empty{font:10px/1.8 var(--sans);color:#999;padding:6px 0 12px}
+.mem-preview-open{display:inline-block;margin-top:9px;padding:3px 0 5px;border:0;border-bottom:1px solid #999;background:transparent;color:#555;font:italic 13px/1 var(--serif)}
+.mem-corner-bar{position:absolute;z-index:30;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:14px;padding:12px 23px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid #e4e4e4;background:rgba(255,255,255,.97)}
+.mem-corner-bar button,.mem-tools-corner{border:0;border-bottom:1px solid #b8b8b8;border-radius:0;background:transparent;color:#444;padding:4px 0 6px;font:italic 14px/1 var(--serif);white-space:nowrap}
+.mem-corner-bar button:active,.mem-tools-corner:active{color:#aaa}
+.mem-tools-corner{position:absolute;top:calc(9px + env(safe-area-inset-top,0px));right:23px;z-index:65;font-size:13px}
+.mem-tools-drawer,.mem-stream-drawer{position:absolute;inset:0;z-index:100;display:none;align-items:flex-end;background:rgba(0,0,0,.22);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.mem-tools-drawer.open,.mem-stream-drawer.open{display:flex;animation:memFadeIn .16s ease}
+@keyframes memFadeIn{from{opacity:0}to{opacity:1}}
+.mem-drawer-panel{position:relative;width:100%;max-height:88%;min-height:300px;display:flex;flex-direction:column;background:#fff;padding:17px 22px calc(15px + env(safe-area-inset-bottom,0px));animation:memPanelUp .22s ease-out}
+@keyframes memPanelUp{from{transform:translateY(15px);opacity:.7}to{transform:translateY(0);opacity:1}}
+.mem-drawer-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #171717}
+.mem-drawer-eyebrow{font:600 8px/1.4 var(--sans);letter-spacing:.18em;color:#888}
+.mem-drawer-close{border:0;border-bottom:1px solid #bbb;background:transparent;color:#555;padding:4px 0;font:italic 13px/1 var(--serif)}
+.mem-drawer-tabs{display:flex;gap:17px;overflow-x:auto;flex-shrink:0;padding:12px 0 10px;border-bottom:1px solid #e8e8e8}
+.mem-drawer-tabs button{position:relative;flex-shrink:0;border:0;background:transparent;padding:3px 0 6px;color:#999;font:10px/1.4 var(--sans)}
+.mem-drawer-tabs button.active{color:#171717;font-weight:650}
+.mem-drawer-tabs button.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:#171717}
+.mem-drawer-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-top:1px}
+.mem-drawer-content::-webkit-scrollbar{display:none}
+.mem-tool-view{display:none!important}
+.mem-tool-view.active{display:block!important}
+.mem-tool-view>.mem-section-title{margin-top:14px!important}
+.mem-tool-view>.mem-card-glass{margin-bottom:0!important}
+.mem-tool-view #summarySettingsCard{display:block!important}
+.mem-tool-view #summarySettingsCard:not(.settings-show){display:none!important}
+.mem-summary-heading{display:flex!important}
+.mem-tool-view .mem-summary-heading{padding-top:3px!important}
+.mem-inline-toggle{display:inline-block!important}
+.mem-tool-view .fold-card{margin-top:0!important}
+.mem-tool-view .fold-card.open .fold-body{max-height:60vh!important;overflow-y:auto!important}
+.mem-stream-panel{min-height:45vh}
+.mem-stream-panel .mem-list-container{overflow-y:auto;min-height:0;max-height:65vh;padding-bottom:18px!important}
+.mem-stream-panel .mem-group-date{font-size:16px!important}
+.mem-stream-heading{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid #171717}
+.mem-stream-heading strong{font:400 26px/1 var(--serif);letter-spacing:-.05em}
+.mem-stream-heading span{font:8px/1 var(--sans);color:#999;letter-spacing:.15em}
+.mem-stream-panel .mem-group-more{cursor:pointer}
+@media(max-width:480px){
+  .mem-drawer-panel{max-height:90%;padding-left:22px;padding-right:22px}
+  .mem-tools-corner{right:23px}
+  .mem-scroll-area{padding-left:23px!important;padding-right:23px!important}
+}
+@media(prefers-reduced-motion:reduce){.mem-tools-drawer,.mem-stream-drawer,.mem-drawer-panel{animation:none!important}}
+</style>
 </head>
 <body>
 <div class="phone-mockup">
@@ -669,8 +820,8 @@
             <div id="mem-list" class="mem-list-container"></div>
 
             <!-- 记忆总结设置 -->
-            <div class="mem-section-title" style="margin-top: 28px;">总结设置</div>
-            <div class="mem-card-glass">
+            <div class="mem-section-title mem-summary-heading" style="margin-top: 28px;"><span>总结设置</span><button type="button" class="mem-inline-toggle" id="summarySettingsToggle" aria-expanded="false">调节 +</button></div>
+            <div class="mem-card-glass" id="summarySettingsCard">
                 <div class="sum-row">
                     <div class="sum-label">总结模式</div>
                     <div class="sum-seg">
@@ -1409,5 +1560,137 @@
     setInterval(updateStatusBarTime, 30000);
 </script>
 <script src="../../shared/js/statusbar-control.js"></script>
+
+<script id="memory-compact-navigation">
+(function(){
+  const page=document.getElementById('memory-page');
+  const scroll=document.querySelector('.mem-scroll-area');
+  const list=document.getElementById('mem-list');
+  if(!page||!scroll||!list)return;
+  const mk=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+
+  // Move the live memory stream into a short bottom sheet; the same list node keeps its ID.
+  const streamTitle=[...scroll.children].find(el=>el.classList&&el.classList.contains('mem-section-title')&&el.textContent.trim()==='记忆流');
+  const preview=mk('div','mem-main-preview');
+  preview.id='mem-main-preview';
+  const previewLines=mk('div','mem-preview-lines');
+  const allBtn=mk('button','mem-preview-open','全部记忆 +');
+  allBtn.type='button';
+  preview.append(previewLines,allBtn);
+  if(streamTitle)streamTitle.insertAdjacentElement('afterend',preview);
+
+  const streamDrawer=mk('div','mem-stream-drawer');
+  streamDrawer.id='mem-stream-drawer';
+  const streamPanel=mk('section','mem-drawer-panel mem-stream-panel');
+  streamPanel.setAttribute('role','dialog');streamPanel.setAttribute('aria-label','全部记忆');
+  const streamHead=mk('div','mem-stream-heading');
+  const streamHeadTitle=mk('strong','','Memory');
+  const streamEyebrow=mk('span','','PERSONAL NOTES');
+  const streamClose=mk('button','mem-drawer-close','关闭');
+  streamClose.type='button';
+  const streamTop=mk('div','mem-drawer-top');
+  const streamBrand=mk('span','mem-drawer-eyebrow','MEMORY / ARCHIVE');
+  streamTop.append(streamBrand,streamClose);streamHead.append(streamHeadTitle,streamEyebrow);
+  streamPanel.append(streamTop,streamHead,list);streamDrawer.append(streamPanel);page.append(streamDrawer);
+
+  // Group the original feature nodes into separate views, so each opens on its own.
+  const children=[...scroll.children];
+  const getTitle=label=>children.find(el=>el.classList&&el.classList.contains('mem-section-title')&&el.textContent.trim().toUpperCase()===label);
+  const summaryTitle=children.find(el=>el.classList&&el.classList.contains('mem-summary-heading'));
+  const autoTitle=getTitle('AUTO SUMMARY');
+  const libraryTitle=getTitle('MEMORY BANK');
+  const toolTitle=getTitle('MEMORY TOOLS');
+  const summaryCard=document.getElementById('summarySettingsCard');
+  const autoCard=document.getElementById('autoCard');
+  const manualCard=document.getElementById('manualCard');
+  const libraryCard=document.getElementById('libCard');
+  const toolCard=document.getElementById('toolCard');
+
+  // Remove original settings nodes from the main page before re-housing them.
+  [summaryTitle,summaryCard,autoTitle,autoCard,manualCard,libraryTitle,libraryCard,toolTitle,toolCard].forEach(el=>{if(el&&el.parentNode)el.parentNode.removeChild(el);});
+
+  const defs=[
+    {key:'settings',label:'参数',nodes:[summaryTitle,summaryCard]},
+    {key:'auto',label:'自动',nodes:[autoTitle,autoCard]},
+    {key:'manual',label:'手动',nodes:[manualCard]},
+    {key:'library',label:'记忆库',nodes:[libraryTitle,libraryCard]},
+    {key:'tools',label:'工具',nodes:[toolTitle,toolCard]}
+  ];
+  const toolsDrawer=mk('div','mem-tools-drawer');
+  toolsDrawer.id='mem-tools-drawer';
+  const toolsPanel=mk('section','mem-drawer-panel');
+  toolsPanel.setAttribute('role','dialog');toolsPanel.setAttribute('aria-label','记忆功能');
+  const top=mk('div','mem-drawer-top');
+  top.append(mk('span','mem-drawer-eyebrow','MEMORY / STUDIO'));
+  const close=mk('button','mem-drawer-close','关闭');close.type='button';top.append(close);
+  const tabs=mk('nav','mem-drawer-tabs');tabs.setAttribute('aria-label','记忆功能分类');
+  const content=mk('div','mem-drawer-content');
+  const views={};
+  defs.forEach(def=>{
+    const tab=mk('button','',def.label);tab.type='button';tab.dataset.view=def.key;tabs.append(tab);
+    const view=mk('section','mem-tool-view');view.dataset.view=def.key;
+    def.nodes.filter(Boolean).forEach(node=>view.append(node));
+    if(def.key==='manual'&&manualCard){const title=mk('div','mem-section-title','MANUAL SUMMARY');view.insertBefore(title,manualCard);}
+    content.append(view);views[def.key]=view;
+  });
+  toolsPanel.append(top,tabs,content);toolsDrawer.append(toolsPanel);page.append(toolsDrawer);
+
+  function setView(key){
+    Object.keys(views).forEach(k=>{views[k].classList.toggle('active',k===key);});
+    tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.view===key));
+  }
+  function openTools(key){
+    setView(key||'settings');
+    toolsDrawer.classList.add('open');toolsDrawer.setAttribute('aria-hidden','false');
+  }
+  function closeTools(){toolsDrawer.classList.remove('open');toolsDrawer.setAttribute('aria-hidden','true');}
+  function openStream(){streamDrawer.classList.add('open');streamDrawer.setAttribute('aria-hidden','false');}
+  function closeStream(){streamDrawer.classList.remove('open');streamDrawer.setAttribute('aria-hidden','true');}
+  tabs.addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)setView(b.dataset.view);});
+  close.addEventListener('click',closeTools);streamClose.addEventListener('click',closeStream);
+  toolsDrawer.addEventListener('click',e=>{if(e.target===toolsDrawer)closeTools();});
+  streamDrawer.addEventListener('click',e=>{if(e.target===streamDrawer)closeStream();});
+  allBtn.addEventListener('click',openStream);
+
+  const back=document.querySelector('.mem-back');
+  if(back){back.innerHTML='';back.setAttribute('aria-label','返回首页');back.style.left='23px';}
+  const corner=mk('button','mem-tools-corner','功能 +');corner.type='button';corner.addEventListener('click',()=>openTools('settings'));page.append(corner);
+  const bar=mk('nav','mem-corner-bar');bar.setAttribute('aria-label','记忆快捷入口');
+  const memoryBtn=mk('button','','记忆 +');memoryBtn.type='button';memoryBtn.addEventListener('click',openStream);
+  const summaryBtn=mk('button','','总结 +');summaryBtn.type='button';summaryBtn.addEventListener('click',()=>openTools('manual'));
+  const manageBtn=mk('button','','管理 +');manageBtn.type='button';manageBtn.addEventListener('click',()=>openTools('library'));
+  bar.append(memoryBtn,summaryBtn,manageBtn);page.append(bar);
+
+  function updatePreview(){
+    previewLines.innerHTML='';
+    const lines=list.querySelectorAll('.mem-line');
+    let visible=0;
+    lines.forEach(line=>{
+      if(visible>=2)return;
+      const time=line.querySelector('.mem-line-time')?.textContent||'';
+      const copy=line.querySelector('.mem-line-content')?.textContent||'';
+      const row=mk('div','mem-preview-line');
+      row.append(mk('span','mem-preview-time',time),mk('span','mem-preview-copy',copy));
+      previewLines.append(row);visible++;
+    });
+    if(!visible)previewLines.append(mk('div','mem-preview-empty','聊天里留下的重要片段，会安静地收在这里。'));
+    const total=list.querySelectorAll('.mem-line').length;
+    allBtn.textContent=total?'全部记忆 · '+total+' 条 +':'打开记忆流 +';
+  }
+  const observer=new MutationObserver(updatePreview);observer.observe(list,{childList:true,subtree:true,characterData:true});
+  updatePreview();
+
+  // Keep the seven summary values editable, but hidden until the small inline control is opened.
+  const sumToggle=document.getElementById('summarySettingsToggle');
+  if(sumToggle&&summaryCard){
+    sumToggle.addEventListener('click',()=>{
+      const opened=summaryCard.classList.toggle('settings-show');
+      sumToggle.setAttribute('aria-expanded',String(opened));
+      sumToggle.textContent=opened?'收起 −':'调节 +';
+    });
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTools();closeStream();}});
+})();
+</script>
 </body>
 </html>

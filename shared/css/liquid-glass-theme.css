@@ -1,0 +1,795 @@
+/* MAOMAO · iOS 26 Liquid Glass
+   A performance-conscious web adaptation. Only active when data-theme="liquid-glass".
+   The original styles remain untouched when the user selects Classic. */
+html[data-theme="liquid-glass"] {
+  color-scheme: light;
+  --lg-ink: #252528;
+  --lg-muted: #77777e;
+  --lg-edge: rgba(255, 255, 255, .78);
+  --lg-surface: rgba(249, 249, 252, .46);
+  --lg-surface-strong: rgba(250, 250, 253, .68);
+  --lg-shadow: 0 12px 32px rgba(31, 31, 37, .09), 0 2px 7px rgba(31, 31, 37, .04);
+  --lg-inset: inset 0 1px 0 rgba(255,255,255,.92), inset 0 -1px 0 rgba(255,255,255,.28);
+}
+html[data-theme="liquid-glass"] body {
+  color: var(--lg-ink) !important;
+  background-color: #ededf0 !important;
+  background-image: radial-gradient(ellipse at 50% 0%, #fff 0%, #f3f3f5 42%, #e7e7eb 100%) !important;
+}
+html[data-theme="liquid-glass"] .simulator-stage {
+  background: radial-gradient(ellipse at 50% 10%, #fff 0%, #f0f0f3 64%, #e4e4e8 100%) !important;
+}
+html[data-theme="liquid-glass"] .phone {
+  border: 1px solid rgba(255,255,255,.84) !important;
+  background: rgba(255,255,255,.62) !important;
+  box-shadow: 0 28px 75px rgba(28,28,35,.17), 0 3px 12px rgba(28,28,35,.08), inset 0 0 0 1px rgba(255,255,255,.82) !important;
+}
+html[data-theme="liquid-glass"] .phone-camera {
+  background: rgba(35,35,40,.84) !important;
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.32) !important;
+}
+html[data-theme="liquid-glass"] .phone-screen,
+html[data-theme="liquid-glass"] .bg-layer,
+html[data-theme="liquid-glass"] .app-frame {
+  background-color: rgba(249,249,252,.16) !important;
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] .status-bar {
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] .signal-icon i,
+html[data-theme="liquid-glass"] .wifi-icon::after,
+html[data-theme="liquid-glass"] .battery-icon b {
+  background-color: currentColor !important;
+}
+html[data-theme="liquid-glass"] .wifi-icon {
+  border-top-color: currentColor !important;
+}
+html[data-theme="liquid-glass"] .battery-icon {
+  border-color: currentColor !important;
+}
+
+/* Liquid Glass surface is reserved for navigation and the icon dock, not home widgets. */
+html[data-theme="liquid-glass"] .dock-bar,
+html[data-theme="liquid-glass"] .floating-nav,
+html[data-theme="liquid-glass"] .bottom-nav,
+html[data-theme="liquid-glass"] .nav-bar,
+html[data-theme="liquid-glass"] .tab-bar {
+  position: relative;
+  border-radius: 28px !important;
+  overflow: visible;
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-dock-fill-alpha, .12)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-dock-highlight-alpha, .2)),
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-fill-alpha, .12)) 54%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-shadow-alpha, .05))
+  ) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  box-shadow: 0 14px 34px rgba(22,22,28,.12), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.45) !important;
+}
+html[data-theme="liquid-glass"] .dock-bar::before,
+html[data-theme="liquid-glass"] .floating-nav::before,
+html[data-theme="liquid-glass"] .bottom-nav::before,
+html[data-theme="liquid-glass"] .nav-bar::before,
+html[data-theme="liquid-glass"] .tab-bar::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 9%;
+  right: 9%;
+  height: 1px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 0 8px rgba(255,255,255,.42);
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] .nav-tab,
+html[data-theme="liquid-glass"] .dock-item,
+html[data-theme="liquid-glass"] .dock-bar .app-tile {
+  color: rgba(38,38,43,.76) !important;
+}
+html[data-theme="liquid-glass"] .nav-tab.active,
+html[data-theme="liquid-glass"] .nav-tab[aria-current="page"] {
+  color: #17171a !important;
+}
+html[data-theme="liquid-glass"] .nav-tab.active::before,
+html[data-theme="liquid-glass"] .nav-tab[aria-current="page"]::before {
+  background: rgba(255,255,255,.76) !important;
+  box-shadow: 0 2px 10px rgba(30,30,36,.08), inset 0 1px 0 #fff !important;
+}
+
+/* iOS 26 home-screen icon appearance. The opacity setting applies to APP ICON TILES. */
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.05) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.05) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 7px 18px rgba(22,22,28,.10), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.4) !important;
+  transition: background .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-icon-fill-alpha, .08)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-icon-highlight-alpha, .16)) 0%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-fill-alpha, .08)) 50%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-shadow-alpha, .025)) 100%
+  ) !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-icon-tint-alpha, .22)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-icon-highlight-alpha, .18)) 0%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-tint-alpha, .22)) 55%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-shadow-alpha, .08)) 100%
+  ) !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(36,36,42,var(--lg-icon-dark-alpha, .54)) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,var(--lg-icon-highlight-alpha, .12)), rgba(36,36,42,var(--lg-icon-dark-alpha, .54)) 55%, rgba(15,15,20,.34)) !important;
+  border-color: rgba(255,255,255,.58) !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="default"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="default"] body.maomao-home .dock-bar .app-icon {
+  background: rgba(248,248,251,.86) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  box-shadow: 0 4px 12px rgba(22,22,28,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon::before,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,var(--lg-icon-highlight-alpha, .16)), transparent 44%, rgba(255,255,255,.025));
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon svg,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,.34));
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-icon svg,
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .dock-bar .app-icon svg {
+  stroke: #fff !important;
+  color: #fff !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.24));
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-name {
+  color: rgba(28,28,33,.9) !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.52);
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-name {
+  color: rgba(248,248,251,.94) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.28);
+}
+html[data-theme="liquid-glass"] body.maomao-home .app-card:active .app-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-item:active .app-icon {
+  transform: scale(.955);
+  box-shadow: 0 2px 8px rgba(22,22,28,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .app-card:hover .app-icon {
+  transform: translateY(-2px);
+}
+html[data-theme="liquid-glass"] body.maomao-home .page-dots .dot { background: rgba(65,65,72,.24) !important; }
+html[data-theme="liquid-glass"] body.maomao-home .page-dots .dot.active {
+  background: rgba(255,255,255,.9) !important;
+  box-shadow: 0 1px 5px rgba(30,30,36,.12);
+}
+
+/* Settings, forms and common app surfaces share the material without flattening content. */
+html[data-theme="liquid-glass"] .header {
+  background: transparent !important;
+}
+html[data-theme="liquid-glass"] .header-title,
+html[data-theme="liquid-glass"] .row-title,
+html[data-theme="liquid-glass"] .menu-title,
+html[data-theme="liquid-glass"] .group-title {
+  color: var(--lg-ink);
+}
+html[data-theme="liquid-glass"] .row,
+html[data-theme="liquid-glass"] .menu-row {
+  border-bottom-color: rgba(255,255,255,.64) !important;
+}
+html[data-theme="liquid-glass"] .row-icon,
+html[data-theme="liquid-glass"] .menu-icon,
+html[data-theme="liquid-glass"] .icon-btn {
+  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(238,238,243,.38)) !important;
+  border: 1px solid rgba(255,255,255,.86) !important;
+  box-shadow: 0 3px 10px rgba(30,30,36,.055), inset 0 1px 0 rgba(255,255,255,.95) !important;
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+html[data-theme="liquid-glass"] textarea,
+html[data-theme="liquid-glass"] select {
+  color: var(--lg-ink) !important;
+  background: rgba(255,255,255,.52) !important;
+  border-color: rgba(255,255,255,.86) !important;
+  box-shadow: inset 0 1px 3px rgba(35,35,40,.035), 0 1px 0 rgba(255,255,255,.76) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(14px) !important;
+}
+html[data-theme="liquid-glass"] .btn-secondary,
+html[data-theme="liquid-glass"] .secondary-btn,
+html[data-theme="liquid-glass"] .icon-button {
+  background: rgba(255,255,255,.55) !important;
+  color: var(--lg-ink) !important;
+  border: 1px solid rgba(255,255,255,.86) !important;
+  box-shadow: 0 4px 13px rgba(31,31,37,.055), inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+html[data-theme="liquid-glass"] .btn-primary,
+html[data-theme="liquid-glass"] .btn-save,
+html[data-theme="liquid-glass"] .primary-btn {
+  background: linear-gradient(145deg, rgba(48,48,53,.94), rgba(20,20,23,.98)) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.36) !important;
+  box-shadow: 0 6px 16px rgba(24,24,28,.18), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+html[data-theme="liquid-glass"] .toast {
+  background: rgba(35,35,40,.82) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  box-shadow: 0 8px 24px rgba(20,20,24,.15) !important;
+}
+
+/* Prefer a stable opaque fallback on browsers without background filtering. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar,
+  html[data-theme="liquid-glass"] .floating-nav,
+  html[data-theme="liquid-glass"] section.card,
+  html[data-theme="liquid-glass"] .card,
+  html[data-theme="liquid-glass"] .customize-panel,
+  html[data-theme="liquid-glass"] .modal,
+  html[data-theme="liquid-glass"] [role="dialog"] {
+    background-color: rgba(247,247,250,.94) !important;
+  }
+}
+@media (max-width: 480px) {
+  html[data-theme="liquid-glass"] .phone {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="liquid-glass"] .app-icon,
+  html[data-theme="liquid-glass"] .nav-tab {
+    transition: none !important;
+  }
+}
+
+/* Home-screen frame only. Home widgets and photo widget keep their original layout/style. */
+html[data-theme="liquid-glass"] body.maomao-home {
+  background: #dedee3 !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .phone-screen,
+html[data-theme="liquid-glass"] body.maomao-home .pages-container,
+html[data-theme="liquid-glass"] body.maomao-home .home-page,
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid,
+html[data-theme="liquid-glass"] body.maomao-home .dock-wrapper {
+  background-color: transparent !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .phone-screen { isolation: isolate; }
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar {
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-dock-fill-alpha, .12)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-dock-highlight-alpha, .2)),
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-fill-alpha, .12)) 55%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-shadow-alpha, .05))
+  ) !important;
+  border: 1px solid rgba(255,255,255,.9) !important;
+  border-radius: 30px !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  box-shadow: 0 16px 34px rgba(21,21,27,.13), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.48) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .gesture-bar {
+  background: rgba(28,28,32,.62) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.45);
+}
+html[data-theme="liquid-glass"] body.maomao-home .status-bar { text-shadow: 0 1px 1px rgba(255,255,255,.4); }
+html[data-theme="liquid-glass"] body.maomao-home .edit-done-btn {
+  background: rgba(248,248,251,.65) !important;
+  color: #222226 !important;
+  border: 1px solid rgba(255,255,255,.9) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.8) !important;
+  backdrop-filter: blur(22px) saturate(1.8) !important;
+  box-shadow: 0 5px 15px rgba(20,20,26,.10), inset 0 1px 0 white !important;
+}
+
+/* ===== Pop-up Liquid Glass control sheet ===== */
+.lg-controls-backdrop {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: rgba(22,22,28,.20);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.lg-controls-backdrop.open {
+  display: flex;
+  animation: lgBackdropIn .22s ease both;
+}
+.lg-controls-sheet {
+  width: min(100%, 460px);
+  max-height: min(86dvh, 780px);
+  overflow-y: auto;
+  border-radius: 30px;
+  padding: 10px 20px 18px;
+  color: #29292E;
+  background: rgba(246,246,250,.78);
+  background-image: linear-gradient(145deg, rgba(255,255,255,.91), rgba(241,241,246,.68) 58%, rgba(231,231,237,.64));
+  border: 1px solid rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(34px) saturate(1.7) contrast(1.04);
+  backdrop-filter: blur(34px) saturate(1.7) contrast(1.04);
+  box-shadow: 0 24px 80px rgba(16,16,22,.24), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.5);
+  animation: lgSheetRise .34s cubic-bezier(.2,.8,.2,1) both;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+.lg-sheet-grabber {
+  width: 37px;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(75,75,83,.23);
+  margin: 2px auto 15px;
+}
+.lg-controls-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.lg-eyebrow {
+  font-size: 9px;
+  letter-spacing: .18em;
+  font-weight: 650;
+  color: #8A8A92;
+  margin-bottom: 5px;
+}
+.lg-controls-header h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  margin: 0;
+}
+.lg-controls-header p {
+  font-size: 12px;
+  color: #777780;
+  margin: 7px 0 0;
+}
+.lg-close-button {
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(255,255,255,.96);
+  border-radius: 50%;
+  background: rgba(255,255,255,.58);
+  color: #404047;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex: 0 0 auto;
+  box-shadow: 0 2px 8px rgba(20,20,26,.06), inset 0 1px 0 #fff;
+}
+.lg-glass-preview {
+  --preview-glass-alpha: .26;
+  --preview-glass-blur: 28px;
+  --preview-glass-tint-rgb: 214,215,222;
+  position: relative;
+  height: 126px;
+  overflow: hidden;
+  border-radius: 23px;
+  margin: 0 0 19px;
+  background:
+    radial-gradient(ellipse at 14% 10%, rgba(255,255,255,.94), transparent 40%),
+    radial-gradient(ellipse at 84% 74%, rgba(178,179,188,.92), transparent 32%),
+    linear-gradient(135deg, #d6d6dc, #f8f8fa 43%, #aeb0b8);
+  border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 8px 18px rgba(30,30,36,.10), inset 0 1px 0 #fff;
+}
+.lg-preview-wallpaper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 1px, transparent 1px 7px),
+    radial-gradient(circle at 18% 70%, rgba(255,255,255,.75), transparent 26%),
+    linear-gradient(135deg, #d8d8de 0%, #f9f9fb 46%, #b4b5bd 100%);
+}
+.lg-preview-orb {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.52);
+}
+.lg-preview-orb-a {
+  width: 118px; height: 118px; right: -7px; top: -37px;
+  background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.9), rgba(184,185,194,.3) 57%, rgba(255,255,255,.1));
+  box-shadow: inset 0 2px 5px rgba(255,255,255,.76), 0 9px 25px rgba(50,50,58,.12);
+}
+.lg-preview-orb-b {
+  width: 76px; height: 76px; left: 28px; bottom: -33px;
+  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.9), rgba(190,190,198,.12) 70%);
+  box-shadow: inset 0 1px 4px #fff;
+}
+.lg-preview-line {
+  position: absolute; left: 0; right: 0; top: 56%;
+  border-top: 1px solid rgba(255,255,255,.55);
+  transform: rotate(-8deg);
+}
+.lg-preview-type {
+  position: absolute; left: 14px; top: 13px;
+  color: rgba(40,40,46,.38);
+  font-size: 9px; line-height: 1.25; letter-spacing: .2em;
+}
+.lg-preview-type b { font-size: 26px; letter-spacing: -.06em; }
+.lg-preview-surface {
+  position: absolute;
+  left: 15%;
+  right: 8%;
+  bottom: 13px;
+  min-height: 49px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 13px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.94);
+  background: linear-gradient(145deg, rgba(255,255,255,calc(var(--preview-glass-alpha) + .34)), rgba(var(--preview-glass-tint-rgb),var(--preview-glass-alpha)) 55%, rgba(var(--preview-glass-tint-rgb),calc(var(--preview-glass-alpha) * .65)));
+  -webkit-backdrop-filter: blur(var(--preview-glass-blur)) saturate(1.8) contrast(1.08);
+  backdrop-filter: blur(var(--preview-glass-blur)) saturate(1.8) contrast(1.08);
+  box-shadow: 0 8px 17px rgba(20,20,26,.1), inset 0 1px 0 rgba(255,255,255,.99), inset 0 -1px 0 rgba(255,255,255,.38);
+}
+.lg-preview-surface span { font-size: 8px; letter-spacing: .21em; color: rgba(45,45,51,.58); }
+.lg-preview-surface strong { font-size: 14px; font-weight: 550; color: rgba(38,38,44,.9); letter-spacing: -.02em; }
+.lg-preview-surface i {
+  position: absolute; top: 2px; left: 20%; right: 20%;
+  height: 1px; border-radius: 50%; background: rgba(255,255,255,.98);
+  box-shadow: 0 0 8px rgba(255,255,255,.4);
+}
+.lg-control-group {
+  padding: 0 1px;
+  margin: 0 0 17px;
+}
+.lg-control-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  color: #3C3C43;
+  font-size: 13px;
+  font-weight: 560;
+}
+.lg-control-label output {
+  color: #777780;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.lg-muted-label { color: #9999A1; font-size: 9px; letter-spacing: .14em; font-weight: 600; }
+.lg-range {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  height: 25px;
+  margin: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+  touch-action: pan-y;
+}
+.lg-range::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #34343A 0%, #A3A3AB 48%, #E0E0E6 100%);
+  box-shadow: inset 0 1px 1px rgba(20,20,26,.12);
+}
+.lg-range::-moz-range-track {
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #34343A 0%, #A3A3AB 48%, #E0E0E6 100%);
+}
+.lg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 19px; height: 19px;
+  margin-top: -7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.98);
+  background: radial-gradient(circle at 32% 24%, #fff, #f4f4f7 56%, #d5d5dc);
+  box-shadow: 0 2px 6px rgba(25,25,31,.2), inset 0 1px 0 #fff;
+}
+.lg-range::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.98);
+  background: radial-gradient(circle at 32% 24%, #fff, #f4f4f7 56%, #d5d5dc);
+  box-shadow: 0 2px 6px rgba(25,25,31,.2), inset 0 1px 0 #fff;
+}
+.lg-range-captions {
+  display: flex;
+  justify-content: space-between;
+  color: #9A9AA2;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.lg-tint-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.lg-tint-option {
+  min-width: 0;
+  padding: 7px 1px 8px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #65656D;
+  font-size: 9px;
+  white-space: nowrap;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.lg-tint-option.selected {
+  background: rgba(255,255,255,.64);
+  border-color: rgba(255,255,255,.98);
+  box-shadow: 0 3px 9px rgba(22,22,28,.055), inset 0 1px 0 #fff;
+  color: #25252A;
+}
+.lg-tint-option:active { transform: scale(.96); }
+.lg-tint-swatch {
+  width: 29px; height: 29px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 28% 22%, #fff, var(--lg-swatch) 65%, #B8B8C0 100%);
+  border: 1px solid rgba(255,255,255,.98);
+  box-shadow: 0 2px 5px rgba(25,25,31,.12), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.lg-controls-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.lg-reset-button,
+.lg-done-button {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.94);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform .16s ease;
+}
+.lg-reset-button:active,
+.lg-done-button:active { transform: scale(.98); }
+.lg-reset-button {
+  color: #55555D;
+  background: rgba(255,255,255,.48);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.lg-done-button {
+  color: #fff;
+  background: linear-gradient(145deg, #414148, #19191E);
+  box-shadow: 0 5px 13px rgba(27,27,33,.14), inset 0 1px 0 rgba(255,255,255,.2);
+}
+@keyframes lgBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lgSheetRise {
+  from { opacity: .5; transform: translateY(34px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 480px) {
+  .lg-controls-backdrop { padding-left: 0; padding-right: 0; }
+  .lg-controls-sheet { border-radius: 30px 30px 0 0; padding-bottom: calc(17px + env(safe-area-inset-bottom, 0px)); max-height: 88dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lg-controls-backdrop.open, .lg-controls-sheet { animation: none !important; }
+}
+
+
+
+/* The customization sheet itself uses glass; unrelated home widgets are deliberately not rethemed. */
+html[data-theme="liquid-glass"] .lg-controls-sheet {
+  border: 1px solid rgba(255,255,255,.96);
+}
+
+
+/* iOS-like icon picker: this sheet previews APP ICONS, not widgets. */
+.lg-controls-sheet { color: #28282E; }
+.lg-glass-preview {
+  height: 142px;
+  margin-bottom: 17px;
+  background: #dadbe1;
+}
+.lg-preview-wallpaper {
+  background:
+    radial-gradient(ellipse at 22% 20%, rgba(255,255,255,.94), transparent 36%),
+    radial-gradient(ellipse at 78% 72%, rgba(168,169,179,.82), transparent 31%),
+    repeating-linear-gradient(132deg, rgba(255,255,255,.16) 0 1px, transparent 1px 8px),
+    linear-gradient(135deg, #d0d1d8 0%, #f7f7fa 47%, #b6b7c0 100%);
+}
+.lg-preview-orb-a {
+  width: 104px;
+  height: 104px;
+  right: -12px;
+  top: -39px;
+}
+.lg-preview-orb-b {
+  width: 80px;
+  height: 80px;
+  left: 20px;
+  bottom: -42px;
+}
+.lg-preview-apps {
+  position: absolute;
+  z-index: 2;
+  inset: 19px 17px 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.lg-preview-icon,
+.lg-preview-dock-icon {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  flex: 0 0 43px;
+  width: 43px;
+  height: 43px;
+  overflow: hidden;
+  border-radius: 13px;
+  border: 1px solid rgba(255,255,255,.9);
+  background-color: rgba(var(--preview-glass-tint-rgb, 214,215,222),var(--preview-icon-fill-alpha,.095));
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--preview-icon-highlight-alpha,.21)),
+    rgba(var(--preview-glass-tint-rgb, 214,215,222),var(--preview-icon-fill-alpha,.095)) 55%,
+    rgba(var(--preview-glass-tint-rgb, 214,215,222),.018)
+  );
+  -webkit-backdrop-filter: blur(var(--preview-glass-blur,24px)) saturate(1.8);
+  backdrop-filter: blur(var(--preview-glass-blur,24px)) saturate(1.8);
+  box-shadow: 0 4px 9px rgba(25,25,31,.08), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.lg-preview-icon i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid rgba(44,44,50,.78);
+  border-radius: 4px;
+  transform: translate(-50%,-50%);
+}
+.lg-preview-icon-a i { border-radius: 50%; }
+.lg-preview-icon-b i { width: 16px; height: 11px; border-radius: 3px; }
+.lg-preview-icon-c i { width: 17px; height: 16px; border-radius: 50% 50% 5px 5px; }
+.lg-preview-icon-d i { width: 13px; height: 18px; border-radius: 3px; }
+.lg-preview-dock {
+  position: absolute;
+  z-index: 3;
+  left: 12px;
+  right: 12px;
+  bottom: 9px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 8px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.94);
+  background: rgba(255,255,255,.12);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  backdrop-filter: blur(24px) saturate(1.8);
+  box-shadow: 0 4px 12px rgba(28,28,34,.08), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.lg-preview-dock-icon {
+  flex-basis: 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.lg-glass-preview[data-icon-style="default"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="default"] .lg-preview-dock-icon {
+  background: rgba(249,249,251,.9);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-dock-icon {
+  background: rgba(36,36,42,var(--preview-icon-dark-alpha,.35));
+  background-image: linear-gradient(145deg, rgba(255,255,255,.14), rgba(36,36,42,var(--preview-icon-dark-alpha,.35)));
+}
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-icon i { border-color: rgba(255,255,255,.92); }
+.lg-glass-preview[data-icon-style="tinted"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="tinted"] .lg-preview-dock-icon {
+  background: rgba(var(--preview-glass-tint-rgb,214,215,222),var(--preview-icon-tint-alpha,.23));
+}
+.lg-preview-dock-icon { flex: 0 0 26px; }
+
+.lg-style-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 7px;
+}
+.lg-style-option {
+  min-width: 0;
+  padding: 8px 2px 7px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: rgba(255,255,255,.24);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #696971;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.lg-style-option.selected {
+  background: rgba(255,255,255,.68);
+  border-color: rgba(255,255,255,.98);
+  color: #242429;
+  box-shadow: 0 3px 10px rgba(22,22,28,.07), inset 0 1px 0 #fff;
+}
+.lg-style-option:active { transform: scale(.97); }
+.lg-style-option strong { font-size: 11px; font-weight: 650; line-height: 1.1; }
+.lg-style-option small { font-size: 8px; color: #92929A; line-height: 1.1; white-space: nowrap; }
+.lg-style-icon {
+  position: relative;
+  width: 44px;
+  height: 35px;
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.96);
+  background: linear-gradient(135deg,#eeeeF2,#cdced6);
+}
+.lg-style-icon i {
+  position: absolute;
+  top: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.86);
+}
+.lg-style-icon i:nth-child(1) { left: 5px; }
+.lg-style-icon i:nth-child(2) { left: 17px; }
+.lg-style-icon i:nth-child(3) { left: 29px; }
+.lg-style-icon-default i { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.lg-style-icon-dark { background: linear-gradient(135deg,#72727c,#28282f); }
+.lg-style-icon-dark i { background: rgba(35,35,42,.38); border-color: rgba(255,255,255,.62); }
+.lg-style-icon-clear i { background: rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.92); }
+.lg-style-icon-tinted { background: linear-gradient(135deg,#c7c8d0,#f4f4f6 55%,#bfc0c9); }
+.lg-style-icon-tinted i { background: rgba(209,210,218,.58); }

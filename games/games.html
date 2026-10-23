@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>游戏 · MAOMAO</title>
+<title>游戏大厅</title>
 <script src="../shared/js/native-feel.js"></script>
 <script src="../shared/js/phone/phone_storage.js"></script>
 <script src="../shared/js/phone/phone_api.js"></script>
@@ -125,6 +125,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(min-width:600px){body{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #e5e5e5}.shell{padding-left:27px;padding-right:27px}.toast{bottom:35px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 
+
+.team-discussion-panel{margin-top:10px}.team-discussion-line{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:10px 0;border-top:1px solid #e3e3df}.team-discussion-index{font-family:var(--serif);font-size:14px;color:#999}.team-discussion-line strong{font-size:11px}.team-discussion-line p,.team-discussion-note,.team-discussion-loading{font-size:10px;line-height:1.7;color:#777;margin:4px 0 0}.team-discussion-note{color:#999;font-size:9px}/* Long-running detective team and AI case generator */
+.detective-team-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.detective-team-chip{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:9px;border:1px solid #e2e2de;background:#fff;color:#222}.detective-team-chip .role-avatar{grid-row:1/3;width:32px;height:32px}.detective-team-chip>span:not(.role-avatar){font-size:11px;font-weight:600}.detective-team-chip small{font-size:9px;color:#8a8a83}.detective-team-chip.selected{border-color:#222;background:#f4f4f2}.team-caption{font-size:10px;line-height:1.7;color:#777;margin:9px 0 18px}.case-ai-create{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;margin:10px 0 16px;border-top:1px solid #e4e4e0;border-bottom:1px solid #e4e4e0}.case-ai-create>div{min-width:0}.case-ai-create strong{font-size:10px;letter-spacing:.08em}.case-ai-create p{font-size:9px;line-height:1.6;color:#92928b;margin:5px 0 0;max-width:250px}.case-ai-create button{flex-shrink:0}.detective-livebar{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px;border-bottom:1px solid #e5e5e0;margin-bottom:8px}.detective-livebar>div{display:flex;flex-direction:column;gap:5px}.detective-livebar .panel-kicker{margin:0}.detective-livebar strong{font-size:12px;font-weight:600}.live-dot{width:7px;height:7px;border-radius:50%;background:#555;box-shadow:0 0 0 4px #ededeb;animation:detectivePulseDot 2s ease-in-out infinite}.detective-livefeed{display:grid;gap:0;margin-bottom:14px}.livefeed-item{display:grid;grid-template-columns:38px 1fr;gap:8px;padding:9px 0;border-bottom:1px solid #efefec}.livefeed-time{font-size:8px;letter-spacing:.05em;color:#999;padding-top:2px;font-variant-numeric:tabular-nums}.livefeed-item p{margin:0;font-size:10px;line-height:1.7;color:#686862;overflow-wrap:anywhere}.livefeed-enter{animation:detectiveFeedIn .28s ease-out both}.detective-progress{margin:-4px 0 16px}.detective-progress-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:9px;color:#888}.detective-progress-head strong{color:#333;font-weight:500}.detective-progress-track{height:3px;background:#ededeb;overflow:hidden}.detective-progress-track span{display:block;width:0;height:100%;background:#222;transition:width .45s cubic-bezier(.2,.7,.2,1)}@keyframes detectiveFeedIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes detectivePulseDot{0%,100%{opacity:.55;box-shadow:0 0 0 3px #ededeb}50%{opacity:1;box-shadow:0 0 0 5px #e4e4e1}}@media(prefers-reduced-motion:reduce){.live-dot,.livefeed-enter{animation:none}.detective-progress-track span{transition:none}}
+.detective-toolkit{margin:14px 0 16px;padding:12px;border:1px solid #e4e4df;background:#fafaf8}.detective-toolkit-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.detective-toolkit-head strong{font-size:11px}.detective-toolkit-head span{font-size:8px;letter-spacing:.12em;color:#999}.detective-tool-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.detective-tool-buttons button{min-height:35px;border:1px solid #e1e1dc;background:#fff;text-align:left;padding:8px 9px;font-size:10px;color:#333}.detective-tool-buttons button:active{background:#ecece8}.detective-tool-note{font-size:9px;line-height:1.6;color:#8a8a83;margin-top:9px}.case-team-presence{padding:12px;background:#f6f6f4;margin:14px 0}.case-team-avatars{display:flex;flex-wrap:wrap;gap:12px;margin-top:9px}.case-team-member{display:flex;align-items:center;gap:5px}.case-team-member .role-avatar{width:27px;height:27px}.case-team-member small{font-size:10px}.case-team-presence p{font-size:10px;line-height:1.7;color:#777;margin:10px 0 0}
+/* Detective bureau: layered case workflow */
+.case-progress-strip{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid #e5e5e1;border-bottom:1px solid #e5e5e1;margin:14px 0;font-size:11px;color:#777770}.case-progress-strip strong{color:#111;font-weight:600}.case-archive-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:18px}.case-archive-heading .panel-kicker{margin:0}.case-archive-count{font-size:9px;color:#999}.case-archive-list{display:grid;gap:8px}.case-archive-hidden{display:none!important}.case-archive-list.expanded .case-archive-hidden{display:flex!important}.case-archive-more{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;margin-top:10px;background:#f7f7f5;border:1px solid #e5e5e1;color:#292925;font-size:11px;transition:background .2s}.case-archive-more span{font-family:var(--serif);font-size:16px}.case-archive-more:active{background:#ecece8}.case-archive-item{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:14px;border:1px solid #e2e2de;background:#fff;color:#20201d;transition:background .18s,border-color .18s}.case-archive-item:active{background:#f3f3f1}.case-archive-item:disabled{opacity:.48}.case-archive-no{font-size:9px;letter-spacing:.15em;color:#8b8b84}.case-archive-item strong{font-size:15px;font-weight:600}.case-archive-desc{font-size:11px;line-height:1.65;color:#777770}.case-archive-status{align-self:flex-end;font-size:10px;color:#55554f}.case-nav-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.case-phase-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:18px 0 12px}.case-phase-track span{padding:8px 4px;border-bottom:1px solid #ddd;text-align:center;font-size:9px;color:#999991}.case-phase-track span.active,.case-phase-track span.complete{border-color:#111;color:#222}.interview-list{display:grid;gap:7px;margin-bottom:17px}.interview-item{display:grid;grid-template-columns:25px 1fr 12px;gap:8px;align-items:start;width:100%;text-align:left;background:#fff;border:1px solid #e2e2e2;padding:12px;color:#222}.interview-item.revealed{background:#f3f3f1;border-color:#cfcfc9}.interview-number{font-family:var(--serif);font-size:15px;color:#888}.interview-item strong{display:block;font-size:12px}.interview-item small{display:block;color:#888;font-size:10px;margin:3px 0 6px}.interview-text{display:block;font-size:11px;line-height:1.75;color:#696963}.interview-mark{font-size:12px;color:#777}.case-timeline{margin-top:15px;padding:14px;background:#f6f6f4;border:1px solid #e5e5e0}.timeline-row{padding:10px 0;border-top:1px solid #e2e2de}.timeline-row span{display:block;font-size:9px;color:#888;letter-spacing:.1em}.timeline-row strong{display:block;font-size:12px;margin-top:4px}.timeline-row p{font-size:11px;line-height:1.7;color:#777;margin:5px 0 0}
+
 /* Editorial polish: pure white canvas, neutral gray and sharp black accents */
 .spotlight{position:relative;overflow:hidden;background:#222220;color:#e8e6e0;padding:30px 25px 25px;margin:-7px 0 33px;cursor:pointer;outline-offset:4px;transition:background .2s}
 .spotlight:active{background:#2a2a28}
@@ -174,6 +181,158 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .quiz-result-caption{font-size:11px;color:#777;margin:9px 0 14px}
 @media(max-width:360px){.shell{padding-left:16px;padding-right:16px}.spotlight{padding:26px 20px 22px}.spotlight-title{font-size:30px}.games-list{gap:8px}.game-row{padding:12px 11px 0}.game-name{font-size:17px}.game-desc{font-size:9px}.memory-grid{gap:5px}.memory-card .memory-mark{font-size:24px}}
 
+
+/* Free-form investigation, generated NPCs and persistent campaign clues */
+.npc-note{font-size:10px;color:#777;line-height:1.7;margin:8px 0 0}
+.investigation-console{border:1px solid #deded9;padding:14px;margin:16px 0;background:#fafaf8}
+.investigation-log{display:grid;gap:10px;margin:12px 0}
+.investigation-entry{border-left:2px solid #b8b8b1;padding:7px 10px;background:#fff}
+.investigation-entry strong{font-size:11px}
+.investigation-entry p{font-size:11px;line-height:1.8;color:#555;margin:5px 0 0;white-space:pre-wrap}
+.investigation-entry small{font-size:9px;color:#999}
+.investigation-actions{display:grid;grid-template-columns:1fr auto;gap:7px}
+.investigation-actions input{min-width:0;height:42px;border:1px solid #ddd;background:#fff;padding:0 10px;font-size:12px}
+
+/* Detective immersive layout */
+body.detective-case-mode .hero,body.detective-case-mode .game-heading{display:none!important}
+body.detective-case-mode .shell{padding-top:10px}
+.case-nav-line{position:sticky;top:0;z-index:8;background:var(--case-paper,#fff);padding:7px 0 10px;display:flex;align-items:center;gap:8px}
+.case-nav-line .game-code{margin-left:auto;font-size:10px}
+.case-theme-toggle{border:1px solid var(--case-line,#ddd);background:var(--case-soft,#f5f5f5);color:var(--case-ink,#222);border-radius:99px;padding:6px 9px;font-size:10px}
+body.detective-case-mode{--case-paper:#fff;--case-ink:#171717;--case-muted:#777;--case-line:#dedede;--case-soft:#f5f5f5}
+body.detective-case-mode[data-case-theme="warm"]{--case-paper:#f6f0e5;--case-ink:#29251f;--case-muted:#7d7468;--case-line:#d9cebd;--case-soft:#eee5d7}
+body.detective-case-mode[data-case-theme="black"]{--case-paper:#171717;--case-ink:#f3f3f0;--case-muted:#aaa9a3;--case-line:#41413e;--case-soft:#242422}
+body.detective-case-mode #gameContent,body.detective-case-mode .board-panel{background:var(--case-paper)!important;color:var(--case-ink)!important}
+body.detective-case-mode .board-panel{padding:14px!important;border-color:var(--case-line)!important}
+body.detective-case-mode .prompt-title{font-size:clamp(25px,7vw,32px);line-height:1.25;margin:8px 0;color:var(--case-ink)}
+body.detective-case-mode .prompt-copy{font-size:13px;line-height:1.85;color:var(--case-muted);overflow-wrap:anywhere}
+body.detective-case-mode .case-team-presence,body.detective-case-mode .investigation-console,body.detective-case-mode .detective-toolkit{background:var(--case-soft)!important;border-color:var(--case-line)!important;color:var(--case-ink)}
+body.detective-case-mode .case-team-presence p,body.detective-case-mode .livefeed-item p,body.detective-case-mode .investigation-entry p{font-size:12px;line-height:1.85;overflow-wrap:anywhere}
+body.detective-case-mode .investigation-log{gap:8px;margin:10px 0;max-height:340px;overflow:auto}
+body.detective-case-mode .investigation-entry{border-left:2px solid var(--case-muted);border-radius:0 8px 8px 0;padding:11px;background:var(--case-soft);color:var(--case-ink)}
+body.detective-case-mode .investigation-entry strong{font-size:12px;color:var(--case-ink)}
+body.detective-case-mode .investigation-entry p{font-size:12px;line-height:1.8;color:var(--case-ink)}
+body.detective-case-mode .role-avatar,body.detective-case-mode .case-team-member .role-avatar{width:32px;height:32px;min-width:32px;min-height:32px;aspect-ratio:1/1;flex:0 0 32px;border-radius:50%;overflow:hidden}
+body.detective-case-mode .role-avatar img,body.detective-case-mode .case-team-member img{width:100%;height:100%;aspect-ratio:1/1;object-fit:cover;object-position:center}
+body.detective-case-mode .detective-tool-buttons button{font-size:12px;min-height:42px;background:var(--case-paper);color:var(--case-ink);border-color:var(--case-line)}
+body.detective-case-mode .investigation-actions input{font-size:13px;background:var(--case-paper);color:var(--case-ink);border-color:var(--case-line);height:46px}
+body.detective-case-mode .evidence,body.detective-case-mode .interview-item{background:var(--case-paper);color:var(--case-ink);border-color:var(--case-line);border-radius:8px;padding:13px}
+body.detective-case-mode .case-phase-track span{font-size:11px;padding:11px 4px}
+
+
+/* Case notebook: keep actions, official notes, and testimony in separate spaces */
+.case-notebook{position:relative;margin:18px 0 14px;border:1px solid #d7d3c9;background:#fffdf8;box-shadow:0 5px 18px rgba(30,25,15,.06);overflow:hidden}
+.notebook-cover{position:relative;padding:16px 16px 13px 21px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,rgba(140,130,110,.10) 28px),#f8f5ec;border-bottom:1px solid #ded8cb}
+.notebook-cover:before{content:"";position:absolute;left:10px;top:0;bottom:0;width:1px;background:#d7bdb6}
+.notebook-kicker{display:block;font-size:9px;letter-spacing:.13em;color:#898174;margin-bottom:8px}
+.notebook-cover strong{display:block;font-family:var(--serif);font-size:23px;font-weight:400;letter-spacing:.04em;color:#26231f}
+.notebook-cover small{display:block;font-size:10px;color:#898174;margin-top:6px}
+.notebook-tabs{display:flex;gap:0;padding:0 12px;border-bottom:1px solid #e5e0d6;background:#f8f6f0}
+.notebook-tab{padding:10px 9px;font-size:10px;color:#999185;border-bottom:2px solid transparent}
+.notebook-tab.active{color:#302c26;border-bottom-color:#555047;font-weight:600}
+body.detective-case-mode[data-case-theme="black"] .case-notebook{background:#1e1e1c;border-color:#45443f}
+body.detective-case-mode[data-case-theme="black"] .notebook-cover{background:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,rgba(255,255,255,.04) 28px),#242421;border-color:#45443f}
+body.detective-case-mode[data-case-theme="black"] .notebook-cover strong,body.detective-case-mode[data-case-theme="black"] .investigation-entry strong{color:#f0eee8}
+body.detective-case-mode[data-case-theme="black"] .notebook-tabs{background:#20201e;border-color:#45443f}
+body.detective-case-mode[data-case-theme="black"] .notebook-tab.active{color:#f0eee8;border-color:#d0ccc2}
+.investigation-log{display:grid;gap:0;margin:0;max-height:380px;overflow:auto;background:linear-gradient(to right,transparent 0,transparent 29px,rgba(178,150,140,.22) 30px,transparent 31px);padding:8px 10px 12px}
+.investigation-entry{position:relative;border:0;border-bottom:1px dashed #ddd7cb;border-radius:0;background:transparent!important;padding:13px 8px 13px 34px;color:#292722}
+.investigation-entry:before{content:"";position:absolute;left:14px;top:18px;width:7px;height:7px;border:1px solid #aaa194;border-radius:50%;background:#f8f5ec}
+.investigation-entry strong{display:block;font-size:13px!important;line-height:1.5;margin:3px 0 5px}
+.investigation-entry p{font-size:12px!important;line-height:1.9!important;margin:0 0 7px!important;white-space:pre-wrap;overflow-wrap:anywhere}
+.investigation-entry small{font-size:10px!important;color:#928a7e!important}
+.record-index{display:inline-block;font-size:9px;letter-spacing:.08em;color:#8d8274}
+.investigation-action-desk{border:1px solid var(--case-line,#dedede);padding:13px;margin:14px 0;background:var(--case-soft,#f5f5f5)}
+.action-desk-title{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.action-desk-title strong{font-family:var(--serif);font-size:18px;font-weight:400}
+.investigation-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px}
+.investigation-actions input{min-width:0;height:46px;padding:0 11px;font-size:12px}
+.investigation-actions button{min-width:68px}
+body.detective-case-mode .investigation-console>.prompt-copy{font-size:12px;line-height:1.8;margin:12px 0;color:var(--case-muted)}
+body.detective-case-mode .detective-toolkit{margin-bottom:12px}
+body.detective-case-mode .case-notebook .investigation-entry p{color:var(--case-ink)}
+body.detective-case-mode[data-case-theme="warm"] .case-notebook{background:#fffdf8}
+
+
+/* Notebook tabs are real filters, not decorative labels */
+.notebook-tabs{display:flex;gap:4px;padding:0 10px;border-bottom:1px solid #e5e0d6;background:#f8f6f0}
+.notebook-tab{appearance:none;border:0;background:transparent;cursor:pointer;font:inherit;padding:11px 9px;font-size:10px;color:#928a7e;border-bottom:2px solid transparent}
+.notebook-tab.active{color:#302c26;border-bottom-color:#555047;font-weight:600}
+body.detective-case-mode[data-case-theme="black"] .notebook-tabs{background:#20201e;border-color:#45443f}
+body.detective-case-mode[data-case-theme="black"] .notebook-tab{color:#aaa9a3}
+body.detective-case-mode[data-case-theme="black"] .notebook-tab.active{color:#f0eee8;border-color:#d0ccc2}
+.investigation-entry[hidden]{display:none!important}
+.case-team-presence>p{max-width:38em;font-size:12px;line-height:1.8}
+.team-discussion-panel{display:grid;gap:8px}
+
+
+/* Dedicated case views and interrogation modal */
+.case-section-nav{position:sticky;bottom:0;z-index:9;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;margin:14px -2px 0;padding:7px;background:var(--case-paper,#fff);border-top:1px solid var(--case-line,#ddd);box-shadow:0 -5px 16px rgba(0,0,0,.04)}
+.case-section-nav button{border:0;background:transparent;color:var(--case-muted,#777);font-size:11px;padding:11px 2px;border-radius:6px}
+.case-section-nav button.active{background:var(--case-soft,#f3f3f3);color:var(--case-ink,#171717);font-weight:600}
+.case-interrogation-modal[hidden]{display:none!important}
+.case-interrogation-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center}
+.case-modal-scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px)}
+.case-modal-sheet{position:relative;width:min(100%,680px);max-height:92dvh;overflow:auto;background:var(--case-paper,#fff);color:var(--case-ink,#171717);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 50px rgba(0,0,0,.18);animation:caseSheetIn .22s ease-out}
+.case-modal-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--case-line,#ddd);padding-bottom:13px;margin-bottom:14px}
+.case-modal-head h2{font-family:var(--serif);font-size:25px;font-weight:400;margin:5px 0 0}
+.case-modal-close{border:1px solid var(--case-line,#ddd);border-radius:50%;width:36px;height:36px;background:transparent;color:inherit;font-size:23px}
+.case-modal-columns{display:grid;grid-template-columns:1fr;gap:12px}
+.case-modal-testimony{border:1px solid var(--case-line,#ddd);background:var(--case-soft,#f5f5f5);padding:14px;border-radius:10px}
+.case-modal-label{font-size:10px;letter-spacing:.08em;color:var(--case-muted,#777)}
+.case-modal-testimony h3{font-size:14px;margin:8px 0}
+.case-modal-testimony p{font-size:13px;line-height:1.9;margin:0}
+.case-modal-evidence{display:grid;gap:8px}
+.case-modal-evidence>[class="case-modal-label"]{margin-bottom:2px}
+.case-modal-evidence-card{display:grid;gap:5px;text-align:left;padding:12px;border:1px solid var(--case-line,#ddd);background:var(--case-paper,#fff);color:var(--case-ink,#171717);border-radius:9px}
+.case-modal-evidence-card span,.case-modal-evidence-card small{font-size:10px;color:var(--case-muted,#777)}
+.case-modal-evidence-card strong{font-size:13px}
+.case-modal-evidence-card small{font-size:12px;line-height:1.7}
+.case-modal-evidence-card.selected{border:2px solid var(--case-ink,#171717);background:var(--case-soft,#f5f5f5)}
+.case-modal-feedback{margin-top:12px;padding:12px;border-left:3px solid var(--case-muted,#888);background:var(--case-soft,#f5f5f5);font-size:12px;line-height:1.8}
+.case-modal-feedback p{margin:6px 0 0}
+.case-modal-empty{font-size:12px;line-height:1.8;color:var(--case-muted,#777)}
+.case-modal-foot{display:flex;justify-content:flex-end;margin-top:12px}
+body.case-modal-open{overflow:hidden}
+@keyframes caseSheetIn{from{transform:translateY(24px);opacity:.7}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){.case-interrogation-modal{align-items:center;padding:20px}.case-modal-sheet{border-radius:16px;max-height:88dvh}.case-modal-columns{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}}
+@media(prefers-reduced-motion:reduce){.case-modal-sheet{animation:none}}
+
+
+/* Editorial detective desk refresh */
+body.detective-case-mode .case-nav-line{padding:4px 0 10px;margin-bottom:10px;border-bottom:1px solid #d8d8d4}
+body.detective-case-mode .case-nav-line .game-code{font-size:9px;letter-spacing:.16em;color:#777}
+body.detective-case-mode .board-panel{border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important}
+body.detective-case-mode .board-panel>.panel-kicker{font-size:9px;letter-spacing:.2em;color:#777;margin:12px 0 6px}
+body.detective-case-mode .board-panel>.prompt-title{font-size:clamp(27px,7vw,36px);line-height:1.2;letter-spacing:-.035em;margin:0 0 8px}
+body.detective-case-mode .board-panel>.prompt-copy{font-size:12px;line-height:1.85;color:#666;margin:0 0 15px;max-width:38em}
+body.detective-case-mode .case-team-presence{background:#f7f7f5;border:1px solid #e3e3df;padding:13px;margin:12px 0}
+body.detective-case-mode .detective-livefeed{background:#fff;border:1px solid #e3e3df;padding:10px 12px}
+body.detective-case-mode .detective-toolkit{background:#fff;border-color:#deded9}
+body.detective-case-mode .divider-label{font-size:10px;letter-spacing:.12em;color:#555;margin:17px 0 9px}
+body.detective-case-mode .evidence,body.detective-case-mode .interview-item{border:1px solid #deded9!important;background:#fff!important;border-radius:7px!important;box-shadow:none!important}
+body.detective-case-mode .evidence.revealed,body.detective-case-mode .interview-item.revealed{border-color:#999!important;background:#f7f7f5!important}
+body.detective-case-mode .case-section-nav{background:rgba(255,255,255,.96);border-top:1px solid #d9d9d5;box-shadow:0 -5px 18px rgba(0,0,0,.035)}
+body.detective-case-mode .case-modal-evidence-card{width:100%;text-align:left;display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid #ddd;background:#fff;color:#222;border-radius:7px;margin:6px 0}
+body.detective-case-mode .case-modal-evidence-card.selected{border-color:#222;background:#f3f3f1;box-shadow:inset 3px 0 #222}
+body.detective-case-mode .case-modal-evidence-card span,body.detective-case-mode .case-modal-evidence-card small{font-size:10px;color:#777;line-height:1.6}
+body.detective-case-mode .case-modal-evidence-card strong{font-size:13px;font-weight:600}
+.case-cross-result{margin-top:10px;padding:11px;border-left:2px solid #777;background:#f5f5f3;font-size:12px;line-height:1.8}
+@media(prefers-reduced-motion:reduce){body.detective-case-mode .case-modal-sheet{animation:none}}
+
+/* Detective dossier: readable portraits, evidence-first interaction */
+body.detective-case-mode .role-avatar,body.detective-case-mode .case-team-member .role-avatar{width:36px;height:36px;min-width:36px;flex:0 0 36px;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:#e7e7e3;outline:1px solid #d6d6d1;outline-offset:2px}
+body.detective-case-mode .role-avatar img{width:100%;height:100%;aspect-ratio:1/1;object-fit:cover;object-position:center;display:block}
+body.detective-case-mode .case-team-avatars{gap:15px;align-items:flex-start}
+body.detective-case-mode .case-team-member{gap:8px}
+body.detective-case-mode .case-modal-columns{gap:10px}
+body.detective-case-mode .case-modal-testimony,body.detective-case-mode .case-modal-evidence{min-width:0;border:1px solid #deded9;background:#fff;padding:12px;border-radius:6px}
+body.detective-case-mode .case-modal-testimony p{font-size:12px;line-height:1.85;color:#383833}
+body.detective-case-mode .case-modal-evidence-card{transition:background .18s,border-color .18s,transform .18s}
+body.detective-case-mode .case-modal-evidence-card:active{transform:scale(.99)}
+body.detective-case-mode .case-modal-evidence-card.selected{background:#f1f1ee;border-color:#333}
+body.detective-case-mode .case-modal-feedback{font-size:12px;line-height:1.8;color:#555}
+@media(max-width:420px){body.detective-case-mode .case-modal-columns{grid-template-columns:1fr}body.detective-case-mode .case-team-avatars{gap:12px}}
 </style>
 
 <style id="maomao-editorial-controls">
@@ -227,6 +386,105 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
 .gtab-panel.active{display:block}
 .gtab-panel .spotlight{margin:0 0 33px}
 </style>
+<style id="compact-game-hall">
+/* Compact lobby: recommendation, partner and all six playable games share one page. */
+.shell{padding:calc(8px + env(safe-area-inset-top)) 19px calc(20px + env(safe-area-inset-bottom))!important}
+.topline{margin-bottom:13px!important}
+.wordmark{font-size:10px!important;letter-spacing:.13em!important;color:#777!important;font-weight:500!important}
+.header-kicker{font-size:8px!important;letter-spacing:.15em!important;margin-bottom:7px!important}
+.hero-title{font-size:clamp(31px,8.5vw,40px)!important;line-height:1!important;letter-spacing:-.065em!important;max-width:none!important}
+.hero-title br{display:none}
+.hero-copy{display:none!important}
+.hero-meta{gap:0!important;padding:11px 0!important;margin:12px 0 15px!important}
+.meta-item{flex:1;padding-left:12px;border-left:1px solid #e5e5e5}
+.meta-item:first-child{padding-left:0;border-left:0}
+.meta-number{font-size:19px!important}
+.meta-label{font-size:9px!important}
+.game-tabs{display:none!important}
+.gtab-panel,.gtab-panel.active{display:block!important}
+#lobbyView .gtab-panel[data-gtab-panel="partner"]{display:block!important;visibility:visible!important;opacity:1!important}
+#lobbyView .gtab-panel[data-gtab-panel="partner"] .role-area{display:block!important}
+.gtab-panel .spotlight{margin:0 0 16px!important}
+.spotlight{padding:13px 14px 12px!important;background:#f7f7f6!important;color:#171717!important;border:0!important;border-top:1px solid #171717!important;border-bottom:1px solid #dedede!important;cursor:pointer}
+.spotlight-top{font-size:8px!important;color:#8c8c8c!important;letter-spacing:.14em!important}
+.spotlight-status{color:#686868!important;font-size:9px}
+.spotlight-status i{background:#777!important}
+.spotlight-title{font-size:clamp(22px,6.3vw,27px)!important;line-height:1.15!important;letter-spacing:-.05em!important;margin:12px 0 5px!important;max-width:none!important;color:#171717!important}
+.spotlight-copy{font-size:10px!important;line-height:1.6!important;color:#737373!important;max-width:none!important;margin:0 0 10px!important}
+.spotlight-bottom{border-top:1px solid #e0e0e0!important;padding-top:9px!important;font-size:9px!important;color:#666!important}
+.spotlight-bottom b{color:#aaa!important}
+.spotlight-cta{font-size:10px!important;color:#222!important;border-bottom:1px solid #aaa;padding-bottom:3px}
+.spotlight-cta span{display:none!important}
+.role-area{margin-bottom:17px!important}
+.section-head{align-items:center!important;margin-bottom:7px!important}
+.section-eyebrow{font-size:8px!important;letter-spacing:.15em!important;margin-bottom:3px!important}
+.section-title{font-size:14px!important;letter-spacing:-.025em!important}
+.micro-note{font-size:9px!important;white-space:nowrap}
+.role-rail{gap:14px!important;padding:4px 1px 7px!important}
+.role-chip{width:48px!important;gap:5px!important}
+.role-chip .role-avatar{width:36px!important;height:36px!important;flex-basis:36px!important;outline-offset:2px!important}
+.role-chip-name{max-width:48px!important;font-size:9px!important}
+.gtab-panel[data-gtab-panel="games"] .section-head{padding-top:8px;margin-bottom:5px!important;border-top:1px solid #171717}
+.gtab-panel[data-gtab-panel="games"] .section-eyebrow{margin-top:9px}
+.games-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 14px!important;padding-top:0!important;border-top:0!important}
+.game-row{padding:9px 0 8px!important;border:0!important;border-bottom:1px solid #e5e5e5!important;background:transparent!important;min-height:0!important;cursor:pointer}
+.game-row:active{background:#fafafa!important}
+.game-topline{margin-bottom:6px!important;height:16px}
+.game-symbol svg{width:17px!important;height:17px!important}
+.game-index{font-size:8px!important}
+.game-tag{font-size:7px!important;letter-spacing:.13em!important;margin-bottom:4px!important;color:#999!important}
+.game-name{font-size:16px!important;letter-spacing:-.025em!important;margin-bottom:4px!important}
+.game-desc{-webkit-line-clamp:1!important;font-size:9px!important;line-height:1.45!important;margin:0 0 2px!important;color:#7c7c7c!important}
+.game-record{padding:4px 0 0!important;margin-top:3px!important;border-top:0!important;font-size:8px!important;color:#aaa!important}
+.bottom-note{margin-top:14px!important;padding-top:10px!important;font-size:8px!important}
+@media(max-width:380px){
+ .shell{padding-left:16px!important;padding-right:16px!important}
+ .spotlight{padding:11px 12px 10px!important}
+ .spotlight-title{font-size:22px!important}
+ .games-list{gap:0 10px!important}
+ .game-name{font-size:15px!important}
+ .game-desc{font-size:8px!important}
+}
+@media(prefers-reduced-motion:reduce){.game-row,.spotlight,.role-chip{transition:none!important}}
+</style>
+<style id="game-partner-editorial-style">
+/* No avatar carousel: the current companion is an editorial feature; alternatives stay hidden until requested. */
+.role-area{margin-bottom:15px!important}
+.role-rail{display:block!important;overflow:visible!important;padding:0!important;gap:0!important}
+.partner-feature{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:14px;align-items:stretch;padding:10px 0 12px;border-top:1px solid #171717;border-bottom:1px solid #dedede}
+.partner-feature-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.partner-feature-kicker{font-size:7px;letter-spacing:.15em;color:#999;margin:2px 0 10px}
+.partner-feature-name{font:400 clamp(23px,6vw,29px)/1.12 var(--serif);letter-spacing:-.05em;overflow-wrap:anywhere;color:#171717}
+.partner-feature-bio{font-size:9px;line-height:1.65;color:#777;margin-top:6px;max-width:240px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.partner-feature-record{display:flex;align-items:center;gap:7px;margin-top:auto;padding-top:8px;font-size:8px;color:#8a8a8a}
+.partner-feature-sep{color:#d1d1d1}
+.partner-feature-portrait{width:78px;min-height:91px;background:#f4f4f3;display:flex;align-items:stretch;justify-content:center;overflow:hidden;align-self:stretch}
+.partner-feature-portrait .role-avatar{width:100%!important;height:100%!important;min-height:91px!important;flex:1 1 auto!important;display:grid!important;place-items:center;border-radius:0!important;outline:0!important;background:#f1f1f0!important;color:#777!important;font:400 32px/1 var(--serif)!important}
+.partner-feature-portrait .role-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);display:block}
+.partner-picker-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 10px}
+.partner-picker-hint{font-size:8px;color:#aaa}
+.partner-picker-toggle{border:0;border-bottom:1px solid #a5a5a5;border-radius:0;background:transparent;color:#555;font:italic 13px/1.2 var(--serif);padding:2px 0 5px;white-space:nowrap}
+.partner-picker-panel{border-top:1px solid #e5e5e5;padding:9px 0 3px;animation:partnerPanelIn .18s ease}
+.partner-picker-panel[hidden]{display:none!important}
+@keyframes partnerPanelIn{from{opacity:.35;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.partner-picker-panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px;color:#555;font-size:10px}
+.partner-picker-panel-head span+span{font-size:7px;letter-spacing:.14em;color:#aaa}
+.partner-picker-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:13px}
+.partner-picker-option{display:grid;grid-template-columns:17px 34px minmax(0,1fr);gap:7px;align-items:center;min-width:0;padding:9px 0;border:0;border-bottom:1px solid #e8e8e8;background:transparent;text-align:left;color:#222}
+.partner-picker-number{align-self:start;padding-top:4px;color:#b0b0b0;font:9px/1 var(--serif)}
+.partner-picker-portrait{width:34px;height:41px;background:#f1f1f0;display:block;overflow:hidden}
+.partner-picker-portrait .role-avatar{width:100%!important;height:100%!important;min-height:0!important;flex:1 1 auto!important;border-radius:0!important;outline:0!important;background:#f1f1f0!important;color:#777!important;font:400 15px/1 var(--serif)!important}
+.partner-picker-portrait .role-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%)}
+.partner-picker-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
+.partner-picker-copy strong{font-size:10px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.partner-picker-copy small{font-size:8px;color:#999}
+.partner-picker-option.selected .partner-picker-copy strong{font-weight:700}
+.partner-picker-option.selected .partner-picker-copy small{color:#222}
+.partner-picker-option.selected .partner-picker-number{color:#222}
+.partner-picker-option:active{background:#f8f8f7}
+@media(max-width:360px){.partner-feature{grid-template-columns:minmax(0,1fr) 66px;gap:10px}.partner-feature-portrait{width:66px}.partner-picker-grid{column-gap:9px}.partner-picker-option{grid-template-columns:14px 30px minmax(0,1fr);gap:5px}.partner-picker-portrait{width:30px;height:37px}.partner-picker-copy strong{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.partner-picker-panel{animation:none!important}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -234,7 +492,7 @@ button{transition:color .2s,background-color .2s,border-color .2s,transform .2s}
     <button class="back" id="backHome" aria-label="返回首页">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <div class="wordmark">MAOMAO / PLAYROOM</div>
+    <div class="wordmark">游戏空间</div>
     <div style="width:36px"></div>
   </div>
 
@@ -349,6 +607,7 @@ var byId=function(id){return document.getElementById(id);};
 var esc=function(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
 var roleList=[];
 var activeRole=null;
+var rolePickerOpen=false;
 var activeGame='';
 var roundNumber=1;
 var reactionSequence=0;
@@ -375,14 +634,23 @@ function avatarMarkup(r,extraClass){
   return '<span class="role-avatar '+(extraClass||'')+'" style="background:'+esc(roleColor(r))+'">'+(src?'<img src="'+esc(src)+'" alt="">':esc(roleName(r).slice(0,1) || '伴'))+'</span>';
 }
 function renderRoles(){
-  var html='';
-  roleList.forEach(function(r){
-    var isActive=String(r.id)===String(activeRole.id);
-    html+='<button class="role-chip '+(isActive?'active':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(isActive?'true':'false')+'">'+avatarMarkup(r,'')+'<span class="role-chip-name">'+esc(roleName(r))+'</span></button>';
-  });
-  byId('roleRail').innerHTML=html;
-  byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
   var st=statsFor(activeRole);
+  var currentIndex=Math.max(0,roleList.findIndex(function(r){return String(r.id)===String(activeRole&&activeRole.id);}));
+  var currentName=roleName(activeRole);
+  var currentBio=String((activeRole&&(activeRole.description||activeRole.bio||activeRole.personality||activeRole.character))||'一位陪你思考、合作和挑战的游戏搭档。').replace(/\\s+/g,' ').slice(0,56);
+  var summary='<span class="partner-feature-stat">'+pad(st.plays||0)+' 局</span><span class="partner-feature-sep">/</span><span class="partner-feature-stat">'+pad(st.wins||0)+' 胜</span>';
+  var html='<div class="partner-feature" id="game-partner-editorial"><div class="partner-feature-copy"><div class="partner-feature-kicker">CURRENT PARTNER / '+pad(currentIndex+1)+'</div><div class="partner-feature-name">'+esc(currentName)+'</div><div class="partner-feature-bio">'+esc(currentBio)+'</div><div class="partner-feature-record">'+summary+'</div></div><div class="partner-feature-portrait">'+avatarMarkup(activeRole,'')+'</div></div>';
+  html+='<div class="partner-picker-actions"><span class="partner-picker-hint">对局记录按角色分别保存</span><button type="button" class="partner-picker-toggle" id="togglePartnerPicker" aria-expanded="'+(rolePickerOpen?'true':'false')+'">'+(rolePickerOpen?'收起 −':'更换搭档 +')+'</button></div>';
+  html+='<div class="partner-picker-panel" '+(rolePickerOpen?'':'hidden')+'><div class="partner-picker-panel-head"><span>选择一位搭档</span><span>'+String(roleList.length).padStart(2,'0')+' CHARACTERS</span></div><div class="partner-picker-grid">';
+  roleList.forEach(function(r,i){
+    var selected=String(r.id)===String(activeRole&&activeRole.id);
+    html+='<button type="button" class="partner-picker-option '+(selected?'selected':'')+'" data-role="'+esc(r.id)+'" aria-pressed="'+(selected?'true':'false')+'"><span class="partner-picker-number">'+String(i+1).padStart(2,'0')+'</span><span class="partner-picker-portrait">'+avatarMarkup(r,'')+'</span><span class="partner-picker-copy"><strong>'+esc(roleName(r))+'</strong><small>'+(selected?'当前搭档':'选择角色')+'</small></span></button>';
+  });
+  html+='</div></div>';
+  byId('roleRail').innerHTML=html;
+  var toggle=byId('togglePartnerPicker');
+  if(toggle)toggle.addEventListener('click',function(){rolePickerOpen=!rolePickerOpen;renderRoles();});
+  byId('roleRail').querySelectorAll('[data-role]').forEach(function(btn){btn.addEventListener('click',function(){selectRole(btn.getAttribute('data-role'));});});
   byId('totalRounds').textContent=pad(st.plays||0);
   byId('totalWins').textContent=pad(st.wins||0);
   byId('wordRecord').textContent='已猜中 '+(st.wordWins||0)+' 题';
@@ -397,7 +665,7 @@ function selectRole(id){
   reactionSequence++;
   var next=roleList.find(function(r){return String(r.id)===String(id);});
   if(!next)return;
-  activeRole=next;localStorage.setItem('maomao_game_role',String(next.id));
+  activeRole=next;rolePickerOpen=false;localStorage.setItem('maomao_game_role',String(next.id));
   renderRoles();showToast('已切换搭档：'+roleName(activeRole));
   if(activeGame) renderPartner();
 }
@@ -455,12 +723,12 @@ function roleLine(context,fallback){
   }).catch(function(){});
 }
 function showGame(id){
-  activeGame=id;gameState={};roundNumber=1;
+  activeGame=id;gameState={};roundNumber=1;setDetectiveVersionBadge(id==='detective');
   byId('lobbyView').style.display='none';byId('gameView').style.display='block';
   renderPartner();
   reactionSequence++;
   if(id==='word'){byId('gameCode').textContent='GAME 01';byId('gameTitle').textContent='默契猜词';byId('gameSubtitle').textContent='看线索，猜一个词。答对之前，TA 会继续给你提示。';startWord();}
-  else if(id==='detective'){byId('gameCode').textContent='GAME 02';byId('gameTitle').textContent='双人侦探社';byId('gameSubtitle').textContent='找出线索之间的矛盾，选出最可能的真相。';startCase();}
+  else if(id==='detective'){byId('gameCode').textContent='GAME 02';byId('gameTitle').textContent='长线侦探局';byId('gameSubtitle').textContent='集结你的 AI 角色调查小队，追踪案件、核对证词，逐步揭开跨章节悬案。';startCase();}
   else if(id==='tic'){byId('gameCode').textContent='GAME 03';byId('gameTitle').textContent='棋盘挑战赛';byId('gameSubtitle').textContent='你先手执 X，TA 执 O。三子连线就能获胜。';startTic();}
   else if(id==='memory'){byId('gameCode').textContent='GAME 04';byId('gameTitle').textContent='记忆翻牌';byId('gameSubtitle').textContent='轮流找出相同图案。配对成功可以继续，记住对方翻过的位置。';startMemory();}
   else if(id==='code'){byId('gameCode').textContent='GAME 05';byId('gameTitle').textContent='三位数密码';byId('gameSubtitle').textContent='猜中由三个不重复数字组成的密码。每条反馈都是下一步的线索。';startCode();}
@@ -468,8 +736,15 @@ function showGame(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function returnLobby(){
-  reactionSequence++;
-  activeGame='';byId('gameView').style.display='none';byId('lobbyView').style.display='block';renderRoles();window.scrollTo({top:0,behavior:'smooth'});
+  reactionSequence++;setDetectiveVersionBadge(false);
+  activeGame='';
+  document.body.classList.remove('detective-case-mode','case-modal-open');
+  document.body.removeAttribute('data-case-theme');
+  var modal=byId('caseInterrogationModal');if(modal)modal.remove();
+  byId('gameView').style.display='none';
+  byId('lobbyView').style.display='block';
+  renderRoles();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function restartGame(){roundNumber++;reactionSequence++;if(activeGame==='word')startWord();else if(activeGame==='detective')startCase();else if(activeGame==='tic')startTic();else if(activeGame==='memory')startMemory();else if(activeGame==='code')startCode();else if(activeGame==='quiz')startQuiz();}
 function setRoundLabel(){byId('roundLabel').textContent='ROUND '+pad(roundNumber);}
@@ -523,30 +798,306 @@ function nextHint(){
   gameState.hintIndex++;byId('wordFeedback').textContent='提示 '+gameState.hintIndex+' / 3 · 继续猜猜看。';
 }
 var CASES=[
- {title:'消失的草莓蛋糕',intro:'咖啡馆打烊前，展示柜里最后一块草莓蛋糕不见了。三个人都说自己没碰过它。',evidence:[{title:'柜台记录',detail:'蛋糕在 16:10 被放进展示柜，16:25 清点时已经不见。'},{title:'围裙上的奶油',detail:'只有主厨小禾的蓝围裙上沾着新鲜奶油，她说那是试做时留下的。'},{title:'订单时间',detail:'阿泽在 16:10 到 16:30 一直处理连续订单，收银记录可以对上。'},{title:'客人去向',detail:'米粒在 16:20 取走外带咖啡后就离开了，店内监控拍到了她出门。'}],suspects:[{name:'小禾',job:'主厨'},{name:'阿泽',job:'收银员'},{name:'米粒',job:'顾客'}],answer:0,explain:'小禾说奶油来自试做，但蛋糕失踪的时间就在展示柜清点之间；她是唯一能接触后厨和展示柜的人，另外两人的时间线都有记录佐证。'},
+ {title:'潮汐档案室的最后一夜',storyTitle:'潮汐档案室的最后一夜',story:'北岬海洋观测中心的一场风暴夜，档案工程师沈闻被发现倒在封闭的资料室内。初步检验排除了单纯意外的可能，死亡时间大致落在 21:05 至 21:25。暴雨让观测站暂时与外界隔绝，门禁、监控和服务器留下的记录，成了还原最后二十分钟的关键。沈闻生前正在复核三年前的一次海上事故：原始浮标数据表明，风暴预警比正式通报早了二十二分钟发出。',motive:'沈闻准备将未经改写的原始潮位序列提交给独立安全复核组。三年前，时任值班负责人贺知远为了避免观测中心因延误发布而承担责任，批准把内部预警时间改写成较晚的正式时间，并把事故原因归到通信故障上。档案工程师沈闻保存了原始数据，打算在当晚公开。贺知远既担心旧事故被重新调查，也害怕自己的职业生涯和曾经的隐瞒一并曝光，于是赶到档案室要求沈闻交出资料。争执演变成致命冲突后，他试图通过管理员权限中断监控、取消外发文件，并继续声称自己早已离站。',aftermath:'当门禁记录、管理员操作日志、原始浮标数据和夜间巡查记录被放到一起，贺知远关于“20:40 已经离站”的说法无法成立。面对被取消发送的复核材料和巡查员的证词，他最终承认自己进入档案室并与沈闻发生冲突。案件移交后，三年前的预警记录被重新调查，观测中心也启动独立审计。唐越承认自己早就察觉时间差，却因为自己曾在旧报告上签过技术复核而选择沉默；罗骁则为没有如实记录巡查情况作出补充说明。真相不仅揭开了当晚的凶案，也让旧事故中被掩盖的责任重新浮出水面。',truth:'真相由多条独立证据共同支持：现场复核排除了单纯意外；门禁记录将贺知远的门卡定位在关键时段；服务器审计显示他的专属管理员账号打开并删除了原始数据文件；监控中断不是暴雨造成，而是从本地控制台手动执行；未发送的复核材料指明作案动机；原始浮标序列说明沈闻掌握了被改写的预警时间；夜间巡查员则补上了贺知远离开档案室的时间线。单独一条记录都可能被解释，彼此交叉后才形成完整证据链。',intro:'暴雨封闭北岬海洋观测中心。档案工程师沈闻在资料室内死亡，现场并非单纯意外。三名最后与他有关联的人各有说法，而一份三年前被改写的预警记录，可能解释了这场死亡。',evidence:[{title:'门禁记录：21:16 的通行卡',detail:'资料室门禁显示，沈闻于 20:51 进入；21:16 又有一张编号 HY-02 的门卡开启资料室。HY-02 登记在副站长贺知远名下。贺知远却称自己 20:40 已经离开观测中心。记录无法单独证明发生了什么，但他的口供与门禁时间明显冲突。'},{title:'服务器审计：被删除的原始数据',detail:'服务器审计记录显示，21:09 有人使用专属管理员账号打开“原始潮位序列_复核件”，并于 21:21 将文件移入删除队列。该管理员账号只分配给副站长贺知远。贺知远称自己没有进入资料室，也没有操作服务器。'},{title:'监控日志：并非天气故障',detail:'资料室外走廊的影像在 21:11 至 21:19 中断。设备自检记录没有发现断电或受潮故障，控制日志反而记载了来自本地控制台的手动停用命令，执行账号与 HY-02 管理权限相符。'},{title:'浮标原始序列：相差二十二分钟',detail:'海上浮标的只读备份显示，系统在 03:08 已达到风暴预警阈值；对外正式报告却把预警时间记为 03:30。两份数据来自不同存储位置，原始备份没有被改写。沈闻近期申请复核的，正是这二十二分钟的差异。'},{title:'未发送的复核材料',detail:'资料室终端保留了一封准备发送给独立安全复核组的邮件草稿，附件是未经改写的浮标序列，计划于 21:30 发出。发送队列在 21:22 被管理员账号取消。草稿正文提到，沈闻会在复核会上说明旧报告的时间差。'},{title:'现场复核：不符合单纯意外',detail:'现场物证记录显示，资料室桌角有新鲜碰撞痕迹，椅子倒向与最初发现时的摆放状态不一致；沈闻的识别牌挂绳断裂。初步检验认为不能以自然病发或普通跌倒结案，仍需结合现场冲突和其他证据调查。现场痕迹本身不能指认凶手。'},{title:'夜间巡查记录：被遗漏的一段',detail:'值班巡查员罗骁补充说明，21:10 左右听见资料室方向有人争执；稍后在东侧楼梯看见贺知远从档案区出来。贺知远当时说自己只是在“处理一份文件”，并要求他不要把这段写进巡查记录。罗骁起初没有如实记录，后来才说明此事。'}],suspects:[{name:'唐越',job:'海洋数据分析师'},{name:'贺知远',job:'副站长'},{name:'罗骁',job:'夜间巡查员'}],answer:1,explain:'贺知远是唯一同时被关键时段门禁、专属管理员操作和取消外发记录指向的人。原始浮标备份揭示了他有理由阻止沈闻提交复核材料；现场复核确认这不是简单意外，罗骁的补充证词又将贺知远放回资料室附近。唐越虽然参与过旧报告复核，但没有证据显示他在关键时段进入资料室或执行删除操作；罗骁的失职在于隐瞒巡查情况，而不是现有证据所指向的致命冲突。'},
  {title:'图书馆的借书卡',intro:'一本稀有旧书的借书卡从柜台失踪。管理员只记得三位访客来过。',evidence:[{title:'值班表',detail:'管理员在 14:00—14:15 去书库归还书籍，柜台当时无人。'},{title:'纸张碎屑',detail:'柜台旁发现的纸屑边缘带有蓝色墨水，与访客留下的蓝色便签颜色相同。'},{title:'访客留言',detail:'林同学留下的便签使用蓝色墨水，而且他承认自己曾在柜台前找笔。'},{title:'监控画面',detail:'陈女士和小周进入大厅后一直在阅览区，只有林同学在管理员离开时靠近柜台。'}],suspects:[{name:'陈女士',job:'研究者'},{name:'小周',job:'学生'},{name:'林同学',job:'来访读者'}],answer:2,explain:'蓝色墨水碎屑与林同学的便签相符，监控也显示只有他在柜台无人时靠近。线索共同指向林同学。'},
- {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'}];
-function startCase(){
-  setRoundLabel();var index=Math.floor(Math.random()*CASES.length);var c=CASES[index];
-  gameState={caseIndex:index,item:c,revealed:{},ended:false};
-  byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">CASE FILE / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div><div class="divider-label">点击线索展开证据</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">'+(i<1?esc(ev.detail):'点击查看这条证据。')+'</span></span><span class="evidence-mark">'+(i<1?'−':'+')+'</span></button>';}).join('')+'</div><div class="divider-label">你认为谁最可疑？</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(s,i){return '<button class="suspect" data-suspect="'+i+'"><div class="suspect-name">'+esc(s.name)+'</div><div class="suspect-role">'+esc(s.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看线索，再选出你的答案。</div><div class="btn-row"><button class="secondary-btn" id="newCase">换一个案件</button></div></div>';
-  byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;gameState.revealed[i]=true;var detail=byId('evidenceDetail'+i);if(detail)detail.textContent=c.evidence[i].detail;btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='−';});});
-  byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(btn){btn.addEventListener('click',function(){chooseSuspect(Number(btn.getAttribute('data-suspect')));});});
-  byId('newCase').addEventListener('click',function(){roundNumber++;startCase();roleLine('玩家选择了另一个案件，请邀请继续推理。','换案！这次我们仔细一点，别放过小细节。');});
-  byId('roleQuote').textContent='我看这事没那么简单。我们先把证据看完，再下结论。';
+ {title:'谁关掉了展厅灯',intro:'艺术展闭馆时，一盏主展灯被人提前关闭。工作人员说自己都按流程工作。',evidence:[{title:'控制台日志',detail:'灯光在 19:42 被手动关闭，操作账号属于讲解员小陆。'},{title:'交接记录',detail:'小陆说自己 19:30 已离开展厅，但 19:45 的巡检单上有他的签名。'},{title:'备用钥匙',detail:'保管员周叔在 19:40 归还了控制台钥匙，交接本有双方签字。'},{title:'访客反馈',detail:'一位观众记得 19:40 左右见过小陆在控制台旁查看灯光。'}],suspects:[{name:'周叔',job:'保管员'},{name:'小乔',job:'策展助理'},{name:'小陆',job:'讲解员'}],answer:2,explain:'控制台日志记录了小陆的操作账号，巡检单和观众目击也证明他说自己提前离开并不属实。'} ,
+ {title:'雨夜的空白车票',intro:'旧车站闭站前，一张盖过章的末班车票从失物招领柜里消失。值班员说那晚只有三个人进过办公室。',evidence:[{title:'站台时刻表',detail:'末班车在 21:18 发车，站台记录显示 21:12 后没有乘客进入办公室。'},{title:'潮湿的鞋印',detail:'办公室门口留下窄底鞋印，方向由档案柜通往后门。'},{title:'交班笔记',detail:'值班员写下 21:05 曾离开柜台三分钟，但口头称整晚没有离岗。'},{title:'车票存根',detail:'存根编号连续，只有失踪车票对应的那一格被提前撕开。'}],suspects:[{name:'许站长',job:'当班负责人'},{name:'小闻',job:'检票员'},{name:'顾客陈',job:'末班车乘客'}],answer:0,explain:'交班笔记与站长的说法矛盾，空白时段正好给了他接近档案柜的机会；鞋印方向也与办公室后门路线吻合。'},
+ {title:'画廊里的错位签名',intro:'一场小型画展结束后，收藏登记簿上的一处签名被改动，导致作品归属出现争议。三位工作人员都接触过登记桌。',evidence:[{title:'墨水干燥程度',detail:'被改动的签名墨迹明显较新，覆盖在原本已干透的笔迹上。'},{title:'布展清单',detail:'策展助理在闭展前负责整理登记簿，清单时间为 18:40。'},{title:'访客留言',detail:'一名访客写道，闭展前看见保管员在登记桌旁寻找印章。'},{title:'印章收纳盒',detail:'盒盖内侧有新鲜墨迹，与登记簿改动处使用的墨水颜色一致。'}],suspects:[{name:'策展助理林',job:'整理登记簿'},{name:'保管员周',job:'保管印章'},{name:'讲解员苏',job:'负责闭展' }],answer:1,explain:'保管员曾在登记桌附近寻找印章，盒盖墨迹又与改动签名的墨水一致，证据共同指向他接触过并改动了登记簿。'},
+ {title:'凌晨三点的来电',intro:'一位作家声称凌晨三点收到匿名电话，随后遗失了写有新书结局的手稿。电话记录、门禁和三份证词之间存在矛盾。',evidence:[{title:'电话清单',detail:'来电实际发生在 02:41，号码来自工作室内部线路，并非外部匿名号码。'},{title:'门禁记录',detail:'02:30 至 03:00 只有编辑唐的门卡打开过工作室走廊。'},{title:'稿纸纤维',detail:'桌边碎纸与编辑室专用稿纸纤维相同，但无法单独证明是谁撕碎。'},{title:'咖啡收据',detail:'咖啡在 02:36 被送到编辑室，收据签名与编辑唐的日常签名一致。'}],suspects:[{name:'编辑唐',job:'负责审稿'},{name:'邻居许',job:'住在隔壁'},{name:'作家本人',job:'手稿所有者'}],answer:0,explain:'内部线路排除了外部匿名来电，门禁和咖啡收据都把编辑唐放在关键时间与地点；稿纸纤维则补充了手稿被处理过的证据。'}
+]; 
+var CASE_INTERVIEWS={
+0:[{title:'唐越 · 海洋数据分析师',text:'沈闻让我帮忙核对三年前的原始潮位序列。我在 20:55 左右把一份比对结果发给他，之后留在实验室参加跨站视频会。旧报告上的签字是技术复核，不是批准对外发布时间。我知道那二十二分钟说不通，但我没有及时把疑点报告上去。'},{title:'贺知远 · 副站长',text:'我 20:40 就离开观测中心了，没有进入资料室。服务器的记录未必能说明实际操作人，管理员权限也可能被人借用。旧预警记录早就复核过，沈闻不该在审核结束前把未确认的数据发给外部机构。'},{title:'罗骁 · 夜间巡查员',text:'21:10 左右我听见资料室方向有争执声。后来在东侧楼梯附近看见贺副站长从档案区出来，他说自己只是处理文件，让我不要把这段写进巡查记录。我当时怕担责任，就没有登记，现在想想，这个遗漏很重要。'}],
+1:[{title:'陈女士 · 研究者',text:'我一直在阅览区查资料，直到离开都没有去过柜台。'},{title:'小周 · 学生',text:'我找过笔，但管理员还在柜台，我没有碰借书卡。'},{title:'林同学 · 来访读者',text:'我确实靠近过柜台找笔，看到蓝色便签时还顺手拿起来看了看。'}],
+2:[{title:'周叔 · 保管员',text:'钥匙按时归还了，我没有理由在闭馆前动灯光控制台。'},{title:'小乔 · 策展助理',text:'我在整理访客反馈，没碰控制台，也没有操作权限。'},{title:'小陆 · 讲解员',text:'我 19:30 就离开展厅了，之后发生什么我不清楚。'}],
+3:[{title:'许站长 · 当班负责人',text:'我整晚都在柜台，没有离开过，也没有打开过失物招领柜。'},{title:'小闻 · 检票员',text:'我在站台协助乘客，21:12 之后没有人再进办公室。'},{title:'顾客陈 · 末班车乘客',text:'我在发车前等车，没有进过办公室，只经过了后门附近。'}],
+4:[{title:'策展助理林 · 整理登记簿',text:'我按清单整理完登记簿就离开了，之后没有再碰它。'},{title:'保管员周 · 保管印章',text:'我去登记桌找过印章，但没有改动签名。'},{title:'讲解员苏 · 负责闭展',text:'我闭展时只检查灯光和展柜，没有查看登记簿。'}],
+5:[{title:'编辑唐 · 负责审稿',text:'我凌晨就离开了工作室，那张咖啡收据可能是别人代签的。'},{title:'邻居许 · 住在隔壁',text:'我听到过电话声，但隔着墙无法判断来自哪间房。'},{title:'作家本人 · 手稿所有者',text:'我说是匿名电话，是因为不想让别人知道工作室内部线路出了问题。'}]
+};
+function caseProgressRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_progress_v1')||'{}')||{};}catch(e){return {};}}
+function caseProgress(){var all=caseProgressRoot(),key=String(activeRole&&activeRole.id||'default-partner');if(!all[key])all[key]={completed:[],attempts:{},notes:{},campaign:{trust:{},flags:[],threads:[],choices:[]}};if(!all[key].campaign)all[key].campaign={trust:{},flags:[],threads:[],choices:[]};if(!all[key].campaign.trust)all[key].campaign.trust={};if(!Array.isArray(all[key].campaign.flags))all[key].campaign.flags=[];if(!Array.isArray(all[key].campaign.threads))all[key].campaign.threads=[];if(!Array.isArray(all[key].campaign.choices))all[key].campaign.choices=[];return all[key];}
+function saveCampaignChoice(caseTitle,choice,result){var p=caseProgress(),c=p.campaign;c.choices.push({caseTitle:caseTitle,choice:choice,result:result,at:new Date().toISOString()});var flag='choice:'+caseTitle+':'+choice;if(c.flags.indexOf(flag)<0)c.flags.push(flag);c.threads.push({caseTitle:caseTitle,summary:result,choice:choice});saveCaseProgress(p);}
+function campaignBrief(){var c=caseProgress().campaign,trust=Object.keys(c.trust||{}).map(function(k){return k+'：'+c.trust[k];}).join('；');return '过往选择：'+(c.choices.slice(-8).map(function(x){return x.caseTitle+'：选择 '+x.choice+'；结果 '+x.result;}).join('；')||'暂无')+'。持续伏笔：'+(c.threads.slice(-8).map(function(x){return x.caseTitle+'留下：'+x.summary;}).join('；')||'暂无')+'。调查队信任记录：'+(trust||'尚未形成')+'。';}
+function saveCaseProgress(progress){var all=caseProgressRoot();all[String(activeRole&&activeRole.id||'default-partner')]=progress||caseProgress();localStorage.setItem('maomao_detective_progress_v1',JSON.stringify(all));}
+var detectiveGeneratedCasesLoaded=false;
+function loadGeneratedDetectiveCases(){if(detectiveGeneratedCasesLoaded)return;detectiveGeneratedCasesLoaded=true;try{var saved=JSON.parse(localStorage.getItem('maomao_detective_generated_cases_v1')||'[]');if(Array.isArray(saved))saved.forEach(function(c){if(c&&c.title&&Array.isArray(c.evidence)&&Array.isArray(c.suspects)&&!CASES.some(function(x){return x.title===c.title;}))CASES.push(c);});}catch(e){}}
+function detectiveTeamRoot(){try{return JSON.parse(localStorage.getItem('maomao_detective_team_v1')||'[]');}catch(e){return [];}}
+function detectiveTeam(){var saved=detectiveTeamRoot().map(String),team=roleList.filter(function(r){return saved.indexOf(String(r.id))>=0;});if(!team.length)team=[activeRole||roleList[0]||defaultRole];return team;}
+var DETECTIVE_NPCS=[
+ {id:'npc_archive',name:'沈砚',job:'档案顾问',personality:'谨慎、重视细节，不轻信口供',bio:'擅长查阅旧档案、核对日期和文书记录。'},
+ {id:'npc_field',name:'林见秋',job:'现场调查员',personality:'敏锐、行动派，容易注意到环境细节',bio:'擅长观察现场痕迹、空间关系与人物反应。'},
+ {id:'npc_mediator',name:'周予安',job:'访谈顾问',personality:'温和、善于倾听，对话中能察觉回避',bio:'擅长梳理人物关系、矛盾说法和情绪变化。'}
+];
+function detectiveParty(customTeam){
+ var team=(customTeam||detectiveTeam()).slice(),npcs=[];
+ for(var i=0;team.length+npcs.length<3;i++)npcs.push(DETECTIVE_NPCS[i%DETECTIVE_NPCS.length]);
+ return team.concat(npcs);
 }
-function chooseSuspect(i){
-  if(gameState.ended)return;
-  var c=gameState.item;var buttons=byId('suspectList').querySelectorAll('[data-suspect]');
-  gameState.ended=true;
-  if(i===c.answer){
-    buttons[i].classList.add('correct');byId('caseFeedback').innerHTML='<strong>案件侦破。</strong> '+esc(c.explain);saveStat('detective','win');
-    roleLine('玩家正确找出了案件“'+c.title+'”的真凶。推理结论：'+c.explain+' 请用角色语气夸奖搭档，最多一句。','漂亮！证据没有白看，我们这次配合得不错。');
-  }else{
-    buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>这次判断有误。</strong> 正确答案是 '+esc(c.suspects[c.answer].name)+'。'+esc(c.explain);
-    saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中选错嫌疑人。正确答案为'+c.suspects[c.answer].name+'。用轻松、不挖苦的语气复盘一句。','这次被线索绕进去了。没事，真相已经找到了。');
+function detectivePersona(r){
+ if(r&&String(r.id).indexOf('npc_')===0)return r.name+'，身份：'+r.job+'；性格：'+r.personality+'；擅长：'+r.bio;
+ return roleName(r)+'；性格：'+String(r.personality||r.description||r.bio||'待从角色资料中理解').slice(0,160)+'；说话方式：'+String(r.speechStyle||r.speech||'遵循原角色说话习惯').slice(0,100);
+}
+function toggleDetectiveRole(id){var ids=detectiveTeamRoot().map(String),key=String(id);if(ids.indexOf(key)>=0)ids=ids.filter(function(x){return x!==key;});else ids.push(key);if(!ids.length)ids=[String(activeRole&&activeRole.id||roleList[0].id)];localStorage.setItem('maomao_detective_team_v1',JSON.stringify(ids));startCase();}
+function setDetectiveVersionBadge(visible){
+ var badge=document.getElementById('detectiveVersionBadge');
+ if(!badge){
+  badge=document.createElement('div');badge.id='detectiveVersionBadge';badge.textContent='V.20';
+  badge.setAttribute('aria-label','侦探游戏版本 V.20');
+  document.body.appendChild(badge);
+ }
+ badge.style.display=visible?'block':'none';
+}
+function startCase(){
+ document.body.classList.remove('detective-case-mode','case-modal-open');document.body.removeAttribute('data-case-theme');setDetectiveVersionBadge(true);
+ loadGeneratedDetectiveCases();setRoundLabel();var progress=caseProgress(),team=detectiveTeam();
+ byId('gameContent').innerHTML='<div class="board-panel"><div class="panel-kicker">DETECTIVE BUREAU / CASE ARCHIVE</div><div class="prompt-title">长线案件档案室</div><div class="prompt-copy">组建你的 AI 角色调查小队，从独立案件逐步追踪同一条暗线。证据、证词和时间线都会影响结案判断。</div><div class="case-progress-strip"><span>已结案件</span><strong>'+progress.completed.length+' / '+CASES.length+'</strong></div><div class="divider-label">调查小队 · 可同时加入多位角色</div><div class="detective-team-picker">'+roleList.map(function(r){var chosen=team.some(function(x){return String(x.id)===String(r.id);});return '<button type="button" class="detective-team-chip '+(chosen?'selected':'')+'" data-team-role="'+esc(r.id)+'" aria-pressed="'+chosen+'">'+avatarMarkup(r,'')+'<span>'+esc(roleName(r))+'</span><small>'+(chosen?'已加入小队':'点击加入')+'</small></button>';}).join('')+'</div><div class="team-caption">当前队伍：'+esc(team.map(roleName).join('、'))+'。不同角色将以各自的人设参与调查讨论。</div><div class="case-ai-create"><div><strong>AI SERIAL CASE / 连载案件生成</strong><p>需要已配置的角色 API 来生成新剧情、证据、证词和后续主线；未配置时仍可游玩内置案件。</p></div><button type="button" class="secondary-btn" id="generateDetectiveCase">生成新案</button></div><div class="case-archive-heading"><span class="panel-kicker">AVAILABLE FILES / 内置案件</span><span class="case-archive-count">先展示 3 宗 · 共 '+CASES.length+' 宗</span></div><div class="case-archive-list" id="caseArchiveList">'+CASES.map(function(c,i){var done=progress.completed.indexOf(i)>=0,locked=i>0&&progress.completed.indexOf(i-1)<0;return '<button class="case-archive-item '+(i>=3?'case-archive-hidden':'')+'" data-open-case="'+i+'" '+(locked?'disabled':'')+'><span class="case-archive-no">CASE / '+String(i+1).padStart(2,'0')+'</span><strong>'+esc(c.title)+'</strong><span class="case-archive-desc">'+esc(c.intro)+'</span><span class="case-archive-status">'+(done?'✓ 已结案':locked?'完成上一案后解锁':i===0?'可调查':'待调查')+'</span></button>';}).join('')+'</div><button type="button" class="case-archive-more" id="caseArchiveMore" aria-expanded="false">展开全部案件 <span>＋</span></button></div>';
+ var archiveMore=byId('caseArchiveMore'),archiveList=byId('caseArchiveList');if(archiveMore&&archiveList){archiveMore.addEventListener('click',function(){var expanded=archiveMore.getAttribute('aria-expanded')==='true';archiveMore.setAttribute('aria-expanded',String(!expanded));archiveList.classList.toggle('expanded',!expanded);archiveMore.innerHTML=expanded?'展开全部案件 <span>＋</span>':'收起案件列表 <span>−</span>';});}
+ byId('gameContent').querySelectorAll('[data-team-role]').forEach(function(b){b.addEventListener('click',function(){toggleDetectiveRole(b.getAttribute('data-team-role'));});});
+ byId('gameContent').querySelectorAll('[data-open-case]').forEach(function(b){b.addEventListener('click',function(){openCase(Number(b.getAttribute('data-open-case')));});});
+ var gen=byId('generateDetectiveCase');if(gen)gen.addEventListener('click',generateDetectiveCase);
+ byId('roleQuote').textContent='案件不急着下结论。先把每一份记录看清楚，再决定谁的说法站不住脚。';
+}
+function generateDetectiveCase(){
+ var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+ if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function'){showToast('请先在小手机设置中配置可用的 AI API。');return;}
+ var button=byId('generateDetectiveCase');if(button){button.disabled=true;button.textContent='正在构思…';}
+ var team=detectiveTeam(),history=CASES.slice(-5).map(function(c){return c.title;}).join('、');
+ var system='你是悬疑推理游戏编剧。创作适合青少年的非血腥推理案件，必须有可验证线索、逻辑闭环，不能靠猜测或超自然力量定案。只返回严格 JSON，不要 Markdown。结构：{"title":"标题","intro":"案情","evidence":[{"title":"证据名称","detail":"可核验线索"}],"suspects":[{"name":"人物","job":"身份"},{"name":"人物","job":"身份"},{"name":"人物","job":"身份"}],"answer":0,"explain":"逐条解释线索如何支持结论并排除其他人","chapter":"本案留下的主线伏笔"}。至少4条证据，恰好3名嫌疑人，answer是0到2整数。';
+ var user='为 MAOMAO 长线侦探游戏生成新案件。调查队成员：'+team.map(detectivePersona).join('。')+'。不要重复这些已有案件：'+history+'。必须有唯一且逻辑闭合的真相，证据至少4条且至少两条能独立支持结论，三名嫌疑人都要有合理动机或机会，证词中至少一处可被已公开证据验证的矛盾。案件需与既有主线相连但不能改写旧案真相。跨案记忆：'+campaignBrief()+'。加入一条未来章节可以回收的主线伏笔。';
+ window.PhoneAPI.complete({system:system,user:user,temperature:0.75,timeoutMs:45000}).then(function(raw){
+  var txt=String(raw||'').trim().replace(/^```(?:json)?s*/i,'').replace(/s*```$/,'');var a=txt.indexOf('{'),z=txt.lastIndexOf('}');if(a>=0&&z>a)txt=txt.slice(a,z+1);
+  var c=JSON.parse(txt);if(!c.title||!c.intro||!Array.isArray(c.evidence)||c.evidence.length<4||!Array.isArray(c.suspects)||c.suspects.length!==3||![0,1,2].includes(Number(c.answer))||!c.explain)throw new Error('invalid case');
+  c.answer=Number(c.answer);c.generated=true;c.chapter=String(c.chapter||'');c.evidence=c.evidence.slice(0,7);
+  var saved=JSON.parse(localStorage.getItem('maomao_detective_generated_cases_v1')||'[]');saved.push(c);localStorage.setItem('maomao_detective_generated_cases_v1',JSON.stringify(saved));CASES.push(c);showToast('新案件已加入档案室');startCase();
+ }).catch(function(){showToast('生成失败，请检查 API 配置或稍后重试。');}).finally(function(){var b=byId('generateDetectiveCase');if(b){b.disabled=false;b.textContent='生成新案';}});
+}
+function installFloatingInvestigationTools(){
+ var root=byId('gameContent');if(!root||root.querySelector('#floatingToolLauncher'))return;
+ var toolkit=root.querySelector('.detective-toolkit');if(!toolkit)return;
+ var launcher=document.createElement('button');launcher.type='button';launcher.id='floatingToolLauncher';launcher.className='floating-tool-launcher';launcher.innerHTML='<span class="floating-tool-icon">＋</span><span><strong>调查工具箱</strong><small>TOOLS / 打开工具</small></span><span class="floating-tool-arrow">↗</span>';
+ toolkit.parentNode.insertBefore(launcher,toolkit);
+ var modal=document.createElement('div');modal.id='floatingInvestigationTools';modal.className='floating-tools-modal';modal.hidden=true;
+ modal.innerHTML='<button type="button" class="floating-tools-scrim" data-tools-close aria-label="关闭工具箱"></button><section class="floating-tools-dialog" role="dialog" aria-modal="true" aria-labelledby="floatingToolsTitle"><div class="floating-tools-topline"><span>FIELD WORK / 04</span><button type="button" data-tools-close aria-label="关闭">×</button></div><div class="floating-tools-eyebrow">INVESTIGATION DESK</div><h2 id="floatingToolsTitle">调查工具箱</h2><p class="floating-tools-intro">选择一项工具，整理当前案件的线索与下一步行动。</p><div class="floating-tools-grid"><button type="button" data-floating-tool="timeline"><span>01</span><strong>时间线核对</strong><small>整理时间顺序与空白</small></button><button type="button" data-floating-tool="testimony"><span>02</span><strong>证词对照</strong><small>寻找明确矛盾</small></button><button type="button" data-floating-tool="scene"><span>03</span><strong>现场复查</strong><small>提出可执行的复查方向</small></button><button type="button" data-floating-tool="note"><span>04</span><strong>调查笔记</strong><small>记录已知信息与待查事项</small></button></div><div class="floating-tools-foot"><span>CASE FILE / ACTIVE</span><span>选择后可继续调查</span></div></section>';
+ root.appendChild(modal);
+ launcher.addEventListener('click',function(){modal.hidden=false;document.body.classList.add('floating-tools-open');});
+ function close(){modal.hidden=true;document.body.classList.remove('floating-tools-open');}
+ modal.addEventListener('click',function(e){
+  if(e.target.closest('[data-tools-close]')){close();return;}
+  var b=e.target.closest('[data-floating-tool]');if(!b)return;
+  var kind=b.getAttribute('data-floating-tool'),original=root.querySelector('[data-investigation-tool="'+kind+'"]');
+  close();if(original)original.click();
+ });
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)close();});
+}
+function showCaseEvidenceDetail(c,index){
+ var ev=c&&c.evidence&&c.evidence[index];if(!ev)return;var old=document.querySelector('.case-evidence-overlay');if(old)old.remove();
+ var overlay=document.createElement('div');overlay.className='case-evidence-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+ var card=document.createElement('article');card.className='case-evidence-card';
+ var k=document.createElement('div');k.className='case-evidence-kicker';k.textContent='EVIDENCE FILE / 证物档案 '+String(index+1).padStart(2,'0');
+ var h=document.createElement('h2');h.textContent=ev.title;var tag=document.createElement('span');tag.className='case-evidence-tag';tag.textContent='已加入调查材料';
+ var p=document.createElement('p');p.className='case-evidence-detail';p.textContent=ev.detail;var foot=document.createElement('div');foot.className='case-evidence-foot';foot.textContent='现场记录 · '+String(c.title||'案件档案');
+ var close=document.createElement('button');close.type='button';close.className='case-evidence-close';close.textContent='返回现场';
+ [k,h,tag,p,foot,close].forEach(function(n){card.appendChild(n);});overlay.appendChild(card);document.body.appendChild(overlay);
+ function done(){overlay.remove();document.removeEventListener('keydown',onKey);}function onKey(e){if(e.key==='Escape')done();}
+ close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});document.addEventListener('keydown',onKey);close.focus();
+}
+
+function openCase(index){document.body.classList.add("detective-case-mode");setDetectiveVersionBadge(true);
+ var progress=caseProgress();if(index>0&&progress.completed.indexOf(index-1)<0){showToast('先完成上一宗案件。');return;}
+ var c=CASES[index];if(!c)return;
+ var savedCaseStates=progress.caseStates||{},savedCaseState=savedCaseStates[c.title]||{};gameState={caseIndex:index,item:c,revealed:Object.assign({},savedCaseState.revealed||{}),interviewed:Object.assign({},savedCaseState.interviewed||{}),ended:false,phase:'evidence'};
+ var investigators=detectiveParty(detectiveTeam()),interviews=CASE_INTERVIEWS[index]||c.suspects.map(function(x){return {title:x.name+' · '+x.job,text:'我只知道自己负责的部分，其他情况需要更多证据才能判断。'};});
+ installFloatingInvestigationTools();
+ var sceneHeading=index===0?'北岬观测中心 · 档案室':'案件现场 · 勘查区域',spots=[[23,43],[58,77],[50,61],[45,24],[80,66],[70,89],[13,50]];
+ var sceneMarkup='<section class="case-scene-stage" aria-label="可交互案件现场"><div class="scene-stage-top"><span>SCENE OVERVIEW / 现场总览</span><span>点击编号调查</span></div><div class="scene-location">'+esc(sceneHeading)+'</div><div class="scene-art '+(index===0?'scene-art-tidal':'scene-art-generic')+'">'+(index===0?'<img class="scene-real-image" src="assets/tidal-archive-room-v18.webp" alt="潮汐档案室正式现场图">':'')+'<div class="scene-window"><div class="scene-horizon"></div><div class="scene-rain"></div></div><div class="scene-clock"></div><div class="scene-shelves"><i></i><i></i><i></i></div><div class="scene-monitor"><b></b><i></i></div><div class="scene-door"></div><div class="scene-desk"></div><div class="scene-paper"></div><div class="scene-folder"></div><div class="scene-lamp"></div><div class="scene-shadow"></div><div class="scene-floor"></div>'+c.evidence.map(function(ev,i){var p=spots[i%spots.length];return '<button type="button" class="scene-hotspot" data-scene-evidence="'+i+'" style="left:'+p[0]+'%;top:'+p[1]+'%" aria-label="查看证物 '+String(i+1)+'：'+esc(ev.title)+'"><span>'+String(i+1).padStart(2,'0')+'</span></button>';}).join('')+'</div><div class="scene-stage-foot"><div><strong>现场勘查图</strong><span>选择编号，打开对应证物档案</span></div><strong id="sceneFoundCount">0 / '+c.evidence.length+' 已确认</strong></div></section>';
+ byId('gameContent').innerHTML='<div class="case-nav-line"><button class="back-text" id="caseArchiveBack">‹ 大厅</button><span class="game-code">案件 / '+String(index+1).padStart(2,'0')+'</span><button type="button" class="case-theme-toggle" id="caseThemeToggle">白色 ◐</button></div><div class="board-panel"><div class="panel-kicker">INVESTIGATION / '+String(index+1).padStart(2,'0')+'</div><div class="prompt-title">'+esc(c.title)+'</div><div class="prompt-copy">'+esc(c.intro)+'</div>'+sceneMarkup+'<div class="detective-livebar"><div><span class="panel-kicker">CASE ACTIVITY / 实时调查</span><strong id="detectiveLiveStatus">调查队已就位</strong></div><span class="live-dot"></span></div><div class="detective-livefeed" id="detectiveLiveFeed" aria-live="polite"><div class="livefeed-item"><span class="livefeed-time">NOW</span><p>案件档案已开启。队员正在等待你的第一个调查方向。</p></div></div><div class="case-team-presence"><span class="panel-kicker">YOUR INVESTIGATION TEAM</span><div class="case-team-avatars">'+investigators.map(function(r){return '<span class="case-team-member">'+avatarMarkup(r,'')+'<small>'+esc(roleName(r))+'</small></span>';}).join('')+'</div><p>队员会从现场、档案和人物关系等不同角度核对线索。所有判断以已掌握的证据为准。</p><button type="button" class="secondary-btn" id="teamDiscussionButton">听取小队讨论</button><div id="teamDiscussionPanel" class="team-discussion-panel" aria-live="polite"></div></div><div class="investigation-console"><div class="panel-kicker">OPEN INVESTIGATION / 自由调查</div><div class="detective-toolkit"><div class="detective-toolkit-head"><strong>调查工具箱</strong><span>FIELD TOOLS / 04</span></div><div class="detective-tool-buttons"><button type="button" data-investigation-tool="timeline">时间线核对</button><button type="button" data-investigation-tool="testimony">证词对照</button><button type="button" data-investigation-tool="scene">现场复查</button><button type="button" data-investigation-tool="note">调查笔记</button></div><div class="detective-tool-note" id="detectiveToolNote">选一个工具，快速整理下一步调查方向。</div></div><div class="prompt-copy">不必只按下面的按钮行动。你可以写下想追问的细节、想对质的人、想重新检查的物件，调查队会根据当前案情回应。队伍人数不足时会由案件档案中的调查员补位。</div><section class="case-notebook" aria-label="正式调查笔录"><div class="notebook-cover"><span class="notebook-kicker">CASE NOTEBOOK / 现场调查笔录</span><strong>调查记录簿</strong><small>案件编号 · '+String(index+1).padStart(2,'0')+'</small></div><div class="notebook-tabs"><button type="button" class="notebook-tab active" data-record-filter="all">全部记录</button><button type="button" class="notebook-tab" data-record-filter="action">调查行动</button><button type="button" class="notebook-tab" data-record-filter="analysis">分析意见</button></div><div id="investigationLog" class="investigation-log"><div class="investigation-entry"><span class="record-index">记录 01</span><strong>初始勘查</strong><p>现场已经封存。请先查看现场证据，或选择一名在场人员询问。</p><small>案件开启时 · 初始记录</small></div></div></section><section class="investigation-action-desk"><div class="action-desk-title"><span class="panel-kicker">NEXT ACTION / 下一步行动</span><strong>写下你的调查指令</strong></div><div class="investigation-actions"><input id="investigationInput" maxlength="500" placeholder="例如：核对小禾的时间说法……"><button class="primary-btn" id="investigationSubmit">提交</button></div></section><details class="npc-note"><summary>调查服务说明</summary><p>部分开放式调查回应依赖外部调查服务；服务不可用时仍可查看已发现的证据、证词和调查记录。</p></details></div><div class="case-phase-track"><span class="active" data-phase-mark="evidence">01 现场取证</span><span data-phase-mark="interview">02 询问证词</span><span data-phase-mark="accuse">03 最终指认</span></div><div class="case-progress-strip"><span id="caseStepText">现场线索</span><strong id="caseStepCount">0 / '+c.evidence.length+' 已查看</strong></div><div class="detective-progress"><div class="detective-progress-head"><span>案件调查进度</span><strong id="detectiveProgressLabel">0% 已完成</strong></div><div class="detective-progress-track"><span id="detectiveProgressFill"></span></div></div><div class="divider-label">证物档案 · 点击卡片查看</div><div class="clue-list" id="evidenceList">'+c.evidence.map(function(ev,i){return '<button class="evidence" data-evidence="'+i+'"><span class="evidence-num">0'+(i+1)+'</span><span class="evidence-text"><strong>'+esc(ev.title)+'</strong><span style="display:block;color:#888;margin-top:4px" id="evidenceDetail'+i+'">尚未检视 · 点击打开档案</span></span><span class="evidence-mark">+</span></button>';}).join('')+'</div><div class="divider-label">人物证词 · 逐一询问</div><div class="interview-list" id="interviewList">'+c.suspects.map(function(x,i){return '<button class="interview-item" data-interview="'+i+'"><span class="interview-number">0'+(i+1)+'</span><span><strong>'+esc(x.name)+'</strong><small>'+esc(x.job)+'</small><span class="interview-text" id="interviewText'+i+'">尚未询问</span></span><span class="interview-mark">+</span></button>';}).join('')+'</div><div class="divider-label">最终指认 · 调查材料齐全后开放</div><div class="suspect-list" id="suspectList">'+c.suspects.map(function(x,i){return '<button class="suspect" data-suspect="'+i+'" disabled><div class="suspect-name">'+esc(x.name)+'</div><div class="suspect-role">'+esc(x.job)+'</div></button>';}).join('')+'</div><div class="feedback" id="caseFeedback" aria-live="polite">先查看所有现场证据，并询问三位相关人物。</div><div class="btn-row"><button class="secondary-btn" id="caseTimeline">整理时间线</button><button class="secondary-btn" id="newCase">返回档案室</button></div><div id="timelinePanel"></div></div>';
+ 
+ var visualRoot=byId('gameContent'),sceneNode=visualRoot.querySelector('.case-scene-stage'),progressNode=visualRoot.querySelector('.case-progress-strip'),meterNode=visualRoot.querySelector('.detective-progress'),cardsNode=byId('evidenceList'),cardsHeading=cardsNode&&cardsNode.previousElementSibling;
+ if(sceneNode&&sceneNode.parentNode){var place=sceneNode.nextSibling;[progressNode,meterNode,cardsHeading,cardsNode].forEach(function(el){if(el){sceneNode.parentNode.insertBefore(el,place);place=el.nextSibling;}});}
+ var caseNav=document.createElement('nav');caseNav.className='case-section-nav';caseNav.innerHTML='<button class="active" data-case-view="scene">现场与线索</button><button data-case-view="testimony">证词档案</button><button data-case-view="notes">笔录与结案</button>';
+ byId('gameContent').appendChild(caseNav);
+ var notebook=byId('gameContent').querySelector('.case-notebook'),actionDesk=byId('gameContent').querySelector('.investigation-action-desk'),consoleEl=byId('gameContent').querySelector('.investigation-console'),evidenceHead=byId('evidenceList').previousElementSibling,interviewHead=byId('interviewList').previousElementSibling,suspectHead=byId('suspectList').previousElementSibling;
+ var gameRoot=byId('gameContent');
+ var phaseTrack=gameRoot.querySelector('.case-phase-track'),progressStrips=gameRoot.querySelectorAll('.case-progress-strip'),progressStrip=progressStrips[0]||null,progressBar=gameRoot.querySelector('.detective-progress'),toolkit=gameRoot.querySelector('.detective-toolkit'),teamPanel=gameRoot.querySelector('.case-team-presence'),feedback=byId('caseFeedback'),timelineButton=byId('caseTimeline'),timelinePanel=byId('timelinePanel'),suspectList=byId('suspectList');
+ var consoleIntro=consoleEl?consoleEl.querySelector('.prompt-copy'):null;
+ var sceneEls=[gameRoot.querySelector('.prompt-title'),gameRoot.querySelector('.prompt-copy'),gameRoot.querySelector('.case-scene-stage'),gameRoot.querySelector('.detective-livebar'),gameRoot.querySelector('.detective-livefeed'),teamPanel,progressStrip,progressBar,toolkit,consoleIntro,evidenceHead,byId('evidenceList')];
+ var views={scene:sceneEls,testimony:[interviewHead,byId('interviewList')],notes:[notebook,actionDesk,feedback,suspectHead,suspectList,timelineButton,timelinePanel]};
+ function setCaseView(view){Object.keys(views).forEach(function(k){(views[k]||[]).forEach(function(el){if(el)el.style.display=k===view?'':'none';});});if(phaseTrack)phaseTrack.style.display='none';caseNav.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-case-view')===view);});}
+ caseNav.querySelectorAll('[data-case-view]').forEach(function(b){b.type='button';b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var view=b.getAttribute('data-case-view');setCaseView(view);if(view==='testimony'){var target=byId('interviewList');if(target)target.scrollIntoView({block:'start',behavior:'smooth'});}else{window.scrollTo({top:0,behavior:'smooth'});}});});caseNav.addEventListener('click',function(e){var b=e.target.closest('[data-case-view]');if(b){e.preventDefault();setCaseView(b.getAttribute('data-case-view'));}},true);setCaseView('scene');
+ var modal=document.createElement('div');modal.className='case-interrogation-modal';modal.id='caseInterrogationModal';modal.hidden=true;modal.innerHTML='<div class="case-modal-scrim" data-modal-close></div><section class="case-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle"><div class="case-modal-grabber" aria-hidden="true"></div><header class="case-modal-head"><div><span class="panel-kicker">CASE FILE / TESTIMONY</span><h2 id="caseModalTitle">人物证词</h2></div><button type="button" class="case-modal-close" data-modal-close aria-label="关闭">×</button></header><div id="caseModalViewActions" class="case-modal-view-actions"><p>选择下一步调查方式</p><div><button type="button" class="secondary-btn" data-modal-mode="ask">深入追问</button><button type="button" class="primary-btn" data-modal-mode="cross">拿证据对质</button></div></div><div class="case-modal-columns"><section class="case-modal-testimony"><span class="case-modal-label">嫌疑人证词</span><h3 id="caseModalSuspect"></h3><p id="caseModalQuote"></p></section><section class="case-modal-evidence"><span class="case-modal-label">选择一条已发现的线索</span><div id="caseModalEvidenceList"></div></section></div><div id="caseModalQuestionBox" class="case-modal-question-box"><span class="case-modal-label">你想具体问什么？</span><div id="caseModalQuestionPrompts" class="case-modal-question-prompts"></div><textarea id="caseModalQuestion" rows="2" maxlength="180" placeholder="也可以自己输入问题，例如：你说离开了，具体几点？"></textarea><p class="case-modal-hint">追问会记录在本案调查笔录中；未被案件资料支持的细节不会自动当作事实。</p></div><div id="caseModalFeedback" class="case-modal-feedback">选择证据，与证词逐项核对。</div><footer class="case-modal-foot"><button type="button" class="secondary-btn" data-modal-close>返回案件</button><button type="button" class="primary-btn" id="caseModalSubmit">提交对质</button></footer></section>';
+ byId('gameContent').appendChild(modal);
+ function closeCaseModal(){modal.hidden=true;document.body.classList.remove('case-modal-open');}
+ modal.addEventListener('click',function(e){if(e.target.closest('[data-modal-close]'))closeCaseModal();var modeBtn=e.target.closest('[data-modal-mode]');if(modeBtn)openInterrogation(Number(modal.dataset.suspectIndex),modeBtn.getAttribute('data-modal-mode'));});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeCaseModal();});
+ var selectedEvidenceIndex=null;
+ function openInterrogation(index,mode){var suspect=c.suspects[index],statement=interviews[index];selectedEvidenceIndex=null;if(!suspect||!statement)return;modal.dataset.suspectIndex=String(index);modal.dataset.mode=mode;
+ byId('caseModalViewActions').style.display=mode==='view'?'block':'none';byId('caseModalEvidenceList').parentElement.style.display=mode==='view'?'none':'grid';byId('caseModalSubmit').style.display=mode==='view'?'none':'inline-flex';byId('caseModalSubmit').textContent=mode==='ask'?'提交追问':'提交对质';byId('caseModalTitle').textContent=mode==='view'?'人物证词':(mode==='ask'?'深入追问':'证据对质');byId('caseModalSuspect').textContent=suspect.name+' · '+suspect.job;byId('caseModalQuote').textContent=statement.text;
+ var questionBox=byId('caseModalQuestionBox'),questionInput=byId('caseModalQuestion'),promptList=byId('caseModalQuestionPrompts');questionBox.style.display=mode==='ask'?'block':'none';questionInput.value='';
+ var prompts=['你能把当时的时间说得更具体吗？','你说的这件事，有什么记录可以核对？','你当时在哪里？之后去了哪里？'];
+ promptList.innerHTML=prompts.map(function(q){return '<button type="button" class="case-question-chip">'+esc(q)+'</button>';}).join('');promptList.querySelectorAll('.case-question-chip').forEach(function(b){b.addEventListener('click',function(){questionInput.value=b.textContent;questionInput.focus();promptList.querySelectorAll('.case-question-chip').forEach(function(x){x.classList.toggle('active',x===b);});});});
+ var list=byId('caseModalEvidenceList');var available=c.evidence.map(function(ev,i){return {ev:ev,i:i};}).filter(function(x){return !!gameState.revealed[x.i];});
+ list.innerHTML=available.length?available.map(function(x){return '<button type="button" class="case-modal-evidence-card" data-modal-evidence="'+x.i+'"><span>证据 '+String(x.i+1).padStart(2,'0')+'</span><strong>'+esc(x.ev.title)+'</strong><small>'+esc(x.ev.detail)+'</small></button>';}).join(''):'<p class="case-modal-empty">还没有已确认的现场线索。先回到「线索板」查看证据。</p>';
+ byId('caseModalFeedback').textContent=mode==='view'?'这是一份已记录的证词。可以继续追问细节，或选择现场证据进行核对。':(mode==='ask'?'选择一条已知信息，围绕证词里的时间、地点或行为继续追问。':'选择你认为能反驳这段证词的线索。系统会把双方内容并列，供你核对。');
+ list.querySelectorAll('[data-modal-evidence]').forEach(function(b){b.addEventListener('click',function(){list.querySelectorAll('.case-modal-evidence-card').forEach(function(x){x.classList.remove('selected');});b.classList.add('selected');selectedEvidenceIndex=Number(b.getAttribute('data-modal-evidence'));var ev=c.evidence[selectedEvidenceIndex];byId('caseModalFeedback').innerHTML='<strong>已选线索：'+esc(ev.title)+'</strong><p>'+esc(ev.detail)+'</p><p>提交后会根据本案的线索关系给出反馈。</p>';});});
+ modal.hidden=false;document.body.classList.add('case-modal-open');
+ }
+ byId('caseModalSubmit').addEventListener('click',function(){
+  var submitButton=byId('caseModalSubmit');
+  if(selectedEvidenceIndex===null){byId('caseModalFeedback').innerHTML='<div class="case-cross-result">请先选择一条已发现的证据，再提交。</div>';return;}
+  var suspectIndex=Number(modal.dataset.suspectIndex),mode=modal.dataset.mode,caseIndex=Number(gameState.caseIndex);
+  var suspect=c.suspects[suspectIndex],statement=interviews[suspectIndex];
+  var supportMap={0:{0:[1],1:[2],2:[3]},1:{0:[],1:[],2:[2,3]},2:{0:[2],1:[],2:[0,1,3]},3:{0:[2],1:[],2:[]},4:{0:[1],1:[2,3],2:[]},5:{0:[1,3],1:[0],2:[2]}};
+  var supporting=((supportMap[caseIndex]||{})[suspectIndex]||[]).indexOf(selectedEvidenceIndex)>=0;
+  var ev=c.evidence[selectedEvidenceIndex],question=byId('caseModalQuestion').value.trim();
+  if(mode==='ask'&&!question){byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>先提出一个具体问题</strong><p>可以点选上方问题，也可以自己写。围绕时间、地点、行为或可核对的记录追问，会比泛泛地问“为什么”更有用。</p></div>';byId('caseModalQuestion').focus();return;}
+  function saveInterrogationRecord(reply,resultCode){
+   gameState.crossExaminations=gameState.crossExaminations||[];
+   gameState.crossExaminations.push({suspect:suspectIndex,evidence:selectedEvidenceIndex,mode:mode,question:question,reply:reply||'',result:resultCode,at:new Date().toISOString()});
+   persistDetectiveCaseState();
   }
-  buttons.forEach(function(b){b.disabled=true;});
+  function showResult(title,body,status){
+   byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>'+esc(title)+'</strong><p>'+esc(body)+'</p><p class="case-result-note">调查判断 · '+esc(status)+' · 不直接等同于定案</p></div>';
+  }
+  if(mode==='ask'){
+   var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+   var apiReady=cfg&&String(cfg.apiKey||'').trim()&&window.PhoneAPI&&typeof window.PhoneAPI.complete==='function';
+   if(apiReady){
+    submitButton.disabled=true;submitButton.textContent='正在追问…';
+    byId('caseModalFeedback').innerHTML='<div class="case-cross-result"><strong>正在核对这段证词</strong><p>调查队正在结合人物当前说法和你选中的公开线索整理回应……</p></div>';
+    var system='你是互动推理故事里的被询问人物。你必须只根据给定的角色身份、原始证词、案件公开背景和玩家刚选中的一条已公开证据回答。不要读取或猜测未公开证据，不要知道自己不可能知道的事，不要发明新物证、新目击者或新记录。可以自然、谨慎、略有防备，也可以承认记不清；如果材料不足，就明确说无法确认。不要直接坦白真相，除非给定公开材料已经足以让角色合理承认。用简体中文，以第一人称角色口吻回答2至4句，最多180字，不要输出分析或旁白。';
+    var user='案件：'+String(c.title||'未命名案件')+'\n公开案情：'+String(c.intro||'')+'\n被询问人物：'+String(suspect.name)+'，身份：'+String(suspect.job)+'\n此人此前的证词：'+String(statement&&statement.text||'暂无明确证词')+'\n玩家已查看并选择的线索：'+String(ev.title)+'——'+String(ev.detail)+'\n玩家追问：'+question+'\n请只生成这个人物此刻合理的回答。不得引用其他未出示的证据，也不得凭空补写时间、动作或物证。';
+    window.PhoneAPI.complete({system:system,user:user,temperature:0.72,timeoutMs:30000}).then(function(raw){
+     var reply=String(raw||'').trim().replace(/^[\"“”']+|[\"“”']+$/g,'').slice(0,700);
+     if(!reply)throw new Error('empty response');
+     var evidenceNote=supporting?'当前线索与此人的说法有核对价值，但仍需要另一条独立材料验证。':'当前线索还不能直接验证这个问题；可以继续查找具体时间、地点或行为记录。';
+     showResult('对方回应 · '+suspect.name,'你问：“'+question+'” '+suspect.name+' 回答：“'+reply+'” 调查提示：'+evidenceNote,supporting?'有核对价值':'证据仍不足');
+     saveInterrogationRecord(reply,supporting?'relevant':'insufficient');
+     detectivePulse('追问已记录：'+suspect.name,String(reply).slice(0,130));
+    }).catch(function(){
+     var fallback='当前剧情引擎没有成功返回新回答。这条追问已保留，你可以稍后重试；先不要把未得到回答的内容视为事实。';
+     showResult('这次没有取得新口供',fallback,'等待重新询问');
+     saveInterrogationRecord('', 'request_failed');
+    }).finally(function(){submitButton.disabled=false;submitButton.textContent=modal.dataset.mode==='ask'?'提交追问':'提交对质';});
+    return;
+   }
+   var noApi='当前没有可用的 AI API，暂时无法生成这名人物的新回答。你问的是：“'+question+'” 已记录所选线索「'+ev.title+'」，可以先依据已知材料核对，或在配置 API 后再继续追问。';
+   showResult('追问已记录，但暂无动态口供',noApi,supporting?'有核对价值':'证据仍不足');
+   saveInterrogationRecord('', 'api_unavailable');
+   return;
+  }
+  var resultTitle=supporting?'发现一处值得核对的关联':'目前还不能形成有效对质';
+  var resultText=supporting?'「'+ev.title+'」与此人的证词存在可继续核实的关联，但关联不等于证明。请再寻找一条独立证据，确认时间线或实际行为。':'「'+ev.title+'」暂时不能直接反驳这段证词。建议先记录这项说法，再寻找能核对同一时间、地点或行为的证据。';
+  showResult(resultTitle,resultText,supporting?'有核对价值':'证据不足');
+  saveInterrogationRecord('',supporting?'relevant':'insufficient');
+  detectivePulse(supporting?'对质找到关联线索':'这条线索还不能证明矛盾',supporting?'这条证据值得继续核对，但仍需要其他信息。':'队员建议继续找能直接核对时间、地点或行为的证据。');
+ });
+ byId('caseArchiveBack').addEventListener('click',startCase);byId('newCase').addEventListener('click',startCase);
+ function syncSceneEvidence(){var found=Object.keys(gameState.revealed).filter(function(k){return !!gameState.revealed[k];}).length;var cnt=byId('sceneFoundCount');if(cnt)cnt.textContent=found+' / '+c.evidence.length+' 已确认';document.querySelectorAll('[data-scene-evidence]').forEach(function(h){var n=Number(h.getAttribute('data-scene-evidence')),known=!!gameState.revealed[n];h.classList.toggle('found',known);h.setAttribute('aria-pressed',String(known));});}
+ byId('evidenceList').querySelectorAll('[data-evidence]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-evidence'));if(gameState.ended)return;var wasKnown=!!gameState.revealed[i];gameState.revealed[i]=true;byId('evidenceDetail'+i).textContent='已查看 · 点击重新阅读';btn.classList.add('revealed');btn.querySelector('.evidence-mark').textContent='✓';persistDetectiveCaseState();if(!wasKnown){detectivePulse('发现新线索：'+c.evidence[i].title,detectiveEvidenceReaction(c.evidence[i],i));}updateCaseProgress();syncSceneEvidence();showCaseEvidenceDetail(c,i);});});
+ byId('gameContent').querySelectorAll('[data-scene-evidence]').forEach(function(h){h.addEventListener('click',function(){var n=Number(h.getAttribute('data-scene-evidence')),target=byId('evidenceList').querySelector('[data-evidence="'+n+'"]');if(target)target.click();});});
+ byId('interviewList').querySelectorAll('[data-interview]').forEach(function(btn){btn.addEventListener('click',function(){var i=Number(btn.getAttribute('data-interview'));if(gameState.ended)return;var wasInterviewed=!!gameState.interviewed[i];gameState.interviewed[i]=true;byId('interviewText'+i).textContent='已询问 · 点击查看完整证词';btn.classList.add('revealed');btn.querySelector('.interview-mark').textContent='✓';persistDetectiveCaseState();if(!wasInterviewed){detectivePulse('已记录 '+c.suspects[i].name+' 的证词',detectiveInterviewReaction(c.suspects[i],interviews[i],i));}var follow=btn.querySelector('.interview-followups');if(!follow){follow=document.createElement('span');follow.className='interview-followups';follow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:9px';follow.innerHTML='<button type="button" class="secondary-btn" data-follow="ask" style="min-height:30px;padding:0 9px;font-size:10px">深入追问</button><button type="button" class="secondary-btn" data-follow="cross" style="min-height:30px;padding:0 9px;font-size:10px">拿证据对质</button>';btn.querySelector('span:nth-child(2)').appendChild(follow);follow.querySelector('[data-follow="ask"]').addEventListener('click',function(e){e.stopPropagation();openInterrogation(i,'ask');});follow.querySelector('[data-follow="cross"]').addEventListener('click',function(e){e.stopPropagation();openInterrogation(i,'cross');});}updateCaseProgress();openInterrogation(i,'ask');});});
+ byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(btn){btn.addEventListener('click',function(){chooseSuspect(Number(btn.getAttribute('data-suspect')));});});
+ byId('caseTimeline').addEventListener('click',function(){var lines=c.evidence.map(function(ev,i){return '<div class="timeline-row"><span>证据 0'+(i+1)+'</span><strong>'+esc(ev.title)+'</strong><p>'+esc(gameState.revealed[i]?ev.detail:'尚未查看，时间线信息不完整。')+'</p></div>';}).join('');byId('timelinePanel').innerHTML='<div class="case-timeline"><div class="panel-kicker">EVIDENCE TIMELINE / WORKING NOTES</div>'+lines+'</div>';});
+ Object.keys(gameState.revealed).forEach(function(k){var b=byId('evidenceList').querySelector('[data-evidence="'+k+'"]');if(b){byId('evidenceDetail'+k).textContent='已查看 · 点击重新阅读';b.classList.add('revealed');var m=b.querySelector('.evidence-mark');if(m)m.textContent='✓';}});Object.keys(gameState.interviewed).forEach(function(k){var b=byId('interviewList').querySelector('[data-interview="'+k+'"]');if(b){byId('interviewText'+k).textContent='已询问 · 点击查看完整证词';b.classList.add('revealed');var m=b.querySelector('.interview-mark');if(m)m.textContent='✓';var f=document.createElement('span');f.className='interview-followups';f.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:9px';f.innerHTML='<button type="button" class="secondary-btn" data-follow="ask" style="min-height:30px;padding:0 9px;font-size:10px">深入追问</button><button type="button" class="secondary-btn" data-follow="cross" style="min-height:30px;padding:0 9px;font-size:10px">拿证据对质</button>';b.querySelector('span:nth-child(2)').appendChild(f);f.querySelector('[data-follow="ask"]').addEventListener('click',function(e){e.stopPropagation();openInterrogation(Number(k),'ask');});f.querySelector('[data-follow="cross"]').addEventListener('click',function(e){e.stopPropagation();openInterrogation(Number(k),'cross');});}});updateCaseProgress();syncSceneEvidence();
+ byId('teamDiscussionButton').addEventListener('click',function(){generateTeamDiscussion(c,investigators);});
+ byId('gameContent').querySelectorAll('[data-investigation-tool]').forEach(function(b){b.addEventListener('click',function(){var kind=b.getAttribute('data-investigation-tool'),input=byId('investigationInput'),note=byId('detectiveToolNote');var prompts={timeline:'请把目前已公开的证据与证词按时间顺序排列，标出时间空白与尚未证实的推测。',testimony:'请逐条对照已公开的嫌疑人证词，只指出与已公开证据存在的明确矛盾；没有证据支持的地方标为待核实。',scene:'请根据已查看的现场证据，提出三个可以实际执行的现场复查方向，不要创造新证物。',note:'请帮我整理当前已公开的证据、已询问的人物和下一步待查事项，分成简短调查笔记。'};if(kind==='note'){var st=detectiveCaseState(),existing=st.fieldNotes||'';var value=window.prompt('调查笔记（会保存在本机本角色进度中）：',existing);if(value!==null){st.fieldNotes=value.slice(0,2000);saveCaseProgress(caseProgress());if(note)note.textContent='笔记已保存 · '+st.fieldNotes.length+' 字';}return;}if(input){input.value=prompts[kind]||'';input.focus();if(note)note.textContent='已准备调查指令，点击下方“提交调查”即可让调查队分析。';}});});
+ byId('investigationSubmit').addEventListener('click',submitFreeformInvestigation);
+ byId('investigationInput').addEventListener('keydown',function(e){if(e.key==='Enter')submitFreeformInvestigation();});
+ roleLine('侦探小队调查案件“'+c.title+'”。案情：'+c.intro+'。队员：'+investigators.map(function(r){return roleName(r)+'，性格：'+String(r.personality||r.description||'').slice(0,80);}).join('；')+'。请以队员不同个性给出一句讨论。','先不急着判断。我们把现场和每个人的说法都收进档案，再交叉核对。');
+}
+function detectiveCaseState(){
+ var root=caseProgress(),all=root.caseStates||(root.caseStates={}),key=String(gameState&&gameState.item?gameState.item.title:'');
+ if(!all[key])all[key]={actions:[],followups:{},pressure:0,verifiedLeads:[],suspectTrust:{},revealed:{},interviewed:{}};
+ var st=all[key];if(!Array.isArray(st.actions))st.actions=[];if(!st.followups)st.followups={};if(!Array.isArray(st.verifiedLeads))st.verifiedLeads=[];if(!st.suspectTrust)st.suspectTrust={};if(!st.revealed)st.revealed={};if(!st.interviewed)st.interviewed={};
+ return st;
+}
+function persistDetectiveCaseState(){var st=detectiveCaseState();st.revealed=Object.assign({},gameState.revealed||{});st.interviewed=Object.assign({},gameState.interviewed||{});saveCaseProgress(caseProgress());}
+function saveDetectiveAction(question,answer,kind){
+ var st=detectiveCaseState(),c=gameState.item,record={question:question,answer:answer,kind:kind||'调查',at:new Date().toISOString(),revealed:Object.keys(gameState.revealed||{}).map(Number),interviewed:Object.keys(gameState.interviewed||{}).map(Number)};
+ st.actions.push(record);st.actions=st.actions.slice(-40);
+ var progress=caseProgress();progress.notes[c.title]=progress.notes[c.title]||{result:'investigating',actions:[]};
+ if(!progress.notes[c.title].actions)progress.notes[c.title].actions=[];
+ progress.notes[c.title].actions.push(record);saveCaseProgress(progress);
+}
+function detectiveActionKind(q){
+ if(/对质|对证|拿.*证据.*问|证据.*质问/.test(q))return '证据对质';
+ if(/追问|再问|继续问|问.*为什么|细节/.test(q))return '深入追问';
+ if(/时间线|时间顺序|核对时间|时间.*矛盾/.test(q))return '时间线核对';
+ if(/检查|搜查|重新看|复查|找.*痕迹/.test(q))return '现场复查';
+ return '自由调查';
+}
+function queueDetectiveFollowup(index,mode){
+ if(!gameState||gameState.ended)return;
+ var c=gameState.item,p=c.suspects[index];if(!p)return;
+ if(!gameState.interviewed[index]){showToast('先听完此人的初次证词，再进行追问。');return;}
+ var st=detectiveCaseState(),count=Number(st.followups[index]||0);
+ if(mode==='cross'&&!Object.keys(gameState.revealed||{}).length){showToast('至少先查看一条证据，才有依据对质。');return;}
+ st.followups[index]=count+1;
+ if(mode==='cross')st.pressure=Math.min(10,Number(st.pressure||0)+1);
+ saveCaseProgress(caseProgress());
+ var input=byId('investigationInput');if(!input)return;
+ input.value=(mode==='cross'?'请用已公开证据对质':'深入追问')+'嫌疑人「'+p.name+'」：'+(mode==='cross'?'请指出证词与已公开证据是否存在明确冲突；如果没有足够依据，必须承认暂时无法对质。':'围绕其刚才的证词追问一个具体细节，不能凭空编造新事实。')+'（第 '+(count+1)+' 次）';
+ input.focus();showToast(mode==='cross'?'已准备证据对质问题':'已准备深入追问问题');
+}
+function submitFreeformInvestigation(){
+ var input=byId('investigationInput'),log=byId('investigationLog');
+ if(!input||!log||gameState.ended)return;
+ var question=input.value.trim();if(!question){showToast('先写下你想调查的方向。');return;}
+ input.value='';var c=gameState.item,team=detectiveParty(detectiveTeam());
+ gameState.freeActions=gameState.freeActions||[];
+ gameState.freeActions.push({question:question,at:new Date().toISOString()});
+ var entry=document.createElement('div');entry.className='investigation-entry';entry.dataset.recordKind='action';
+ entry.innerHTML='<span class="record-index">调查行动</span><strong>调查指令</strong><p></p><small>自由调查 · '+String(gameState.freeActions.length).padStart(2,'0')+'</small>';
+ entry.querySelector('p').textContent=question;log.appendChild(entry);
+ var answer=document.createElement('div');answer.className='investigation-entry';answer.dataset.recordKind='analysis';answer.innerHTML='<span class="record-index">调查分析</span><strong>调查队意见</strong><p>正在分析案情与现有证据……</p>';log.appendChild(answer);
+ var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+ var apiReady=cfg&&String(cfg.apiKey||'').trim()&&window.PhoneAPI&&typeof window.PhoneAPI.complete==='function';
+ var evidence=c.evidence.map(function(e,i){return (gameState.revealed[i]?'[已查看] ':'[未查看] ')+e.title+': '+(gameState.revealed[i]?e.detail:'内容尚未公开');}).join('\n');
+ var interviews=c.suspects.map(function(p,i){return p.name+'（'+p.job+'）：'+(gameState.interviewed[i]?(CASE_INTERVIEWS[gameState.caseIndex]||[])[i]&&((CASE_INTERVIEWS[gameState.caseIndex]||[])[i].text)||'已询问，证词已记录':'尚未询问');}).join('\n');
+ function showAnswer(text,who){
+  answer.querySelector('p').textContent=text;
+  if(who)answer.querySelector('strong').textContent=who;
+  detectivePulse('调查队回应了你的行动',String(text).replace(/\s+/g,' ').slice(0,150));
+  saveDetectiveAction(question,text,detectiveActionKind(question));
+ }
+ if(!apiReady){
+  var opened=Object.keys(gameState.revealed).map(Number),hint=opened.length?c.evidence[opened[opened.length-1]].detail:'目前公开证据还不够，先选择一条现场证据展开。';
+  showAnswer('档案顾问沈砚：先把问题拆成可核对的事实。现场调查员林见秋：目前能确认的线索是「'+hint+'」。访谈顾问周予安：可以继续询问人物，找出说法之间的矛盾。此为基础反馈；配置 API 后才能对你的自由提问生成动态回应。','自动 NPC · 调查建议');return;
+ }
+ var system='你是受约束的开放式推理引擎。真凶、时间线、证据含义以内部案件圣经为准，不能改写。绝不能泄露未查看证据或内部结案解释。嫌疑人只知道本人亲历或合理可知的事情，不得全知或为戏剧性捏造事实。追问要针对具体证词；对质必须引用已公开证据标题，没有明确冲突就承认证据不足。区分【已证实】【角色推测】【待核实】。最多三位队员分别发言并遵循人设；新方向不自动成为证物。输出简体中文纯文本，不要JSON，不超过500字。';
+ var st=detectiveCaseState();
+ var prior=st.actions.slice(-8).map(function(a){return a.kind+'：'+a.question+' → '+a.answer;}).join('\\n')||'暂无此前自由调查记录';
+ var user='案件：'+c.title+'\\n案情：'+c.intro+'\\n既有证据：\\n'+evidence+'\\n人物证词：\\n'+interviews+'\\n调查队：\\n'+team.map(detectivePersona).join('\\n')+'\\n本案已记录的追问与回应：\\n'+prior+'\\n本案状态：已查看证据 '+Object.keys(gameState.revealed).length+'/'+c.evidence.length+'；已询问人物 '+Object.keys(gameState.interviewed).length+'/'+c.suspects.length+'；对质次数 '+st.pressure+'。\\n跨案记忆：'+campaignBrief()+'\\n玩家现在想做的事：'+question+'\\n【引擎内部案件圣经，仅供一致性校验，绝不可复述】\\n既定真凶：'+String(c.suspects[c.answer]&&c.suspects[c.answer].name||'未定义')+'\\n结案解释：'+String(c.explain||'未填写')+'\\n全部证据（未公开项仅供内部核验）：'+c.evidence.map(function(e,i){return '['+(i+1)+'] '+e.title+'：'+e.detail;}).join('；')+'\\n内部资料不代表玩家已经知道。未查看证据绝不可在回应中引用其内容。证词只能以 CASE_INTERVIEWS 已定义内容为准；资料未给出的细节回答“现有资料无法确认”，不得补写。请给出队员各自不同的实际回应。';
+ byId('investigationSubmit').disabled=true;
+ window.PhoneAPI.complete({system:system,user:user,temperature:0.75,timeoutMs:40000}).then(function(raw){
+  var text=String(raw||'').trim();if(!text)throw new Error('empty response');showAnswer(text,'调查队 · 动态回应');
+ }).catch(function(){showAnswer('这次没有连上剧情引擎，调查记录已保留。你可以换个问法重试，也可以先查看证据或询问人物。','调查引擎暂时不可用');}).finally(function(){var b=byId('investigationSubmit');if(b)b.disabled=false;});
+}
+function generateTeamDiscussion(c,team){
+ var panel=byId('teamDiscussionPanel');if(!panel)return;panel.innerHTML='<p class="team-discussion-loading">正在整理每位队员的调查意见……</p>';
+ var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+ if(!cfg||!String(cfg.apiKey||'').trim()||!window.PhoneAPI||typeof window.PhoneAPI.complete!=='function'){
+  panel.innerHTML=team.map(function(r,i){var trait=String(r.personality||r.description||r.bio||'').toLowerCase(),line=trait.indexOf('冷')>=0?'先核对时间和记录，不要急着相信口头证词。':trait.indexOf('活泼')>=0||trait.indexOf('开朗')>=0?'我觉得有个细节不太对，我们再把线索翻一遍！':trait.indexOf('聪明')>=0||trait.indexOf('理性')>=0?'把每条证据放到同一条时间线上，矛盾就会显出来。':'我们先检查现场，再听完每个人的说法。';return '<div class="team-discussion-line"><span class="team-discussion-index">0'+(i+1)+'</span><div><strong>'+esc(roleName(r))+'</strong><p>'+esc(line)+'</p></div></div>';}).join('')+'<p class="team-discussion-note">配置 AI API 后，可生成更贴合角色人设的专属讨论。</p>';return;}
+ var system='你是受约束的多角色推理引擎。只依据提供的案情与已公开材料发言，不准泄露凶手、结案解释或未公开证据。角色只能根据人设和当前已知材料推理，不得伪造秘密、经历、证物或证词；证据不足时表达不确定。只输出 JSON 数组，每项包含 name 和 line 两个字符串。每人一句，简体中文，每句不超过45字。';
+ var user='案件：'+c.title+'。案情：'+c.intro+'。调查队角色：'+team.map(function(r){return {name:roleName(r),bio:String(r.description||r.bio||r.background||''),personality:String(r.personality||r.character||r.profile||''),speech:String(r.speechStyle||r.speech||'')};}).map(function(x){return x.name+'；简介 '+x.bio+'；性格 '+x.personality+'；说话方式 '+x.speech;}).join('\n')+'。当前已公开证据：'+c.evidence.map(function(e,i){return gameState&&gameState.item===c&&gameState.revealed[i]?'['+(i+1)+'] '+e.title+'：'+e.detail:'';}).filter(Boolean).join('；')+'。已公开证词：'+c.suspects.map(function(p,i){return gameState&&gameState.item===c&&gameState.interviewed[i]?p.name+'：'+((CASE_INTERVIEWS[c.caseIndex]||[])[i]||{}).text:'';}).filter(Boolean).join('；')+'。不得泄露结案答案或未公开证据。请严格按队员顺序每人给一句独立的调查意见。';
+ window.PhoneAPI.complete({system:system,user:user,temperature:0.8,timeoutMs:30000}).then(function(raw){var txt=String(raw||'').trim().replace(/^\x60{3}(?:json)?\s*/i,'').replace(/\s*\x60{3}$/,'');var a=txt.indexOf('['),z=txt.lastIndexOf(']');if(a>=0&&z>a)txt=txt.slice(a,z+1);var arr=JSON.parse(txt);if(!Array.isArray(arr)||!arr.length)throw new Error('invalid discussion');panel.innerHTML=team.map(function(r,i){var item=arr.find(function(x){return x&&x.name===roleName(r);})||arr[i]||{};return '<div class="team-discussion-line"><span class="team-discussion-index">0'+(i+1)+'</span><div><strong>'+esc(roleName(r))+'</strong><p>'+esc(String(item.line||'我想再检查一下现有线索。').slice(0,120))+'</p></div></div>';}).join('');}).catch(function(){panel.innerHTML='<p class="team-discussion-note">这次没能生成角色讨论，请检查 API 配置后重试。</p>';});
+}
+function detectivePulse(title,detail){var feed=byId('detectiveLiveFeed'),status=byId('detectiveLiveStatus');if(!feed)return;if(status)status.textContent=title;var item=document.createElement('div');item.className='livefeed-item livefeed-enter';var time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});var t=document.createElement('span');t.className='livefeed-time';t.textContent=time;var p=document.createElement('p');p.textContent=detail||'调查队正在整理信息。';item.appendChild(t);item.appendChild(p);feed.insertBefore(item,feed.firstChild);while(feed.children.length>4)feed.removeChild(feed.lastChild);}
+function detectiveEvidenceReaction(e,i){var reactions=['沈砚把记录重新排了一遍：先记下能确认的部分，别急着下结论。','林见秋凑近看了看：这条线索值得继续查，先别忽略它的细节。','周予安提醒：线索本身不会说谎，但我们对它的解释仍可能出错。'];return reactions[i%reactions.length]+'【'+e.title+'】已加入公开调查材料。';}
+function detectiveInterviewReaction(p,it,i){var reactions=['沈砚低声补充：把这段证词和记录上的时间再对一下。','林见秋记下了现场细节：说法先保留，等其他线索来验证。','周予安没有急着评价：先听完每个人，再判断谁在回避问题。'];return p.name+'：'+String(it&&it.text||'证词已记录').slice(0,95)+'\\n'+reactions[i%reactions.length];}
+function updateCaseProgress(){var c=gameState.item,ec=Object.keys(gameState.revealed).length,ic=Object.keys(gameState.interviewed).length,minEvidence=Math.min(2,c.evidence.length),minInterviews=Math.min(2,c.suspects.length),ready=ec>=minEvidence&&ic>=minInterviews;byId('caseStepCount').textContent=ec+' 条线索 · '+ic+' 份证词';byId('caseStepText').textContent=ready?'可以尝试指认，也可以继续调查':'至少查看 '+minEvidence+' 条线索、询问 '+minInterviews+' 位人物';byId('caseFeedback').textContent=ready?'已达到基本调查条件，可以尝试指认；若还不确定，可以继续查看线索和询问人物。':'先查看至少 '+minEvidence+' 条线索，再听取至少 '+minInterviews+' 位人物的证词，就能开始判断。';var meter=byId('detectiveProgressFill'),label=byId('detectiveProgressLabel');if(meter)meter.style.width=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'%';if(label)label.textContent=Math.round((ec+ic)/(c.evidence.length+c.suspects.length)*100)+'% 已完成';byId('suspectList').querySelectorAll('[data-suspect]').forEach(function(b){b.disabled=!ready;});if(ready){document.querySelectorAll('[data-phase-mark]').forEach(function(n){n.classList.add('complete');});byId('detectiveLiveStatus').textContent='材料齐全 · 可以推理指认';}}
+function chooseSuspect(i){
+ if(gameState.ended)return;
+ var c=gameState.item,buttons=byId('suspectList').querySelectorAll('[data-suspect]'),progress=caseProgress();
+ if(Object.keys(gameState.revealed).length<Math.min(2,c.evidence.length)||Object.keys(gameState.interviewed).length<Math.min(2,c.suspects.length)){showToast('先查看至少两条线索，并听取至少两位人物的证词，就可以尝试指认。');return;}
+ gameState.ended=true;progress.attempts[c.title]=(progress.attempts[c.title]||0)+1;
+ var correct=i===c.answer;var campaign=progress.campaign||(progress.campaign={trust:{},flags:[],threads:[],choices:[]});campaign.trust=campaign.trust||{};var trustKey='investigation-team';campaign.trust[trustKey]=Math.max(-5,Math.min(5,Number(campaign.trust[trustKey]||0)+(correct?1:-1)));
+ if(correct){buttons[i].classList.add('correct');showCaseClosedCelebration(c.title,function(){showCaseStoryReveal(c);});var closedCover=document.querySelector('.case-notebook .notebook-cover');if(closedCover&&!closedCover.querySelector('.case-closed-stamp')){var closedStamp=document.createElement('div');closedStamp.className='case-closed-stamp';closedStamp.setAttribute('aria-label','案件已结案');closedStamp.innerHTML='<span>CASE CLOSED</span><strong>已结案</strong><small>ARCHIVED · '+new Date().getFullYear()+'</small>';closedCover.appendChild(closedStamp);closedCover.classList.add('is-case-closed');}byId('caseFeedback').innerHTML='<strong>案件侦破 · 推理成立。</strong> '+esc(c.explain);if(progress.completed.indexOf(gameState.caseIndex)<0)progress.completed.push(gameState.caseIndex);progress.notes[c.title]={result:'solved',day:new Date().toISOString().slice(0,10),suspect:c.suspects[i].name,evidence:Object.keys(gameState.revealed).length};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'正确指认；调查队信任上升，后续案件会参考这次判断。');saveStat('detective','win');roleLine('玩家正确侦破案件“'+c.title+'”。结论：'+c.explain+' 请用角色语气自然夸赞搭档。','漂亮，证据和证词终于对上了。我们把这案子正式归档。');}
+ else{buttons[c.answer].classList.add('correct');byId('caseFeedback').innerHTML='<strong>指认有误，案件复盘：</strong> '+esc(c.explain)+' 正确指向：'+esc(c.suspects[c.answer].name)+'。你可以回看证据，再重新调查。';progress.notes[c.title]={result:'review',suspect:c.suspects[i].name};saveCaseProgress(progress);saveCampaignChoice(c.title,c.suspects[i].name,'误判后进入复盘；队员会在后续调查中提醒你重新核对证据。');saveStat('detective','loss');roleLine('玩家在案件“'+c.title+'”中指认错误。正确对象是'+c.suspects[c.answer].name+'。鼓励玩家复盘证据，语气友好。','差一点就抓住关键了。回看一下时间线，我们再试一次。');}
+ buttons.forEach(function(b){b.disabled=true;});
+ var phase=document.querySelector('[data-phase-mark="accuse"]');if(phase)phase.classList.add('complete');
+ var extra=byId('gameContent').querySelector('.case-result-actions');if(!extra){extra=document.createElement('div');extra.className='btn-row case-result-actions';byId('gameContent').querySelector('.board-panel').appendChild(extra);}
+ extra.innerHTML='<button class="secondary-btn" id="caseResultArchive">返回案件档案</button><button class="primary-btn" id="caseResultRetry">重新调查</button>';
+ byId('caseResultArchive').addEventListener('click',startCase);byId('caseResultRetry').addEventListener('click',function(){openCase(gameState.caseIndex);});
 }
 var WIN_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 var DIFFICULTY='normal';
@@ -860,6 +1411,15 @@ byId('backLobby').addEventListener('click',returnLobby);
 byId('toLobbyFromGame').addEventListener('click',returnLobby);
 byId('restartGame').addEventListener('click',restartGame);
 document.querySelectorAll('[data-game]').forEach(function(b){b.addEventListener('click',function(e){if(b.classList.contains('spotlight')&&e.target.closest('button'))return;showGame(b.getAttribute('data-game'));});b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showGame(b.getAttribute('data-game'));}});});
+/* 推荐入口显式绑定，确保移动端点击 CTA 也能启动侦探游戏 */
+var detectiveSpotlight=document.querySelector('.spotlight[data-game="detective"]');
+if(detectiveSpotlight){
+  detectiveSpotlight.style.cursor='pointer';
+  detectiveSpotlight.setAttribute('role','button');
+  detectiveSpotlight.setAttribute('tabindex','0');
+  var detectiveCta=detectiveSpotlight.querySelector('.spotlight-cta');
+  if(detectiveCta){detectiveCta.style.pointerEvents='auto';detectiveCta.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();showGame('detective');});}
+}
 
 /* 大厅 Tab 互斥切换：仅当前面板显示，其余彻底隐藏 */
 var lobbyTab='featured';
@@ -870,6 +1430,16 @@ function setLobbyTab(t){
 }
 document.querySelectorAll('[data-gtab]').forEach(function(b){b.addEventListener('click',function(){setLobbyTab(b.getAttribute('data-gtab'));});});
 
+
+document.addEventListener('click',function(e){
+ var tab=e.target.closest&&e.target.closest('[data-record-filter]');if(!tab)return;
+ var notebook=tab.closest('.case-notebook');if(!notebook)return;
+ notebook.querySelectorAll('[data-record-filter]').forEach(function(b){b.classList.toggle('active',b===tab);});
+ var filter=tab.getAttribute('data-record-filter');
+ notebook.querySelectorAll('.investigation-entry').forEach(function(row){row.hidden=filter!=='all'&&row.dataset.recordKind!==filter;});
+});
+
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#caseThemeToggle');if(!b)return;var list=[{id:'white',label:'白色'},{id:'warm',label:'纸色'},{id:'black',label:'黑色'}],cur=document.body.getAttribute('data-case-theme')||'white',idx=list.findIndex(function(x){return x.id===cur;});idx=(idx+1)%list.length;document.body.setAttribute('data-case-theme',list[idx].id);b.textContent=list[idx].label+' ◐';try{localStorage.setItem('maomao_detective_theme_v1',list[idx].id);}catch(err){}});
 loadRoles();renderRoles();
 if(window.PhoneStorage&&typeof window.PhoneStorage.getCurrentContactId==='function'){
   var current=window.PhoneStorage.getCurrentContactId();
@@ -878,5 +1448,653 @@ if(window.PhoneStorage&&typeof window.PhoneStorage.getCurrentContactId==='functi
 })();
 </script>
 <script src="../shared/js/nav.js"></script>
+
+<style id="maomao-detective-editorial-redesign">
+/* DETECTIVE CASE DESK / editorial redesign */
+body.detective-case-mode #gameContent{padding-bottom:22px}
+body.detective-case-mode #gameContent>.board-panel{
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  background:transparent!important;padding:0!important;margin:0!important;
+}
+body.detective-case-mode .case-nav-line{
+  margin:0 0 24px;padding:2px 0 14px;border-bottom:1px solid #d6d6d2;
+  gap:12px;min-height:42px
+}
+body.detective-case-mode .case-nav-line .back-text{
+  font-size:13px;color:#555;padding:5px 0 8px
+}
+body.detective-case-mode .game-code{
+  margin-left:auto;margin-right:4px;font-size:10px;letter-spacing:.16em;
+  color:#858580;white-space:nowrap
+}
+body.detective-case-mode .case-theme-toggle{
+  border:1px solid #d9d9d5;border-radius:999px;background:#fff;color:#333;
+  min-height:34px;padding:0 12px;font-size:11px
+}
+body.detective-case-mode .board-panel>.panel-kicker{
+  margin-bottom:12px;font-size:9px;letter-spacing:.2em;color:#8d8d86
+}
+body.detective-case-mode .board-panel>.prompt-title{
+  max-width:100%;font-family:var(--serif);font-size:clamp(30px,8vw,43px);
+  line-height:1.1;letter-spacing:-.06em;margin:0 0 12px;color:#171717
+}
+body.detective-case-mode .board-panel>.prompt-copy{
+  font-size:12px;line-height:1.85;max-width:34em;color:#777770;margin:0 0 20px
+}
+body.detective-case-mode .detective-livebar{
+  padding:13px 0 11px;border-top:1px solid #deded9;border-bottom:1px solid #deded9;
+  margin:18px 0 7px
+}
+body.detective-case-mode .detective-livebar strong{font-size:12px;letter-spacing:.015em}
+body.detective-case-mode .detective-livefeed{margin:0 0 20px}
+body.detective-case-mode .livefeed-item{padding:10px 0;border-color:#ededeb}
+body.detective-case-mode .livefeed-item p{font-size:11px;line-height:1.75}
+body.detective-case-mode .case-team-presence{
+  background:#f7f7f5;border:0;border-top:1px solid #e3e3df;border-bottom:1px solid #e3e3df;
+  padding:13px 0;margin:18px 0
+}
+body.detective-case-mode .case-team-presence>p{max-width:34em;font-size:10px;line-height:1.8}
+body.detective-case-mode .investigation-console>.prompt-copy{
+  background:#f6f6f4;border:0;border-left:2px solid #252522;border-radius:0;
+  padding:12px 14px;margin:12px 0 18px;font-size:11px;line-height:1.85;color:#5f5f59
+}
+body.detective-case-mode .investigation-console>.prompt-copy details{margin-top:8px}
+body.detective-case-mode .investigation-console>.prompt-copy summary{
+  cursor:pointer;font-size:10px;color:#777770;letter-spacing:.04em
+}
+body.detective-case-mode .divider-label{
+  display:flex;align-items:center;gap:12px;margin:23px 0 12px;
+  color:#777770;font-size:10px;letter-spacing:.1em
+}
+body.detective-case-mode .divider-label:after{
+  content:"";display:block;flex:1;height:1px;background:#deded9
+}
+body.detective-case-mode .interview-list{
+  display:block;gap:0;margin:0 0 28px;border-top:1px solid #d9d9d5
+}
+body.detective-case-mode .interview-item{
+  display:grid;grid-template-columns:34px minmax(0,1fr) 14px;gap:10px;
+  width:100%;padding:18px 1px 19px;margin:0;text-align:left;
+  border:0!important;border-bottom:1px solid #deded9!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#20201e;align-items:start;transition:background .2s,padding .2s
+}
+body.detective-case-mode .interview-item:active{background:#f7f7f5!important;padding-left:6px;padding-right:6px}
+body.detective-case-mode .interview-item.revealed{background:transparent!important}
+body.detective-case-mode .interview-number{
+  font-family:var(--serif);font-size:25px;line-height:1;color:#a0a09a;
+  padding-top:1px;font-variant-numeric:tabular-nums
+}
+body.detective-case-mode .interview-item strong{
+  display:block;font-size:15px;line-height:1.35;font-weight:650;letter-spacing:-.025em;color:#181818
+}
+body.detective-case-mode .interview-item small{
+  display:block;margin:5px 0 10px;font-size:9px;letter-spacing:.1em;color:#858580
+}
+body.detective-case-mode .interview-text{
+  display:block;font-size:12px;line-height:1.9;color:#65655f;max-width:36em
+}
+body.detective-case-mode .interview-mark{
+  color:#777770;font-size:13px;line-height:1.2;padding-top:3px
+}
+body.detective-case-mode .interview-item.revealed .interview-mark{color:#222}
+body.detective-case-mode .interview-followups{gap:14px!important;margin-top:12px!important}
+body.detective-case-mode .interview-followups .secondary-btn{
+  min-height:29px!important;font-size:10px!important;padding:0 0 4px!important;
+  border-bottom:1px solid #bcbcb6!important;color:#333
+}
+body.detective-case-mode .case-section-nav{
+  bottom:0;margin:20px -2px 0;padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+  gap:8px;border-top:1px solid #d8d8d4;box-shadow:0 -6px 18px rgba(0,0,0,.025);
+  background:rgba(255,255,255,.97);backdrop-filter:blur(14px)
+}
+body.detective-case-mode .case-section-nav button{
+  position:relative;border-radius:0!important;background:transparent!important;
+  color:#898983;font-size:10px;letter-spacing:.015em;padding:13px 2px
+}
+body.detective-case-mode .case-section-nav button.active{
+  color:#171717;font-weight:650
+}
+body.detective-case-mode .case-section-nav button.active:after{
+  content:"";position:absolute;left:16%;right:16%;bottom:2px;height:2px;background:#171717
+}
+body.detective-case-mode .case-phase-track{display:none!important}
+body.detective-case-mode .case-modal-sheet{
+  border-radius:0!important;padding:22px 18px calc(20px + env(safe-area-inset-bottom))!important
+}
+body.detective-case-mode .case-modal-head{border-bottom:1px solid #deded9;padding-bottom:13px}
+body.detective-case-mode .case-modal-evidence-card{border-radius:0!important;box-shadow:none!important}
+@media(max-width:380px){
+  body.detective-case-mode .interview-item{grid-template-columns:28px minmax(0,1fr) 12px;gap:8px}
+  body.detective-case-mode .interview-number{font-size:22px}
+  body.detective-case-mode .board-panel>.prompt-title{font-size:30px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.detective-case-mode .interview-item{transition:none}
+}
+</style>
+
+<style id="maomao-detective-depth-v02">
+.case-modal-question-box{margin:15px 0;padding:13px 0;border-top:1px solid var(--case-line,#ddd);border-bottom:1px solid var(--case-line,#ddd)}
+.case-modal-question-prompts{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.case-question-chip{border:1px solid #d8d8d3;background:transparent;color:#555;padding:8px 10px;font-size:11px;border-radius:0;text-align:left}
+.case-question-chip.active{background:#191919;color:#fff;border-color:#191919}
+#caseModalQuestion{display:block;box-sizing:border-box;width:100%;resize:vertical;min-height:66px;padding:11px;border:1px solid #d7d7d2;border-radius:0;background:#fafaf8;color:#222;font:inherit;font-size:12px;line-height:1.7}
+.case-modal-hint{font-size:10px;line-height:1.7;color:#888;margin:7px 0 0}
+.case-result-note{border-top:1px solid #e4e4df;padding-top:8px!important;color:#777;font-size:10px!important;letter-spacing:.04em}
+.case-modal-question-box[hidden]{display:none!important}
+</style>
+<style id="maomao-detective-popup-v03">
+body.detective-case-mode .interview-list{border-top:1px solid #d9d9d5;margin-bottom:24px}
+body.detective-case-mode .interview-item{grid-template-columns:30px minmax(0,1fr) 14px;padding:13px 1px;cursor:pointer}
+body.detective-case-mode .interview-item .interview-text{display:none!important}
+body.detective-case-mode .interview-item small{margin:3px 0 0}
+body.detective-case-mode .interview-followups{display:none!important}
+.case-modal-grabber{width:34px;height:3px;border-radius:99px;background:#c8c8c2;margin:0 auto 14px}
+.case-modal-view-actions{padding:13px 0 4px;border-top:1px solid #e1e1dc}
+.case-modal-view-actions>p{margin:0 0 10px;color:#777;font-size:11px}
+.case-modal-view-actions>div{display:flex;gap:9px;flex-wrap:wrap}
+.case-modal-view-actions button{min-height:38px;padding:0 14px;font-size:11px}
+.case-modal-sheet{max-height:min(84dvh,760px);border-radius:18px 18px 0 0}
+.case-modal-testimony{border:0;border-left:2px solid #252522;border-radius:0;background:#f6f6f4;padding:14px}
+.case-modal-evidence-card{border-radius:0;padding:10px 11px}
+.case-modal-evidence-card small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:600px){.case-modal-sheet{border-radius:18px;align-self:center;max-height:84dvh}.case-interrogation-modal{align-items:center;padding:18px}}
+</style>
+<style id="maomao-detective-v04-fixed-version">
+#detectiveVersionBadge{
+ position:fixed;z-index:9998;display:none;right:max(9px,calc((100vw - 460px)/2 + 9px));
+ bottom:calc(env(safe-area-inset-bottom) + 74px);padding:5px 7px;
+ border:1px solid rgba(255,255,255,.18);background:#202020;color:#fff;
+ font-size:9px;line-height:1;letter-spacing:.14em;font-variant-numeric:tabular-nums;
+ opacity:.76;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.08)
+}
+.case-modal-question-box{border-top:1px solid #e1e1dc;border-bottom:1px solid #e1e1dc}
+.case-modal-question-prompts{display:flex;flex-wrap:wrap;gap:6px}
+.case-question-chip{max-width:100%;line-height:1.5;padding:7px 9px;font-size:10px}
+.case-modal-view-actions button:active,.case-question-chip:active{transform:scale(.98)}
+.case-modal-feedback{overflow-wrap:anywhere}
+@media(max-width:360px){#detectiveVersionBadge{right:6px;bottom:calc(env(safe-area-inset-bottom) + 72px);font-size:8px;padding:4px 5px}}
+</style>
+<style id="maomao-detective-v05-floating-toolbox">
+body.detective-case-mode .investigation-console>.detective-toolkit{display:none!important}
+.floating-tool-launcher{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;margin:14px 0 18px;padding:12px 14px;border:1px solid #d9d9d4;border-radius:0;background:#fafaf8;color:#222;text-align:left;box-shadow:0 5px 18px rgba(0,0,0,.035)}
+.floating-tool-icon{display:grid;place-items:center;width:34px;height:34px;border:1px solid #d3d3cd;border-radius:50%;font-size:20px;font-weight:300}
+.floating-tool-launcher strong{display:block;font-size:12px;font-weight:650}
+.floating-tool-launcher small{display:block;margin-top:4px;font-size:8px;letter-spacing:.12em;color:#888}
+.floating-tool-arrow{margin-left:auto;font-size:17px;color:#777}
+.floating-tools-modal[hidden]{display:none!important}
+.floating-tools-modal{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+.floating-tools-scrim{position:absolute;inset:0;width:100%;height:100%;border:0;background:rgba(18,18,17,.42);backdrop-filter:blur(5px)}
+.floating-tools-dialog{position:relative;z-index:1;width:min(100%,410px);max-height:min(82dvh,650px);overflow:auto;box-sizing:border-box;padding:21px 19px 15px;background:#fff;color:#1d1d1b;border:1px solid #deded9;box-shadow:0 24px 80px rgba(0,0,0,.18);animation:floatingToolsIn .2s ease-out}
+.floating-tools-topline{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #e3e3de;font-size:8px;letter-spacing:.15em;color:#888}
+.floating-tools-topline button{width:30px;height:30px;border:1px solid #deded9;background:#fff;color:#333;font-size:21px;line-height:1}
+.floating-tools-eyebrow{margin-top:22px;font-size:9px;letter-spacing:.18em;color:#8c8c85}
+.floating-tools-dialog h2{margin:7px 0 9px;font-family:var(--serif,Georgia,serif);font-size:30px;line-height:1.1;letter-spacing:-.05em;font-weight:500}
+.floating-tools-intro{margin:0 0 19px;color:#777770;font-size:11px;line-height:1.8}
+.floating-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.floating-tools-grid button{display:flex;flex-direction:column;align-items:flex-start;min-height:105px;padding:12px 11px;border:1px solid #e0e0db;border-radius:0;background:#fafaf8;color:#222;text-align:left;transition:background .16s,transform .16s}
+.floating-tools-grid button:active{background:#ededeb;transform:scale(.985)}
+.floating-tools-grid button span{font-size:9px;letter-spacing:.12em;color:#999;margin-bottom:12px}
+.floating-tools-grid button strong{font-size:12px;font-weight:650}
+.floating-tools-grid button small{font-size:9px;line-height:1.6;color:#888;margin-top:5px}
+.floating-tools-foot{display:flex;justify-content:space-between;gap:8px;margin-top:17px;padding-top:11px;border-top:1px solid #e3e3de;font-size:8px;letter-spacing:.05em;color:#999}
+body.floating-tools-open{overflow:hidden}
+@keyframes floatingToolsIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.floating-tools-dialog{animation:none}}
+@media(max-width:340px){.floating-tools-modal{padding:12px}.floating-tools-dialog{padding:17px 14px}.floating-tools-grid button{min-height:96px;padding:10px}}
+</style>
+<style id="maomao-detective-v05-version">#detectiveVersionBadge{bottom:calc(env(safe-area-inset-bottom) + 74px)}#detectiveVersionBadge:after{content:"";}</style>
+
+<style id="maomao-detective-v06-discussion-modal">
+.team-discussion-panel{display:grid;gap:8px}
+.team-discussion-launch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:11px 13px;border:1px solid #deded9;background:#fff;color:#222;text-align:left;width:100%;font-size:12px}
+.team-discussion-launch small{font-size:10px;color:#888}
+.team-discussion-overlay{position:fixed;inset:0;z-index:10040;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(18,18,18,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);animation:teamDiscussionFade .18s ease-out}
+.team-discussion-dialog{width:min(100%,460px);max-height:min(78vh,680px);overflow:auto;background:#fff;color:#222;border:1px solid #ddd;box-shadow:0 24px 70px rgba(0,0,0,.2);padding:18px;animation:teamDiscussionRise .22s ease-out}
+.team-discussion-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:13px;border-bottom:1px solid #ddd;margin-bottom:8px}
+.team-discussion-dialog-head small{display:block;font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}
+.team-discussion-dialog-head h3{margin:0;font-size:20px;font-weight:500;letter-spacing:-.04em}
+.team-discussion-close{width:34px;height:34px;border:1px solid #ddd;background:#fff;color:#222;font-size:20px;flex:0 0 auto}
+.team-discussion-dialog .team-discussion-panel{margin-top:0}
+.team-discussion-dialog .team-discussion-line{grid-template-columns:30px 1fr;gap:10px;padding:12px 0}
+.team-discussion-dialog .team-discussion-index{font-size:16px}
+.team-discussion-dialog .team-discussion-line strong{font-size:12px}
+.team-discussion-dialog .team-discussion-line p{font-size:12px;line-height:1.8;color:#555}
+.team-discussion-dialog .team-discussion-note{padding-top:8px;border-top:1px solid #eee;font-size:10px;line-height:1.7}
+.team-discussion-dialog .team-discussion-loading{font-size:12px;padding:12px 0}
+.team-discussion-refresh{margin-top:12px;width:100%;padding:12px;border:1px solid #222;background:#222;color:#fff;font-size:12px}
+@keyframes teamDiscussionFade{from{opacity:0}to{opacity:1}}
+@keyframes teamDiscussionRise{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.team-discussion-overlay,.team-discussion-dialog{animation:none}}
+</style>
+<script id="maomao-detective-v06-discussion-modal-script">
+(function(){
+ if(window.__maomaoTeamDiscussionV06)return;window.__maomaoTeamDiscussionV06=true;
+ var overlay=null,originalParent=null,originalNext=null,panel=null,activeCase=null;
+ function close(){
+  if(!overlay)return;
+  if(panel&&originalParent){if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(panel,originalNext);else originalParent.appendChild(panel);panel.style.display='none';}
+  overlay.remove();overlay=null;panel=null;activeCase=null;
+ }
+ function open(){
+  var button=document.getElementById('teamDiscussionButton'),p=document.getElementById('teamDiscussionPanel');
+  if(!button||!p||typeof gameState==='undefined'||!gameState||!gameState.item){return;}
+  close();panel=p;originalParent=p.parentNode;originalNext=p.nextSibling;activeCase=gameState.item;
+  overlay=document.createElement('div');overlay.className='team-discussion-overlay';overlay.setAttribute('role','presentation');
+  var dialog=document.createElement('section');dialog.className='team-discussion-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','小队讨论');
+  var head=document.createElement('div');head.className='team-discussion-dialog-head';head.innerHTML='<div><small>TEAM BRIEFING / CASE NOTES</small><h3>小队讨论</h3></div><button type="button" class="team-discussion-close" aria-label="关闭讨论">×</button>';
+  var hint=document.createElement('p');hint.className='team-discussion-note';hint.textContent='队员只根据目前已公开的证据与证词讨论；尚未确认的内容会保留为推测。';
+  var refresh=document.createElement('button');refresh.type='button';refresh.className='team-discussion-refresh';refresh.textContent='重新听取讨论';
+  dialog.appendChild(head);dialog.appendChild(hint);dialog.appendChild(panel);dialog.appendChild(refresh);overlay.appendChild(dialog);document.body.appendChild(overlay);
+  panel.style.display='grid';
+  head.querySelector('button').addEventListener('click',close);refresh.addEventListener('click',function(){if(window.gameState&&gameState.item===activeCase&&typeof generateTeamDiscussion==='function'){generateTeamDiscussion(activeCase,detectiveParty(detectiveTeam()));}});
+  overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
+  document.addEventListener('keydown',onKey);
+  function onKey(e){if(e.key==='Escape'&&overlay){close();document.removeEventListener('keydown',onKey);}}
+  if(typeof generateTeamDiscussion==='function')generateTeamDiscussion(activeCase,detectiveParty(detectiveTeam()));
+ }
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('#teamDiscussionButton'):null;if(!b)return;
+  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();open();
+ },true);
+ document.addEventListener('click',function(e){
+  var p=e.target&&e.target.closest?e.target.closest('#teamDiscussionPanel'):null;
+  if(p&&p.querySelector('.team-discussion-note')&&!p.querySelector('.team-discussion-line')){
+   var note=p.querySelector('.team-discussion-note');
+   if(note&&/配置 AI API/.test(note.textContent)){note.textContent='当前未连接 AI API：以下是基础调查建议，不是根据本轮案情实时生成的角色对话。';}
+  }
+ },false);
+})();
+</script>
+
+
+<style id="maomao-detective-v07-live-evidence-layout">
+body.detective-case-mode .detective-livebar{position:sticky;top:8px;z-index:18;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;margin:10px 0 14px;background:rgba(255,255,255,.97);border:1px solid #deded9;box-shadow:0 5px 18px rgba(0,0,0,.045);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer}
+body.detective-case-mode .detective-livebar:after{content:'查看动态 ↗';font-size:10px;color:#777;white-space:nowrap}
+body.detective-case-mode .detective-livebar strong{font-size:12px}
+body.detective-case-mode .detective-livefeed{display:none!important}
+.detective-live-modal{position:fixed;inset:0;z-index:10060;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(18,18,18,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.detective-live-modal[hidden]{display:none!important}
+.detective-live-modal-card{width:min(100%,440px);max-height:min(75vh,600px);overflow:auto;background:#fff;border:1px solid #ddd;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.2);animation:teamDiscussionRise .2s ease-out}
+.detective-live-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #ddd;margin-bottom:10px}
+.detective-live-modal-head small{display:block;font-size:9px;letter-spacing:.15em;color:#888;margin-bottom:5px}
+.detective-live-modal-head h3{margin:0;font-size:20px;font-weight:500}
+.detective-live-modal-close{width:34px;height:34px;border:1px solid #ddd;background:#fff;color:#222;font-size:20px}
+body.detective-case-mode .detective-live-modal .detective-livefeed{display:grid!important;visibility:visible!important;opacity:1!important;gap:0!important}
+.detective-live-modal .livefeed-item{padding:12px 0;border-top:1px solid #eee}
+.detective-live-modal .livefeed-item p{font-size:12px;line-height:1.8;color:#555}
+@media(prefers-reduced-motion:reduce){.detective-live-modal-card{animation:none}}
+</style>
+<script id="maomao-detective-v07-live-evidence-script">
+(function(){
+ if(window.__maomaoDetectiveLiveV07)return;window.__maomaoDetectiveLiveV07=true;
+ var modal=null,feed=null,home=null,next=null;
+ function close(){if(!modal)return;if(feed&&home){if(next&&next.parentNode===home)home.insertBefore(feed,next);else home.appendChild(feed);feed.style.display='none';}modal.remove();modal=null;feed=null;home=null;next=null;document.removeEventListener('keydown',keyHandler);}
+ function keyHandler(e){if(e.key==='Escape')close();}
+ function open(){
+  var bar=document.getElementById('detectiveLiveStatus');var live=document.getElementById('detectiveLiveFeed');if(!bar||!live)return;
+  close();feed=live;home=feed.parentNode;next=feed.nextSibling;
+  modal=document.createElement('div');modal.className='detective-live-modal';modal.setAttribute('role','presentation');
+  var card=document.createElement('section');card.className='detective-live-modal-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','实时调查动态');
+  var head=document.createElement('div');head.className='detective-live-modal-head';head.innerHTML='<div><small>CASE ACTIVITY / LIVE LOG</small><h3>实时调查动态</h3></div><button type="button" class="detective-live-modal-close" aria-label="关闭">×</button>';
+  card.appendChild(head);card.appendChild(feed);modal.appendChild(card);document.body.appendChild(modal);feed.style.display='grid';
+  head.querySelector('button').addEventListener('click',close);modal.addEventListener('click',function(e){if(e.target===modal)close();});document.addEventListener('keydown',keyHandler);
+ }
+ document.addEventListener('click',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar, #detectiveLiveStatus, [data-open-live-log]'):null;if(!bar)return;var liveBar=bar.closest('.detective-livebar')||bar;if(!document.getElementById('detectiveLiveFeed'))return;e.preventDefault();e.stopPropagation();open();},true);
+ document.addEventListener('keydown',function(e){var bar=e.target&&e.target.closest?e.target.closest('.detective-livebar'):null;if(!bar||!(e.key==='Enter'||e.key===' '))return;e.preventDefault();open();},true);
+ document.addEventListener('DOMContentLoaded',function(){var bar=document.querySelector('.detective-livebar');if(bar){bar.setAttribute('role','button');bar.setAttribute('tabindex','0');bar.setAttribute('aria-label','打开实时调查动态');}});
+})();
+</script>
+
+
+<style id="maomao-notebook-v10-style">
+.case-notebook .investigation-entry{cursor:pointer;position:relative;transition:background .18s,border-color .18s;padding-right:28px}
+.case-notebook .investigation-entry:after{content:'查看档案 ↗';position:absolute;right:8px;bottom:10px;font-size:10px;letter-spacing:.04em;color:#777}
+.case-notebook .investigation-entry:focus-visible{outline:2px solid #555;outline-offset:2px}
+.case-notebook .investigation-entry:hover{background:rgba(0,0,0,.025)}
+.notebook-detail-overlay{position:fixed;inset:0;z-index:10080;background:rgba(20,20,20,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px}
+.notebook-detail-card{width:min(100%,440px);max-height:78vh;overflow:auto;background:#fff;color:#222;border:1px solid #d8d8d8;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:20px;animation:teamDiscussionRise .18s ease-out}
+.notebook-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid #ddd;margin-bottom:14px}
+.notebook-detail-head small{display:block;color:#888;font-size:10px;letter-spacing:.14em;margin-bottom:7px}
+.notebook-detail-head h3{margin:0;font-size:22px;font-weight:500}
+.notebook-detail-close{width:36px;height:36px;background:#fff;border:1px solid #ccc;font-size:23px;flex:none}
+.notebook-detail-body{font-size:14px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere;color:#444}
+.notebook-detail-meta{margin-top:16px;padding-top:12px;border-top:1px dashed #ccc;color:#888;font-size:11px;line-height:1.8}
+</style>
+<script id="maomao-notebook-v10-script">
+(function(){
+ if(window.__maomaoNotebookV10)return;window.__maomaoNotebookV10=true;
+ var recordCount={};
+ function byId(id){return document.getElementById(id);}
+ function addRecord(kind,title,body,meta,key){
+  var log=byId('investigationLog');if(!log||!body)return;
+  var token=key||kind+'|'+title+'|'+body;
+  if(recordCount[token])return;recordCount[token]=true;
+  var n=log.querySelectorAll('.investigation-entry').length+1;
+  var row=document.createElement('article');row.className='investigation-entry';row.dataset.recordKind=kind;
+  var index=document.createElement('span');index.className='record-index';index.textContent='记录 '+String(n).padStart(2,'0');
+  var h=document.createElement('strong');h.textContent=title;
+  var p=document.createElement('p');p.textContent=body.length>170?body.slice(0,167)+'…':body;
+  var small=document.createElement('small');small.textContent=meta||'调查过程中 · 已记录';
+  row.appendChild(index);row.appendChild(h);row.appendChild(p);row.appendChild(small);
+  row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','查看档案：'+title);
+  row.dataset.detailTitle=title;row.dataset.detailBody=body;row.dataset.detailMeta=small.textContent;
+  log.appendChild(row);
+ }
+ function openDetail(row){
+  var overlay=document.createElement('div');overlay.className='notebook-detail-overlay';
+  var card=document.createElement('section');card.className='notebook-detail-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','调查记录详情');
+  var head=document.createElement('div');head.className='notebook-detail-head';
+  var titleBox=document.createElement('div'),k=document.createElement('small'),h=document.createElement('h3'),close=document.createElement('button');
+  k.textContent='CASE NOTE / 调查档案';h.textContent=row.dataset.detailTitle||'调查记录';titleBox.appendChild(k);titleBox.appendChild(h);
+  close.type='button';close.className='notebook-detail-close';close.textContent='×';close.setAttribute('aria-label','关闭详情');head.appendChild(titleBox);head.appendChild(close);
+  var body=document.createElement('div');body.className='notebook-detail-body';body.textContent=row.dataset.detailBody||row.querySelector('p')?.textContent||'暂无详细内容。';
+  var meta=document.createElement('div');meta.className='notebook-detail-meta';meta.textContent=(row.dataset.detailMeta||'调查过程中 · 已记录')+'\n此条记录仅整理已发生的调查行为与已公开信息；分析意见不等同于最终定案。';
+  card.appendChild(head);card.appendChild(body);card.appendChild(meta);overlay.appendChild(card);document.body.appendChild(overlay);
+  function done(){overlay.remove();document.removeEventListener('keydown',key);}
+  function key(e){if(e.key==='Escape')done();}
+  close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});document.addEventListener('keydown',key);close.focus();
+ }
+ document.addEventListener('click',function(e){
+  var row=e.target&&e.target.closest?e.target.closest('.case-notebook .investigation-entry'):null;
+  if(!row)return;
+  e.preventDefault();openDetail(row);
+ });
+ document.addEventListener('keydown',function(e){var row=e.target&&e.target.closest?e.target.closest('.case-notebook .investigation-entry'):null;if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDetail(row);}});
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-evidence]'):null;
+  if(!b)return;var i=Number(b.getAttribute('data-evidence'));var c=window.gameState&&gameState.item;
+  if(!c||!c.evidence||!c.evidence[i])return;
+  var ev=c.evidence[i];addRecord('action','现场证据：'+ev.title,ev.detail,'现场取证 · 证据 '+String(i+1).padStart(2,'0'),'evidence|'+(c.title||'')+'|'+i);
+ },false);
+ document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-interview]'):null;
+  if(!b)return;var i=Number(b.getAttribute('data-interview'));var c=window.gameState&&gameState.item;
+  if(!c||!c.suspects||!c.suspects[i])return;
+  var ss=c.suspects[i],list=window.CASE_INTERVIEWS||[],interviews=list[gameState.caseIndex]||[],it=interviews[i];
+  if(!it||!it.text)return;
+  addRecord('analysis','人物证词：'+ss.name,it.text,'人物询问 · '+(ss.job||'在场人员'),'interview|'+(c.title||'')+'|'+i);
+ },false);
+})();
+</script>
+
+
+<style id="maomao-case-closed-stamp-v11">
+.case-notebook .notebook-cover{position:relative;overflow:hidden}
+.case-notebook .case-closed-stamp{position:absolute;right:18px;top:50%;transform:translateY(-50%) rotate(-12deg);width:112px;min-height:82px;border:3px double #333;color:#292929;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;opacity:.92;pointer-events:none;background:rgba(250,248,241,.82);box-shadow:0 0 0 2px rgba(45,45,45,.06),inset 0 0 0 1px rgba(45,45,45,.08);animation:caseStampIn .42s cubic-bezier(.2,.8,.2,1) both}
+.case-notebook .case-closed-stamp span{font-size:9px;letter-spacing:.12em;font-weight:700}
+.case-notebook .case-closed-stamp strong{font-family:Georgia,'Noto Serif SC',serif;font-size:22px;letter-spacing:.12em;line-height:1.25}
+.case-notebook .case-closed-stamp small{font-size:7px;letter-spacing:.1em}
+@keyframes caseStampIn{0%{opacity:0;transform:translateY(-50%) rotate(-12deg) scale(1.35)}65%{opacity:1;transform:translateY(-50%) rotate(-10deg) scale(.96)}100%{opacity:.92;transform:translateY(-50%) rotate(-12deg) scale(1)}}
+@media(max-width:420px){.case-notebook .case-closed-stamp{right:10px;width:88px;min-height:68px}.case-notebook .case-closed-stamp strong{font-size:18px}.case-notebook .case-closed-stamp span{font-size:7px}.case-notebook .notebook-cover strong{max-width:62%;display:block}}
+@media(prefers-reduced-motion:reduce){.case-notebook .case-closed-stamp{animation:none}}
+</style>
+
+
+<style id="maomao-case-closed-fullscreen-v12">
+.case-closed-celebration{position:fixed;inset:0;z-index:10150;background:rgba(12,12,12,.76);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;animation:caseClosedVeil .25s ease-out forwards;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.case-closed-celebration .closed-stamp-stage{width:min(88vw,430px);aspect-ratio:1.22;display:flex;align-items:center;justify-content:center;transform:scale(1.7) rotate(-9deg);opacity:0;animation:caseClosedSlam .68s cubic-bezier(.16,.85,.25,1.25) .12s forwards}
+.case-closed-celebration .closed-stamp-art{width:100%;padding:25px 16px;border:7px double #fff;color:#fff;text-align:center;outline:1px solid rgba(255,255,255,.7);outline-offset:-14px;box-shadow:0 0 0 2px rgba(255,255,255,.3),0 16px 45px rgba(0,0,0,.28);position:relative}
+.case-closed-celebration .closed-stamp-art:before,.case-closed-celebration .closed-stamp-art:after{content:'';position:absolute;left:12%;right:12%;height:1px;background:rgba(255,255,255,.7)}
+.case-closed-celebration .closed-stamp-art:before{top:15px}.case-closed-celebration .closed-stamp-art:after{bottom:15px}
+.case-closed-celebration .closed-stamp-art .closed-en{font-size:clamp(12px,3vw,17px);font-weight:700;letter-spacing:.22em}
+.case-closed-celebration .closed-stamp-art strong{display:block;font-family:Georgia,'Noto Serif SC',serif;font-size:clamp(48px,13vw,78px);line-height:1.3;letter-spacing:.12em}
+.case-closed-celebration .closed-stamp-art .closed-case-name{font-size:12px;letter-spacing:.12em;margin-top:7px;max-width:100%;overflow-wrap:anywhere}
+.case-closed-celebration .closed-stamp-art .closed-year{font-size:10px;letter-spacing:.2em;margin-top:12px}
+.case-closed-celebration .closed-dismiss{position:absolute;bottom:max(30px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);border:1px solid rgba(255,255,255,.75);background:transparent;color:#fff;padding:11px 24px;letter-spacing:.08em;font-size:13px;white-space:nowrap}
+@keyframes caseClosedVeil{to{opacity:1}}
+@keyframes caseClosedSlam{0%{opacity:0;transform:scale(1.7) rotate(-9deg)}58%{opacity:1;transform:scale(.94) rotate(-12deg)}72%{transform:scale(1.04) rotate(-11deg)}100%{opacity:1;transform:scale(1) rotate(-11deg)}}
+@media(prefers-reduced-motion:reduce){.case-closed-celebration,.case-closed-celebration .closed-stamp-stage{animation:none;opacity:1;transform:none}}
+</style>
+<script id="maomao-case-closed-fullscreen-v12-script">
+function showCaseClosedCelebration(caseTitle,onDismiss){
+ if(document.querySelector('.case-closed-celebration'))return;
+ var overlay=document.createElement('div');overlay.className='case-closed-celebration';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','案件已结案');
+ var stage=document.createElement('div');stage.className='closed-stamp-stage';
+ var art=document.createElement('div');art.className='closed-stamp-art';
+ var en=document.createElement('div');en.className='closed-en';en.textContent='CASE CLOSED';
+ var cn=document.createElement('strong');cn.textContent='已结案';
+ var name=document.createElement('div');name.className='closed-case-name';name.textContent=caseTitle||'案件档案';
+ var year=document.createElement('div');year.className='closed-year';year.textContent='OFFICIALLY ARCHIVED · '+new Date().getFullYear();
+ art.appendChild(en);art.appendChild(cn);art.appendChild(name);art.appendChild(year);stage.appendChild(art);
+ var dismiss=document.createElement('button');dismiss.className='closed-dismiss';dismiss.type='button';dismiss.textContent='查看案件档案 →';
+ overlay.appendChild(stage);overlay.appendChild(dismiss);document.body.appendChild(overlay);
+ function close(showArchive){overlay.remove();document.removeEventListener('keydown',onKey);if(showArchive&&typeof onDismiss==='function')onDismiss();}
+ function onKey(e){if(e.key==='Escape')close(false);}
+ dismiss.addEventListener('click',function(){close(true);});overlay.addEventListener('click',function(e){if(e.target===overlay)close(false);});document.addEventListener('keydown',onKey);dismiss.focus();
+}
+(function(){
+ function refreshArchiveStatuses(){
+  var done=[];try{var p=caseProgress();done=p.completed||[];}catch(e){}
+  document.querySelectorAll('[data-open-case]').forEach(function(b){
+   var i=Number(b.getAttribute('data-open-case')),status=b.querySelector('.case-archive-status');
+   if(done.indexOf(i)>=0){b.classList.add('is-archived');if(status)status.textContent='✓ 已结案 · CASE CLOSED';}
+  });
+ }
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseResultArchive'))setTimeout(refreshArchiveStatuses,0);});
+ var oldStart=window.startCase;
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseArchiveBack'))setTimeout(refreshArchiveStatuses,0);});
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseArchiveMore'))setTimeout(refreshArchiveStatuses,0);});
+ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('#caseResultArchive'))setTimeout(refreshArchiveStatuses,80);});
+ var observer=new MutationObserver(function(){refreshArchiveStatuses();});
+ observer.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="maomao-case-archive-closed-v12">
+.case-archive-item.is-archived{border-color:#555;background:#f7f7f7}
+.case-archive-item.is-archived .case-archive-status{font-weight:700;letter-spacing:.03em}
+</style>
+<style id="maomao-team-discussion-v13">
+#teamDiscussionButton{position:relative;z-index:2;pointer-events:auto;cursor:pointer;min-height:44px}
+.team-discussion-overlay{z-index:10180!important}
+.team-discussion-dialog{max-height:82vh!important}
+.team-discussion-error{padding:14px 0;color:#555;font-size:13px;line-height:1.8}
+</style>
+<script id="maomao-team-discussion-v13-fix">
+(function(){
+ function openDiscussionFallback(){
+  var button=document.getElementById('teamDiscussionButton');
+  if(!button)return;
+  if(document.querySelector('.team-discussion-overlay'))return;
+  if(typeof gameState==='undefined'||!gameState||!gameState.item){if(typeof showToast==='function')showToast('请先打开一宗案件，再听取小队讨论。');return;}
+  var overlay=document.createElement('div');overlay.className='team-discussion-overlay';overlay.style.zIndex='10180';
+  var dialog=document.createElement('section');dialog.className='team-discussion-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+  var head=document.createElement('div');head.className='team-discussion-dialog-head';
+  var labels=document.createElement('div'),small=document.createElement('small'),title=document.createElement('h3'),close=document.createElement('button');
+  small.textContent='TEAM BRIEFING / CASE NOTES';title.textContent='小队讨论';labels.appendChild(small);labels.appendChild(title);
+  close.type='button';close.className='team-discussion-close';close.textContent='×';close.setAttribute('aria-label','关闭讨论');head.appendChild(labels);head.appendChild(close);
+  var note=document.createElement('p');note.className='team-discussion-note';note.textContent='队员将根据已公开的证据与证词讨论；推测会与已证实事实分开。';
+  var body=document.createElement('div');body.className='team-discussion-panel';body.style.display='grid';
+  var refresh=document.createElement('button');refresh.type='button';refresh.className='team-discussion-refresh';refresh.textContent='重新听取讨论';
+  dialog.appendChild(head);dialog.appendChild(note);dialog.appendChild(body);dialog.appendChild(refresh);overlay.appendChild(dialog);document.body.appendChild(overlay);
+  function generate(){body.innerHTML='<p class="team-discussion-loading">正在整理小队意见……</p>';try{
+   var cfg=window.PhoneStorage&&window.PhoneStorage.getApiConfig?window.PhoneStorage.getApiConfig():{};
+   var c=gameState.item,team=typeof detectiveParty==='function'&&typeof detectiveTeam==='function'?detectiveParty(detectiveTeam()):[];
+   if(typeof generateTeamDiscussion==='function'){
+    var original=document.getElementById('teamDiscussionPanel');
+    if(original){original.style.display='none';generateTeamDiscussion(c,team);setTimeout(function(){if(overlay.isConnected&&original.innerHTML){body.innerHTML=original.innerHTML;}},80);setTimeout(function(){if(overlay.isConnected&&original.innerHTML&&!/正在整理/.test(original.textContent)){body.innerHTML=original.innerHTML;}},1200);}
+    else body.innerHTML='<p class="team-discussion-error">讨论引擎暂时不可用，请检查页面是否已完整加载。</p>';
+   }else body.innerHTML='<p class="team-discussion-error">当前页面没有加载小队讨论模块，请刷新部署后的页面再试。</p>';
+  }catch(err){body.innerHTML='<p class="team-discussion-error">小队讨论暂时无法打开，请稍后重试。</p>';}}
+  function done(){overlay.remove();document.removeEventListener('keydown',key);}
+  function key(e){if(e.key==='Escape')done();}
+  close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});refresh.addEventListener('click',generate);document.addEventListener('keydown',key);generate();close.focus();
+ }
+ document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('#teamDiscussionButton'):null;if(!b)return;
+  if(document.querySelector('.team-discussion-overlay'))return;
+  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+  openDiscussionFallback();
+ },true);
+})();
+</script>
+
+<style id="maomao-case-story-v14-style">
+.case-story-overlay{position:fixed;inset:0;z-index:10190;background:rgba(12,12,12,.78);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.case-story-card{width:min(100%,520px);max-height:86vh;overflow:auto;background:#fff;color:#222;padding:22px;border:1px solid #d8d8d8;box-shadow:0 22px 70px rgba(0,0,0,.25);animation:teamDiscussionRise .2s ease-out}
+.case-story-kicker{font-size:10px;letter-spacing:.18em;color:#888;border-bottom:1px solid #ddd;padding-bottom:12px;margin-bottom:14px}
+.case-story-card h2{font-family:Georgia,'Noto Serif SC',serif;font-size:27px;font-weight:500;line-height:1.35;margin:0 0 18px}
+.case-story-section{margin:16px 0}
+.case-story-section small{display:block;font-size:10px;letter-spacing:.14em;color:#777;margin-bottom:6px}
+.case-story-section p{font-size:14px;line-height:1.95;color:#444;margin:0;white-space:pre-wrap}
+.case-story-close{width:100%;margin-top:18px;padding:13px;background:#222;color:#fff;border:1px solid #222;font-size:13px;letter-spacing:.08em}
+</style>
+<script id="maomao-case-story-v14-script">
+function showCaseStoryReveal(c){
+ if(!c||!c.storyTitle||document.querySelector('.case-story-overlay'))return;
+ var overlay=document.createElement('div');overlay.className='case-story-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','案件完整真相');
+ var card=document.createElement('article');card.className='case-story-card';
+ var kicker=document.createElement('div');kicker.className='case-story-kicker';kicker.textContent='CASE FILE / FULL STORY · 完整案情';
+ var title=document.createElement('h2');title.textContent=c.storyTitle;
+ card.appendChild(kicker);card.appendChild(title);
+ [['起因 / BEFORE',c.story],['作案动机 / MOTIVE',c.motive],['经过与后续 / AFTERMATH',c.aftermath],['证据如何串起真相 / THE TRUTH',c.truth]].forEach(function(item){var section=document.createElement('section');section.className='case-story-section';var small=document.createElement('small');small.textContent=item[0];var p=document.createElement('p');p.textContent=item[1];section.appendChild(small);section.appendChild(p);card.appendChild(section);});
+ var close=document.createElement('button');close.className='case-story-close';close.type='button';close.textContent='读完档案 · 返回案件';card.appendChild(close);overlay.appendChild(card);document.body.appendChild(overlay);
+ function done(){overlay.remove();document.removeEventListener('keydown',key);}
+ function key(e){if(e.key==='Escape')done();}
+ close.addEventListener('click',done);overlay.addEventListener('click',function(e){if(e.target===overlay)done();});document.addEventListener('keydown',key);close.focus();
+}
+</script>
+<style id="maomao-detective-visual-v16">
+body.detective-case-mode .board-panel{padding:15px 14px 24px!important;border:0!important;background:var(--case-paper)!important}
+body.detective-case-mode .prompt-title{font-size:clamp(31px,8vw,42px);line-height:1.06;letter-spacing:-.055em;margin:12px 0}
+body.detective-case-mode .prompt-copy{font-size:12px;line-height:1.85;max-width:390px;color:var(--case-muted)}
+.case-scene-stage{margin:20px 0 17px;background:#171716;color:#f1f1ed;border:1px solid #30302d;overflow:hidden;box-shadow:0 9px 25px rgba(0,0,0,.1)}
+.scene-stage-top{display:flex;justify-content:space-between;gap:8px;padding:13px 13px 8px;font-size:8px;letter-spacing:.13em;color:#a4a49c}
+.scene-location{padding:0 13px 12px;font-family:var(--serif);font-size:18px;color:#f0f0eb}
+.scene-art{height:clamp(245px,72vw,330px);position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 53% 43%,#555550,#343431 35%,#222220 66%,#151514)}
+.scene-art:before{content:"";position:absolute;inset:0;z-index:0;opacity:.28;background:linear-gradient(90deg,transparent 0 9%,#080808 9.4% 10%,transparent 10.5% 89%,#080808 89.5% 90%,transparent 90.5%),linear-gradient(0deg,transparent 0 18%,rgba(0,0,0,.8) 18.5% 19%,transparent 19.5%)}
+.scene-window{position:absolute;z-index:1;left:8%;top:8%;width:57%;height:43%;border:8px solid #696963;outline:1px solid #8b8b84;box-shadow:inset 0 0 0 2px #1a1a19;background:linear-gradient(180deg,#777772,#4b4b47 45%,#292927);overflow:hidden}
+.scene-window:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,transparent 0 13px,rgba(245,245,240,.17) 14px,transparent 15px 27px);opacity:.55}
+.scene-horizon{position:absolute;left:0;right:0;bottom:0;height:31%;background:linear-gradient(180deg,transparent,#171716 92%),repeating-linear-gradient(90deg,#282826 0 13px,#3e3e39 14px 17px,#20201e 18px 26px)}
+.scene-rain{position:absolute;inset:0;background:linear-gradient(90deg,transparent 49%,rgba(245,245,240,.16) 50%,transparent 51%);opacity:.55}
+.scene-clock{position:absolute;right:15%;top:10%;width:27px;height:27px;border:1px solid #a4a49a;border-radius:50%;opacity:.6}
+.scene-clock:after{content:"";position:absolute;left:13px;top:5px;width:1px;height:8px;background:#d4d4cb;transform:rotate(120deg);transform-origin:bottom}
+.scene-shelves{position:absolute;left:4%;bottom:21%;width:17%;height:29%;border:2px solid #444440;border-bottom:5px solid #4b4b46;background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(255,255,255,.04));z-index:2}
+.scene-shelves i{display:block;height:1px;background:#62625b;margin-top:29%}
+.scene-monitor{position:absolute;z-index:3;right:12%;top:37%;width:24%;height:27%;border:5px solid #5d5d57;background:#1c1c1b;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.scene-monitor b{display:block;margin:9px 6px 0;height:2px;background:#8b8b82;box-shadow:0 6px #50504b,0 12px #77776e,0 18px #3e3e39}
+.scene-monitor i{position:absolute;bottom:-13px;left:37%;width:24%;height:10px;background:#565650}
+.scene-door{position:absolute;z-index:1;right:3%;bottom:13%;width:19%;height:49%;border:3px solid #4a4a45;background:linear-gradient(90deg,#20201f,#30302c 75%,#191918)}
+.scene-door:after{content:"";position:absolute;left:17%;top:10%;width:64%;height:34%;border:1px solid #565650}
+.scene-desk{position:absolute;z-index:4;left:23%;right:14%;bottom:14%;height:14%;background:linear-gradient(180deg,#686861 0,#454540 18%,#242422 20%,#30302d);clip-path:polygon(4% 0,100% 0,92% 100%,0 100%)}
+.scene-paper{position:absolute;z-index:5;left:37%;bottom:27%;width:22%;height:10%;background:repeating-linear-gradient(180deg,#d0d0c7 0 2px,#a3a39a 3px 4px);transform:rotate(-7deg);box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.scene-folder{position:absolute;z-index:5;left:59%;bottom:26%;width:13%;height:9%;background:linear-gradient(180deg,#77776e,#4e4e48);border:1px solid #8a8a80;transform:rotate(7deg)}
+.scene-lamp{position:absolute;z-index:5;left:28%;bottom:24%;width:35px;height:53px}
+.scene-lamp:before{content:"";position:absolute;left:8px;top:0;width:25px;height:16px;background:#b6b6ac;clip-path:polygon(20% 0,100% 0,74% 100%,0 100%);opacity:.9}
+.scene-lamp:after{content:"";position:absolute;left:20px;top:14px;width:2px;height:32px;background:#aaa99f;box-shadow:0 31px 0 6px #77776e}
+.scene-shadow{position:absolute;z-index:2;left:58%;bottom:18%;width:22px;height:48px;background:#171716;opacity:.9;clip-path:polygon(37% 0,65% 0,83% 17%,80% 31%,100% 100%,0 100%,20% 31%,17% 17%)}
+.scene-floor{position:absolute;z-index:1;left:0;right:0;bottom:0;height:17%;background:repeating-linear-gradient(105deg,transparent 0 35px,rgba(255,255,255,.06) 36px 37px,transparent 38px 72px),linear-gradient(180deg,#242422,#171716)}
+.scene-hotspot{position:absolute;z-index:8;width:35px;height:35px;padding:0;border:1px solid rgba(255,255,255,.8);border-radius:50%;background:rgba(15,15,14,.72);color:#fff;display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 0 0 5px rgba(255,255,255,.07);transition:background .2s,transform .2s}
+.scene-hotspot span{font-size:9px;font-variant-numeric:tabular-nums}.scene-hotspot:active{transform:translate(-50%,-50%) scale(.92)}
+.scene-hotspot.found{background:#f2f2ec;color:#181817;border-color:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.17)}
+.scene-hotspot.found:after{content:"✓";position:absolute;right:-2px;top:-4px;width:13px;height:13px;display:grid;place-items:center;border-radius:50%;background:#fff;color:#111;font-size:8px}
+.scene-stage-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border-top:1px solid #40403b;background:#20201e}
+.scene-stage-foot>div{display:grid;gap:3px}.scene-stage-foot strong{font-size:11px;font-weight:600;color:#f2f2ec}.scene-stage-foot span,.scene-stage-foot>strong{font-size:9px;color:#a8a89f;line-height:1.6}.scene-stage-foot>strong{white-space:nowrap}
+body.detective-case-mode .case-progress-strip{margin:5px 0 9px;padding:10px 12px;background:var(--case-soft);border:1px solid var(--case-line);border-radius:8px;font-size:10px}
+body.detective-case-mode .detective-progress{margin:0 0 16px;padding:0 1px}
+body.detective-case-mode .detective-progress-track{height:4px;border-radius:9px}
+body.detective-case-mode .clue-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+body.detective-case-mode .evidence{position:relative;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr;align-content:start;gap:9px 4px;min-height:108px;padding:12px 11px;text-align:left;border:1px solid var(--case-line);border-radius:9px;background:var(--case-soft);color:var(--case-ink)}
+body.detective-case-mode .evidence-num{grid-column:1;grid-row:1;font-size:9px;letter-spacing:.12em;color:var(--case-muted)}
+body.detective-case-mode .evidence-text{grid-column:1/-1;grid-row:2;min-width:0;font-size:11px;line-height:1.55}
+body.detective-case-mode .evidence-text>strong{display:block;font-size:11px;line-height:1.5;padding-right:8px}
+body.detective-case-mode .evidence-text [id^="evidenceDetail"]{display:block!important;margin-top:7px!important;font-size:9px;color:var(--case-muted)!important;line-height:1.5;min-height:14px}
+body.detective-case-mode .evidence-mark{position:absolute;right:10px;top:9px;color:var(--case-muted);font-size:12px}
+body.detective-case-mode .evidence.revealed{background:#eaeae6;border-color:#777770}
+body.detective-case-mode .detective-livebar{margin-top:22px;padding-top:13px;border-top:1px solid var(--case-line)}
+body.detective-case-mode .detective-livefeed{max-height:120px;overflow:auto;padding:0 11px;background:var(--case-soft);border:1px solid var(--case-line);border-radius:8px}
+body.detective-case-mode .livefeed-item{grid-template-columns:32px 1fr;padding:9px 0}
+body.detective-case-mode .case-team-presence{margin-top:18px;padding:13px;border:1px solid var(--case-line);border-radius:9px;background:var(--case-soft)}
+body.detective-case-mode .interview-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:17px}
+body.detective-case-mode .interview-item{position:relative;display:grid;grid-template-columns:1fr;grid-template-rows:auto auto auto auto;gap:7px;min-width:0;min-height:135px;padding:11px 9px;text-align:left;border:1px solid var(--case-line);border-radius:9px;background:var(--case-soft);color:var(--case-ink)}
+body.detective-case-mode .interview-item>span:nth-child(2){display:contents}
+body.detective-case-mode .interview-number{grid-column:1;font-size:25px;line-height:1;color:#b0b0a8}
+body.detective-case-mode .interview-item strong{grid-column:1;display:block;font-size:11px;line-height:1.4;padding-right:5px;overflow-wrap:anywhere}
+body.detective-case-mode .interview-item small{grid-column:1;display:block;margin:0;font-size:9px;color:var(--case-muted);line-height:1.4}
+body.detective-case-mode .interview-text{grid-column:1;display:block;font-size:9px;line-height:1.45;color:var(--case-muted);min-height:26px;overflow-wrap:anywhere}
+body.detective-case-mode .interview-mark{position:absolute;right:8px;top:9px;font-size:12px;color:var(--case-muted)}
+body.detective-case-mode .interview-item.revealed{background:#eaeae6;border-color:#777770}
+body.detective-case-mode .interview-followups{grid-column:1/-1!important;display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:6px!important}
+body.detective-case-mode .interview-followups button{min-height:27px!important;padding:0 6px!important;font-size:9px!important}
+.case-evidence-overlay{position:fixed;inset:0;z-index:10030;display:flex;align-items:flex-end;justify-content:center;padding:18px 12px calc(16px + env(safe-area-inset-bottom));background:rgba(0,0,0,.56);backdrop-filter:blur(5px);animation:caseEvidenceFade .18s ease-out}
+.case-evidence-card{width:min(100%,520px);max-height:min(78dvh,680px);overflow:auto;padding:23px 20px 18px;background:#f8f8f5;color:#191918;border:1px solid #d4d4cc;box-shadow:0 20px 70px rgba(0,0,0,.28);animation:caseEvidenceIn .23s ease-out}
+.case-evidence-kicker{font-size:9px;letter-spacing:.17em;color:#76766f;padding-bottom:12px;border-bottom:1px solid #d7d7cf}
+.case-evidence-card h2{font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.17;letter-spacing:-.04em;margin:17px 0 12px}
+.case-evidence-tag{display:inline-block;padding:5px 8px;border:1px solid #cecec5;color:#66665e;font-size:9px;letter-spacing:.05em}
+.case-evidence-detail{font-size:13px;line-height:1.95;color:#44443e;margin:17px 0 22px;white-space:pre-wrap}
+.case-evidence-foot{border-top:1px solid #d7d7cf;padding-top:11px;margin-bottom:14px;font-size:9px;color:#88887e;letter-spacing:.04em}
+.case-evidence-close{width:100%;min-height:43px;border:1px solid #171716;background:#171716;color:#f8f8f4;font-size:11px;letter-spacing:.06em}
+@keyframes caseEvidenceFade{from{opacity:0}to{opacity:1}}@keyframes caseEvidenceIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:350px){body.detective-case-mode .clue-list{grid-template-columns:1fr}.scene-hotspot{width:30px;height:30px}}
+@media(prefers-reduced-motion:reduce){.scene-hotspot,.case-evidence-card,.case-evidence-overlay{animation:none;transition:none}}
+</style>
+
+<style id="maomao-detective-editorial-ui-v16">
+/* Editorial investigation UI: separate information hierarchy without removing any tools */
+body.detective-case-mode #gameContent{padding-bottom:96px}
+body.detective-case-mode .case-section-nav{
+ position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));z-index:80;
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;
+ margin:18px 0 14px;padding:6px;border:1px solid #d8d8d3;
+ background:rgba(255,255,255,.97);backdrop-filter:blur(14px);
+ box-shadow:0 8px 28px rgba(0,0,0,.08)
+}
+body.detective-case-mode .case-section-nav button{
+ min-width:0;min-height:42px;padding:10px 3px;border:0!important;
+ font-size:11px;letter-spacing:0;color:#777;background:transparent!important;
+ border-radius:2px!important;position:relative
+}
+body.detective-case-mode .case-section-nav button.active{
+ color:#fff;background:#191919!important;font-weight:600
+}
+body.detective-case-mode .case-section-nav button.active:after{display:none}
+body.detective-case-mode .case-scene-stage{margin-top:15px;box-shadow:0 14px 34px rgba(0,0,0,.12)}
+body.detective-case-mode .scene-stage-top{font-size:9px;letter-spacing:.1em}
+body.detective-case-mode .scene-location{font-size:21px;letter-spacing:.015em}
+body.detective-case-mode .detective-livebar{margin-top:18px;border-top:1px solid #deded9;border-bottom:1px solid #deded9;padding:13px 0}
+body.detective-case-mode .detective-livebar strong{font-size:13px;letter-spacing:.01em}
+body.detective-case-mode .detective-livefeed{margin:0 0 18px;padding:2px 0 5px}
+body.detective-case-mode .livefeed-item{display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;padding:11px 0;border-bottom:1px solid #e9e9e5}
+body.detective-case-mode .livefeed-time{font-size:9px;letter-spacing:.08em;color:#777}
+body.detective-case-mode .livefeed-item p{margin:0;font-size:11px;line-height:1.7;color:#444}
+body.detective-case-mode .clue-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+body.detective-case-mode .evidence{
+ min-height:112px;padding:13px 12px 12px;gap:10px 5px;
+ border-radius:3px!important;background:#fff!important;border-color:#deded9!important;
+ box-shadow:none!important;transition:border-color .18s,background .18s,transform .18s
+}
+body.detective-case-mode .evidence:active{transform:scale(.985)}
+body.detective-case-mode .evidence-num{font-size:10px;letter-spacing:.14em;color:#888}
+body.detective-case-mode .evidence-text{grid-row:2;align-self:start}
+body.detective-case-mode .evidence-text>strong{font-size:12px;line-height:1.55;color:#202020;padding-right:0}
+body.detective-case-mode .evidence-text [id^="evidenceDetail"]{display:none!important}
+body.detective-case-mode .evidence-mark{font-size:15px;color:#777;align-self:start}
+body.detective-case-mode .evidence.revealed{background:#f4f4f1!important;border-color:#a5a59e!important}
+body.detective-case-mode .evidence.revealed .evidence-num:after{content:" / 已确认";font-size:8px;letter-spacing:0;color:#555}
+body.detective-case-mode .divider-label{display:flex;align-items:center;gap:9px;margin:21px 0 11px;font-size:10px;letter-spacing:.08em;color:#555}
+body.detective-case-mode .divider-label:after{content:"";height:1px;background:#e1e1dc;flex:1}
+body.detective-case-mode .interview-list{display:grid;gap:8px}
+body.detective-case-mode .interview-item{border-radius:3px!important;background:#fff!important;border-color:#deded9!important;padding:14px 12px}
+body.detective-case-mode .interview-item strong{font-size:13px}
+body.detective-case-mode .interview-item small{font-size:10px;color:#777}
+body.detective-case-mode .interview-text{display:block!important;margin-top:7px;font-size:10px;line-height:1.6;color:#777}
+body.detective-case-mode .interview-item.revealed{background:#f5f5f2!important;border-color:#aaa!important}
+body.detective-case-mode .case-notebook{border-radius:2px;box-shadow:0 10px 28px rgba(0,0,0,.05)}
+body.detective-case-mode .notebook-cover strong{font-size:26px;letter-spacing:.01em}
+body.detective-case-mode .investigation-entry{padding-top:14px;padding-bottom:14px}
+body.detective-case-mode .case-progress-strip{margin:12px 0;padding:12px 0;border-top:1px solid #e2e2dd;border-bottom:1px solid #e2e2dd}
+body.detective-case-mode .detective-progress{margin-bottom:18px}
+body.detective-case-mode .case-modal-sheet{max-height:88dvh;overflow:auto}
+@media(max-width:360px){
+ body.detective-case-mode .clue-list{gap:6px}
+ body.detective-case-mode .evidence{min-height:105px;padding:10px 9px}
+ body.detective-case-mode .evidence-text>strong{font-size:11px}
+ body.detective-case-mode .case-section-nav button{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){body.detective-case-mode .evidence{transition:none}}
+</style>
+<style id="maomao-detective-v18-scene">.scene-art-tidal{height:auto;aspect-ratio:280/348;min-height:350px;max-height:520px;background:#171715}.scene-art-tidal .scene-real-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.scene-art-tidal>:not(.scene-hotspot):not(.scene-real-image){display:none!important}.scene-art-tidal .scene-hotspot{z-index:5}@media(max-width:360px){.scene-art-tidal{min-height:320px}}</style>
+<script src="js/interrogation-v20.js?v=20"></script>
 </body>
 </html>
