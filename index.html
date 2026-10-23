@@ -29,7 +29,8 @@
     <meta property="og:title" content="手机模拟器" />
     <meta property="og:description" content="沉浸式手机模拟器，支持聊天、论坛、音乐、记忆、世界书等完整手机功能" />
     <script src="shared/js/font-loader.js?v=20261022v1"></script>
-    <script src="shared/js/native-feel.js?v=20261023v6"></script>
+    <script src="shared/js/wallpaper-store.js?v=20261023v1"></script>
+<script src="shared/js/native-feel.js?v=20261023v6"></script>
     <link rel="stylesheet" href="desktop/css/styles.css?v=20261022v8">
   <link rel="stylesheet" href="shared/css/mobile-fit.css?v=20261022v4">
   <style>
@@ -1583,6 +1584,51 @@
       //   navigator.serviceWorker.register('sw.js').catch(function () {});
       // }
     </script>
-<script src="shared/js/liquid-glass-controls.js?v=20261023v6"></script>
+<script>
+(function () {
+  'use strict';
+  var store = window.MAOMAOWallpaperStore;
+  var root = document.documentElement;
+  var lastApplied = '';
+
+  function setDesktopWallpaper(dataUrl) {
+    if (dataUrl) {
+      root.style.setProperty('--desktop-bg-img', 'url("' + dataUrl + '")');
+      root.setAttribute('data-home-wallpaper', 'custom');
+      lastApplied = dataUrl;
+    } else {
+      root.style.removeProperty('--desktop-bg-img');
+      root.removeAttribute('data-home-wallpaper');
+      lastApplied = '';
+    }
+  }
+
+  function applyDesktopWallpaper() {
+    if (!store || typeof store.get !== 'function') return Promise.resolve('');
+    return store.get().then(function (dataUrl) {
+      setDesktopWallpaper(dataUrl || '');
+      return dataUrl || '';
+    }).catch(function (error) {
+      console.warn('[MAOMAO wallpaper] Unable to read saved wallpaper', error);
+      return '';
+    });
+  }
+
+  /* Initial load, return from Settings, and tab/app refocus all re-read the saved image. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyDesktopWallpaper, { once: true });
+  } else {
+    applyDesktopWallpaper();
+  }
+  window.addEventListener('pageshow', applyDesktopWallpaper);
+  window.addEventListener('focus', applyDesktopWallpaper);
+  window.addEventListener('storage', function (event) {
+    if (!event.key || event.key === 'home_custom_wallpaper') applyDesktopWallpaper();
+  });
+
+  window.MAOMAOApplyDesktopWallpaper = applyDesktopWallpaper;
+})();
+</script>
+<script src="shared/js/liquid-glass-controls.js?v=20261023v7"></script>
 </body>
 </html>
