@@ -184,8 +184,17 @@
 
     function observeDynamic(rootEl) {
         if (!rootEl || rootEl.__chatBeautyObserver || !global.MutationObserver) return;
-        rootEl.__chatBeautyObserver = new MutationObserver(function () {
-            if (rootEl.__chatBeautyVars) applyDynamic(rootEl, rootEl.__chatBeautyVars);
+        rootEl.__chatBeautyObserver = new MutationObserver(function (records) {
+            var config = rootEl.__chatBeautyVars;
+            if (!config) return;
+            // Only inspect newly inserted message rows/subtrees; do not rescan the full history for each new message.
+            records.forEach(function (record) {
+                Array.prototype.forEach.call(record.addedNodes || [], function (node) {
+                    if (!node || node.nodeType !== 1) return;
+                    applyBubbleDecorations(node, config);
+                    applyPaymentText(node, config);
+                });
+            });
         });
         rootEl.__chatBeautyObserver.observe(rootEl, { childList: true, subtree: true });
     }
