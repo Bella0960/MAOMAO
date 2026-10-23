@@ -263,3 +263,18 @@
   display: block;
   width: 100%;
 }
+
+
+/* The transfer sample remains a transfer card even though the preview also contains a red packet. */
+#vbPreview .vbp-pay.is-transfer {
+  background: var(--chat-transfer-bg, #FFFFFF) !important;
+  border-color: var(--chat-transfer-border-color, #E5E5EA) !important;
+  border-width: var(--chat-transfer-border-width, 1px) !important;
+  color: var(--chat-transfer-text-color, #111111) !important;
+}
+#vbPreview .vbp-pay.is-transfer::before { background-image: none !important; }
+#vbPreview .vbp-pay.is-transfer .vbp-pay-title,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-status {
+  color: var(--chat-transfer-text-color, #111111) !important;
+}
