@@ -655,12 +655,6 @@ html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liqu
   overflow: hidden !important;
   isolation: isolate !important;
 }
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon::before,
-html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon::before {
-  /* Do not paint the old imitation highlight over the vendor's actual glass layer. */
-  background: var(--_lg-fill) !important;
-  z-index: -1 !important;
-}
 html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon::after,
 html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon::after {
   pointer-events: none;
