@@ -1468,6 +1468,7 @@
 
       function applyImg(src) {
         el.style.backgroundImage = 'url(' + src + ')';
+        el.style.setProperty('--lg-image-widget-src', 'url("' + src + '")');
         el.style.backgroundSize = 'cover';
         el.style.backgroundPosition = 'center';
         if (ph) ph.style.display = 'none';
