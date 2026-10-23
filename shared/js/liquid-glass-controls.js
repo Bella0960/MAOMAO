@@ -94,9 +94,11 @@
     });
     document.querySelectorAll('[data-lg-opacity]').forEach(function (node) {
       node.value = String(state.opacity);
+      node.disabled = state.style === 'default';
     });
     document.querySelectorAll('[data-lg-blur]').forEach(function (node) {
       node.value = String(state.blur);
+      node.disabled = state.style === 'default';
     });
     document.querySelectorAll('[data-lg-style]').forEach(function (node) {
       var active = node.getAttribute('data-lg-style') === state.style;
@@ -107,6 +109,7 @@
       var active = node.getAttribute('data-lg-tint') === state.tint;
       node.classList.toggle('selected', active);
       node.setAttribute('aria-pressed', active ? 'true' : 'false');
+      node.disabled = state.style === 'default';
     });
     document.querySelectorAll('[data-lg-preview]').forEach(function (node) {
       node.setAttribute('data-icon-style', state.style);
