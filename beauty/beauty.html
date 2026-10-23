@@ -6,8 +6,8 @@
 <title>聊天美化 · 小手机</title>
 <script src="../shared/js/font-loader.js?v=20261022v1"></script>
 <script src="../shared/js/native-feel.js"></script>
-<script src="../shared/js/chat-beauty.js"></script>
-<link rel="stylesheet" href="../shared/css/chat-beauty-runtime.css?v=20261024v1">
+<script src="../shared/js/chat-beauty.js?v=20261024v2"></script>
+<link rel="stylesheet" href="../shared/css/chat-beauty-runtime.css?v=20261024v2">
 <link rel="stylesheet" href="../shared/css/mobile-fit.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
@@ -892,7 +892,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
 // ====================== Tab 1：可视化调节 ======================
 // 数据链路：draft（内存）--input 事件--> applyVars 到预览区（零延迟）；点保存才 ChatBeauty.save 落盘
 (function () {
-  var VISUAL_FIELDS = ['avatarSize','avatarRadius','bubbleGap','bubbleGapX','bubbleMaxWidth','bubblePadding','myBubbleBg','myBubbleColor','partnerBubbleBg','partnerBubbleColor','myBubbleBorderColor','myBubbleBorderWidth','partnerBubbleBorderColor','partnerBubbleBorderWidth','myBubbleRadiusSize','partnerBubbleRadiusSize','myBubblePadding','partnerBubblePadding','myBubbleFontSize','partnerBubbleFontSize','myBubbleFontFamily','partnerBubbleFontFamily','myBubbleTailSize','myBubbleTailX','myBubbleTailY','partnerBubbleTailSize','partnerBubbleTailX','partnerBubbleTailY','myBubbleDecorations','partnerBubbleDecorations','avatarBorderColor','avatarBorderWidth','messageTimeVisible','messageTimeColor','messageTimeSize','imageBubbleOpacity','imageBubbleRadius','redPacketBg','redPacketBgOpacity','redPacketImage','redPacketImageOpacity','redPacketBorderColor','redPacketBorderWidth','redPacketRadius','redPacketShowStatus','redPacketTextColor','redPacketFontSize','redPacketTitle','redPacketTitleColor','redPacketAmountTemplate','redPacketAmountColor','transferBg','transferBorderColor','transferBorderWidth','transferTextColor','chatBg','chatBgDim'];
+  var VISUAL_FIELDS = ['avatarSize','avatarRadius','bubbleGap','bubbleGapX','bubbleMaxWidth','bubblePadding','myBubbleBg','myBubbleColor','myBubbleRadius','partnerBubbleBg','partnerBubbleColor','partnerBubbleRadius','myBubbleBorderColor','myBubbleBorderWidth','partnerBubbleBorderColor','partnerBubbleBorderWidth','myBubbleRadiusSize','partnerBubbleRadiusSize','myBubblePadding','partnerBubblePadding','myBubbleFontSize','partnerBubbleFontSize','myBubbleFontFamily','partnerBubbleFontFamily','myBubbleTailSize','myBubbleTailX','myBubbleTailY','partnerBubbleTailSize','partnerBubbleTailX','partnerBubbleTailY','myBubbleDecorations','partnerBubbleDecorations','avatarBorderColor','avatarBorderWidth','messageTimeVisible','messageTimeColor','messageTimeSize','imageBubbleOpacity','imageBubbleRadius','redPacketBg','redPacketBgOpacity','redPacketImage','redPacketImageOpacity','redPacketBorderColor','redPacketBorderWidth','redPacketRadius','redPacketShowStatus','redPacketTextColor','redPacketFontSize','redPacketTitle','redPacketTitleColor','redPacketAmountTemplate','redPacketAmountColor','transferBg','transferBorderColor','transferBorderWidth','transferTextColor','chatBg','chatBgDim'];
   var previewEl = document.getElementById('vbPreview');
   var scopeSel = document.getElementById('vbScope');
   var currentScope = 'global';
