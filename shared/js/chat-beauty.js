@@ -159,12 +159,12 @@
 
     function applyPaymentText(rootEl, v) {
         if (!rootEl || !rootEl.querySelectorAll) return;
-        rootEl.querySelectorAll('.pay-card-red .pay-card-label').forEach(function (label) {
+        rootEl.querySelectorAll('.pay-card-red .pay-card-label, .vbp-pay-title').forEach(function (label) {
             if (!label.hasAttribute('data-chat-beauty-original')) label.setAttribute('data-chat-beauty-original', label.textContent || '');
             var chosenTitle = String(v.redPacketTitle || '').trim() || label.getAttribute('data-chat-beauty-original') || '红包';
             if (label.textContent !== chosenTitle) label.textContent = chosenTitle;
         });
-        rootEl.querySelectorAll('.pay-card-red .pay-card-amount').forEach(function (amount) {
+        rootEl.querySelectorAll('.pay-card-red .pay-card-amount, #vbPreview .vbp-pay:not(.is-transfer) .vbp-pay-amount').forEach(function (amount) {
             if (!amount.hasAttribute('data-chat-beauty-original')) amount.setAttribute('data-chat-beauty-original', amount.textContent || '');
             var template = String(v.redPacketAmountTemplate || '');
             var desiredAmount;
