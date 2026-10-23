@@ -242,7 +242,7 @@
   document.addEventListener('click', function (event) {
     var target = event.target && event.target.closest ? event.target : null;
     if (!target) return;
-    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn, #homeActionCustomize');
+    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn');
     if (trigger) {
       event.preventDefault();
       event.stopPropagation();
