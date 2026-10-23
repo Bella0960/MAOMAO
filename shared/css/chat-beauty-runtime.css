@@ -278,3 +278,75 @@
 #vbPreview .vbp-pay.is-transfer .vbp-pay-status {
   color: var(--chat-transfer-text-color, #111111) !important;
 }
+
+
+/* Preview payment cards mirror their native 150px chat-card structure. */
+#vbPreview .vbp-pay {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:8px;
+  width:150px;
+  max-width:100%;
+  min-height:60px;
+  padding:8px 12px;
+  box-sizing:border-box;
+}
+#vbPreview .vbp-pay .pay-ico {
+  flex:0 0 22px;
+  width:22px;
+  height:22px;
+  color:var(--chat-redpacket-text-color,#FFFFFF);
+  stroke:currentColor;
+}
+#vbPreview .vbp-pay-main {
+  display:flex;
+  flex:1;
+  min-width:0;
+  flex-direction:column;
+  gap:0;
+}
+#vbPreview .vbp-pay-title {
+  font-size:var(--chat-redpacket-font-size,12px);
+  line-height:1.2;
+  color:var(--chat-redpacket-title-color,#8E8E93);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#vbPreview .vbp-pay-amount {
+  font-size:calc(var(--chat-redpacket-font-size,12px)*1.35);
+  line-height:1.2;
+  font-weight:650;
+  color:var(--chat-redpacket-amount-color,#FFFFFF);
+  white-space:nowrap;
+}
+#vbPreview .vbp-pay-msg {
+  margin-top:2px;
+  padding-right:18px;
+  color:var(--chat-redpacket-text-color,#FFFFFF);
+  opacity:.65;
+  font-size:calc(var(--chat-redpacket-font-size,12px)*.72);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#vbPreview .vbp-pay-status {
+  position:absolute;
+  right:8px;
+  bottom:6px;
+  font-size:calc(var(--chat-redpacket-font-size,12px)*.68);
+  line-height:1.1;
+}
+#vbPreview .vbp-pay.is-transfer .pay-ico,
+#vbPreview .vbp-pay.is-transfer .pay-card-arrow {
+  flex-shrink:0;
+  color:var(--chat-transfer-text-color,#111111);
+  stroke:currentColor;
+}
+#vbPreview .vbp-pay.is-transfer .vbp-pay-title,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount,
+#vbPreview .vbp-pay.is-transfer .vbp-pay-status {
+  color:var(--chat-transfer-text-color,#111111) !important;
+}
+#vbPreview .vbp-pay.is-transfer .vbp-pay-amount { font-size:calc(var(--chat-redpacket-font-size,12px)*1.15); }
