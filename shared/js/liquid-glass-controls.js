@@ -4,7 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { style: 'clear', hue: 218, tone: 48, appearance: 'auto', blur: 24 };
+  var DEFAULTS = { style: 'clear', hue: 218, tone: 9, appearance: 'auto', blur: 24 };
   var STYLES = [
     { key: 'default', label: '默认', note: 'Default' },
     { key: 'dark', label: '深色', note: 'Dark' },
@@ -136,10 +136,6 @@
       document.documentElement.setAttribute('data-theme', 'liquid-glass');
     }
     applySettings(true);
-  }
-
-  function cloudSvg() {
-    return '<svg viewBox="0 0 64 52" aria-hidden="true"><defs><linearGradient id="lgCloudGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cbd4df"/></linearGradient></defs><path d="M15 40C6 40 2 34 4 27c2-7 8-10 15-9C22 7 31 4 39 10c5 4 6 9 5 13 8-2 15 4 15 11s-6 10-14 10H15Z" fill="url(#lgCloudGradient)" stroke="rgba(255,255,255,.92)" stroke-width="1.8"/></svg>';
   }
 
   function weatherIcon(kind) {
