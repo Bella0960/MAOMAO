@@ -85,8 +85,8 @@ html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .dock
   ) !important;
   border-color: rgba(255,255,255,.8) !important;
 }
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon::before,
-html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon::before {
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon:not(.glass)::before,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon:not(.glass)::before {
   content: "";
   position: absolute;
   z-index: 0;
@@ -635,4 +635,53 @@ body.maomao-home.home-action-open #editDoneBtn::before {
   display: block;
   font-size: 16px;
   line-height: 1;
+}
+
+
+/* ===== Real Liquid Glass runtime on app icon tiles only =====
+   The vendor layer draws the lens in ::before/::after. The host must stay transparent and must not
+   apply its own backdrop-filter, otherwise it would hide the sampled desktop wallpaper. */
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  border: 1px solid rgba(255,255,255,.52) !important;
+  box-shadow: 0 4px 13px rgba(20,24,34,.12), inset 0 1px 0 rgba(255,255,255,.44) !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon::before,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon::before {
+  /* Do not paint the old imitation highlight over the vendor's actual glass layer. */
+  background: var(--_lg-fill) !important;
+  z-index: -1 !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon::after,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon::after {
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon,
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: rgba(255,255,255,.40) !important;
+  box-shadow: 0 3px 12px rgba(20,24,34,.08), inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon,
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon {
+  border-color: rgba(255,255,255,.55) !important;
+}
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon,
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon {
+  border-color: rgba(255,255,255,.62) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon.maomao-liquid-glass-icon svg,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon.maomao-liquid-glass-icon svg {
+  position: relative;
+  z-index: 2;
 }
