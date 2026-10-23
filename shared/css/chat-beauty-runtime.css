@@ -125,7 +125,8 @@
 }
 .chat-stage .bubble-pay > .chat-beauty-content,
 .chat-stage .bubble-media > .chat-beauty-content {
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
 }
 .chat-stage .bubble-pay .chat-beauty-decoration-layer { overflow: visible; }
 
@@ -261,7 +262,8 @@
 .chat-stage .bubble-pay > .chat-beauty-content,
 .chat-stage .bubble-media > .chat-beauty-content {
   display: block;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
 }
 
 
