@@ -1163,7 +1163,8 @@
         if (
           !e.target.closest('[data-drag]') &&
           !e.target.closest('.dot') &&
-          !e.target.closest('#editModeIndicator')
+          !e.target.closest('#editModeIndicator') &&
+          !e.target.closest('#liquidGlassControls')
         ) {
           exitEdit();
         }
