@@ -1,0 +1,252 @@
+/* MAOMAO · iOS 26 Liquid Glass
+   A performance-conscious web adaptation. Only active when data-theme="liquid-glass".
+   The original styles remain untouched when the user selects Classic. */
+html[data-theme="liquid-glass"] {
+  color-scheme: light;
+  --lg-ink: #252528;
+  --lg-muted: #77777e;
+  --lg-edge: rgba(255, 255, 255, .78);
+  --lg-surface: rgba(249, 249, 252, .46);
+  --lg-surface-strong: rgba(250, 250, 253, .68);
+  --lg-shadow: 0 12px 32px rgba(31, 31, 37, .09), 0 2px 7px rgba(31, 31, 37, .04);
+  --lg-inset: inset 0 1px 0 rgba(255,255,255,.92), inset 0 -1px 0 rgba(255,255,255,.28);
+}
+html[data-theme="liquid-glass"] body {
+  color: var(--lg-ink) !important;
+  background-color: #ededf0 !important;
+  background-image: radial-gradient(ellipse at 50% 0%, #fff 0%, #f3f3f5 42%, #e7e7eb 100%) !important;
+}
+html[data-theme="liquid-glass"] .simulator-stage {
+  background: radial-gradient(ellipse at 50% 10%, #fff 0%, #f0f0f3 64%, #e4e4e8 100%) !important;
+}
+html[data-theme="liquid-glass"] .phone {
+  border: 1px solid rgba(255,255,255,.84) !important;
+  background: rgba(255,255,255,.62) !important;
+  box-shadow: 0 28px 75px rgba(28,28,35,.17), 0 3px 12px rgba(28,28,35,.08), inset 0 0 0 1px rgba(255,255,255,.82) !important;
+}
+html[data-theme="liquid-glass"] .phone-camera {
+  background: rgba(35,35,40,.84) !important;
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.32) !important;
+}
+html[data-theme="liquid-glass"] .phone-screen,
+html[data-theme="liquid-glass"] .bg-layer,
+html[data-theme="liquid-glass"] .app-frame {
+  background-color: rgba(249,249,252,.16) !important;
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] .status-bar {
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] .signal-icon i,
+html[data-theme="liquid-glass"] .wifi-icon::after,
+html[data-theme="liquid-glass"] .battery-icon b {
+  background-color: currentColor !important;
+}
+html[data-theme="liquid-glass"] .wifi-icon {
+  border-top-color: currentColor !important;
+}
+html[data-theme="liquid-glass"] .battery-icon {
+  border-color: currentColor !important;
+}
+
+/* One shared material for floating controls and content surfaces. */
+html[data-theme="liquid-glass"] .glass,
+html[data-theme="liquid-glass"] .time-card,
+html[data-theme="liquid-glass"] .img-card,
+html[data-theme="liquid-glass"] .music-card,
+html[data-theme="liquid-glass"] .widget-card,
+html[data-theme="liquid-glass"] .korean-widgets .widget-card,
+html[data-theme="liquid-glass"] .dock-bar,
+html[data-theme="liquid-glass"] .floating-nav,
+html[data-theme="liquid-glass"] .bottom-nav,
+html[data-theme="liquid-glass"] .nav-bar,
+html[data-theme="liquid-glass"] .tab-bar,
+html[data-theme="liquid-glass"] .chat-input-bar,
+html[data-theme="liquid-glass"] section.card,
+html[data-theme="liquid-glass"] .card,
+html[data-theme="liquid-glass"] .customize-panel,
+html[data-theme="liquid-glass"] .modal,
+html[data-theme="liquid-glass"] [role="dialog"] {
+  background-color: var(--lg-surface) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.34) 42%, rgba(245,245,249,.22) 100%) !important;
+  border: 1px solid var(--lg-edge) !important;
+  box-shadow: var(--lg-shadow), var(--lg-inset) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
+  backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
+}
+html[data-theme="liquid-glass"] .dock-bar,
+html[data-theme="liquid-glass"] .floating-nav,
+html[data-theme="liquid-glass"] .bottom-nav,
+html[data-theme="liquid-glass"] .nav-bar,
+html[data-theme="liquid-glass"] .tab-bar {
+  position: relative;
+  border-radius: 26px !important;
+  overflow: visible;
+}
+html[data-theme="liquid-glass"] .dock-bar::before,
+html[data-theme="liquid-glass"] .floating-nav::before,
+html[data-theme="liquid-glass"] .bottom-nav::before,
+html[data-theme="liquid-glass"] .nav-bar::before,
+html[data-theme="liquid-glass"] .tab-bar::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 9%;
+  right: 9%;
+  height: 1px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 0 8px rgba(255,255,255,.42);
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] .dock-bar {
+  background-color: rgba(245,245,249,.48) !important;
+  background-image: linear-gradient(155deg, rgba(255,255,255,.8), rgba(245,245,249,.34) 62%, rgba(255,255,255,.48)) !important;
+  border-radius: 30px !important;
+  box-shadow: 0 16px 38px rgba(25,25,30,.12), inset 0 1px 0 rgba(255,255,255,.96), inset 0 -1px 0 rgba(255,255,255,.42) !important;
+}
+html[data-theme="liquid-glass"] .floating-nav {
+  background-color: rgba(248,248,251,.48) !important;
+  background-image: linear-gradient(150deg, rgba(255,255,255,.78), rgba(245,245,249,.3)) !important;
+  box-shadow: 0 12px 34px rgba(27,27,33,.12), inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+html[data-theme="liquid-glass"] .nav-tab,
+html[data-theme="liquid-glass"] .dock-item,
+html[data-theme="liquid-glass"] .dock-bar .app-tile {
+  color: rgba(38,38,43,.76) !important;
+}
+html[data-theme="liquid-glass"] .nav-tab.active,
+html[data-theme="liquid-glass"] .nav-tab[aria-current="page"] {
+  color: #17171a !important;
+}
+html[data-theme="liquid-glass"] .nav-tab.active::before,
+html[data-theme="liquid-glass"] .nav-tab[aria-current="page"]::before {
+  background: rgba(255,255,255,.76) !important;
+  box-shadow: 0 2px 10px rgba(30,30,36,.08), inset 0 1px 0 white !important;
+}
+
+/* Home-screen app icons: milky transparent tiles with a crisp lens edge. */
+html[data-theme="liquid-glass"] .app-icon,
+html[data-theme="liquid-glass"] .dock-bar .app-icon {
+  background-color: rgba(255,255,255,.46) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,255,255,.34) 48%, rgba(235,235,241,.32)) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7) !important;
+  backdrop-filter: blur(22px) saturate(1.7) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 7px 17px rgba(37,37,44,.08), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.42) !important;
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, background .28s ease !important;
+}
+html[data-theme="liquid-glass"] .app-icon svg {
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,.36));
+}
+html[data-theme="liquid-glass"] .app-name {
+  color: rgba(37,37,42,.86) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.58);
+}
+html[data-theme="liquid-glass"] .app-card:active .app-icon,
+html[data-theme="liquid-glass"] .dock-bar .app-tile:active .app-icon,
+html[data-theme="liquid-glass"] .widget-card:active,
+html[data-theme="liquid-glass"] .nav-tab:active {
+  transform: scale(.965) translateY(1px);
+  box-shadow: 0 2px 8px rgba(37,37,44,.07), inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+html[data-theme="liquid-glass"] .app-card:hover .app-icon {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 21px rgba(37,37,44,.1), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+html[data-theme="liquid-glass"] .page-dots .dot {
+  background: rgba(65,65,72,.24) !important;
+}
+html[data-theme="liquid-glass"] .page-dots .dot.active {
+  background: rgba(255,255,255,.9) !important;
+  box-shadow: 0 1px 5px rgba(30,30,36,.12);
+}
+
+/* Settings, forms and common app surfaces share the material without flattening content. */
+html[data-theme="liquid-glass"] .header {
+  background: transparent !important;
+}
+html[data-theme="liquid-glass"] .header-title,
+html[data-theme="liquid-glass"] .row-title,
+html[data-theme="liquid-glass"] .menu-title,
+html[data-theme="liquid-glass"] .group-title {
+  color: var(--lg-ink);
+}
+html[data-theme="liquid-glass"] .row,
+html[data-theme="liquid-glass"] .menu-row {
+  border-bottom-color: rgba(255,255,255,.64) !important;
+}
+html[data-theme="liquid-glass"] .row-icon,
+html[data-theme="liquid-glass"] .menu-icon,
+html[data-theme="liquid-glass"] .icon-btn {
+  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(238,238,243,.38)) !important;
+  border: 1px solid rgba(255,255,255,.86) !important;
+  box-shadow: 0 3px 10px rgba(30,30,36,.055), inset 0 1px 0 rgba(255,255,255,.95) !important;
+  color: var(--lg-ink) !important;
+}
+html[data-theme="liquid-glass"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+html[data-theme="liquid-glass"] textarea,
+html[data-theme="liquid-glass"] select {
+  color: var(--lg-ink) !important;
+  background: rgba(255,255,255,.52) !important;
+  border-color: rgba(255,255,255,.86) !important;
+  box-shadow: inset 0 1px 3px rgba(35,35,40,.035), 0 1px 0 rgba(255,255,255,.76) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(14px) !important;
+}
+html[data-theme="liquid-glass"] .btn-secondary,
+html[data-theme="liquid-glass"] .secondary-btn,
+html[data-theme="liquid-glass"] .icon-button {
+  background: rgba(255,255,255,.55) !important;
+  color: var(--lg-ink) !important;
+  border: 1px solid rgba(255,255,255,.86) !important;
+  box-shadow: 0 4px 13px rgba(31,31,37,.055), inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+html[data-theme="liquid-glass"] .btn-primary,
+html[data-theme="liquid-glass"] .btn-save,
+html[data-theme="liquid-glass"] .primary-btn {
+  background: linear-gradient(145deg, rgba(48,48,53,.94), rgba(20,20,23,.98)) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.36) !important;
+  box-shadow: 0 6px 16px rgba(24,24,28,.18), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+html[data-theme="liquid-glass"] .toast {
+  background: rgba(35,35,40,.82) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  box-shadow: 0 8px 24px rgba(20,20,24,.15) !important;
+}
+
+/* Prefer a stable opaque fallback on browsers without background filtering. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html[data-theme="liquid-glass"] .glass,
+  html[data-theme="liquid-glass"] .time-card,
+  html[data-theme="liquid-glass"] .img-card,
+  html[data-theme="liquid-glass"] .music-card,
+  html[data-theme="liquid-glass"] .widget-card,
+  html[data-theme="liquid-glass"] .dock-bar,
+  html[data-theme="liquid-glass"] .floating-nav,
+  html[data-theme="liquid-glass"] section.card,
+  html[data-theme="liquid-glass"] .card,
+  html[data-theme="liquid-glass"] .customize-panel,
+  html[data-theme="liquid-glass"] .modal,
+  html[data-theme="liquid-glass"] [role="dialog"] {
+    background-color: rgba(247,247,250,.94) !important;
+  }
+}
+@media (max-width: 480px) {
+  html[data-theme="liquid-glass"] .phone {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="liquid-glass"] .app-icon,
+  html[data-theme="liquid-glass"] .widget-card,
+  html[data-theme="liquid-glass"] .nav-tab {
+    transition: none !important;
+  }
+}
