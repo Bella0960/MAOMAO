@@ -1230,3 +1230,15 @@ html, body { background: #E8E8EC !important; }
 .simulator-stage { background: transparent !important; padding: 0 !important; display: block !important; }
 .phone-camera { display: none !important; }
 .phone-screen { border-radius: 0 !important; }
+
+/* The iOS-like long-press menu replaces the old centered three-button toolbar. */
+body.maomao-home.home-editing .edit-mode-indicator {
+  display: none !important;
+}
+body.maomao-home.maomao-dock-hidden .dock-wrapper {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+body.maomao-home.maomao-dock-hidden .dock-bar {
+  display: none !important;
+}
