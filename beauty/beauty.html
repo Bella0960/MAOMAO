@@ -289,6 +289,116 @@
   .vb-mini-hint{display:block;font-size:9px;color:#9a9aa1;margin-top:5px}
   @media(max-width:360px){.vb-advanced-grid{gap:14px 10px;padding:12px 10px}.vb-advanced-sides{grid-template-columns:1fr}.vb-copy-side{width:100%}.vb-decor-add-row{padding-left:10px;padding-right:10px}}
 
+
+  /* ===== 四入口聊天美化工作台：小预览、独立设置视图、行内色盘 ===== */
+  #tabVisual{min-width:0}
+  #vbHomeView,#vbSettingsView{min-width:0}
+  #vbSettingsView{display:none}
+  .vb-section-kicker{font:8px Arial,sans-serif;letter-spacing:.2em;color:#898991;margin:1px 0 9px}
+  .vb-preview-caption{display:flex;align-items:center;justify-content:space-between;margin:0 0 9px}
+  .vb-preview-caption strong{font:italic 15px Georgia,serif;font-weight:400;color:#202026}
+  .vb-preview-caption span{font-size:8px;letter-spacing:.15em;color:#9999a0}
+  .vb-preview-home-slot,.vb-preview-editor-slot{min-width:0}
+  .vb-preview-editor-slot .vb-preview{margin-bottom:12px}
+  .vb-preview{position:relative;top:auto;z-index:1;margin-bottom:13px;box-shadow:0 3px 12px rgba(0,0,0,.055)}
+  .vb-preview .vbp-stage{min-height:0;padding:12px 11px;gap:8px}
+  .vb-preview .vbp-row{gap:7px}
+  .vb-preview .vbp-avatar{width:26px;height:26px;font-size:10px}
+  .vb-preview .vbp-bubble{font-size:11px;padding:8px 10px}
+  .vb-preview .vbp-time{font-size:7px;padding:0 6px}
+  .vb-preview .vbp-special-samples{display:none}
+  .vb-preview.mode-my .vbp-row.ta .vbp-bubble{opacity:.48}
+  .vb-preview.mode-partner .vbp-row.me .vbp-bubble{opacity:.48}
+  .vb-preview.mode-my .vbp-row.me .vbp-bubble,
+  .vb-preview.mode-partner .vbp-row.ta .vbp-bubble{box-shadow:0 0 0 1px rgba(17,17,17,.12)}
+  .vb-preview.mode-redpacket .vbp-row,
+  .vb-preview.mode-transfer .vbp-row{display:none}
+  .vb-preview.mode-redpacket .vbp-special-samples,
+  .vb-preview.mode-transfer .vbp-special-samples{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0}
+  .vb-preview.mode-redpacket .vbp-pay.pay-card-red,
+  .vb-preview.mode-transfer .vbp-pay.is-transfer{display:flex;width:100%;min-height:94px;padding:14px 15px;gap:5px}
+  .vb-preview.mode-redpacket .vbp-pay.is-transfer,
+  .vb-preview.mode-redpacket .vbp-image,
+  .vb-preview.mode-transfer .vbp-pay.pay-card-red,
+  .vb-preview.mode-transfer .vbp-image{display:none!important}
+  .vb-preview.mode-redpacket .vbp-pay-title,
+  .vb-preview.mode-transfer .vbp-pay-title{font-size:12px}
+  .vb-preview.mode-redpacket .vbp-pay-amount,
+  .vb-preview.mode-transfer .vbp-pay-amount{font-size:19px}
+  .vb-preview.mode-redpacket .vbp-pay-status,
+  .vb-preview.mode-transfer .vbp-pay-status{font-size:9px}
+  .vb-home-entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;margin:15px 0 22px;border-top:1px solid #dedee2}
+  .vb-home-entry{width:100%;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;background:transparent;border:0;border-bottom:1px solid #dedee2;padding:15px 1px;cursor:pointer;color:#17171c}
+  .vb-home-entry:active{opacity:.6}
+  .vb-home-entry-num{align-self:flex-start;font:italic 12px Georgia,serif;color:#aaaab0;min-width:17px;padding-top:2px}
+  .vb-home-entry-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+  .vb-home-entry-title{font:17px Georgia,"Times New Roman",serif;letter-spacing:-.025em}
+  .vb-home-entry-note{font-size:9px;line-height:1.5;color:#898991;word-break:break-word}
+  .vb-home-entry-arrow{font:16px Georgia,serif;color:#77777e;align-self:flex-start}
+  .vb-base-settings{border-top:1px solid #dedee2;border-bottom:1px solid #dedee2;margin:4px 0 12px}
+  .vb-base-settings>summary{list-style:none;display:flex;align-items:center;gap:9px;padding:15px 0;cursor:pointer}
+  .vb-base-settings>summary::-webkit-details-marker{display:none}
+  .vb-base-settings>summary:after{content:"＋";margin-left:auto;color:#77777e;font-size:13px}
+  .vb-base-settings[open]>summary:after{content:"−"}
+  .vb-base-title{font:17px Georgia,"Times New Roman",serif;color:#222228}
+  .vb-base-kicker{font-size:8px;letter-spacing:.12em;color:#96969d}
+  .vb-base-settings-body{padding:2px 0 18px}
+  .vb-base-sliders{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;padding:0 1px 7px}
+  .vb-base-sliders .vb-slider{margin-bottom:17px}
+  .vb-base-settings .vb-advanced-heading{margin-top:7px;padding-top:18px;border-top:1px solid #e2e2e6}
+  .vb-base-settings .vb-advanced-card{margin-bottom:10px}
+  .vb-settings-header{display:flex;align-items:center;gap:13px;margin:0 0 14px;padding:0 0 13px;border-bottom:1px solid #dedee2}
+  .vb-settings-back{width:30px;height:31px;flex:0 0 30px;border:0;border-right:1px solid #dedee2;background:transparent;color:#222;cursor:pointer;font:22px Georgia,serif;text-align:left}
+  .vb-settings-heading{flex:1;min-width:0}
+  .vb-settings-kicker{display:block;font-size:8px;letter-spacing:.17em;color:#99999f;margin-bottom:5px}
+  .vb-settings-title{font:24px Georgia,"Times New Roman",serif;letter-spacing:-.04em;color:#17171b;line-height:1.05}
+  .vb-settings-subtitle{font-size:10px;color:#85858d;margin-top:6px;line-height:1.5}
+  .vb-editor-panel{min-width:0;animation:vbPanelIn .22s ease both}
+  .vb-editor-panel[hidden]{display:none!important}
+  @keyframes vbPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .vb-editor-panel .vb-colors{margin-top:0;margin-bottom:19px;padding:13px 0 0;gap:12px}
+  .vb-editor-panel .vb-advanced-sides{margin-top:8px}
+  .vb-editor-panel .vb-advanced-card{margin-top:10px}
+  .vb-editor-panel .vb-advanced-card summary{padding:14px 12px}
+  .vb-editor-panel .vb-advanced-grid{padding:13px 12px}
+  .vb-editor-panel .vb-advanced-help{padding-left:12px;padding-right:12px}
+  .vb-color-inline-trigger{min-width:0;display:flex;align-items:center;gap:8px;justify-content:flex-start;border:1px solid #e1e1e6;background:#f8f8fa;color:#34343b;padding:6px 8px;cursor:pointer;text-align:left;border-radius:9px;font:11px Arial,sans-serif}
+  .vb-color-trigger-chip{display:block;width:22px;height:22px;flex:0 0 22px;border:1px solid rgba(0,0,0,.14);border-radius:5px;background:#111}
+  .vb-color-trigger-value{font:10px "SF Mono",Menlo,monospace;color:#64646d}
+  .vb-color-trigger-action{margin-left:auto;font-size:9px;color:#84848c;white-space:nowrap}
+  .vb-advanced-control>.vb-color-inline-trigger{width:100%;height:35px}
+  .vb-color-row .vb-color-inline-trigger{width:30px;height:30px;flex:0 0 30px;padding:3px;border:0;border-radius:0;background:transparent}
+  .vb-color-row .vb-color-trigger-chip{width:24px;height:24px;flex-basis:24px;border-radius:2px}
+  .vb-hidden-color-input{display:none!important}
+  .vb-inline-color-panel{display:none;position:relative;width:100%;margin:0 0 16px;padding:15px 13px 13px;background:#f7f7f8;border:1px solid #e1e1e5;border-radius:12px;box-shadow:none;z-index:1}
+  .vb-inline-color-panel.show{display:block}
+  .vb-inline-color-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+  .vb-inline-color-head small{display:block;font-size:8px;letter-spacing:.16em;color:#92929a;margin-bottom:4px}
+  .vb-inline-color-head strong{font:16px Georgia,"Times New Roman",serif;font-weight:400;color:#202026}
+  .vb-inline-color-close{border:0;border-bottom:1px solid #222;background:transparent;padding:5px 0;color:#222;font:italic 13px Georgia,serif;cursor:pointer}
+  .vb-inline-swatches{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;margin-bottom:14px}
+  .vb-inline-swatch{width:100%;aspect-ratio:1;border:1px solid rgba(0,0,0,.12);border-radius:4px;cursor:pointer;min-width:0}
+  .vb-inline-swatch[aria-pressed="true"]{outline:2px solid #16161a;outline-offset:2px}
+  .vb-inline-color-ranges{display:grid;grid-template-columns:1fr;gap:10px}
+  .vb-inline-range{display:grid;grid-template-columns:58px minmax(0,1fr) 42px;gap:9px;align-items:center;font-size:10px;color:#6e6e76}
+  .vb-inline-range input{width:100%;min-width:0;accent-color:#222229}
+  .vb-inline-range output{font:italic 11px Georgia,serif;text-align:right;color:#34343b}
+  .vb-inline-color-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;margin-top:13px;border-top:1px solid #e2e2e5;font-size:9px;color:#85858c}
+  .vb-inline-color-current{display:flex;align-items:center;gap:8px}
+  .vb-inline-color-current span{width:22px;height:22px;border:1px solid rgba(0,0,0,.15);border-radius:4px;background:#111}
+  .vb-inline-color-foot code{font:11px "SF Mono",Menlo,monospace;color:#313139}
+  .vb-side-color-sliders{display:none!important}
+  @media(max-width:360px){
+    .vb-home-entry-grid{gap:0 10px}
+    .vb-home-entry{gap:6px;padding:13px 0}
+    .vb-home-entry-num{min-width:14px}
+    .vb-home-entry-title{font-size:15px}
+    .vb-home-entry-note{font-size:8px}
+    .vb-base-sliders{gap:0 9px}
+    .vb-inline-swatches{grid-template-columns:repeat(6,minmax(0,1fr))}
+    .vb-editor-panel .vb-advanced-grid{gap:13px 10px}
+  }
+
 </style>
 </head>
 <body>
@@ -932,6 +1042,380 @@ document.getElementById('importFile').addEventListener('change', function(e){
   var currentScope = 'global';
   var draft = null;
   var activeTab = 'visual';
+  var activeVisualCategory = null;
+  var layoutUi = buildVisualLayout();
+  var colorUi = setupInlineColorPicker(layoutUi);
+
+  function buildVisualLayout() {
+    var tabVisual = document.getElementById('tabVisual');
+    var direct = Array.prototype.slice.call(tabVisual.children);
+    var scopeField = direct.find(function (node) { return node.classList && node.classList.contains('field'); });
+    var preview = document.getElementById('vbPreview');
+    var sliders = direct.filter(function (node) { return node.classList && node.classList.contains('vb-slider'); });
+    var oldColors = direct.find(function (node) { return node.classList && node.classList.contains('vb-colors'); });
+    var advanced = direct.find(function (node) { return node.classList && node.classList.contains('vb-advanced'); });
+    var background = direct.find(function (node) { return node.classList && node.classList.contains('vb-bg'); });
+    if (!scopeField || !preview || sliders.length !== 6 || !oldColors || !advanced || !background) return null;
+
+    var heading = advanced.querySelector('.vb-advanced-heading');
+    var sideTools = advanced.querySelector('.vb-advanced-sides');
+    var cards = Array.prototype.filter.call(advanced.children, function (node) { return node.classList && node.classList.contains('vb-advanced-card'); });
+    if (cards.length < 5 || !heading || !sideTools) return null;
+
+    function node(tag, className, textValue) {
+      var el = document.createElement(tag);
+      if (className) el.className = className;
+      if (textValue !== undefined) el.textContent = textValue;
+      return el;
+    }
+    var home = node('section', 'vb-home-view');
+    home.id = 'vbHomeView';
+    var settings = node('section', 'vb-settings-view');
+    settings.id = 'vbSettingsView';
+    var homeCaption = node('div', 'vb-preview-caption');
+    homeCaption.innerHTML = '<strong>实时效果预览</strong><span>LIVE / CHAT</span>';
+    var homePreviewSlot = node('div', 'vb-preview-home-slot');
+    var entryGrid = node('div', 'vb-home-entry-grid');
+    var baseDetails = node('details', 'vb-base-settings');
+    var baseSummary = node('summary');
+    baseSummary.innerHTML = '<span class="vb-base-title">基础布局与背景</span><span class="vb-base-kicker">LAYOUT / BACKGROUND</span>';
+    var baseBody = node('div', 'vb-base-settings-body');
+    var basicSliders = node('div', 'vb-base-sliders');
+    sliders.forEach(function (slider) { basicSliders.appendChild(slider); });
+    baseBody.appendChild(basicSliders);
+    baseBody.appendChild(heading);
+    baseBody.appendChild(cards[2]);
+    baseBody.appendChild(background);
+    baseDetails.appendChild(baseSummary);
+    baseDetails.appendChild(baseBody);
+
+    var myColors = node('div', 'vb-colors vb-colors-single');
+    myColors.id = 'vbMyQuickColors';
+    var partnerColors = node('div', 'vb-colors vb-colors-single');
+    partnerColors.id = 'vbPartnerQuickColors';
+    Array.prototype.slice.call(oldColors.children).forEach(function (colorBlock) {
+      var isMy = !!colorBlock.querySelector('#vbMyBg, #vbMyColor');
+      colorBlock.dataset.chatSide = isMy ? 'my' : 'partner';
+      (isMy ? myColors : partnerColors).appendChild(colorBlock);
+    });
+
+    var settingsHeader = node('div', 'vb-settings-header');
+    var backButton = node('button', 'vb-settings-back', '‹');
+    backButton.type = 'button';
+    backButton.setAttribute('aria-label', '返回聊天美化首页');
+    var headerCopy = node('div', 'vb-settings-heading');
+    var headerKicker = node('span', 'vb-settings-kicker', 'CHAT BEAUTY / DETAIL');
+    var headerTitle = node('div', 'vb-settings-title', '我的气泡');
+    var headerSubtitle = node('div', 'vb-settings-subtitle', '实时调整样式，保存后应用到聊天页面');
+    headerCopy.appendChild(headerKicker);
+    headerCopy.appendChild(headerTitle);
+    headerCopy.appendChild(headerSubtitle);
+    settingsHeader.appendChild(backButton);
+    settingsHeader.appendChild(headerCopy);
+    var previewSlot = node('div', 'vb-preview-editor-slot');
+    var editorCaption = node('div', 'vb-preview-caption');
+    editorCaption.innerHTML = '<strong>当前样式预览</strong><span>LIVE / STYLE</span>';
+    var colorPanel = node('section', 'vb-inline-color-panel');
+    colorPanel.id = 'vbInlineColorPanel';
+    colorPanel.innerHTML = '<div class="vb-inline-color-head"><div><small>COLOR LAB / INLINE PALETTE</small><strong id="vbInlineColorTitle">选择颜色</strong></div><button class="vb-inline-color-close" id="vbInlineColorClose" type="button">完成 ×</button></div><div class="vb-inline-swatches" id="vbInlineColorSwatches"></div><div class="vb-inline-color-ranges"><label class="vb-inline-range"><span>色相</span><input type="range" id="vbInlineHue" min="0" max="360" value="0"><output id="vbInlineHueValue">0°</output></label><label class="vb-inline-range"><span>饱和度</span><input type="range" id="vbInlineSaturation" min="0" max="100" value="0"><output id="vbInlineSaturationValue">0%</output></label><label class="vb-inline-range"><span>明暗</span><input type="range" id="vbInlineLightness" min="0" max="100" value="7"><output id="vbInlineLightnessValue">7%</output></label></div><div class="vb-inline-color-foot"><div class="vb-inline-color-current"><span id="vbInlineColorChip"></span><span id="vbInlineColorName">当前颜色</span></div><code id="vbInlineColorHex">#111111</code></div>';
+
+    function makePanel(key, title, kicker, subtitle) {
+      var panel = node('section', 'vb-editor-panel');
+      panel.dataset.category = key;
+      panel.hidden = true;
+      var slot = node('div', 'vb-bubble-control-slot');
+      panel.appendChild(slot);
+      return { panel: panel, slot: slot, title: title, kicker: kicker, subtitle: subtitle };
+    }
+    var myPage = makePanel('my', '我的气泡', '01 / MY BUBBLE', '调整我的气泡填充、文字、形状、描边和装饰图片。');
+    var partnerPage = makePanel('partner', '对方气泡', '02 / PARTNER BUBBLE', '单独调整对方气泡，不会影响我的气泡样式。');
+    var redPage = makePanel('redpacket', '红包气泡', '03 / RED PACKET', '红包预览独立显示，底色、背景图、文案和金额可分别调整。');
+    var transferPage = makePanel('transfer', '转账气泡', '04 / TRANSFER', '单独设置转账卡片的底色、描边和文字，不与红包混排。');
+
+    settings.appendChild(settingsHeader);
+    settings.appendChild(previewSlot);
+    settings.appendChild(colorPanel);
+    settings.appendChild(myPage.panel);
+    settings.appendChild(partnerPage.panel);
+    settings.appendChild(redPage.panel);
+    settings.appendChild(transferPage.panel);
+    myPage.panel.insertBefore(myColors, myPage.slot);
+    partnerPage.panel.insertBefore(partnerColors, partnerPage.slot);
+    redPage.panel.appendChild(cards[3]);
+    transferPage.panel.appendChild(cards[4]);
+    myPage.slot.appendChild(sideTools);
+    myPage.slot.appendChild(cards[0]);
+    myPage.slot.appendChild(cards[1]);
+
+    while (tabVisual.firstChild) tabVisual.removeChild(tabVisual.firstChild);
+    tabVisual.appendChild(home);
+    tabVisual.appendChild(settings);
+    home.appendChild(scopeField);
+    home.appendChild(homeCaption);
+    home.appendChild(homePreviewSlot);
+    homePreviewSlot.appendChild(preview);
+    home.appendChild(entryGrid);
+    home.appendChild(baseDetails);
+    previewSlot.appendChild(editorCaption);
+    settings.style.display = 'none';
+
+    var entries = [
+      { key: 'my', num: '01', title: '我的气泡', note: '填充 · 字体 · 形状 · 装饰' },
+      { key: 'partner', num: '02', title: '对方气泡', note: '独立颜色与轮廓细节' },
+      { key: 'redpacket', num: '03', title: '红包气泡', note: '红包底色 · 金额 · 背景' },
+      { key: 'transfer', num: '04', title: '转账气泡', note: '转账卡片 · 描边 · 文案' }
+    ];
+    entries.forEach(function (item) {
+      var button = node('button', 'vb-home-entry');
+      button.type = 'button';
+      button.dataset.category = item.key;
+      button.innerHTML = '<span class="vb-home-entry-num">' + item.num + '</span><span class="vb-home-entry-copy"><span class="vb-home-entry-title">' + item.title + '</span><span class="vb-home-entry-note">' + item.note + '</span></span><span class="vb-home-entry-arrow">↗</span>';
+      button.addEventListener('click', function () { openVisualSetting(item.key); });
+      entryGrid.appendChild(button);
+    });
+
+    preview.classList.remove('mode-my', 'mode-partner', 'mode-redpacket', 'mode-transfer');
+    preview.classList.add('mode-home');
+    backButton.addEventListener('click', returnToVisualHome);
+    return {
+      tabVisual: tabVisual, home: home, settings: settings, homePreviewSlot: homePreviewSlot,
+      previewSlot: previewSlot, preview: preview, entryGrid: entryGrid, settingsHeader: settingsHeader,
+      headerKicker: headerKicker, headerTitle: headerTitle, headerSubtitle: headerSubtitle,
+      colorPanel: colorPanel, panels: { my: myPage.panel, partner: partnerPage.panel, redpacket: redPage.panel, transfer: transferPage.panel },
+      slots: { my: myPage.slot, partner: partnerPage.slot, redpacket: redPage.slot, transfer: transferPage.slot },
+      sideTools: sideTools, cards: cards, myColors: myColors, partnerColors: partnerColors
+    };
+  }
+
+  function openVisualSetting(category) {
+    if (!layoutUi || !layoutUi.panels[category]) return;
+    activeVisualCategory = category;
+    layoutUi.home.style.display = 'none';
+    layoutUi.settings.style.display = 'block';
+    layoutUi.headerTitle.textContent = ({my:'我的气泡',partner:'对方气泡',redpacket:'红包气泡',transfer:'转账气泡'})[category];
+    layoutUi.headerKicker.textContent = ({my:'01 / MY BUBBLE',partner:'02 / PARTNER BUBBLE',redpacket:'03 / RED PACKET',transfer:'04 / TRANSFER'})[category];
+    layoutUi.headerSubtitle.textContent = ({my:'只调整当前一侧的气泡样式；预览会实时更新。',partner:'对方气泡拥有独立参数，不会覆盖我的气泡。',redpacket:'此处只预览红包样式，转账卡片不会混入。',transfer:'此处只预览转账卡片，红包会单独设置。'})[category];
+    layoutUi.previewSlot.appendChild(layoutUi.preview);
+    layoutUi.preview.classList.remove('mode-home', 'mode-my', 'mode-partner', 'mode-redpacket', 'mode-transfer');
+    layoutUi.preview.classList.add('mode-' + category);
+    Object.keys(layoutUi.panels).forEach(function (key) { layoutUi.panels[key].hidden = key !== category; });
+    layoutUi.colorPanel.classList.remove('show');
+
+    if (category === 'my' || category === 'partner') {
+      var side = category === 'my' ? 'my' : 'partner';
+      var select = document.getElementById('vbEditSide');
+      select.value = side;
+      select.disabled = true;
+      var sideLabel = layoutUi.sideTools.querySelector('.vb-advanced-field span');
+      if (sideLabel) sideLabel.textContent = '当前设置对象';
+      layoutUi.slots[category].appendChild(layoutUi.sideTools);
+      layoutUi.slots[category].appendChild(layoutUi.cards[0]);
+      layoutUi.slots[category].appendChild(layoutUi.cards[1]);
+      layoutUi.cards[0].open = true;
+      if (typeof loadSideControls === 'function') loadSideControls();
+    } else {
+      document.getElementById('vbEditSide').disabled = false;
+      if (category === 'redpacket') layoutUi.cards[3].open = true;
+      if (category === 'transfer') layoutUi.cards[4].open = true;
+    }
+    if (colorUi) colorUi.refreshAll();
+  }
+
+  function returnToVisualHome() {
+    if (!layoutUi) return;
+    activeVisualCategory = null;
+    layoutUi.home.style.display = 'block';
+    layoutUi.settings.style.display = 'none';
+    layoutUi.homePreviewSlot.appendChild(layoutUi.preview);
+    layoutUi.preview.classList.remove('mode-my', 'mode-partner', 'mode-redpacket', 'mode-transfer');
+    layoutUi.preview.classList.add('mode-home');
+    layoutUi.colorPanel.classList.remove('show');
+    document.getElementById('vbEditSide').disabled = false;
+  }
+
+  function setupInlineColorPicker(ui) {
+    if (!ui) return { refreshAll: function () {} };
+    var panel = ui.colorPanel;
+    var currentInput = null;
+    var presets = ['#111111','#292929','#444444','#666666','#888888','#AAAAAA','#CCCCCC','#FFFFFF','#6D7883','#81756D','#6D7C73','#8D7777','#9B8C6D','#756D8A','#577E83','#B5A99C'];
+    var swatches = document.getElementById('vbInlineColorSwatches');
+    var hue = document.getElementById('vbInlineHue');
+    var saturation = document.getElementById('vbInlineSaturation');
+    var lightness = document.getElementById('vbInlineLightness');
+    var hueOut = document.getElementById('vbInlineHueValue');
+    var saturationOut = document.getElementById('vbInlineSaturationValue');
+    var lightnessOut = document.getElementById('vbInlineLightnessValue');
+    var title = document.getElementById('vbInlineColorTitle');
+    var hexOut = document.getElementById('vbInlineColorHex');
+    var chip = document.getElementById('vbInlineColorChip');
+    var colorName = document.getElementById('vbInlineColorName');
+    var triggers = [];
+
+    function hexToHsl(hex) {
+      var value = String(hex || '#111111').replace('#', '');
+      if (value.length === 3) value = value.split('').map(function (c) { return c + c; }).join('');
+      if (value.length !== 6) value = '111111';
+      var r = parseInt(value.slice(0, 2), 16) / 255;
+      var g = parseInt(value.slice(2, 4), 16) / 255;
+      var b = parseInt(value.slice(4, 6), 16) / 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        var d = max - min;
+        s = l > .5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h *= 60;
+      }
+      return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+    }
+    function hslToHex(h, s, l) {
+      h = ((Number(h) % 360) + 360) % 360 / 360;
+      s = Math.max(0, Math.min(100, Number(s))) / 100;
+      l = Math.max(0, Math.min(100, Number(l))) / 100;
+      var r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        function hueToRgb(p, q, t) {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1 / 6) return p + (q - p) * 6 * t;
+          if (t < 1 / 2) return q;
+          if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+          return p;
+        }
+        var q = l < .5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hueToRgb(p, q, h + 1 / 3);
+        g = hueToRgb(p, q, h);
+        b = hueToRgb(p, q, h - 1 / 3);
+      }
+      function part(v) { var n = Math.round(v * 255).toString(16); return n.length < 2 ? '0' + n : n; }
+      return ('#' + part(r) + part(g) + part(b)).toUpperCase();
+    }
+    function updateTrigger(input) {
+      var item = triggers.find(function (entry) { return entry.input === input; });
+      if (!item) return;
+      var hex = String(input.value || '#111111').toUpperCase();
+      item.chip.style.backgroundColor = hex;
+      item.button.setAttribute('aria-label', '选择' + item.label + '，当前 ' + hex);
+      if (item.value) item.value.textContent = hex;
+      if (currentInput === input && panel.classList.contains('show')) syncPanelFromInput(input);
+    }
+    function syncPanelFromInput(input) {
+      if (!input) return;
+      currentInput = input;
+      var label = input.id;
+      var associated = input.closest('.vb-advanced-control');
+      if (associated) {
+        var labelNode = associated.querySelector('.vb-advanced-control-head label');
+        if (labelNode) label = labelNode.textContent.trim();
+      } else {
+        var colorBlock = input.closest('.vb-color');
+        if (colorBlock) {
+          var nameNode = colorBlock.querySelector('.vb-name');
+          if (nameNode) label = nameNode.textContent.trim();
+        }
+      }
+      title.textContent = label;
+      colorName.textContent = '正在微调';
+      var current = String(input.value || '#111111').toUpperCase();
+      hexOut.textContent = current;
+      chip.style.backgroundColor = current;
+      var hsl = hexToHsl(current);
+      hue.value = String(hsl.h);
+      saturation.value = String(hsl.s);
+      lightness.value = String(hsl.l);
+      hueOut.textContent = hsl.h + '°';
+      saturationOut.textContent = hsl.s + '%';
+      lightnessOut.textContent = hsl.l + '%';
+      swatches.querySelectorAll('.vb-inline-swatch').forEach(function (swatch) {
+        swatch.setAttribute('aria-pressed', swatch.dataset.color.toUpperCase() === current ? 'true' : 'false');
+      });
+    }
+    function applyColor(hex) {
+      if (!currentInput) return;
+      currentInput.value = String(hex).toLowerCase();
+      currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+      syncPanelFromInput(currentInput);
+      updateTrigger(currentInput);
+    }
+    function applyHsl() {
+      if (!currentInput) return;
+      var h = Number(hue.value), s = Number(saturation.value), l = Number(lightness.value);
+      hueOut.textContent = h + '°';
+      saturationOut.textContent = s + '%';
+      lightnessOut.textContent = l + '%';
+      applyColor(hslToHex(h, s, l));
+    }
+
+    presets.forEach(function (hex) {
+      var swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'vb-inline-swatch';
+      swatch.dataset.color = hex;
+      swatch.style.backgroundColor = hex;
+      swatch.title = hex;
+      swatch.setAttribute('aria-label', '使用颜色 ' + hex);
+      swatch.setAttribute('aria-pressed', 'false');
+      swatch.addEventListener('click', function () { applyColor(hex); });
+      swatches.appendChild(swatch);
+    });
+
+    Array.prototype.forEach.call(ui.tabVisual.querySelectorAll('input[type="color"]'), function (input) {
+      var compact = !!input.closest('.vb-color-row');
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'vb-color-inline-trigger';
+      var chipNode = document.createElement('span');
+      chipNode.className = 'vb-color-trigger-chip';
+      button.appendChild(chipNode);
+      var valueNode = null;
+      if (!compact) {
+        valueNode = document.createElement('span');
+        valueNode.className = 'vb-color-trigger-value';
+        valueNode.textContent = String(input.value || '#111111').toUpperCase();
+        button.appendChild(valueNode);
+        var actionNode = document.createElement('span');
+        actionNode.className = 'vb-color-trigger-action';
+        actionNode.textContent = '展开色盘 ↗';
+        button.appendChild(actionNode);
+      }
+      input.parentNode.insertBefore(button, input);
+      input.classList.add('vb-hidden-color-input');
+      var labelText = input.id;
+      var advParent = input.closest('.vb-advanced-control');
+      if (advParent) {
+        var advLabel = advParent.querySelector('.vb-advanced-control-head label');
+        if (advLabel) labelText = advLabel.textContent.trim();
+      } else {
+        var quickParent = input.closest('.vb-color');
+        var quickLabel = quickParent && quickParent.querySelector('.vb-name');
+        if (quickLabel) labelText = quickLabel.textContent.trim();
+      }
+      var item = { input: input, button: button, chip: chipNode, value: valueNode, label: labelText };
+      triggers.push(item);
+      button.addEventListener('click', function () {
+        if (currentInput === input && panel.classList.contains('show')) {
+          panel.classList.remove('show');
+          return;
+        }
+        syncPanelFromInput(input);
+        panel.classList.add('show');
+        updateTrigger(input);
+        if (ui.preview && typeof ui.preview.scrollIntoView === 'function') ui.preview.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      });
+      input.addEventListener('input', function () { updateTrigger(input); });
+      updateTrigger(input);
+    });
+    document.getElementById('vbInlineColorClose').addEventListener('click', function () { panel.classList.remove('show'); });
+    [hue, saturation, lightness].forEach(function (slider) { slider.addEventListener('input', applyHsl); });
+    return {
+      refreshAll: function () { triggers.forEach(function (item) { updateTrigger(item.input); }); },
+      close: function () { panel.classList.remove('show'); }
+    };
+  }
 
   function readRoles() {
     try {
@@ -1419,6 +1903,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
     setColor('vbPartnerBg', draft.partnerBubbleBg, '#FFFFFF');
     setColor('vbPartnerColor', draft.partnerBubbleColor, '#111111');
     loadAdvancedControls();
+    if (colorUi) colorUi.refreshAll();
     updateBgHint();
     updateScopeHint();
     applyPreviewDraft();
@@ -1541,6 +2026,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
     document.getElementById('tabVisual').classList.toggle('hide', tab !== 'visual');
     document.getElementById('tabCss').classList.toggle('hide', tab !== 'css');
     if (tab === 'visual') {
+      returnToVisualHome();
       document.getElementById('btnLeft').textContent = '恢复默认';
       document.getElementById('btnRight').textContent = '保存配置';
       loadVisualScope(currentScope);   // 回到 Tab 1 时刷新一次（角色列表可能已变化）
