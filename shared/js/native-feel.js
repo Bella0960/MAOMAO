@@ -4,7 +4,56 @@
    3. 点击震动反馈（安卓生效，iOS 自动跳过）
    引入方式：每个页面 <head> 中、font-loader.js 之后同步引入 */
 (function () {
-    'use strict';
+'use strict';
+
+    /* ---------- Theme layer: default stays Classic; glass is strictly opt-in ---------- */
+    var MAOMAO_THEME_KEY = 'maomao_theme';
+    var maomaoThemeRoot = document.documentElement;
+    var maomaoThemeLink = null;
+    function normalizeMaoMaoTheme(value) {
+        return value === 'liquid-glass' ? 'liquid-glass' : 'classic';
+    }
+    function readMaoMaoTheme() {
+        try { return normalizeMaoMaoTheme(window.localStorage.getItem(MAOMAO_THEME_KEY)); }
+        catch (err) { return 'classic'; }
+    }
+    function ensureMaoMaoThemeStylesheet() {
+        if (maomaoThemeLink && maomaoThemeLink.isConnected) return maomaoThemeLink;
+        maomaoThemeLink = document.getElementById('maomao-liquid-glass-theme');
+        if (maomaoThemeLink) return maomaoThemeLink;
+        var current = document.currentScript;
+        if (!current || !current.src) return null;
+        try {
+            maomaoThemeLink = document.createElement('link');
+            maomaoThemeLink.id = 'maomao-liquid-glass-theme';
+            maomaoThemeLink.rel = 'stylesheet';
+            maomaoThemeLink.href = new URL('../css/liquid-glass-theme.css', current.src).href;
+            /* Load once while classic remains visually unchanged; the CSS only activates via data-theme. */
+            maomaoThemeLink.media = 'all';
+            document.head.appendChild(maomaoThemeLink);
+            return maomaoThemeLink;
+        } catch (err) {
+            maomaoThemeLink = null;
+            return null;
+        }
+    }
+    maomaoThemeRoot.setAttribute('data-theme', readMaoMaoTheme());
+    ensureMaoMaoThemeStylesheet();
+    window.MAOMAOTheme = {
+        key: MAOMAO_THEME_KEY,
+        get: readMaoMaoTheme,
+        set: function (value) {
+            var theme = normalizeMaoMaoTheme(value);
+            try { window.localStorage.setItem(MAOMAO_THEME_KEY, theme); } catch (err) {}
+            maomaoThemeRoot.setAttribute('data-theme', theme);
+            ensureMaoMaoThemeStylesheet();
+            try {
+                window.dispatchEvent(new CustomEvent('maomao:themechange', { detail: { theme: theme } }));
+            } catch (err) {}
+            return theme;
+        }
+    };
+
 
     /* ---------- 一、全局原生 CSS（脚本在 head 同步执行，先于首屏绘制注入） ---------- */
     var css = [
