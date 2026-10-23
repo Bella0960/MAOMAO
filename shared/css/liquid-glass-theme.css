@@ -250,12 +250,9 @@ html[data-theme="liquid-glass"] .toast {
 
 /* Prefer a stable opaque fallback on browsers without background filtering. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  html[data-theme="liquid-glass"] .glass,
-  html[data-theme="liquid-glass"] .time-card,
-  html[data-theme="liquid-glass"] .img-card,
-  html[data-theme="liquid-glass"] .music-card,
-  html[data-theme="liquid-glass"] .widget-card,
-  html[data-theme="liquid-glass"] .dock-bar,
+  html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar,
   html[data-theme="liquid-glass"] .floating-nav,
   html[data-theme="liquid-glass"] section.card,
   html[data-theme="liquid-glass"] .card,
@@ -274,7 +271,6 @@ html[data-theme="liquid-glass"] .toast {
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="liquid-glass"] .app-icon,
-  html[data-theme="liquid-glass"] .widget-card,
   html[data-theme="liquid-glass"] .nav-tab {
     transition: none !important;
   }
