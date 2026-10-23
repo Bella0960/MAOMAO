@@ -28,7 +28,7 @@
                 maomaoThemeLink.id = 'maomao-liquid-glass-theme';
                 maomaoThemeLink.rel = 'stylesheet';
                 var themeCssUrl = new URL('../css/liquid-glass-theme.css', current.src);
-                themeCssUrl.searchParams.set('v', '20261023v3');
+                themeCssUrl.searchParams.set('v', '20261023v4');
                 maomaoThemeLink.href = themeCssUrl.href;
                 maomaoThemeLink.media = 'all';
             } catch (err) {

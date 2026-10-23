@@ -50,47 +50,26 @@ html[data-theme="liquid-glass"] .battery-icon {
   border-color: currentColor !important;
 }
 
-/* One shared material for floating glass controls. */
-html[data-theme="liquid-glass"] .glass,
-html[data-theme="liquid-glass"] .time-card,
-html[data-theme="liquid-glass"] .img-card,
-html[data-theme="liquid-glass"] .music-card,
-html[data-theme="liquid-glass"] .widget-card,
-html[data-theme="liquid-glass"] .korean-widgets .widget-card,
-html[data-theme="liquid-glass"] .dock-bar,
-html[data-theme="liquid-glass"] .floating-nav,
-html[data-theme="liquid-glass"] .bottom-nav,
-html[data-theme="liquid-glass"] .nav-bar,
-html[data-theme="liquid-glass"] .tab-bar,
-html[data-theme="liquid-glass"] .chat-input-bar {
-  background-color: var(--lg-surface) !important;
-  background-image: linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.34) 42%, rgba(245,245,249,.22) 100%) !important;
-  border: 1px solid var(--lg-edge) !important;
-  box-shadow: var(--lg-shadow), var(--lg-inset) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
-  backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
-}
-
-/* Generic content panels keep their original background images intact. */
-html[data-theme="liquid-glass"] section.card,
-html[data-theme="liquid-glass"] .card,
-html[data-theme="liquid-glass"] .customize-panel,
-html[data-theme="liquid-glass"] .modal,
-html[data-theme="liquid-glass"] [role="dialog"] {
-  background-color: var(--lg-surface) !important;
-  border: 1px solid var(--lg-edge) !important;
-  box-shadow: var(--lg-shadow), var(--lg-inset) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
-  backdrop-filter: blur(26px) saturate(1.65) contrast(1.025) !important;
-}
+/* Liquid Glass surface is reserved for navigation and the icon dock, not home widgets. */
 html[data-theme="liquid-glass"] .dock-bar,
 html[data-theme="liquid-glass"] .floating-nav,
 html[data-theme="liquid-glass"] .bottom-nav,
 html[data-theme="liquid-glass"] .nav-bar,
 html[data-theme="liquid-glass"] .tab-bar {
   position: relative;
-  border-radius: 26px !important;
+  border-radius: 28px !important;
   overflow: visible;
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-dock-fill-alpha, .12)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-dock-highlight-alpha, .2)),
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-fill-alpha, .12)) 54%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-shadow-alpha, .05))
+  ) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  box-shadow: 0 14px 34px rgba(22,22,28,.12), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.45) !important;
 }
 html[data-theme="liquid-glass"] .dock-bar::before,
 html[data-theme="liquid-glass"] .floating-nav::before,
@@ -108,17 +87,6 @@ html[data-theme="liquid-glass"] .tab-bar::before {
   box-shadow: 0 0 8px rgba(255,255,255,.42);
   pointer-events: none;
 }
-html[data-theme="liquid-glass"] .dock-bar {
-  background-color: rgba(245,245,249,.48) !important;
-  background-image: linear-gradient(155deg, rgba(255,255,255,.8), rgba(245,245,249,.34) 62%, rgba(255,255,255,.48)) !important;
-  border-radius: 30px !important;
-  box-shadow: 0 16px 38px rgba(25,25,30,.12), inset 0 1px 0 rgba(255,255,255,.96), inset 0 -1px 0 rgba(255,255,255,.42) !important;
-}
-html[data-theme="liquid-glass"] .floating-nav {
-  background-color: rgba(248,248,251,.48) !important;
-  background-image: linear-gradient(150deg, rgba(255,255,255,.78), rgba(245,245,249,.3)) !important;
-  box-shadow: 0 12px 34px rgba(27,27,33,.12), inset 0 1px 0 rgba(255,255,255,.95) !important;
-}
 html[data-theme="liquid-glass"] .nav-tab,
 html[data-theme="liquid-glass"] .dock-item,
 html[data-theme="liquid-glass"] .dock-bar .app-tile {
@@ -131,42 +99,95 @@ html[data-theme="liquid-glass"] .nav-tab[aria-current="page"] {
 html[data-theme="liquid-glass"] .nav-tab.active::before,
 html[data-theme="liquid-glass"] .nav-tab[aria-current="page"]::before {
   background: rgba(255,255,255,.76) !important;
-  box-shadow: 0 2px 10px rgba(30,30,36,.08), inset 0 1px 0 white !important;
+  box-shadow: 0 2px 10px rgba(30,30,36,.08), inset 0 1px 0 #fff !important;
 }
 
-/* Home-screen app icons: milky transparent tiles with a crisp lens edge. */
-html[data-theme="liquid-glass"] .app-icon,
-html[data-theme="liquid-glass"] .dock-bar .app-icon {
-  background-color: rgba(255,255,255,.46) !important;
-  background-image: linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,255,255,.34) 48%, rgba(235,235,241,.32)) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.7) !important;
-  backdrop-filter: blur(22px) saturate(1.7) !important;
+/* iOS 26 home-screen icon appearance. The opacity setting applies to APP ICON TILES. */
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.05) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.05) !important;
   border: 1px solid rgba(255,255,255,.88) !important;
-  box-shadow: 0 7px 17px rgba(37,37,44,.08), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.42) !important;
-  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, background .28s ease !important;
+  box-shadow: 0 7px 18px rgba(22,22,28,.10), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.4) !important;
+  transition: background .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease !important;
 }
-html[data-theme="liquid-glass"] .app-icon svg {
-  filter: drop-shadow(0 1px 1px rgba(255,255,255,.36));
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="clear"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-icon-fill-alpha, .08)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-icon-highlight-alpha, .16)) 0%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-fill-alpha, .08)) 50%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-shadow-alpha, .025)) 100%
+  ) !important;
 }
-html[data-theme="liquid-glass"] .app-name {
-  color: rgba(37,37,42,.86) !important;
-  text-shadow: 0 1px 0 rgba(255,255,255,.58);
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="tinted"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-icon-tint-alpha, .22)) !important;
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--lg-icon-highlight-alpha, .18)) 0%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-tint-alpha, .22)) 55%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-icon-shadow-alpha, .08)) 100%
+  ) !important;
 }
-html[data-theme="liquid-glass"] .app-card:active .app-icon,
-html[data-theme="liquid-glass"] .dock-bar .app-tile:active .app-icon,
-html[data-theme="liquid-glass"] .widget-card:active,
-html[data-theme="liquid-glass"] .nav-tab:active {
-  transform: scale(.965) translateY(1px);
-  box-shadow: 0 2px 8px rgba(37,37,44,.07), inset 0 1px 0 rgba(255,255,255,.96) !important;
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .dock-bar .app-icon {
+  background-color: rgba(36,36,42,var(--lg-icon-dark-alpha, .54)) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,var(--lg-icon-highlight-alpha, .12)), rgba(36,36,42,var(--lg-icon-dark-alpha, .54)) 55%, rgba(15,15,20,.34)) !important;
+  border-color: rgba(255,255,255,.58) !important;
 }
-html[data-theme="liquid-glass"] .app-card:hover .app-icon {
+html[data-theme="liquid-glass"][data-icon-style="default"] body.maomao-home .desktop-grid .app-icon,
+html[data-theme="liquid-glass"][data-icon-style="default"] body.maomao-home .dock-bar .app-icon {
+  background: rgba(248,248,251,.86) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  box-shadow: 0 4px 12px rgba(22,22,28,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon::before,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,var(--lg-icon-highlight-alpha, .16)), transparent 44%, rgba(255,255,255,.025));
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon svg,
+html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,.34));
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-icon svg,
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .dock-bar .app-icon svg {
+  stroke: #fff !important;
+  color: #fff !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.24));
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-name {
+  color: rgba(28,28,33,.9) !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.52);
+}
+html[data-theme="liquid-glass"][data-icon-style="dark"] body.maomao-home .desktop-grid .app-name {
+  color: rgba(248,248,251,.94) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.28);
+}
+html[data-theme="liquid-glass"] body.maomao-home .app-card:active .app-icon,
+html[data-theme="liquid-glass"] body.maomao-home .dock-item:active .app-icon {
+  transform: scale(.955);
+  box-shadow: 0 2px 8px rgba(22,22,28,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .app-card:hover .app-icon {
   transform: translateY(-2px);
-  box-shadow: 0 10px 21px rgba(37,37,44,.1), inset 0 1px 0 rgba(255,255,255,.98) !important;
 }
-html[data-theme="liquid-glass"] .page-dots .dot {
-  background: rgba(65,65,72,.24) !important;
-}
-html[data-theme="liquid-glass"] .page-dots .dot.active {
+html[data-theme="liquid-glass"] body.maomao-home .page-dots .dot { background: rgba(65,65,72,.24) !important; }
+html[data-theme="liquid-glass"] body.maomao-home .page-dots .dot.active {
   background: rgba(255,255,255,.9) !important;
   box-shadow: 0 1px 5px rgba(30,30,36,.12);
 }
@@ -229,12 +250,9 @@ html[data-theme="liquid-glass"] .toast {
 
 /* Prefer a stable opaque fallback on browsers without background filtering. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  html[data-theme="liquid-glass"] .glass,
-  html[data-theme="liquid-glass"] .time-card,
-  html[data-theme="liquid-glass"] .img-card,
-  html[data-theme="liquid-glass"] .music-card,
-  html[data-theme="liquid-glass"] .widget-card,
-  html[data-theme="liquid-glass"] .dock-bar,
+  html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon,
+  html[data-theme="liquid-glass"] body.maomao-home .dock-bar,
   html[data-theme="liquid-glass"] .floating-nav,
   html[data-theme="liquid-glass"] section.card,
   html[data-theme="liquid-glass"] .card,
@@ -253,18 +271,12 @@ html[data-theme="liquid-glass"] .toast {
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="liquid-glass"] .app-icon,
-  html[data-theme="liquid-glass"] .widget-card,
   html[data-theme="liquid-glass"] .nav-tab {
     transition: none !important;
   }
 }
 
-/* ===== iOS 26-style home-screen glass: intentionally scoped to the mobile desktop ===== */
-html[data-theme="liquid-glass"] {
-  --lg-glass-alpha: .16;
-  --lg-glass-blur: 32px;
-  --lg-glass-tint-rgb: 214,215,222;
-}
+/* Home-screen frame only. Home widgets and photo widget keep their original layout/style. */
 html[data-theme="liquid-glass"] body.maomao-home {
   background: #dedee3 !important;
 }
@@ -275,160 +287,32 @@ html[data-theme="liquid-glass"] body.maomao-home .desktop-grid,
 html[data-theme="liquid-glass"] body.maomao-home .dock-wrapper {
   background-color: transparent !important;
 }
-html[data-theme="liquid-glass"] body.maomao-home .phone-screen {
-  isolation: isolate;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) {
-  position: relative;
-  overflow: hidden;
-  color: rgba(31,31,36,.92) !important;
-  background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
-  background-image: linear-gradient(
-    142deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .14)) 0%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .02)) 37%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .66)) 100%
-  ) !important;
-  border: 1px solid rgba(255,255,255,.78) !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.07) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.07) !important;
-  box-shadow:
-    0 12px 27px rgba(22,22,28,.085),
-    0 2px 5px rgba(22,22,28,.04),
-    inset 0 1px 0 rgba(255,255,255,.98),
-    inset 0 -1px 0 rgba(255,255,255,.42) !important;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image)::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    linear-gradient(118deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.08) 24%, transparent 48%),
-    radial-gradient(ellipse at 8% 0%, rgba(255,255,255,.34), transparent 52%);
-  pointer-events: none;
-  z-index: 0;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) > * {
-  position: relative;
-  z-index: 1;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.ds-image) .ds-del {
-  z-index: 5;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image {
-  grid-row: span 4 !important;
-  aspect-ratio: auto !important;
-  height: clamp(248px, 37vh, 322px) !important;
-  min-height: 248px !important;
-  max-height: none !important;
-  background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
-  background-image:
-    linear-gradient(
-      138deg,
-      rgba(255,255,255,calc(var(--lg-glass-alpha) + .12)) 0%,
-      rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .72)) 47%,
-      rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .22)) 100%
-    ),
-    var(--lg-image-widget-src, none) !important;
-  background-size: cover, cover !important;
-  background-position: center, center !important;
-  border: 1px solid rgba(255,255,255,.88) !important;
-  border-radius: 30px !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.05) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.05) !important;
-  box-shadow:
-    0 16px 34px rgba(22,22,28,.12),
-    inset 0 1px 0 rgba(255,255,255,.99),
-    inset 0 -1px 0 rgba(255,255,255,.48) !important;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(138deg, rgba(255,255,255,.31), transparent 35%, transparent 72%, rgba(255,255,255,.10));
-  border: 1px solid rgba(255,255,255,.3);
-  pointer-events: none;
-}
-html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-time,
-html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-date,
-html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-week,
-html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-title,
-html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-song,
-html[data-theme="liquid-glass"] body.maomao-home .ds-music .ms-artist,
-html[data-theme="liquid-glass"] body.maomao-home .ds-dialog .dl-bubble,
-html[data-theme="liquid-glass"] body.maomao-home .po-wrapper .po-text {
-  color: rgba(34,34,39,.88) !important;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon,
-html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon {
-  position: relative !important;
-  isolation: isolate;
-  overflow: hidden;
-  background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .58)) !important;
-  background-image: linear-gradient(
-    146deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .22)) 0%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .68)) 54%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .42)) 100%
-  ) !important;
-  border: 1px solid rgba(255,255,255,.88) !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
-  box-shadow:
-    0 7px 16px rgba(23,23,29,.10),
-    inset 0 1px 0 rgba(255,255,255,.98),
-    inset 0 -1px 0 rgba(255,255,255,.44) !important;
-  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, background .28s ease !important;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon::before,
-html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,.4), transparent 43%, rgba(255,255,255,.07));
-  pointer-events: none;
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-icon svg,
-html[data-theme="liquid-glass"] body.maomao-home .dock-bar .app-icon svg {
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 1px 1px rgba(255,255,255,.4));
-}
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .app-name {
-  color: rgba(28,28,33,.9) !important;
-  text-shadow: 0 1px 1px rgba(255,255,255,.6);
-}
+html[data-theme="liquid-glass"] body.maomao-home .phone-screen { isolation: isolate; }
 html[data-theme="liquid-glass"] body.maomao-home .dock-bar {
-  background-color: rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .7)) !important;
+  background-color: rgba(var(--lg-glass-tint-rgb, 214,215,222), var(--lg-dock-fill-alpha, .12)) !important;
   background-image: linear-gradient(
-    150deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .24)) 0%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .76)) 46%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .64)) 100%
+    145deg,
+    rgba(255,255,255,var(--lg-dock-highlight-alpha, .2)),
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-fill-alpha, .12)) 55%,
+    rgba(var(--lg-glass-tint-rgb, 214,215,222),var(--lg-dock-shadow-alpha, .05))
   ) !important;
-  border: 1px solid rgba(255,255,255,.88) !important;
-  border-radius: 31px !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.85) contrast(1.06) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.85) contrast(1.06) !important;
+  border: 1px solid rgba(255,255,255,.9) !important;
+  border-radius: 30px !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
+  backdrop-filter: blur(var(--lg-glass-blur, 22px)) saturate(1.85) contrast(1.06) !important;
   box-shadow: 0 16px 34px rgba(21,21,27,.13), inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(255,255,255,.48) !important;
 }
 html[data-theme="liquid-glass"] body.maomao-home .gesture-bar {
   background: rgba(28,28,32,.62) !important;
   box-shadow: 0 1px 0 rgba(255,255,255,.45);
 }
-html[data-theme="liquid-glass"] body.maomao-home .status-bar {
-  text-shadow: 0 1px 1px rgba(255,255,255,.4);
-}
+html[data-theme="liquid-glass"] body.maomao-home .status-bar { text-shadow: 0 1px 1px rgba(255,255,255,.4); }
 html[data-theme="liquid-glass"] body.maomao-home .edit-done-btn {
-  background: rgba(248,248,251,.56) !important;
+  background: rgba(248,248,251,.65) !important;
   color: #222226 !important;
-  border: 1px solid rgba(255,255,255,.88) !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) !important;
+  border: 1px solid rgba(255,255,255,.9) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.8) !important;
+  backdrop-filter: blur(22px) saturate(1.8) !important;
   box-shadow: 0 5px 15px rgba(20,20,26,.10), inset 0 1px 0 white !important;
 }
 
@@ -734,244 +618,178 @@ html[data-theme="liquid-glass"] body.maomao-home .edit-done-btn {
 }
 
 
-/* Editorial hero composition inspired by the reference home screen. */
-.lg-hero-overlay { display: none; }
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image::after {
-  z-index: 1;
+
+/* The customization sheet itself uses glass; unrelated home widgets are deliberately not rethemed. */
+html[data-theme="liquid-glass"] .lg-controls-sheet {
+  border: 1px solid rgba(255,255,255,.96);
 }
-html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image .im-placeholder {
-  display: none !important;
+
+
+/* iOS-like icon picker: this sheet previews APP ICONS, not widgets. */
+.lg-controls-sheet { color: #28282E; }
+.lg-glass-preview {
+  height: 142px;
+  margin-bottom: 17px;
+  background: #dadbe1;
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-overlay {
+.lg-preview-wallpaper {
+  background:
+    radial-gradient(ellipse at 22% 20%, rgba(255,255,255,.94), transparent 36%),
+    radial-gradient(ellipse at 78% 72%, rgba(168,169,179,.82), transparent 31%),
+    repeating-linear-gradient(132deg, rgba(255,255,255,.16) 0 1px, transparent 1px 8px),
+    linear-gradient(135deg, #d0d1d8 0%, #f7f7fa 47%, #b6b7c0 100%);
+}
+.lg-preview-orb-a {
+  width: 104px;
+  height: 104px;
+  right: -12px;
+  top: -39px;
+}
+.lg-preview-orb-b {
+  width: 80px;
+  height: 80px;
+  left: 20px;
+  bottom: -42px;
+}
+.lg-preview-apps {
   position: absolute;
   z-index: 2;
-  inset: 0;
-  display: block;
-  color: rgba(42,42,48,.9);
-  pointer-events: none;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline {
-  position: absolute;
-  top: 17px;
-  left: 19px;
-  right: 19px;
+  inset: 19px 17px 42px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  color: rgba(43,43,49,.58);
-  font-size: 8px;
-  font-weight: 650;
-  letter-spacing: .16em;
+  gap: 10px;
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline i {
-  font-family: Georgia, serif;
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 400;
-  letter-spacing: .04em;
+.lg-preview-icon,
+.lg-preview-dock-icon {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  flex: 0 0 43px;
+  width: 43px;
+  height: 43px;
+  overflow: hidden;
+  border-radius: 13px;
+  border: 1px solid rgba(255,255,255,.9);
+  background-color: rgba(var(--preview-glass-tint-rgb, 214,215,222),var(--preview-icon-fill-alpha,.095));
+  background-image: linear-gradient(
+    145deg,
+    rgba(255,255,255,var(--preview-icon-highlight-alpha,.21)),
+    rgba(var(--preview-glass-tint-rgb, 214,215,222),var(--preview-icon-fill-alpha,.095)) 55%,
+    rgba(var(--preview-glass-tint-rgb, 214,215,222),.018)
+  );
+  -webkit-backdrop-filter: blur(var(--preview-glass-blur,24px)) saturate(1.8);
+  backdrop-filter: blur(var(--preview-glass-blur,24px)) saturate(1.8);
+  box-shadow: 0 4px 9px rgba(25,25,31,.08), inset 0 1px 0 rgba(255,255,255,.98);
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-portrait {
+.lg-preview-icon i {
   position: absolute;
   left: 50%;
-  top: 40%;
-  width: min(46%, 174px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid rgba(255,255,255,.9);
-  background-color: rgba(var(--lg-glass-tint-rgb),.28);
-  background-image:
-    linear-gradient(142deg, rgba(255,255,255,.2), rgba(var(--lg-glass-tint-rgb),.05) 55%, rgba(255,255,255,.15)),
-    var(--lg-image-widget-src, radial-gradient(circle at 34% 28%, #fff 0%, #e4e4e9 44%, #babac3 100%));
-  background-size: cover, cover;
-  background-position: center, center;
-  box-shadow:
-    0 12px 28px rgba(33,33,40,.15),
-    0 2px 6px rgba(255,255,255,.4),
-    inset 0 2px 0 rgba(255,255,255,.98),
-    inset 0 -2px 0 rgba(255,255,255,.32);
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid rgba(44,44,50,.78);
+  border-radius: 4px;
+  transform: translate(-50%,-50%);
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-portrait::after {
-  content: "";
+.lg-preview-icon-a i { border-radius: 50%; }
+.lg-preview-icon-b i { width: 16px; height: 11px; border-radius: 3px; }
+.lg-preview-icon-c i { width: 17px; height: 16px; border-radius: 50% 50% 5px 5px; }
+.lg-preview-icon-d i { width: 13px; height: 18px; border-radius: 3px; }
+.lg-preview-dock {
   position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255,255,255,.34), transparent 36%, transparent 68%, rgba(255,255,255,.12));
-  border: 1px solid rgba(255,255,255,.52);
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-name {
-  position: absolute;
-  top: 67%;
-  left: 8px;
-  right: 8px;
-  text-align: center;
-  font-family: Georgia, "Times New Roman", "Songti SC", serif;
-  font-size: clamp(25px, 7vw, 31px);
-  line-height: 1;
-  font-weight: 500;
-  letter-spacing: -.045em;
-  color: rgba(35,35,41,.9);
-  text-shadow: 0 1px 0 rgba(255,255,255,.62);
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-caption {
-  position: absolute;
-  top: 78%;
-  left: 14px;
-  right: 14px;
-  text-align: center;
-  color: rgba(56,56,63,.62);
-  font-size: 8px;
-  font-weight: 550;
-  letter-spacing: .19em;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: rgba(255,255,255,.94);
-  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  filter: drop-shadow(0 1px 3px rgba(58,58,66,.22));
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle-a {
-  top: 28%;
-  right: 17%;
-  transform: scale(1.15) rotate(8deg);
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle-b {
-  top: 58%;
-  left: 16%;
-  transform: scale(.72) rotate(18deg);
-  opacity: .76;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily {
-  position: absolute;
-  left: 13px;
-  right: 13px;
-  bottom: 12px;
-  height: 44px;
-  padding: 5px 10px;
+  z-index: 3;
+  left: 12px;
+  right: 12px;
+  bottom: 9px;
+  height: 39px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.88);
-  background: linear-gradient(
-    140deg,
-    rgba(255,255,255,calc(var(--lg-glass-alpha) + .20)),
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .08)) 60%,
-    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .5))
-  );
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8);
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8);
-  box-shadow: 0 6px 16px rgba(32,32,39,.09), inset 0 1px 0 rgba(255,255,255,.98);
+  justify-content: space-evenly;
+  gap: 8px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.94);
+  background: rgba(255,255,255,.12);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  backdrop-filter: blur(24px) saturate(1.8);
+  box-shadow: 0 4px 12px rgba(28,28,34,.08), inset 0 1px 0 rgba(255,255,255,.98);
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-mini-avatar {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.92);
-  background-image: var(--lg-image-widget-src, linear-gradient(145deg, #fff, #c9c9d1));
-  background-size: cover;
-  background-position: center;
-  box-shadow: 0 2px 6px rgba(30,30,36,.09), inset 0 1px 0 #fff;
+.lg-preview-dock-icon {
+  flex-basis: 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
 }
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy {
+.lg-glass-preview[data-icon-style="default"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="default"] .lg-preview-dock-icon {
+  background: rgba(249,249,251,.9);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-dock-icon {
+  background: rgba(36,36,42,var(--preview-icon-dark-alpha,.35));
+  background-image: linear-gradient(145deg, rgba(255,255,255,.14), rgba(36,36,42,var(--preview-icon-dark-alpha,.35)));
+}
+.lg-glass-preview[data-icon-style="dark"] .lg-preview-icon i { border-color: rgba(255,255,255,.92); }
+.lg-glass-preview[data-icon-style="tinted"] .lg-preview-icon,
+.lg-glass-preview[data-icon-style="tinted"] .lg-preview-dock-icon {
+  background: rgba(var(--preview-glass-tint-rgb,214,215,222),var(--preview-icon-tint-alpha,.23));
+}
+.lg-preview-dock-icon { flex: 0 0 26px; }
+
+.lg-style-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 7px;
+}
+.lg-style-option {
   min-width: 0;
-  flex: 1;
+  padding: 8px 2px 7px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: rgba(255,255,255,.24);
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  text-align: left;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy strong {
-  color: rgba(39,39,45,.86);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 12px;
-  font-style: italic;
-  line-height: 1;
-  font-weight: 600;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy span {
-  color: rgba(58,58,65,.66);
-  font-size: 9px;
-  line-height: 1.2;
-  letter-spacing: .02em;
-}
-html[data-theme="liquid-glass"] body.maomao-home .lg-hero-now {
-  flex: 0 0 auto;
-  color: rgba(53,53,60,.7);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: .11em;
-}
-@media (max-width: 360px) {
-  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline {
-    left: 14px;
-    right: 14px;
-    font-size: 7px;
-  }
-  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily {
-    left: 9px;
-    right: 9px;
-    padding-left: 7px;
-    padding-right: 7px;
-    gap: 7px;
-  }
-  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy span {
-    font-size: 8px;
-  }
-}
-
-
-/* Reliable, always-visible entry point to the Liquid Glass control sheet. */
-html[data-theme="liquid-glass"] body.maomao-home .lg-quick-trigger,
-body.maomao-home .lg-quick-trigger {
-  display: inline-flex !important;
-  flex: 0 0 27px;
-  width: 27px;
-  height: 27px;
-  padding: 0;
-  margin-left: 3px;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.88) !important;
-  color: #3b3b42 !important;
-  background: rgba(255,255,255,.46) !important;
-  background-image: linear-gradient(145deg, rgba(255,255,255,.72), rgba(220,220,228,.25)) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.7) !important;
-  backdrop-filter: blur(18px) saturate(1.7) !important;
-  box-shadow: 0 3px 10px rgba(28,28,34,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
+  gap: 5px;
+  color: #696971;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.lg-style-option.selected {
+  background: rgba(255,255,255,.68);
+  border-color: rgba(255,255,255,.98);
+  color: #242429;
+  box-shadow: 0 3px 10px rgba(22,22,28,.07), inset 0 1px 0 #fff;
+}
+.lg-style-option:active { transform: scale(.97); }
+.lg-style-option strong { font-size: 11px; font-weight: 650; line-height: 1.1; }
+.lg-style-option small { font-size: 8px; color: #92929A; line-height: 1.1; white-space: nowrap; }
+.lg-style-icon {
   position: relative;
-  z-index: 60;
-  pointer-events: auto !important;
-  touch-action: manipulation;
+  width: 44px;
+  height: 35px;
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.96);
+  background: linear-gradient(135deg,#eeeeF2,#cdced6);
 }
-body.maomao-home .lg-quick-trigger:active {
-  transform: scale(.94);
+.lg-style-icon i {
+  position: absolute;
+  top: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.86);
 }
-body.lg-controls-open {
-  overflow: hidden !important;
-}
-.lg-controls-backdrop {
-  isolation: isolate;
-  touch-action: auto;
-}
-.lg-controls-backdrop.open {
-  display: flex !important;
-  pointer-events: auto !important;
-}
-.lg-controls-backdrop:not(.open) {
-  display: none !important;
-  pointer-events: none !important;
-}
-.lg-controls-sheet,
-.lg-controls-sheet * {
-  pointer-events: auto;
-}
+.lg-style-icon i:nth-child(1) { left: 5px; }
+.lg-style-icon i:nth-child(2) { left: 17px; }
+.lg-style-icon i:nth-child(3) { left: 29px; }
+.lg-style-icon-default i { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.lg-style-icon-dark { background: linear-gradient(135deg,#72727c,#28282f); }
+.lg-style-icon-dark i { background: rgba(35,35,42,.38); border-color: rgba(255,255,255,.62); }
+.lg-style-icon-clear i { background: rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.92); }
+.lg-style-icon-tinted { background: linear-gradient(135deg,#c7c8d0,#f4f4f6 55%,#bfc0c9); }
+.lg-style-icon-tinted i { background: rgba(209,210,218,.58); }

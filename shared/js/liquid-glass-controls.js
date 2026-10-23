@@ -1,10 +1,16 @@
-/* MAOMAO · Liquid Glass controls
-   Live tuning for the mobile home screen. Settings are stored separately from layout and wallpaper. */
+/* MAOMAO · iOS 26 Home Screen icon customization
+   Changes only home-screen app icon tiles and the Dock. Layout, widgets and wallpaper remain untouched. */
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { opacity: 16, blur: 32, tint: 'silver' };
+  var DEFAULTS = { style: 'clear', opacity: 28, blur: 24, tint: 'silver' };
+  var STYLES = [
+    { key: 'default', label: '默认', note: '原始图标' },
+    { key: 'dark', label: '深色', note: '深色玻璃' },
+    { key: 'clear', label: '透明', note: 'Clear' },
+    { key: 'tinted', label: '色调', note: 'Tinted' }
+  ];
   var TINTS = [
     { key: 'clear', label: '晶透白', rgb: '255,255,255', swatch: '#FFFFFF' },
     { key: 'ice', label: '冰雾白', rgb: '241,242,246', swatch: '#F1F2F6' },
@@ -20,18 +26,19 @@
   }
 
   function normalize(raw) {
-    var tint = TINTS.some(function (item) { return item.key === raw.tint; }) ? raw.tint : DEFAULTS.tint;
+    raw = raw && typeof raw === 'object' ? raw : {};
     return {
-      opacity: Math.round(clamp(raw.opacity, 8, 65)),
-      blur: Math.round(clamp(raw.blur, 8, 40)),
-      tint: tint
+      style: STYLES.some(function (item) { return item.key === raw.style; }) ? raw.style : DEFAULTS.style,
+      opacity: Math.round(clamp(raw.opacity, 0, 80)),
+      blur: Math.round(clamp(raw.blur, 0, 40)),
+      tint: TINTS.some(function (item) { return item.key === raw.tint; }) ? raw.tint : DEFAULTS.tint
     };
   }
 
   function readSettings() {
     try {
       var parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      return normalize(parsed && typeof parsed === 'object' ? parsed : DEFAULTS);
+      return normalize(parsed);
     } catch (error) {
       return normalize(DEFAULTS);
     }
@@ -46,14 +53,38 @@
     return TINTS[2];
   }
 
+  function getOpacityVars() {
+    var amount = state.opacity / 100;
+    return {
+      fill: (amount * 0.34).toFixed(3),
+      highlight: (0.035 + amount * 0.62).toFixed(3),
+      shadow: Math.max(0.008, amount * 0.13).toFixed(3),
+      tint: (amount * 0.82).toFixed(3),
+      dark: (0.18 + amount * 0.62).toFixed(3),
+      dock: (0.035 + amount * 0.33).toFixed(3),
+      dockHighlight: (0.10 + amount * 0.48).toFixed(3),
+      dockShadow: (0.015 + amount * 0.12).toFixed(3)
+    };
+  }
+
   function applySettings(shouldPersist) {
     state = normalize(state);
     var tint = getTint(state.tint);
+    var values = getOpacityVars();
     var root = document.documentElement;
-    root.style.setProperty('--lg-glass-alpha', String(state.opacity / 100));
+
+    root.setAttribute('data-icon-style', state.style);
+    root.setAttribute('data-glass-tint', tint.key);
     root.style.setProperty('--lg-glass-blur', state.blur + 'px');
     root.style.setProperty('--lg-glass-tint-rgb', tint.rgb);
-    root.setAttribute('data-glass-tint', tint.key);
+    root.style.setProperty('--lg-icon-fill-alpha', values.fill);
+    root.style.setProperty('--lg-icon-highlight-alpha', values.highlight);
+    root.style.setProperty('--lg-icon-shadow-alpha', values.shadow);
+    root.style.setProperty('--lg-icon-tint-alpha', values.tint);
+    root.style.setProperty('--lg-icon-dark-alpha', values.dark);
+    root.style.setProperty('--lg-dock-fill-alpha', values.dock);
+    root.style.setProperty('--lg-dock-highlight-alpha', values.dockHighlight);
+    root.style.setProperty('--lg-dock-shadow-alpha', values.dockShadow);
 
     document.querySelectorAll('[data-lg-opacity-value]').forEach(function (node) {
       node.textContent = state.opacity + '%';
@@ -63,19 +94,31 @@
     });
     document.querySelectorAll('[data-lg-opacity]').forEach(function (node) {
       node.value = String(state.opacity);
+      node.disabled = state.style === 'default';
     });
     document.querySelectorAll('[data-lg-blur]').forEach(function (node) {
       node.value = String(state.blur);
+      node.disabled = state.style === 'default';
     });
-    document.querySelectorAll('[data-lg-preview]').forEach(function (node) {
-      node.style.setProperty('--preview-glass-alpha', String(state.opacity / 100));
-      node.style.setProperty('--preview-glass-blur', state.blur + 'px');
-      node.style.setProperty('--preview-glass-tint-rgb', tint.rgb);
+    document.querySelectorAll('[data-lg-style]').forEach(function (node) {
+      var active = node.getAttribute('data-lg-style') === state.style;
+      node.classList.toggle('selected', active);
+      node.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
     document.querySelectorAll('[data-lg-tint]').forEach(function (node) {
       var active = node.getAttribute('data-lg-tint') === state.tint;
       node.classList.toggle('selected', active);
       node.setAttribute('aria-pressed', active ? 'true' : 'false');
+      node.disabled = state.style === 'default';
+    });
+    document.querySelectorAll('[data-lg-preview]').forEach(function (node) {
+      node.setAttribute('data-icon-style', state.style);
+      node.style.setProperty('--preview-icon-fill-alpha', values.fill);
+      node.style.setProperty('--preview-icon-highlight-alpha', values.highlight);
+      node.style.setProperty('--preview-icon-tint-alpha', values.tint);
+      node.style.setProperty('--preview-icon-dark-alpha', values.dark);
+      node.style.setProperty('--preview-glass-blur', state.blur + 'px');
+      node.style.setProperty('--preview-glass-tint-rgb', tint.rgb);
     });
 
     if (shouldPersist !== false) {
@@ -99,41 +142,60 @@
   function buildPanel() {
     if (document.getElementById('liquidGlassControls')) return;
 
-    var colorButtons = TINTS.map(function (tint) {
-      return '<button class="lg-tint-option" type="button" data-lg-tint="' + tint.key +
-        '" aria-pressed="false"><span class="lg-tint-swatch" style="--lg-swatch:' + tint.swatch +
-        '"></span><span>' + tint.label + '</span></button>';
+    var styleButtons = STYLES.map(function (item) {
+      return '<button class="lg-style-option" type="button" data-lg-style="' + item.key +
+        '" aria-pressed="false"><span class="lg-style-icon lg-style-icon-' + item.key +
+        '"><i></i><i></i><i></i></span><strong>' + item.label + '</strong><small>' +
+        item.note + '</small></button>';
+    }).join('');
+
+    var tintButtons = TINTS.map(function (item) {
+      return '<button class="lg-tint-option" type="button" data-lg-tint="' + item.key +
+        '" aria-pressed="false"><span class="lg-tint-swatch" style="--lg-swatch:' + item.swatch +
+        '"></span><span>' + item.label + '</span></button>';
     }).join('');
 
     var panel = document.createElement('div');
     panel.className = 'lg-controls-backdrop';
     panel.id = 'liquidGlassControls';
     panel.setAttribute('aria-hidden', 'true');
+    panel.style.display = 'none';
+    panel.style.pointerEvents = 'none';
     panel.innerHTML =
       '<section class="lg-controls-sheet" role="dialog" aria-modal="true" aria-labelledby="lgControlsTitle">' +
         '<div class="lg-sheet-grabber" aria-hidden="true"></div>' +
         '<header class="lg-controls-header">' +
-          '<div><div class="lg-eyebrow">MAOMAO / APPEARANCE</div><h2 id="lgControlsTitle">Liquid Glass</h2>' +
-          '<p>把玻璃调成喜欢的通透程度。</p></div>' +
-          '<button class="lg-close-button" type="button" data-lg-close aria-label="关闭设置">×</button>' +
+          '<div><div class="lg-eyebrow">HOME SCREEN / CUSTOMIZE</div><h2 id="lgControlsTitle">自定义图标</h2>' +
+          '<p>只调整桌面应用图标和底部 Dock，不改变挂件。</p></div>' +
+          '<button class="lg-close-button" type="button" data-lg-close aria-label="关闭自定义面板">×</button>' +
         '</header>' +
-        '<div class="lg-glass-preview" data-lg-preview>' +
-          '<div class="lg-preview-wallpaper"><span class="lg-preview-orb lg-preview-orb-a"></span><span class="lg-preview-orb lg-preview-orb-b"></span><span class="lg-preview-line"></span><span class="lg-preview-type">GLASS<br><b>26</b></span></div>' +
-          '<div class="lg-preview-surface"><span>MAOMAO</span><strong>Liquid Glass</strong><i></i></div>' +
+        '<div class="lg-glass-preview" data-lg-preview data-icon-style="clear">' +
+          '<div class="lg-preview-wallpaper"><span class="lg-preview-orb lg-preview-orb-a"></span><span class="lg-preview-orb lg-preview-orb-b"></span><span class="lg-preview-line"></span></div>' +
+          '<div class="lg-preview-apps">' +
+            '<span class="lg-preview-icon lg-preview-icon-a"><i></i></span>' +
+            '<span class="lg-preview-icon lg-preview-icon-b"><i></i></span>' +
+            '<span class="lg-preview-icon lg-preview-icon-c"><i></i></span>' +
+            '<span class="lg-preview-icon lg-preview-icon-d"><i></i></span>' +
+          '</div>' +
+          '<div class="lg-preview-dock"><span class="lg-preview-dock-icon"></span><span class="lg-preview-dock-icon"></span><span class="lg-preview-dock-icon"></span><span class="lg-preview-dock-icon"></span></div>' +
         '</div>' +
         '<div class="lg-control-group">' +
-          '<div class="lg-control-label"><label for="lgOpacity">玻璃透明度</label><output data-lg-opacity-value>26%</output></div>' +
-          '<input id="lgOpacity" class="lg-range" type="range" min="8" max="65" step="1" value="26" data-lg-opacity aria-label="玻璃透明度">' +
-          '<div class="lg-range-captions"><span>更通透</span><span>更厚实</span></div>' +
+          '<div class="lg-control-label"><span>图标外观</span><span class="lg-muted-label">IOS 26 STYLE</span></div>' +
+          '<div class="lg-style-grid">' + styleButtons + '</div>' +
         '</div>' +
         '<div class="lg-control-group">' +
-          '<div class="lg-control-label"><label for="lgBlur">背景折射 / 模糊</label><output data-lg-blur-value>28 px</output></div>' +
-          '<input id="lgBlur" class="lg-range" type="range" min="8" max="40" step="1" value="28" data-lg-blur aria-label="背景折射模糊强度">' +
+          '<div class="lg-control-label"><label for="lgOpacity">图标透明度</label><output data-lg-opacity-value>28%</output></div>' +
+          '<input id="lgOpacity" class="lg-range" type="range" min="0" max="80" step="1" value="28" data-lg-opacity aria-label="应用图标透明度">' +
+          '<div class="lg-range-captions"><span>更透明</span><span>更实</span></div>' +
+        '</div>' +
+        '<div class="lg-control-group">' +
+          '<div class="lg-control-label"><label for="lgBlur">玻璃背景柔化</label><output data-lg-blur-value>24 px</output></div>' +
+          '<input id="lgBlur" class="lg-range" type="range" min="0" max="40" step="1" value="24" data-lg-blur aria-label="图标玻璃模糊程度">' +
           '<div class="lg-range-captions"><span>清晰</span><span>柔化</span></div>' +
         '</div>' +
         '<div class="lg-control-group">' +
-          '<div class="lg-control-label"><span>玻璃色调</span><span class="lg-muted-label">MONOCHROME</span></div>' +
-          '<div class="lg-tint-grid">' + colorButtons + '</div>' +
+          '<div class="lg-control-label"><span>图标色调</span><span class="lg-muted-label">BLACK / WHITE / GREY</span></div>' +
+          '<div class="lg-tint-grid">' + tintButtons + '</div>' +
         '</div>' +
         '<footer class="lg-controls-footer">' +
           '<button class="lg-reset-button" type="button" data-lg-reset>恢复默认</button>' +
@@ -141,23 +203,31 @@
         '</footer>' +
       '</section>';
 
-    panel.style.display = 'none';
-    panel.style.pointerEvents = 'none';
     document.body.appendChild(panel);
 
     panel.addEventListener('click', function (event) {
-      if (event.target === panel || event.target.closest('[data-lg-close]')) {
+      if (event.target === panel || (event.target.closest && event.target.closest('[data-lg-close]'))) {
         closePanel();
         return;
       }
 
-      var tintButton = event.target.closest('[data-lg-tint]');
-      if (tintButton) {
-        state.tint = tintButton.getAttribute('data-lg-tint');
+      var styleButton = event.target.closest && event.target.closest('[data-lg-style]');
+      if (styleButton) {
+        state.style = styleButton.getAttribute('data-lg-style');
+        activateGlassTheme();
         applySettings(true);
+        return;
       }
 
-      if (event.target.closest('[data-lg-reset]')) {
+      var tintButton = event.target.closest && event.target.closest('[data-lg-tint]');
+      if (tintButton) {
+        state.tint = tintButton.getAttribute('data-lg-tint');
+        activateGlassTheme();
+        applySettings(true);
+        return;
+      }
+
+      if (event.target.closest && event.target.closest('[data-lg-reset]')) {
         state = normalize(DEFAULTS);
         activateGlassTheme();
         applySettings(true);
@@ -165,11 +235,11 @@
     });
 
     panel.querySelector('[data-lg-opacity]').addEventListener('input', function (event) {
-      state.opacity = clamp(event.target.value, 8, 65);
+      state.opacity = clamp(event.target.value, 0, 80);
       applySettings(true);
     });
     panel.querySelector('[data-lg-blur]').addEventListener('input', function (event) {
-      state.blur = clamp(event.target.value, 8, 40);
+      state.blur = clamp(event.target.value, 0, 40);
       applySettings(true);
     });
   }
@@ -201,7 +271,7 @@
     var target = event.target && event.target.closest ? event.target : null;
     if (!target) return;
 
-    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn, #liquidGlassQuickButton, [data-open-liquid-glass]');
+    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn, [data-open-liquid-glass]');
     if (trigger) {
       event.preventDefault();
       event.stopPropagation();
@@ -209,7 +279,6 @@
       return;
     }
 
-    /* Reliability fallback for the existing Settings app tile: keep its original URL. */
     var settingsTile = target.closest('.app-tile[data-name="设置"], .app-tile[data-href="settings/settings.html"]');
     if (settingsTile) {
       event.preventDefault();
@@ -227,7 +296,6 @@
     applySettings(false);
   });
 
-  /* This file is loaded near the end of index.html and Appearance, after the DOM exists. */
   if (document.readyState !== 'loading') {
     buildPanel();
     applySettings(false);
