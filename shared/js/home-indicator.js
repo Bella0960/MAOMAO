@@ -37,7 +37,7 @@
     style.textContent = '.maomao-global-home-indicator {' +
       'appearance:none!important;-webkit-appearance:none!important;position:fixed!important;' +
       'left:50%!important;bottom:calc(3px + env(safe-area-inset-bottom,0px))!important;' +
-      'transform:translateX(-50%)!important;display:flex!important;align-items:center!important;' +
+      'transform:translateX(-50%)!important;display:flex;align-items:center!important;' +
       'justify-content:center!important;width:140px!important;min-width:140px!important;' +
       'max-width:140px!important;height:30px!important;min-height:30px!important;margin:0!important;' +
       'padding:0!important;border:0!important;outline:0!important;border-radius:0!important;' +
