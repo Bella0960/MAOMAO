@@ -216,6 +216,18 @@
   .vb-bg-actions{display:flex;gap:24px;align-items:center;margin-bottom:8px}
 
 
+  .vb-side-color-sliders{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 13px 15px}
+  .vb-side-color-channel{min-width:0;display:flex;flex-direction:column;gap:10px}
+  .vb-side-color-head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:9px;color:#66666f}
+  .vb-side-color-head output{font:italic 11px Georgia,serif;color:#222229}
+  .vb-hue-range,.vb-tone-range{appearance:none;-webkit-appearance:none;width:100%;height:20px;margin:0;padding:0;background:transparent;outline:none;cursor:pointer}
+  .vb-hue-range::-webkit-slider-runnable-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#f33 0%,#ffb52e 14%,#f4ee42 25%,#55c66e 39%,#21c8b4 51%,#2797ed 64%,#5852dc 76%,#bd42d8 88%,#f33 100%)}
+  .vb-hue-range::-moz-range-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#f33 0%,#ffb52e 14%,#f4ee42 25%,#55c66e 39%,#21c8b4 51%,#2797ed 64%,#5852dc 76%,#bd42d8 88%,#f33 100%)}
+  .vb-hue-range::-webkit-slider-thumb,.vb-tone-range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-3.5px;border-radius:50%;border:2px solid #fff;background:#42424a;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .vb-hue-range::-moz-range-thumb,.vb-tone-range::-moz-range-thumb{width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:#42424a;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .vb-tone-range::-webkit-slider-runnable-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#fff 0%,var(--vb-tone-hue,hsl(0,72%,50%)) 50%,#111 100%);border:1px solid rgba(0,0,0,.06)}
+  .vb-tone-range::-moz-range-track{height:9px;border-radius:999px;background:linear-gradient(90deg,#fff 0%,var(--vb-tone-hue,hsl(0,72%,50%)) 50%,#111 100%);border:1px solid rgba(0,0,0,.06)}
+  @media(max-width:360px){.vb-side-color-sliders{gap:10px;padding-left:10px;padding-right:10px}}
   /* ===== ChatBeauty advanced live editor ===== */
   .vbp-special-samples{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;align-items:stretch}
   .vbp-pay{position:relative;display:flex;flex-direction:column;gap:3px;min-height:58px;padding:8px 10px;border-radius:var(--chat-redpacket-radius,10px);background:var(--chat-redpacket-bg-rgba,#111);border:var(--chat-redpacket-border-width,0px) solid var(--chat-redpacket-border-color,#111);color:var(--chat-redpacket-text-color,#fff);overflow:hidden;isolation:isolate}
@@ -417,6 +429,18 @@
             <label class="vb-advanced-field"><span>字体</span>
               <select id="vbSideFontFamily"><option value="system">系统默认</option><option value="serif">衬线</option><option value="mono">等宽</option></select>
             </label>
+          </div>
+          <div class="vb-side-color-sliders">
+            <div class="vb-side-color-channel">
+              <div class="vb-side-color-head"><span>气泡填充色</span><output id="vbSideFillHex">#111111</output></div>
+              <input type="range" id="vbSideFillHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡填充色色调">
+              <input type="range" id="vbSideFillTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡填充色明暗">
+            </div>
+            <div class="vb-side-color-channel">
+              <div class="vb-side-color-head"><span>气泡描边色</span><output id="vbSideBorderHueHex">#111111</output></div>
+              <input type="range" id="vbSideBorderHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡描边色色调">
+              <input type="range" id="vbSideBorderTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡描边色明暗">
+            </div>
           </div>
           <div class="vb-advanced-subtitle">气泡尾巴 · TAIL</div>
           <div class="vb-advanced-grid vb-tail-grid">
