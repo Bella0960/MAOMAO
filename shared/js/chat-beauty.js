@@ -42,6 +42,7 @@
         myBubbleBorderColor: '#111111', myBubbleBorderWidth: 0,
         partnerBubbleBorderColor: '#DADAE0', partnerBubbleBorderWidth: 1,
         myBubbleRadiusSize: 15, partnerBubbleRadiusSize: 15,
+        myBubblePadding: 10, partnerBubblePadding: 10,
         myBubbleFontSize: 12, partnerBubbleFontSize: 12,
         myBubbleFontFamily: 'system', partnerBubbleFontFamily: 'system',
         myBubbleTailSize: 0, myBubbleTailX: 0, myBubbleTailY: 12,
@@ -83,6 +84,11 @@
         var key = scope === 'global' ? GLOBAL_KEY : ROLE_PREFIX + scope;
         var cfg = readJSON(key, null);
         return (cfg && cfg.vars && typeof cfg.vars === 'object') ? cfg.vars : {};
+    }
+
+    function paddingCss(sideValue, fallback) {
+        var pad = Math.max(2, Math.min(28, num(sideValue, num(fallback, 10))));
+        return (pad - 0.5) + 'px ' + (pad + 3) + 'px';
     }
 
     function fontFamily(key) {
@@ -155,17 +161,19 @@
         if (!rootEl || !rootEl.querySelectorAll) return;
         rootEl.querySelectorAll('.pay-card-red .pay-card-label').forEach(function (label) {
             if (!label.hasAttribute('data-chat-beauty-original')) label.setAttribute('data-chat-beauty-original', label.textContent || '');
-            label.textContent = String(v.redPacketTitle || '').trim() || label.getAttribute('data-chat-beauty-original') || '红包';
+            var chosenTitle = String(v.redPacketTitle || '').trim() || label.getAttribute('data-chat-beauty-original') || '红包';
+            if (label.textContent !== chosenTitle) label.textContent = chosenTitle;
         });
         rootEl.querySelectorAll('.pay-card-red .pay-card-amount').forEach(function (amount) {
             if (!amount.hasAttribute('data-chat-beauty-original')) amount.setAttribute('data-chat-beauty-original', amount.textContent || '');
             var template = String(v.redPacketAmountTemplate || '');
-            if (!template) {
-                amount.textContent = amount.getAttribute('data-chat-beauty-original') || '';
-                return;
+            var desiredAmount;
+            if (!template) desiredAmount = amount.getAttribute('data-chat-beauty-original') || '';
+            else {
+                var raw = (amount.getAttribute('data-chat-beauty-original') || '').replace(/^[¥￥]\\s*/, '');
+                desiredAmount = template.replace(/\\{amount\\}/g, raw).replace(/\\{currency\\}/g, '¥');
             }
-            var raw = (amount.getAttribute('data-chat-beauty-original') || '').replace(/^[¥￥]\s*/, '');
-            amount.textContent = template.replace(/\{amount\}/g, raw).replace(/\{currency\}/g, '¥');
+            if (amount.textContent !== desiredAmount) amount.textContent = desiredAmount;
         });
     }
 
@@ -225,7 +233,9 @@
         s.setProperty('--chat-bubble-ta-border-color', v.partnerBubbleBorderColor || '#DADAE0');
         s.setProperty('--chat-bubble-ta-border-width', num(v.partnerBubbleBorderWidth, 1) + 'px');
         s.setProperty('--chat-bubble-my-radius-size', num(v.myBubbleRadiusSize, 15) + 'px');
+        s.setProperty('--chat-bubble-my-padding', paddingCss(v.myBubblePadding, v.bubblePadding));
         s.setProperty('--chat-bubble-ta-radius-size', num(v.partnerBubbleRadiusSize, 15) + 'px');
+        s.setProperty('--chat-bubble-ta-padding', paddingCss(v.partnerBubblePadding, v.bubblePadding));
         s.setProperty('--chat-bubble-my-font-size', num(v.myBubbleFontSize, 12) + 'px');
         s.setProperty('--chat-bubble-ta-font-size', num(v.partnerBubbleFontSize, 12) + 'px');
         s.setProperty('--chat-bubble-my-font-family', fontFamily(v.myBubbleFontFamily));
