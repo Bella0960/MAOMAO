@@ -732,3 +732,195 @@ html[data-theme="liquid-glass"] body.maomao-home .edit-done-btn {
 @media (prefers-reduced-motion: reduce) {
   .lg-controls-backdrop.open, .lg-controls-sheet { animation: none !important; }
 }
+
+
+/* Editorial hero composition inspired by the reference home screen. */
+.lg-hero-overlay { display: none; }
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image::after {
+  z-index: 1;
+}
+html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image .im-placeholder {
+  display: none !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-overlay {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: block;
+  color: rgba(42,42,48,.9);
+  pointer-events: none;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline {
+  position: absolute;
+  top: 17px;
+  left: 19px;
+  right: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgba(43,43,49,.58);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: .16em;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline i {
+  font-family: Georgia, serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: .04em;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-portrait {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: min(46%, 174px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255,255,255,.9);
+  background-color: rgba(var(--lg-glass-tint-rgb),.28);
+  background-image:
+    linear-gradient(142deg, rgba(255,255,255,.2), rgba(var(--lg-glass-tint-rgb),.05) 55%, rgba(255,255,255,.15)),
+    var(--lg-image-widget-src, radial-gradient(circle at 34% 28%, #fff 0%, #e4e4e9 44%, #babac3 100%));
+  background-size: cover, cover;
+  background-position: center, center;
+  box-shadow:
+    0 12px 28px rgba(33,33,40,.15),
+    0 2px 6px rgba(255,255,255,.4),
+    inset 0 2px 0 rgba(255,255,255,.98),
+    inset 0 -2px 0 rgba(255,255,255,.32);
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,.34), transparent 36%, transparent 68%, rgba(255,255,255,.12));
+  border: 1px solid rgba(255,255,255,.52);
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-name {
+  position: absolute;
+  top: 67%;
+  left: 8px;
+  right: 8px;
+  text-align: center;
+  font-family: Georgia, "Times New Roman", "Songti SC", serif;
+  font-size: clamp(25px, 7vw, 31px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -.045em;
+  color: rgba(35,35,41,.9);
+  text-shadow: 0 1px 0 rgba(255,255,255,.62);
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-caption {
+  position: absolute;
+  top: 78%;
+  left: 14px;
+  right: 14px;
+  text-align: center;
+  color: rgba(56,56,63,.62);
+  font-size: 8px;
+  font-weight: 550;
+  letter-spacing: .19em;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: rgba(255,255,255,.94);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  filter: drop-shadow(0 1px 3px rgba(58,58,66,.22));
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle-a {
+  top: 28%;
+  right: 17%;
+  transform: scale(1.15) rotate(8deg);
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-sparkle-b {
+  top: 58%;
+  left: 16%;
+  transform: scale(.72) rotate(18deg);
+  opacity: .76;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily {
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  bottom: 12px;
+  height: 44px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.88);
+  background: linear-gradient(
+    140deg,
+    rgba(255,255,255,calc(var(--lg-glass-alpha) + .34)),
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) + .08)) 60%,
+    rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .5))
+  );
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8);
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8);
+  box-shadow: 0 6px 16px rgba(32,32,39,.09), inset 0 1px 0 rgba(255,255,255,.98);
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-mini-avatar {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.92);
+  background-image: var(--lg-image-widget-src, linear-gradient(145deg, #fff, #c9c9d1));
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 2px 6px rgba(30,30,36,.09), inset 0 1px 0 #fff;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy strong {
+  color: rgba(39,39,45,.86);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1;
+  font-weight: 600;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy span {
+  color: rgba(58,58,65,.66);
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: .02em;
+}
+html[data-theme="liquid-glass"] body.maomao-home .lg-hero-now {
+  flex: 0 0 auto;
+  color: rgba(53,53,60,.7);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .11em;
+}
+@media (max-width: 360px) {
+  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-topline {
+    left: 14px;
+    right: 14px;
+    font-size: 7px;
+  }
+  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily {
+    left: 9px;
+    right: 9px;
+    padding-left: 7px;
+    padding-right: 7px;
+    gap: 7px;
+  }
+  html[data-theme="liquid-glass"] body.maomao-home .lg-hero-daily-copy span {
+    font-size: 8px;
+  }
+}
