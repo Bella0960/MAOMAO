@@ -236,10 +236,13 @@
     document.body.classList.remove('lg-controls-open');
   }
 
+  /* Expose one explicit entry point for the long-press menu and edit toolbar. */
+  window.MAOMAOOpenIconCustomize = openPanel;
+
   document.addEventListener('click', function (event) {
     var target = event.target && event.target.closest ? event.target : null;
     if (!target) return;
-    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn');
+    var trigger = target.closest('#editGlassBtn, #customizeLiquidGlassBtn, #homeActionCustomize');
     if (trigger) {
       event.preventDefault();
       event.stopPropagation();
