@@ -244,8 +244,26 @@
           '<button class="lg-control-symbol lg-control-layout" type="button" data-lg-close aria-label="完成自定义"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="7" height="12" rx="2"/><rect x="13" y="3" width="8" height="17" rx="2"/></svg></button>' +
         '</div>' +
         '<div class="lg-style-grid" role="group" aria-label="图标外观">' + styleButtons + '</div>' +
-        '<div class="lg-spectrum-row"><input type="range" min="0" max="360" step="1" value="' + state.hue + '" data-lg-hue aria-label="图标色调" class="lg-spectrum-slider"></div>' +
-        '<div class="lg-tone-row" data-lg-tone-value><input type="range" min="0" max="100" step="1" value="' + state.tone + '" data-lg-tone aria-label="图标色调明暗" class="lg-tone-slider"></div>' +
+        '<div class="lg-icon-size-row"><span class="lg-section-label">图标大小</span><div class="lg-size-options" role="group" aria-label="图标大小">' +
+          '<button type="button" class="lg-size-option" data-lg-size="small" aria-pressed="false"><span class="lg-size-preview lg-size-preview-small"></span><span>小</span></button>' +
+          '<button type="button" class="lg-size-option" data-lg-size="medium" aria-pressed="false"><span class="lg-size-preview lg-size-preview-medium"></span><span>中</span></button>' +
+          '<button type="button" class="lg-size-option" data-lg-size="large" aria-pressed="false"><span class="lg-size-preview lg-size-preview-large"></span><span>大</span></button>' +
+        '</div></div>' +
+        '<div class="lg-spectrum-row"><input type="range" min="0" max="360" step="1" value="' + state.hue + '" data-lg-hue aria-label="玻璃色调" class="lg-spectrum-slider"></div>' +
+        '<div class="lg-tone-row" data-lg-tone-value><input type="range" min="0" max="100" step="1" value="' + state.tone + '" data-lg-tone aria-label="玻璃色调明暗" class="lg-tone-slider"></div>' +
+        '<div class="lg-glyph-color-section">' +
+          '<div class="lg-glyph-color-header"><span class="lg-section-label">图案颜色</span><label class="lg-native-color-picker"><input type="color" data-lg-glyph-color value="' + state.glyphColor + '" aria-label="打开图案颜色色盘"><span class="lg-native-color-preview"></span><span>色盘</span></label></div>' +
+          '<div class="lg-glyph-swatches" role="group" aria-label="常用图案颜色">' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#292930" aria-label="炭黑" style="--glyph-swatch:#292930"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#FFFFFF" aria-label="白色" style="--glyph-swatch:#FFFFFF"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#888890" aria-label="中灰" style="--glyph-swatch:#888890"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#D5A0B6" aria-label="灰粉" style="--glyph-swatch:#D5A0B6"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#D6A35D" aria-label="柔金" style="--glyph-swatch:#D6A35D"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#4CA88C" aria-label="薄荷绿" style="--glyph-swatch:#4CA88C"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#538FDB" aria-label="雾蓝" style="--glyph-swatch:#538FDB"></button>' +
+            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#8970C7" aria-label="柔紫" style="--glyph-swatch:#8970C7"></button>' +
+          '</div>' +
+        '</div>' +
         '<div class="lg-appearance-row" role="group" aria-label="图标明暗模式">' +
           '<button class="lg-appearance-option" type="button" data-lg-appearance="light" aria-pressed="false"><span class="lg-appearance-disc lg-light-disc"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 6h4"/></svg></span><span>浅色</span></button>' +
           '<button class="lg-appearance-option" type="button" data-lg-appearance="dark" aria-pressed="false"><span class="lg-appearance-disc lg-dark-disc"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 6h4"/></svg></span><span>深色</span></button>' +
@@ -268,6 +286,18 @@
         applySettings(true);
         return;
       }
+      var sizeButton = target.closest('[data-lg-size]');
+      if (sizeButton) {
+        state.iconSize = sizeButton.getAttribute('data-lg-size');
+        applySettings(true);
+        return;
+      }
+      var glyphPreset = target.closest('[data-lg-glyph-preset]');
+      if (glyphPreset) {
+        state.glyphColor = glyphPreset.getAttribute('data-lg-glyph-preset');
+        applySettings(true);
+        return;
+      }
       var appearanceButton = target.closest('[data-lg-appearance]');
       if (appearanceButton) {
         state.appearance = appearanceButton.getAttribute('data-lg-appearance');
@@ -284,6 +314,12 @@
       state.tone = clamp(event.target.value, 0, 100);
       if (state.style === 'default' || state.style === 'dark' || state.style === 'clear') state.style = 'tinted';
       applySettings(true);
+    });
+    panel.querySelector('[data-lg-glyph-color]').addEventListener('input', function (event) {
+      if (/^#[0-9a-f]{6}$/i.test(event.target.value)) {
+        state.glyphColor = event.target.value.toUpperCase();
+        applySettings(true);
+      }
     });
   }
 
