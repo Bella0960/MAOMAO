@@ -3,6 +3,7 @@
  * 全局状态栏控制：根据 localStorage 开关隐藏/显示 时间 与 电量图标
  *   settings_statusbar_time    = '0' 时隐藏时间
  *   settings_statusbar_battery = '0' 时隐藏电量/状态图标
+ *   settings_home_indicator_visible = '0' 时隐藏桌面最底部的小横条
  * 所有页面在 </body> 前引入本脚本即可自动生效。
  * ============================================================ */
 (function () {
@@ -15,6 +16,7 @@
     function apply() {
         var hideTime = getPref('settings_statusbar_time') === '0';
         var hideBattery = getPref('settings_statusbar_battery') === '0';
+        var hideHomeIndicator = getPref('settings_home_indicator_visible') === '0';
         var bars = document.querySelectorAll('.status-bar');
         for (var i = 0; i < bars.length; i++) {
             var sb = bars[i];
@@ -37,6 +39,13 @@
                 bat.style.display = hideBattery ? 'none' : '';
             }
         }
+
+        /* The bottom home indicator is separate from the top status bar and has its own setting. */
+        var homeIndicators = document.querySelectorAll('.gesture-bar');
+        for (var j = 0; j < homeIndicators.length; j++) {
+            homeIndicators[j].style.display = hideHomeIndicator ? 'none' : '';
+            homeIndicators[j].setAttribute('aria-hidden', 'true');
+        }
     }
 
     if (document.readyState === 'loading') {
@@ -44,6 +53,11 @@
     } else {
         apply();
     }
+    window.addEventListener('pageshow', apply);
+    window.addEventListener('storage', function (event) {
+        if (!event.key || event.key === 'settings_home_indicator_visible' ||
+            event.key === 'settings_statusbar_time' || event.key === 'settings_statusbar_battery') apply();
+    });
     /* 暴露给设置页开关联动 */
     window.__statusbarControlApply = apply;
 })();
