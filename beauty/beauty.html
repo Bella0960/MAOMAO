@@ -218,6 +218,8 @@
 
   .vb-side-color-sliders{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 13px 15px}
   .vb-side-color-channel{min-width:0;display:flex;flex-direction:column;gap:10px}
+  .vb-color-slider-line{display:grid;grid-template-columns:38px minmax(0,1fr);gap:7px;align-items:center;font-size:8px;color:#92929a}
+  .vb-color-slider-line input{min-width:0}
   .vb-side-color-head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:9px;color:#66666f}
   .vb-side-color-head output{font:italic 11px Georgia,serif;color:#222229}
   .vb-hue-range,.vb-tone-range{appearance:none;-webkit-appearance:none;width:100%;height:20px;margin:0;padding:0;background:transparent;outline:none;cursor:pointer}
@@ -441,13 +443,13 @@
           <div class="vb-side-color-sliders">
             <div class="vb-side-color-channel">
               <div class="vb-side-color-head"><span>气泡填充色</span><output id="vbSideFillHex">#111111</output></div>
-              <input type="range" id="vbSideFillHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡填充色色调">
-              <input type="range" id="vbSideFillTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡填充色明暗">
+              <label class="vb-color-slider-line"><span>彩色色调</span><input type="range" id="vbSideFillHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡填充色色调"></label>
+              <label class="vb-color-slider-line"><span>浅 / 深</span><input type="range" id="vbSideFillTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡填充色明暗"></label>
             </div>
             <div class="vb-side-color-channel">
               <div class="vb-side-color-head"><span>气泡描边色</span><output id="vbSideBorderHueHex">#111111</output></div>
-              <input type="range" id="vbSideBorderHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡描边色色调">
-              <input type="range" id="vbSideBorderTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡描边色明暗">
+              <label class="vb-color-slider-line"><span>彩色色调</span><input type="range" id="vbSideBorderHue" class="vb-hue-range" min="0" max="360" step="1" value="0" aria-label="气泡描边色色调"></label>
+              <label class="vb-color-slider-line"><span>浅 / 深</span><input type="range" id="vbSideBorderTone" class="vb-tone-range" min="0" max="100" step="1" value="8" aria-label="气泡描边色明暗"></label>
             </div>
           </div>
           <div class="vb-advanced-subtitle">气泡尾巴 · TAIL</div>
