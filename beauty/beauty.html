@@ -1013,10 +1013,100 @@ document.getElementById('importFile').addEventListener('change', function(e){
     if (out) out.textContent = hex.toUpperCase();
   }
 
+
+  function rgbToHslValue(value) {
+    var hex = toHex(value, '#111111').replace('#', '');
+    var r = parseInt(hex.slice(0, 2), 16) / 255;
+    var g = parseInt(hex.slice(2, 4), 16) / 255;
+    var b = parseInt(hex.slice(4, 6), 16) / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      var delta = max - min;
+      s = delta / (1 - Math.abs(2 * l - 1));
+      if (max === r) h = ((g - b) / delta) % 6;
+      else if (max === g) h = (b - r) / delta + 2;
+      else h = (r - g) / delta + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return { h: Math.round(h), l: Math.round(l * 100) };
+  }
+
+  function hslToHex(hue, lightness) {
+    var h = ((Number(hue) % 360) + 360) % 360;
+    var l = Math.max(0, Math.min(100, Number(lightness))) / 100;
+    var sat = 0.72;
+    var c = (1 - Math.abs(2 * l - 1)) * sat;
+    var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    var m = l - c / 2;
+    var r = 0, g = 0, b = 0;
+    if (h < 60) { r = c; g = x; }
+    else if (h < 120) { r = x; g = c; }
+    else if (h < 180) { g = c; b = x; }
+    else if (h < 240) { g = x; b = c; }
+    else if (h < 300) { r = x; b = c; }
+    else { r = c; b = x; }
+    function hx(v) {
+      var n = Math.round((v + m) * 255).toString(16);
+      return n.length < 2 ? '0' + n : n;
+    }
+    return '#' + hx(r) + hx(g) + hx(b);
+  }
+
+  function syncSideColorSliders() {
+    if (!draft) return;
+    var prefix = getSidePrefix();
+    [
+      { type: 'Fill', value: draft[prefix + 'Bg'] || (prefix === 'myBubble' ? '#111111' : '#FFFFFF') },
+      { type: 'Border', value: draft[prefix + 'BorderColor'] || (prefix === 'myBubble' ? '#111111' : '#DADAE0') }
+    ].forEach(function (item) {
+      var hsl = rgbToHslValue(item.value);
+      var hue = document.getElementById('vbSide' + item.type + 'Hue');
+      var tone = document.getElementById('vbSide' + item.type + 'Tone');
+      var out = document.getElementById(item.type === 'Fill' ? 'vbSideFillHex' : 'vbSideBorderHueHex');
+      hue.value = String(hsl.h);
+      tone.value = String(hsl.l);
+      tone.style.setProperty('--vb-tone-hue', 'hsl(' + hsl.h + ',72%,50%)');
+      if (out) out.textContent = toHex(item.value, '#111111').toUpperCase();
+    });
+  }
+
+  function applySideSliderColor(type) {
+    var prefix = getSidePrefix();
+    var hue = Number(document.getElementById('vbSide' + type + 'Hue').value);
+    var tone = Number(document.getElementById('vbSide' + type + 'Tone').value);
+    var hex = hslToHex(hue, tone);
+    var field = prefix + (type === 'Fill' ? 'Bg' : 'BorderColor');
+    draft[field] = hex;
+    document.getElementById('vbSide' + type + 'Tone').style.setProperty('--vb-tone-hue', 'hsl(' + hue + ',72%,50%)');
+    if (type === 'Fill') {
+      var colorId = prefix === 'myBubble' ? 'vbMyBg' : 'vbPartnerBg';
+      document.getElementById(colorId).value = hex;
+      document.getElementById(colorId + 'Hex').textContent = hex.toUpperCase();
+      document.getElementById('vbSideFillHex').textContent = hex.toUpperCase();
+    } else {
+      document.getElementById('vbSideBorderColor').value = hex;
+      document.getElementById('vbSideBorderColorHex').textContent = hex.toUpperCase();
+      document.getElementById('vbSideBorderHueHex').textContent = hex.toUpperCase();
+    }
+    applyPreviewDraft();
+  }
+
+  ['Fill', 'Border'].forEach(function (type) {
+    document.getElementById('vbSide' + type + 'Hue').addEventListener('input', function () {
+      applySideSliderColor(type);
+    });
+    document.getElementById('vbSide' + type + 'Tone').addEventListener('input', function () {
+      applySideSliderColor(type);
+    });
+  });
+
   function loadSideControls() {
     if (!draft) return;
     var prefix = getSidePrefix();
     setAdvColor('vbSideBorderColor', draft[prefix + 'BorderColor'], prefix === 'myBubble' ? '#111111' : '#DADAE0');
+    syncSideColorSliders();
     setAdvRange('vbSideBorderWidth', draft[prefix + 'BorderWidth'], 'px', prefix === 'myBubble' ? 0 : 1);
     setAdvRange('vbSideRadius', draft[prefix + 'RadiusSize'], 'px', 15);
     setAdvRange('vbSidePadding', draft[prefix + 'Padding'], 'px', numOr(draft.bubblePadding, 10));
@@ -1180,6 +1270,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
   document.getElementById('vbSideBorderColor').addEventListener('input', function () {
     draft[getSidePrefix() + 'BorderColor'] = this.value.toUpperCase();
     document.getElementById('vbSideBorderColorHex').textContent = this.value.toUpperCase();
+    syncSideColorSliders();
     applyPreviewDraft();
   });
   [
@@ -1339,8 +1430,10 @@ document.getElementById('importFile').addEventListener('change', function(e){
   }
   function bindColor(id, field) {
     document.getElementById(id).addEventListener('input', function () {
-      draft[field] = this.value;
-      document.getElementById(id + 'Hex').textContent = this.value;
+      draft[field] = this.value.toUpperCase();
+      document.getElementById(id + 'Hex').textContent = this.value.toUpperCase();
+      if ((field === 'myBubbleBg' && getSidePrefix() === 'myBubble') ||
+          (field === 'partnerBubbleBg' && getSidePrefix() === 'partnerBubble')) syncSideColorSliders();
       applyPreviewDraft();
     });
   }
