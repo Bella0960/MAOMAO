@@ -650,6 +650,7 @@
 
       function exitEdit() {
         if (!editing) return;
+        closeHomeActionMenu();
         editing = false;
         document.body.classList.remove('home-editing');
         if (editModeIndicator) editModeIndicator.style.display = 'none';
@@ -657,6 +658,62 @@
         if (isDragging) endDrag();
         cleanupEmptyTrailingPages();
         persistCurrentDOM();
+      }
+
+      /* iOS-like long-press action menu. It is separate from the icon editor sheet. */
+      function showHomeActionMenu() {
+        closeHomeActionMenu();
+        var menu = document.createElement('div');
+        menu.id = 'homeActionMenu';
+        menu.className = 'home-action-menu open';
+        menu.setAttribute('role', 'menu');
+        menu.setAttribute('aria-label', '主屏幕操作');
+        menu.innerHTML =
+          '<button type="button" class="home-action-item" role="menuitem" data-home-action="widgets">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><span>添加小组件</span></button>' +
+          '<button type="button" class="home-action-item" role="menuitem" id="homeActionCustomize">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.6v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.3v-2.6h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2H15v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.6h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg><span>自定义</span></button>' +
+          '<button type="button" class="home-action-item" role="menuitem" data-home-action="wallpaper">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>编辑墙纸</span></button>' +
+          '<button type="button" class="home-action-item" role="menuitem" data-home-action="pages">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v16"/></svg><span>编辑页面</span></button>';
+        document.body.appendChild(menu);
+
+        menu.addEventListener('click', function (event) {
+          var item = event.target && event.target.closest ? event.target.closest('[data-home-action], #homeActionCustomize') : null;
+          if (!item) return;
+          event.preventDefault();
+          event.stopPropagation();
+          var action = item.getAttribute('data-home-action');
+          if (item.id === 'homeActionCustomize') {
+            closeHomeActionMenu();
+            if (typeof window.MAOMAOOpenIconCustomize === 'function') {
+              window.MAOMAOOpenIconCustomize();
+            } else {
+              var button = document.getElementById('editGlassBtn');
+              if (button) button.click();
+            }
+            return;
+          }
+          closeHomeActionMenu();
+          if (action === 'widgets') {
+            window.location.href = 'desktop/widgets.html';
+          } else if (action === 'wallpaper') {
+            window.location.href = 'settings/appearance.html';
+          } else if (action === 'pages') {
+            var toast = document.querySelector('.toast');
+            if (toast) {
+              toast.textContent = '拖动图标可调整页面布局';
+              toast.classList.add('show');
+              setTimeout(function () { toast.classList.remove('show'); }, 1500);
+            }
+          }
+        });
+      }
+
+      function closeHomeActionMenu() {
+        var menu = document.getElementById('homeActionMenu');
+        if (menu) menu.remove();
       }
 
       if (editDoneBtn) {
@@ -1093,6 +1150,7 @@
           emptyPressTimer = null;
           if (editing) return;
           enterEdit();
+          showHomeActionMenu();
           swallowEmptyPressClick = true;
         }, EMPTY_PRESS_MS);
       }
@@ -1140,9 +1198,14 @@
       document.addEventListener('click', function (e) {
         if (swallowEmptyPressClick) {
           swallowEmptyPressClick = false;
-          e.stopPropagation();
-          e.preventDefault();
-          return;
+          /* Do not swallow a real tap on the edit toolbar, action menu, or customize sheet. */
+          if (e.target.closest && e.target.closest('#editModeIndicator, #homeActionMenu, #liquidGlassControls')) {
+            // Allow this control tap to continue to its own handler.
+          } else {
+            e.stopPropagation();
+            e.preventDefault();
+            return;
+          }
         }
         if (!editing) return;
 
@@ -1164,6 +1227,7 @@
           !e.target.closest('[data-drag]') &&
           !e.target.closest('.dot') &&
           !e.target.closest('#editModeIndicator') &&
+          !e.target.closest('#homeActionMenu') &&
           !e.target.closest('#liquidGlassControls')
         ) {
           exitEdit();
@@ -1517,6 +1581,6 @@
       //   navigator.serviceWorker.register('sw.js').catch(function () {});
       // }
     </script>
-<script src="shared/js/liquid-glass-controls.js?v=20261023v5"></script>
+<script src="shared/js/liquid-glass-controls.js?v=20261023v6"></script>
 </body>
 </html>
