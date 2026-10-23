@@ -300,12 +300,6 @@
         applySettings(true);
         return;
       }
-      var glyphPreset = target.closest('[data-lg-glyph-preset]');
-      if (glyphPreset) {
-        state.glyphColor = glyphPreset.getAttribute('data-lg-glyph-preset');
-        applySettings(true);
-        return;
-      }
       var appearanceButton = target.closest('[data-lg-appearance]');
       if (appearanceButton) {
         state.appearance = appearanceButton.getAttribute('data-lg-appearance');
@@ -319,7 +313,6 @@
     });
     panel.querySelector('[data-lg-tone]').addEventListener('input', function (event) {
       state.tone = clamp(event.target.value, 0, 100);
-      if (state.style === 'default' || state.style === 'dark' || state.style === 'clear') state.style = 'tinted';
       applySettings(true);
     });
   }
