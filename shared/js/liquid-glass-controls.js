@@ -24,8 +24,8 @@
     var style = STYLES.some(function (item) { return item.key === raw.style; }) ? raw.style : DEFAULTS.style;
     return {
       style: style,
-      hue: Math.round(clamp(raw.hue, 0, 360)),
-      tone: Math.round(clamp(raw.tone, 0, 100)),
+      hue: Math.round(clamp(raw.hue == null ? DEFAULTS.hue : raw.hue, 0, 360)),
+      tone: Math.round(clamp(raw.tone == null ? DEFAULTS.tone : raw.tone, 0, 100)),
       appearance: appearance,
       blur: Math.round(clamp(raw.blur == null ? DEFAULTS.blur : raw.blur, 0, 40))
     };
@@ -148,7 +148,7 @@
     var sunMarkup = kind === 'clear' ? '<circle cx="43" cy="19" r="13" fill="rgba(255,255,255,.94)"/>' : sun;
     return '<span class="lg-mode-weather lg-mode-weather-' + kind + '" style="--lg-weather-background:' + background + '">' +
       '<svg viewBox="0 0 64 52" aria-hidden="true">' + sunMarkup +
-      '<path d="M15 42C6 42 2 36 4 29c2-7 8-10 15-9C22 9 31 6 39 12c4 3 6 8 5 12 8-2 15 4 15 11 0 5-5 8-13 8H15Z" fill="url(#lgCloudGradient)" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/>' +
+      '<path d="M15 42C6 42 2 36 4 29c2-7 8-10 15-9C22 9 31 6 39 12c4 3 6 8 5 12 8-2 15 4 15 11 0 5-5 8-13 8H15Z" fill="rgba(255,255,255,.94)" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/>' +
       '</svg></span>';
   }
 
