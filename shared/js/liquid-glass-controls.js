@@ -4,7 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { style: 'clear', hue: 180, tone: 9, appearance: 'light', blur: 24, iconSize: 'medium', glyphColor: '#292930' };
+  var DEFAULTS = { style: 'clear', hue: 180, tone: 9, appearance: 'light', blur: 24, iconSize: 'medium' };
   var STYLES = [
     { key: 'default', label: '默认', note: 'Default' },
     { key: 'dark', label: '深色', note: 'Dark' },
@@ -28,8 +28,7 @@
       tone: Math.round(clamp(raw.tone == null ? DEFAULTS.tone : raw.tone, 0, 100)),
       appearance: appearance,
       blur: Math.round(clamp(raw.blur == null ? DEFAULTS.blur : raw.blur, 0, 40)),
-      iconSize: ['small', 'medium', 'large'].indexOf(raw.iconSize) >= 0 ? raw.iconSize : DEFAULTS.iconSize,
-      glyphColor: /^#[0-9a-f]{6}$/i.test(raw.glyphColor || '') ? raw.glyphColor : DEFAULTS.glyphColor
+      iconSize: ['small', 'medium', 'large'].indexOf(raw.iconSize) >= 0 ? raw.iconSize : DEFAULTS.iconSize
     };
   }
 
@@ -84,17 +83,11 @@
       node.classList.toggle('selected', active);
       node.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
-    document.querySelectorAll('[data-lg-glyph-color]').forEach(function (node) { node.value = state.glyphColor; });
-    document.querySelectorAll('[data-lg-glyph-preset]').forEach(function (node) {
-      var active = node.getAttribute('data-lg-glyph-preset').toUpperCase() === state.glyphColor.toUpperCase();
-      node.classList.toggle('selected', active);
-      node.setAttribute('aria-pressed', active ? 'true' : 'false');
-    });
     document.querySelectorAll('[data-lg-preview]').forEach(function (node) {
       node.setAttribute('data-icon-style', state.style);
       node.setAttribute('data-icon-appearance', state.appearance);
       node.setAttribute('data-icon-size', state.iconSize);
-      node.style.setProperty('--preview-glyph-color', state.glyphColor);
+      node.style.setProperty('--preview-glyph-color', 'rgb(' + getTintRgb() + ')');
       node.style.setProperty('--preview-glass-tint-rgb', getTintRgb());
       node.style.setProperty('--preview-glass-blur', state.blur + 'px');
       node.style.setProperty('--preview-icon-fill-alpha', state.style === 'clear' ? '.035' : '.20');
@@ -113,6 +106,7 @@
     var icons = document.querySelectorAll('body.maomao-home .desktop-grid .app-icon, body.maomao-home .dock-bar .app-icon');
     var addedGlass = false;
     var rgb = getTintRgb();
+    var glyphColor = 'rgb(' + rgb + ')';
     var toneAmount = state.tone / 100;
 
     icons.forEach(function (icon) {
@@ -142,7 +136,7 @@
       icon.style.setProperty('--glass-highlight', '0.22');
       icon.style.setProperty('--glass-edge-dark', '0.10');
       icon.style.setProperty('--glass-bezel', '2px');
-      icon.style.setProperty('--lg-icon-glyph-color', state.glyphColor);
+      icon.style.setProperty('--lg-icon-glyph-color', glyphColor);
 
       /* Clear is the intended desktop look: near-zero fill, live iPhone backdrop blur and lens rim. */
       icon.removeAttribute('data-glass');
@@ -195,8 +189,8 @@
     root.setAttribute('data-icon-style', state.style);
     root.setAttribute('data-icon-appearance', state.appearance);
     root.setAttribute('data-icon-size', state.iconSize);
-    root.setAttribute('data-icon-color', state.glyphColor);
-    root.style.setProperty('--lg-icon-glyph-color', state.glyphColor);
+    root.setAttribute('data-icon-color', 'rgb(' + rgb + ')');
+    root.style.setProperty('--lg-icon-glyph-color', 'rgb(' + rgb + ')');
     root.setAttribute('data-glass-tint', 'hue-' + state.hue);
     root.style.setProperty('--lg-glass-tint-rgb', rgb);
     root.style.setProperty('--lg-glass-blur', state.blur + 'px');
@@ -275,21 +269,9 @@
           '<button type="button" class="lg-size-option" data-lg-size="medium" aria-pressed="false"><span class="lg-size-preview lg-size-preview-medium"></span><span>中</span></button>' +
           '<button type="button" class="lg-size-option" data-lg-size="large" aria-pressed="false"><span class="lg-size-preview lg-size-preview-large"></span><span>大</span></button>' +
         '</div></div>' +
+        '<div class="lg-slider-help">图案颜色由下方两条色彩滑杆控制</div>' +
         '<div class="lg-spectrum-row"><input type="range" min="0" max="360" step="1" value="' + state.hue + '" data-lg-hue aria-label="玻璃色调" class="lg-spectrum-slider"></div>' +
         '<div class="lg-tone-row" data-lg-tone-value><input type="range" min="0" max="100" step="1" value="' + state.tone + '" data-lg-tone aria-label="玻璃色调明暗" class="lg-tone-slider"></div>' +
-        '<div class="lg-glyph-color-section">' +
-          '<div class="lg-glyph-color-header"><span class="lg-section-label">图案颜色</span><label class="lg-native-color-picker"><input type="color" data-lg-glyph-color value="' + state.glyphColor + '" aria-label="打开图案颜色色盘"><span class="lg-native-color-preview"></span><span>色盘</span></label></div>' +
-          '<div class="lg-glyph-swatches" role="group" aria-label="常用图案颜色">' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#292930" aria-label="炭黑" style="--glyph-swatch:#292930"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#FFFFFF" aria-label="白色" style="--glyph-swatch:#FFFFFF"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#888890" aria-label="中灰" style="--glyph-swatch:#888890"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#D5A0B6" aria-label="灰粉" style="--glyph-swatch:#D5A0B6"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#D6A35D" aria-label="柔金" style="--glyph-swatch:#D6A35D"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#4CA88C" aria-label="薄荷绿" style="--glyph-swatch:#4CA88C"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#538FDB" aria-label="雾蓝" style="--glyph-swatch:#538FDB"></button>' +
-            '<button type="button" class="lg-glyph-swatch" data-lg-glyph-preset="#8970C7" aria-label="柔紫" style="--glyph-swatch:#8970C7"></button>' +
-          '</div>' +
-        '</div>' +
         '<div class="lg-appearance-row" role="group" aria-label="图标明暗模式">' +
           '<button class="lg-appearance-option" type="button" data-lg-appearance="light" aria-pressed="false"><span class="lg-appearance-disc lg-light-disc"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 6h4"/></svg></span><span>浅色</span></button>' +
           '<button class="lg-appearance-option" type="button" data-lg-appearance="dark" aria-pressed="false"><span class="lg-appearance-disc lg-dark-disc"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 6h4"/></svg></span><span>深色</span></button>' +
@@ -333,19 +315,12 @@
 
     panel.querySelector('[data-lg-hue]').addEventListener('input', function (event) {
       state.hue = clamp(event.target.value, 0, 360);
-      if (state.style === 'default' || state.style === 'dark' || state.style === 'clear') state.style = 'tinted';
       applySettings(true);
     });
     panel.querySelector('[data-lg-tone]').addEventListener('input', function (event) {
       state.tone = clamp(event.target.value, 0, 100);
       if (state.style === 'default' || state.style === 'dark' || state.style === 'clear') state.style = 'tinted';
       applySettings(true);
-    });
-    panel.querySelector('[data-lg-glyph-color]').addEventListener('input', function (event) {
-      if (/^#[0-9a-f]{6}$/i.test(event.target.value)) {
-        state.glyphColor = event.target.value.toUpperCase();
-        applySettings(true);
-      }
     });
   }
 
