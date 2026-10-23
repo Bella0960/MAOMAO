@@ -4,7 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'maomao_liquid_glass_settings';
-  var DEFAULTS = { style: 'clear', hue: 180, tone: 9, appearance: 'light', blur: 24 };
+  var DEFAULTS = { style: 'clear', hue: 180, tone: 9, appearance: 'light', blur: 24, iconSize: 'medium', glyphColor: '#292930' };
   var STYLES = [
     { key: 'default', label: '默认', note: 'Default' },
     { key: 'dark', label: '深色', note: 'Dark' },
@@ -27,7 +27,9 @@
       hue: Math.round(clamp(raw.hue == null ? DEFAULTS.hue : raw.hue, 0, 360)),
       tone: Math.round(clamp(raw.tone == null ? DEFAULTS.tone : raw.tone, 0, 100)),
       appearance: appearance,
-      blur: Math.round(clamp(raw.blur == null ? DEFAULTS.blur : raw.blur, 0, 40))
+      blur: Math.round(clamp(raw.blur == null ? DEFAULTS.blur : raw.blur, 0, 40)),
+      iconSize: ['small', 'medium', 'large'].indexOf(raw.iconSize) >= 0 ? raw.iconSize : DEFAULTS.iconSize,
+      glyphColor: /^#[0-9a-f]{6}$/i.test(raw.glyphColor || '') ? raw.glyphColor : DEFAULTS.glyphColor
     };
   }
 
@@ -77,9 +79,22 @@
     });
     document.querySelectorAll('[data-lg-hue]').forEach(function (node) { node.value = String(state.hue); });
     document.querySelectorAll('[data-lg-tone]').forEach(function (node) { node.value = String(state.tone); });
+    document.querySelectorAll('[data-lg-size]').forEach(function (node) {
+      var active = node.getAttribute('data-lg-size') === state.iconSize;
+      node.classList.toggle('selected', active);
+      node.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-lg-glyph-color]').forEach(function (node) { node.value = state.glyphColor; });
+    document.querySelectorAll('[data-lg-glyph-preset]').forEach(function (node) {
+      var active = node.getAttribute('data-lg-glyph-preset').toUpperCase() === state.glyphColor.toUpperCase();
+      node.classList.toggle('selected', active);
+      node.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
     document.querySelectorAll('[data-lg-preview]').forEach(function (node) {
       node.setAttribute('data-icon-style', state.style);
       node.setAttribute('data-icon-appearance', state.appearance);
+      node.setAttribute('data-icon-size', state.iconSize);
+      node.style.setProperty('--preview-glyph-color', state.glyphColor);
       node.style.setProperty('--preview-glass-tint-rgb', getTintRgb());
       node.style.setProperty('--preview-glass-blur', state.blur + 'px');
       node.style.setProperty('--preview-icon-fill-alpha', state.style === 'clear' ? '.035' : '.20');
@@ -112,6 +127,10 @@
           icon.style.removeProperty('--glass-fill-opacity');
           icon.style.removeProperty('--glass-fill-opacity-dark');
           icon.style.removeProperty('--glass-blur');
+          icon.style.removeProperty('--glass-highlight');
+          icon.style.removeProperty('--glass-edge-dark');
+          icon.style.removeProperty('--glass-bezel');
+          icon.style.removeProperty('--lg-icon-glyph-color');
           icon.style.removeProperty('--_lg-fill');
         }
         return;
@@ -120,6 +139,10 @@
       if (!icon.classList.contains('maomao-liquid-glass-icon')) addedGlass = true;
       icon.classList.add('glass', 'maomao-liquid-glass-icon');
       icon.setAttribute('data-glass-interactive', '');
+      icon.style.setProperty('--glass-highlight', '0.22');
+      icon.style.setProperty('--glass-edge-dark', '0.10');
+      icon.style.setProperty('--glass-bezel', '2px');
+      icon.style.setProperty('--lg-icon-glyph-color', state.glyphColor);
 
       /* Clear is the intended desktop look: near-zero fill, live iPhone backdrop blur and lens rim. */
       icon.removeAttribute('data-glass');
@@ -171,6 +194,9 @@
 
     root.setAttribute('data-icon-style', state.style);
     root.setAttribute('data-icon-appearance', state.appearance);
+    root.setAttribute('data-icon-size', state.iconSize);
+    root.setAttribute('data-icon-color', state.glyphColor);
+    root.style.setProperty('--lg-icon-glyph-color', state.glyphColor);
     root.setAttribute('data-glass-tint', 'hue-' + state.hue);
     root.style.setProperty('--lg-glass-tint-rgb', rgb);
     root.style.setProperty('--lg-glass-blur', state.blur + 'px');
