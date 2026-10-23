@@ -317,15 +317,30 @@ html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-widget:not(.d
   z-index: 5;
 }
 html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image {
+  grid-row: span 4 !important;
+  aspect-ratio: auto !important;
+  height: clamp(248px, 37vh, 322px) !important;
+  min-height: 248px !important;
+  max-height: none !important;
   background-color: rgba(var(--lg-glass-tint-rgb), var(--lg-glass-alpha)) !important;
-  border: 1px solid rgba(255,255,255,.82) !important;
-  border-radius: 23px !important;
-  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.7) !important;
-  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.7) !important;
+  background-image:
+    linear-gradient(
+      138deg,
+      rgba(255,255,255,calc(var(--lg-glass-alpha) + .19)) 0%,
+      rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .72)) 47%,
+      rgba(var(--lg-glass-tint-rgb),calc(var(--lg-glass-alpha) * .22)) 100%
+    ),
+    var(--lg-image-widget-src, none) !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  border-radius: 30px !important;
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.05) !important;
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.8) contrast(1.05) !important;
   box-shadow:
-    0 14px 30px rgba(22,22,28,.095),
-    inset 0 1px 0 rgba(255,255,255,.98),
-    inset 0 -1px 0 rgba(255,255,255,.42) !important;
+    0 16px 34px rgba(22,22,28,.12),
+    inset 0 1px 0 rgba(255,255,255,.99),
+    inset 0 -1px 0 rgba(255,255,255,.48) !important;
 }
 html[data-theme="liquid-glass"] body.maomao-home .desktop-grid .ds-image::after {
   content: "";
