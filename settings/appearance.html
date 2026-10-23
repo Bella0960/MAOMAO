@@ -6,7 +6,7 @@
 <title>Appearance · 外观</title>
 <script src="../shared/js/font-loader.js?v=20261022v1"></script>
 <script src="../shared/js/wallpaper-store.js?v=20261023v1"></script>
-<script src="../shared/js/native-feel.js?v=20261023v9"></script>
+<script src="../shared/js/native-feel.js?v=20261023v10"></script>
 <script src="../shared/js/statusbar-control.js"></script>
 <style>
   :root {
@@ -182,6 +182,54 @@
   }
   .wallpaper-empty { font-size: 12px; color: var(--aux); }
   .wallpaper-actions { display: flex; gap: 10px; margin-bottom: 14px; }
+  .home-indicator-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 2px 3px;
+    margin-top: 3px;
+    border-top: 1px solid var(--line);
+  }
+  .home-indicator-copy { display: flex; flex-direction: column; gap: 4px; }
+  .home-indicator-copy strong { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .home-indicator-copy span { font-size: 11px; line-height: 1.45; color: var(--aux); }
+  .home-indicator-switch {
+    position: relative;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 29px;
+    display: inline-block;
+  }
+  .home-indicator-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .home-indicator-switch-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 99px;
+    background: #D8D8DE;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
+    transition: background .2s ease;
+  }
+  .home-indicator-switch-track::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,.16);
+    transition: transform .2s ease;
+  }
+  .home-indicator-switch input:checked + .home-indicator-switch-track { background: #333338; }
+  .home-indicator-switch input:checked + .home-indicator-switch-track::after { transform: translateX(19px); }
+  .home-indicator-switch input:focus-visible + .home-indicator-switch-track { outline: 2px solid #8E8E93; outline-offset: 3px; }
   .btn {
     flex: 1;
     height: 44px;
@@ -374,6 +422,16 @@
           <input type="file" id="wallpaperInput" accept="image/*" style="display:none;">
         </label>
         <button type="button" class="btn btn-secondary" id="resetWallpaperBtn">恢复默认</button>
+      </div>
+      <div class="home-indicator-setting">
+        <div class="home-indicator-copy">
+          <strong>底部小横条</strong>
+          <span>控制桌面最下方的横条显示或隐藏</span>
+        </div>
+        <label class="home-indicator-switch" aria-label="显示底部小横条">
+          <input type="checkbox" id="homeIndicatorToggle" checked>
+          <span class="home-indicator-switch-track"></span>
+        </label>
       </div>
     </section>
 
@@ -591,8 +649,22 @@
       });
     });
   }
+
+  /* ---- 桌面底部 Home Indicator 开关 ---- */
+  var homeIndicatorToggle = document.getElementById('homeIndicatorToggle');
+  var HOME_INDICATOR_KEY = 'settings_home_indicator_visible';
+  if (homeIndicatorToggle) {
+    try { homeIndicatorToggle.checked = localStorage.getItem(HOME_INDICATOR_KEY) !== '0'; }
+    catch (error) { homeIndicatorToggle.checked = true; }
+    homeIndicatorToggle.addEventListener('change', function () {
+      try { localStorage.setItem(HOME_INDICATOR_KEY, homeIndicatorToggle.checked ? '1' : '0'); } catch (error) {}
+      if (typeof window.__statusbarControlApply === 'function') window.__statusbarControlApply();
+      showToast(homeIndicatorToggle.checked ? '已显示桌面底部小横条' : '已隐藏桌面底部小横条');
+    });
+  }
+
 })();
 </script>
-<script src="../shared/js/liquid-glass-controls.js?v=20261023v10"></script>
+<script src="../shared/js/liquid-glass-controls.js?v=20261023v11"></script>
 </body>
 </html>
