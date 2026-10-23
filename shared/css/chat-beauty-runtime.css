@@ -68,6 +68,31 @@
   pointer-events: none;
 }
 
+#vbPreview .vbp-row.ta .vbp-bubble::after {
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:var(--chat-bubble-ta-tail-x,0px);
+  top:var(--chat-bubble-ta-tail-y,12px);
+  width:var(--chat-bubble-ta-tail-size,0px);
+  height:var(--chat-bubble-ta-tail-size,0px);
+  background:var(--chat-bubble-ta-bg,#fff);
+  clip-path:polygon(0 0,100% 0,100% 100%);
+  pointer-events:none;
+}
+#vbPreview .vbp-row.me .vbp-bubble::after {
+  content:"";
+  position:absolute;
+  z-index:0;
+  right:var(--chat-bubble-my-tail-x,0px);
+  top:var(--chat-bubble-my-tail-y,12px);
+  width:var(--chat-bubble-my-tail-size,0px);
+  height:var(--chat-bubble-my-tail-size,0px);
+  background:var(--chat-bubble-my-bg,#111);
+  clip-path:polygon(0 0,100% 0,0 100%);
+  pointer-events:none;
+}
+
 /* Multi-layer decorative stickers. Original images keep aspect ratio and are placed independently. */
 .chat-stage .msg-bubble,
 #vbPreview .vbp-bubble {
@@ -93,6 +118,7 @@
   user-select: none;
 }
 .chat-beauty-content {
+  display: block;
   position: relative;
   z-index: 1;
   min-width: 0;
