@@ -856,3 +856,94 @@ html[data-theme="liquid-glass"][data-icon-size="large"] body.maomao-home .dock-b
   text-align: center;
   margin: -7px 0 10px;
 }
+
+
+/* Long-press actions: keep only the lower-right floating glass menu. */
+body.maomao-home.home-editing .edit-mode-indicator {
+  display: none !important;
+}
+body.maomao-home.home-editing .status-bar {
+  position: relative;
+}
+.home-action-menu {
+  left: auto !important;
+  right: 14px !important;
+  bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+  width: min(222px, calc(100vw - 28px)) !important;
+  padding: 8px !important;
+  border-radius: 23px !important;
+  background: rgba(143,145,157,.27) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.25), rgba(125,127,141,.24) 54%, rgba(82,84,98,.20)) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  -webkit-backdrop-filter: blur(38px) saturate(1.5) contrast(1.03) !important;
+  backdrop-filter: blur(38px) saturate(1.5) contrast(1.03) !important;
+  box-shadow: 0 14px 32px rgba(20,20,28,.13), inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+.home-action-item {
+  border-radius: 14px !important;
+  min-height: 39px !important;
+  background: transparent !important;
+  color: rgba(255,255,255,.96) !important;
+}
+.home-action-item:active,
+.home-action-item:focus-visible {
+  background: rgba(255,255,255,.16) !important;
+}
+#homeActionCustomize {
+  background: rgba(255,255,255,.07) !important;
+  box-shadow: none !important;
+}
+
+/* Liquid Glass widgets: transparent material instead of opaque white tiles.
+   Image widgets keep their own chosen photo untouched. */
+html[data-theme="liquid-glass"] body.maomao-home .ds-widget:not(.ds-image) {
+  background-color: rgba(var(--lg-glass-tint-rgb, 208,210,218), .065) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.105), rgba(var(--lg-glass-tint-rgb,208,210,218),.04) 60%, rgba(255,255,255,.018)) !important;
+  border-color: transparent !important;
+  outline: none !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.45) !important;
+  backdrop-filter: blur(24px) saturate(1.45) !important;
+  box-shadow: 0 5px 18px rgba(24,26,36,.065), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock {
+  background-color: rgba(var(--lg-glass-tint-rgb,208,210,218),.045) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.07), rgba(var(--lg-glass-tint-rgb,208,210,218),.025)) !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.5) !important;
+  backdrop-filter: blur(28px) saturate(1.5) !important;
+  box-shadow: 0 4px 16px rgba(24,26,36,.045), inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-music {
+  background-color: rgba(var(--lg-glass-tint-rgb,208,210,218),.055) !important;
+  background-image: linear-gradient(145deg, rgba(255,255,255,.08), rgba(var(--lg-glass-tint-rgb,208,210,218),.035)) !important;
+  border: 0 !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.45) !important;
+  backdrop-filter: blur(24px) saturate(1.45) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-postcard {
+  background-color: rgba(var(--lg-glass-tint-rgb,208,210,218),.045) !important;
+  border: 0 !important;
+  box-shadow: 0 5px 17px rgba(24,26,36,.06) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-postcard .pc-bg-bottom {
+  background: linear-gradient(to bottom, rgba(255,255,255,.025), rgba(var(--lg-glass-tint-rgb,208,210,218),.045)) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-dialog {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .po-card {
+  background: rgba(255,255,255,.10) !important;
+  border: 0 !important;
+  box-shadow: 0 3px 9px rgba(24,26,36,.045) !important;
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-time {
+  color: rgba(28,29,36,.92) !important;
+  text-shadow: 0 1px 10px rgba(255,255,255,.12);
+}
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-week,
+html[data-theme="liquid-glass"] body.maomao-home .ds-clock .cl-date {
+  color: rgba(52,53,63,.70) !important;
+}
