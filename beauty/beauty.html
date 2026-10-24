@@ -291,81 +291,19 @@
 
 
   /* ===== Pinned live preview + independent settings scroll ===== */
-  .content{
-    flex:1 1 auto;
-    min-height:0;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    padding:12px 22px 100px;
-  }
+  .content{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:12px 22px 100px}
   #beautyTabs{flex:0 0 auto;margin-bottom:10px;padding-bottom:8px}
-  #tabVisual:not(.hide){
-    display:flex;
-    flex:1 1 auto;
-    flex-direction:column;
-    min-height:0;
-    overflow:hidden;
-    gap:9px;
-  }
-  #tabCss:not(.hide){
-    display:block;
-    flex:1 1 auto;
-    min-height:0;
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    padding-bottom:22px;
-  }
-  .vb-preview-dock{
-    position:relative;
-    z-index:8;
-    flex:0 0 auto;
-    min-width:0;
-    padding:0 0 9px;
-    background:#fff;
-  }
-  .vb-preview-modes{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    margin:0 0 8px;
-  }
-  .vb-preview-modes-label{
-    font:8px Arial,sans-serif;
-    letter-spacing:.18em;
-    color:#919198;
-  }
+  #tabVisual:not(.hide){display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;gap:9px}
+  #tabCss:not(.hide){display:block;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:22px}
+  .vb-preview-dock{position:relative;z-index:8;flex:0 0 auto;min-width:0;padding:0 0 9px;background:#fff}
+  .vb-preview-modes{display:flex;flex-direction:column;gap:7px;margin:0 0 8px}
+  .vb-preview-modes-label{font:8px Arial,sans-serif;letter-spacing:.18em;color:#919198}
   .vb-preview-mode-buttons{display:flex;gap:5px;align-items:center;flex-wrap:nowrap}
-  .vb-preview-mode{
-    min-width:0;
-    flex:1 1 0;
-    white-space:nowrap;
-    padding:7px 4px;
-    border:0;
-    border-radius:999px;
-    background:#F1F1F3;
-    color:#68686F;
-    font:10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    cursor:pointer;
-    transition:background .16s ease,color .16s ease;
-  }
+  .vb-preview-mode{min-width:0;flex:1 1 0;white-space:nowrap;padding:7px 4px;border:0;border-radius:999px;background:#F1F1F3;color:#68686F;font:10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer;transition:background .16s ease,color .16s ease}
   .vb-preview-mode.on{background:#111;color:#fff}
   .vb-preview-mode:active{opacity:.7}
-  #vbPreview.vb-preview{
-    position:relative;
-    top:auto;
-    z-index:auto;
-    margin:0;
-    box-shadow:0 3px 12px rgba(0,0,0,.055);
-  }
-  #vbPreview .vbp-stage{
-    min-height:0;
-    height:clamp(155px,21vh,205px);
-    max-height:205px;
-    overflow:hidden;
-    padding:10px 12px;
-    gap:7px;
-  }
+  #vbPreview.vb-preview{position:relative;top:auto;z-index:auto;margin:0;box-shadow:0 3px 12px rgba(0,0,0,.055)}
+  #vbPreview .vbp-stage{min-height:0;height:clamp(155px,21vh,205px);max-height:205px;overflow:hidden;padding:10px 12px;gap:7px}
   #vbPreview .vbp-row{gap:7px}
   #vbPreview .vbp-avatar{width:26px;height:26px;font-size:10px}
   #vbPreview .vbp-bubble{font-size:11px;line-height:1.4;padding:7px 10px}
@@ -376,30 +314,13 @@
   #vbPreview .vbp-novel-sample strong{font:22px Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.04em;margin:5px 0}
   #vbPreview .vbp-novel-sample p{font-size:10px;line-height:1.6;max-width:30em}
   #vbPreview .vbp-novel-meta{font:7px Arial,sans-serif;letter-spacing:.08em;opacity:.65;margin-top:7px}
-  #vbPreview.mode-redpacket .vbp-row,
-  #vbPreview.mode-transfer .vbp-row,
-  #vbPreview.mode-novel .vbp-row{display:none}
-  #vbPreview.mode-redpacket .vbp-special-samples,
-  #vbPreview.mode-transfer .vbp-special-samples{display:grid;grid-template-columns:minmax(0,1fr);gap:0;flex:1;min-height:0;align-content:center}
-  #vbPreview.mode-redpacket .vbp-pay.pay-card-red,
-  #vbPreview.mode-transfer .vbp-pay.is-transfer{display:flex;width:100%;min-height:96px;padding:13px 15px;gap:5px}
-  #vbPreview.mode-redpacket .vbp-pay.is-transfer,
-  #vbPreview.mode-redpacket .vbp-image,
-  #vbPreview.mode-transfer .vbp-pay.pay-card-red,
-  #vbPreview.mode-transfer .vbp-image{display:none!important}
+  #vbPreview.mode-redpacket .vbp-row,#vbPreview.mode-transfer .vbp-row,#vbPreview.mode-novel .vbp-row{display:none}
+  #vbPreview.mode-redpacket .vbp-special-samples,#vbPreview.mode-transfer .vbp-special-samples{display:grid;grid-template-columns:minmax(0,1fr);gap:0;flex:1;min-height:0;align-content:center}
+  #vbPreview.mode-redpacket .vbp-pay.pay-card-red,#vbPreview.mode-transfer .vbp-pay.is-transfer{display:flex;width:100%;min-height:96px;padding:13px 15px;gap:5px}
+  #vbPreview.mode-redpacket .vbp-pay.is-transfer,#vbPreview.mode-redpacket .vbp-image,#vbPreview.mode-transfer .vbp-pay.pay-card-red,#vbPreview.mode-transfer .vbp-image{display:none!important}
   #vbPreview.mode-novel .vbp-special-samples{display:none}
   #vbPreview.mode-novel .vbp-novel-sample{display:flex}
-  #vbSettingsScroll{
-    flex:1 1 auto;
-    min-height:0;
-    overflow-y:auto;
-    overflow-x:hidden;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-    padding:0 2px 24px 0;
-    scrollbar-width:thin;
-    scrollbar-color:#D0D0D5 transparent;
-  }
+  #vbSettingsScroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 2px 24px 0;scrollbar-width:thin;scrollbar-color:#D0D0D5 transparent}
   #vbSettingsScroll::-webkit-scrollbar{display:block;width:3px}
   #vbSettingsScroll::-webkit-scrollbar-thumb{background:#D0D0D5;border-radius:4px}
   #vbSettingsScroll>.field{margin-bottom:12px}
@@ -484,7 +405,6 @@
           <div class="vbp-novel-sample" id="vbPreviewNovel"><span class="vbp-novel-kicker">CHAPTER 01 / 午后</span><strong>雨停之前</strong><p>窗边落着一层很轻的光。你抬起头时，故事正好从这一句开始。</p><span class="vbp-novel-meta">细节叙事 · 实时样式预览</span></div>
         </div>
       </div>
-
       </div>
       <div class="vb-settings-scroll" id="vbSettingsScroll">
       <div class="field">
@@ -741,11 +661,7 @@
         <input type="file" id="vbBgFile" accept="image/*" style="display:none;">
         <div class="field-hint" id="vbBgHint">未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）</div>
       </div>      </div>
-clearVisualBg()">恢复默认</button>
-        </div>
-        <input type="file" id="vbBgFile" accept="image/*" style="display:none;">
-        <div class="field-hint" id="vbBgHint">未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）</div>
-      </div>
+
     </div>
 
     <!-- ============ Tab 2：深度自定义（原有 CSS 预设管理，原样保留） ============ -->
@@ -1077,7 +993,7 @@ document.getElementById('importFile').addEventListener('change', function(e){
   var draft = null;
   var activeTab = 'visual';
 
-  // 预览区独立固定在上方，只有设置区滚动；切换模式不会重置 draft。
+  // Keep the preview in a non-scrolling dock; only settings scroll independently.
   var previewModeButtons = document.querySelectorAll('#vbPreviewModes [data-preview-mode]');
   function setPreviewMode(mode) {
     if (!previewEl) return;
