@@ -289,6 +289,132 @@
   .vb-mini-hint{display:block;font-size:9px;color:#9a9aa1;margin-top:5px}
   @media(max-width:360px){.vb-advanced-grid{gap:14px 10px;padding:12px 10px}.vb-advanced-sides{grid-template-columns:1fr}.vb-copy-side{width:100%}.vb-decor-add-row{padding-left:10px;padding-right:10px}}
 
+
+  /* ===== Pinned live preview + independent settings scroll ===== */
+  .content{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    padding:12px 22px 100px;
+  }
+  #beautyTabs{flex:0 0 auto;margin-bottom:10px;padding-bottom:8px}
+  #tabVisual:not(.hide){
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+    gap:9px;
+  }
+  #tabCss:not(.hide){
+    display:block;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    padding-bottom:22px;
+  }
+  .vb-preview-dock{
+    position:relative;
+    z-index:8;
+    flex:0 0 auto;
+    min-width:0;
+    padding:0 0 9px;
+    background:#fff;
+  }
+  .vb-preview-modes{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    margin:0 0 8px;
+  }
+  .vb-preview-modes-label{
+    font:8px Arial,sans-serif;
+    letter-spacing:.18em;
+    color:#919198;
+  }
+  .vb-preview-mode-buttons{display:flex;gap:5px;align-items:center;flex-wrap:nowrap}
+  .vb-preview-mode{
+    min-width:0;
+    flex:1 1 0;
+    white-space:nowrap;
+    padding:7px 4px;
+    border:0;
+    border-radius:999px;
+    background:#F1F1F3;
+    color:#68686F;
+    font:10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    cursor:pointer;
+    transition:background .16s ease,color .16s ease;
+  }
+  .vb-preview-mode.on{background:#111;color:#fff}
+  .vb-preview-mode:active{opacity:.7}
+  #vbPreview.vb-preview{
+    position:relative;
+    top:auto;
+    z-index:auto;
+    margin:0;
+    box-shadow:0 3px 12px rgba(0,0,0,.055);
+  }
+  #vbPreview .vbp-stage{
+    min-height:0;
+    height:clamp(155px,21vh,205px);
+    max-height:205px;
+    overflow:hidden;
+    padding:10px 12px;
+    gap:7px;
+  }
+  #vbPreview .vbp-row{gap:7px}
+  #vbPreview .vbp-avatar{width:26px;height:26px;font-size:10px}
+  #vbPreview .vbp-bubble{font-size:11px;line-height:1.4;padding:7px 10px}
+  #vbPreview .vbp-time{padding:0 6px;font-size:7px}
+  #vbPreview .vbp-special-samples{display:none}
+  #vbPreview .vbp-novel-sample{display:none;flex:1;min-height:0;flex-direction:column;justify-content:center;padding:8px 12px;color:var(--chat-bubble-my-color,#fff);background:var(--chat-bubble-my-bg,#111);border-radius:var(--chat-bubble-my-radius,15px 15px 4px 15px)}
+  #vbPreview .vbp-novel-kicker{font:7px Arial,sans-serif;letter-spacing:.18em;opacity:.68}
+  #vbPreview .vbp-novel-sample strong{font:22px Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.04em;margin:5px 0}
+  #vbPreview .vbp-novel-sample p{font-size:10px;line-height:1.6;max-width:30em}
+  #vbPreview .vbp-novel-meta{font:7px Arial,sans-serif;letter-spacing:.08em;opacity:.65;margin-top:7px}
+  #vbPreview.mode-redpacket .vbp-row,
+  #vbPreview.mode-transfer .vbp-row,
+  #vbPreview.mode-novel .vbp-row{display:none}
+  #vbPreview.mode-redpacket .vbp-special-samples,
+  #vbPreview.mode-transfer .vbp-special-samples{display:grid;grid-template-columns:minmax(0,1fr);gap:0;flex:1;min-height:0;align-content:center}
+  #vbPreview.mode-redpacket .vbp-pay.pay-card-red,
+  #vbPreview.mode-transfer .vbp-pay.is-transfer{display:flex;width:100%;min-height:96px;padding:13px 15px;gap:5px}
+  #vbPreview.mode-redpacket .vbp-pay.is-transfer,
+  #vbPreview.mode-redpacket .vbp-image,
+  #vbPreview.mode-transfer .vbp-pay.pay-card-red,
+  #vbPreview.mode-transfer .vbp-image{display:none!important}
+  #vbPreview.mode-novel .vbp-special-samples{display:none}
+  #vbPreview.mode-novel .vbp-novel-sample{display:flex}
+  #vbSettingsScroll{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding:0 2px 24px 0;
+    scrollbar-width:thin;
+    scrollbar-color:#D0D0D5 transparent;
+  }
+  #vbSettingsScroll::-webkit-scrollbar{display:block;width:3px}
+  #vbSettingsScroll::-webkit-scrollbar-thumb{background:#D0D0D5;border-radius:4px}
+  #vbSettingsScroll>.field{margin-bottom:12px}
+  #vbSettingsScroll .vb-slider{margin-bottom:17px}
+  #vbSettingsScroll .vb-advanced{margin-top:14px}
+  #vbSettingsScroll .vb-advanced-heading{margin-bottom:12px}
+  @media(max-width:420px){
+    .content{padding:9px 16px 94px}
+    #beautyTabs{margin-bottom:7px}
+    .vb-preview-modes{gap:6px;margin-bottom:7px}
+    .vb-preview-mode{font-size:9px;padding:7px 2px}
+    #vbPreview .vbp-stage{height:clamp(150px,20vh,185px);padding:9px 10px;gap:6px}
+    #vbPreview .vbp-bubble{font-size:10px;padding:6px 8px}
+  }
+
 </style>
 </head>
 <body>
@@ -308,14 +434,16 @@
 
     <!-- ============ Tab 1：可视化调节 ============ -->
     <div class="tab-view" id="tabVisual">
-      <div class="field">
-        <label>配置对象</label>
-        <select id="vbScope">
-          <option value="global">全局默认配置</option>
-        </select>
-        <div class="field-hint" id="vbScopeHint">对所有角色生效；某个角色可以在下拉里单独覆盖全局。</div>
+      <div class="vb-preview-dock" id="vbPreviewDock">
+      <div class="vb-preview-modes" id="vbPreviewModes" role="group" aria-label="切换预览模式">
+        <span class="vb-preview-modes-label">PREVIEW MODE</span>
+        <div class="vb-preview-mode-buttons">
+          <button type="button" class="vb-preview-mode on" data-preview-mode="basic" aria-pressed="true">普通气泡</button>
+          <button type="button" class="vb-preview-mode" data-preview-mode="redpacket" aria-pressed="false">红包</button>
+          <button type="button" class="vb-preview-mode" data-preview-mode="transfer" aria-pressed="false">转账</button>
+          <button type="button" class="vb-preview-mode" data-preview-mode="novel" aria-pressed="false">小说</button>
+        </div>
       </div>
-
       <!-- 实时预览：类名与 chat-detail 同构，CSS 变量由 ChatBeauty.applyVars 注入 -->
       <div class="vb-preview" id="vbPreview">
         <div class="vbp-stage">
@@ -353,7 +481,18 @@
             </div>
             <div class="vbp-image" id="vbPreviewImage" aria-label="图片消息预览"><span>IMAGE MESSAGE</span></div>
           </div>
+          <div class="vbp-novel-sample" id="vbPreviewNovel"><span class="vbp-novel-kicker">CHAPTER 01 / 午后</span><strong>雨停之前</strong><p>窗边落着一层很轻的光。你抬起头时，故事正好从这一句开始。</p><span class="vbp-novel-meta">细节叙事 · 实时样式预览</span></div>
         </div>
+      </div>
+
+      </div>
+      <div class="vb-settings-scroll" id="vbSettingsScroll">
+      <div class="field">
+        <label>配置对象</label>
+        <select id="vbScope">
+          <option value="global">全局默认配置</option>
+        </select>
+        <div class="field-hint" id="vbScopeHint">对所有角色生效；某个角色可以在下拉里单独覆盖全局。</div>
       </div>
 
       <div class="vb-slider">
@@ -598,6 +737,11 @@
         <div class="vb-bg-actions">
           <button class="btn btn-secondary" type="button" onclick="document.getElementById('vbBgFile').click()">上传图片</button>
           <button class="btn btn-secondary" type="button" onclick="clearVisualBg()">恢复默认</button>
+        </div>
+        <input type="file" id="vbBgFile" accept="image/*" style="display:none;">
+        <div class="field-hint" id="vbBgHint">未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）</div>
+      </div>      </div>
+clearVisualBg()">恢复默认</button>
         </div>
         <input type="file" id="vbBgFile" accept="image/*" style="display:none;">
         <div class="field-hint" id="vbBgHint">未设置背景 · 上传时自动压缩到 800×1422 内（JPEG）</div>
@@ -932,6 +1076,26 @@ document.getElementById('importFile').addEventListener('change', function(e){
   var currentScope = 'global';
   var draft = null;
   var activeTab = 'visual';
+
+  // 预览区独立固定在上方，只有设置区滚动；切换模式不会重置 draft。
+  var previewModeButtons = document.querySelectorAll('#vbPreviewModes [data-preview-mode]');
+  function setPreviewMode(mode) {
+    if (!previewEl) return;
+    ['basic','redpacket','transfer','novel'].forEach(function (name) {
+      previewEl.classList.toggle('mode-' + name, name === mode);
+    });
+    previewModeButtons.forEach(function (button) {
+      var active = button.dataset.previewMode === mode;
+      button.classList.toggle('on', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+  previewModeButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      setPreviewMode(button.dataset.previewMode || 'basic');
+    });
+  });
+  setPreviewMode('basic');
 
   function readRoles() {
     try {
